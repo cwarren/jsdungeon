@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas UI Test</title>
+</head>
+<body>
+    <script type="module">
+        import { gameState } from "./gameplay.js";
+        import { resizeCanvas } from "./ui.js";
+
+        // Draw game on page load
+        resizeCanvas(gameState);
+
+        // Redraw game on window resize
+        window.addEventListener("resize", () => resizeCanvas(gameState));
+    </script>
+</body>
+</html>
