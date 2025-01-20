@@ -16,6 +16,8 @@ class GridCell {
         this.entryMovementCost = type.entryMovementCost;
         this.isOpaque = type.isOpaque;
         this.color = type.color;
+        this.structure = undefined;
+        this.entity = undefined;
         // console.log("created cell", this);
     }
 }

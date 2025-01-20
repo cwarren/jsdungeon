@@ -5,8 +5,9 @@ import { executeGameCommand } from "./gameCommands.js";
 
 // Define the level dimensions
 const levelDimensions = [
-  [60, 40], // Level 1: 20x20 grid
-  [30, 20]  // Level 2: 15x15 grid
+  [30, 20], 
+  [30, 20], 
+  [30, 20]  
 ];
 
 // Initialize the game state
@@ -152,7 +153,28 @@ function drawWorldLevelGrid(worldLevel) {
 
 // Stub functions for additional world level elements
 function drawWorldLevelStructures(worldLevel) {
-  // Placeholder for drawing structures
+  const cellSize = uiSettings.baseCellSize * uiSettings.zoomFactor;
+  const gridSpacing = uiSettings.gridCellSpacing;
+  const offsetX = (canvas.width - (worldLevel.levelWidth * (cellSize + gridSpacing))) / 2;
+  const offsetY = (canvas.height - (worldLevel.levelHeight * (cellSize + gridSpacing))) / 2;
+
+  // Draw all structures in the level
+  worldLevel.levelStructures.forEach(structure => {
+    drawStructureInWorldLevel(structure, offsetX, offsetY, cellSize, gridSpacing);
+  });
+}
+
+// Function to draw an entity in the world level
+function drawStructureInWorldLevel(structure, offsetX, offsetY, cellSize, gridSpacing) {
+  ctx.fillStyle = "white";
+  ctx.font = `${cellSize * 0.8}px Arial`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(
+    structure.displaySymbol,
+    offsetX + structure.x * (cellSize + gridSpacing) + cellSize / 2,
+    offsetY + structure.y * (cellSize + gridSpacing) + cellSize / 2
+  );
 }
 
 function drawWorldLevelItems(worldLevel) {

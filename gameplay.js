@@ -3,14 +3,14 @@ import { WorldLevel } from "./worldLevelClass.js";
 
 const gameState = {
   score: 0,
-  currentLevel: 1,
+  currentLevel: 0,
   isPlaying: false,
   world: [],
   avatar: null
 };
 
 function initializeGameState(levelDimensions) {
-  gameState.world = levelDimensions.map(([width, height], index) => new WorldLevel(index + 1, width, height));
+  gameState.world = levelDimensions.map(([width, height], index) => new WorldLevel(index, width, height));
   
   const firstLevel = gameState.world[0];
   const centerX = Math.floor(firstLevel.levelWidth / 2);
@@ -21,8 +21,13 @@ function initializeGameState(levelDimensions) {
   const avatarX = floorCell ? floorCell.x : centerX;
   const avatarY = floorCell ? floorCell.y : centerY;
   
-  gameState.avatar = new Entity(avatarX, avatarY, 1, "player", "@");
+  gameState.avatar = new Entity(avatarX, avatarY, 0, "player", "@");
+  firstLevel.addStairsDown();
 }
 
-export { gameState, initializeGameState };
+function getAvatarCell() {
+  return gameState.world[gameState.avatar.z].grid[gameState.avatar.x][gameState.avatar.y]
+}
+
+export { gameState, initializeGameState, getAvatarCell };
 

@@ -1,4 +1,4 @@
-import { gameState } from "./gameplay.js";
+import { gameState, getAvatarCell } from "./gameplay.js";
 
 function move(entity, dx, dy) {
     const currentLevel = gameState.world.find(level => level.levelNumber === entity.z);
@@ -38,5 +38,39 @@ function moveAvatar_DL() { move_DL(gameState.avatar); }
 function moveAvatar_D() { move_D(gameState.avatar); }
 function moveAvatar_DR() { move_DR(gameState.avatar); }
 
+function ascendStairs() {
+    const curCell = getAvatarCell();
+    const stairsUp = curCell.structure;
+    if (stairsUp && stairsUp.type == "STAIRS_UP") {
+        gameState.currentLevel--;
+        gameState.avatar.x = stairsUp.connectsTo.x;
+        gameState.avatar.y = stairsUp.connectsTo.y;
+        gameState.avatar.z = stairsUp.connectsTo.z;
+    } else {
+        console.log("cannot ascend - no stairs up");
+    }
+}
+function descendStairs() {
+    const curCell = getAvatarCell();
+    const stairsDown = curCell.structure;
+    if (stairsDown && stairsDown.type == "STAIRS_DOWN") {
+        gameState.currentLevel++;
+        const lowerWorldLevel = gameState.world[gameState.currentLevel]
+        if (! stairsDown.connectsTo) {
+            lowerWorldLevel.addStairsUpTo(stairsDown);
+            if (gameState.currentLevel < gameState.world.length -1) {
+                lowerWorldLevel.addStairsDown();
+            }
+        }
+        gameState.avatar.x = stairsDown.connectsTo.x;
+        gameState.avatar.y = stairsDown.connectsTo.y;
+        gameState.avatar.z = stairsDown.connectsTo.z;
+    } else {
+        console.log("cannot descend - no stairs down");
+    }
+}
+
+
 export { move, move_UL, move_U, move_UR, move_L, move_wait, move_R, move_DL, move_D, move_DR,
-         moveAvatar_UL, moveAvatar_U, moveAvatar_UR, moveAvatar_L, moveAvatar_wait, moveAvatar_R, moveAvatar_DL, moveAvatar_D, moveAvatar_DR };
+         moveAvatar_UL, moveAvatar_U, moveAvatar_UR, moveAvatar_L, moveAvatar_wait, moveAvatar_R, moveAvatar_DL, moveAvatar_D, moveAvatar_DR,
+         ascendStairs, descendStairs };
