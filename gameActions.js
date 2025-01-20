@@ -1,5 +1,6 @@
 import { gameState, getAvatarCell } from "./gameplay.js";
 
+
 function move(entity, dx, dy) {
     const currentLevel = gameState.world.find(level => level.levelNumber === entity.z);
     if (!currentLevel) return;
@@ -28,15 +29,15 @@ function move_DL(entity) { move(entity, -1, 1); }
 function move_D(entity) { move(entity, 0, 1); }
 function move_DR(entity) { move(entity, 1, 1); }
 
-function moveAvatar_UL() { move_UL(gameState.avatar); }
-function moveAvatar_U() { move_U(gameState.avatar); console.log("moving avatar U"); }
-function moveAvatar_UR() { move_UR(gameState.avatar); }
-function moveAvatar_L() { move_L(gameState.avatar); }
-function moveAvatar_wait() { move_wait(gameState.avatar); }
-function moveAvatar_R() { move_R(gameState.avatar); }
-function moveAvatar_DL() { move_DL(gameState.avatar); }
-function moveAvatar_D() { move_D(gameState.avatar); }
-function moveAvatar_DR() { move_DR(gameState.avatar); }
+function moveAvatar_UL() { move_UL(gameState.avatar); gameState.avatar.determineVisibleCells();}
+function moveAvatar_U() { move_U(gameState.avatar); gameState.avatar.determineVisibleCells(); }
+function moveAvatar_UR() { move_UR(gameState.avatar); gameState.avatar.determineVisibleCells();}
+function moveAvatar_L() { move_L(gameState.avatar); gameState.avatar.determineVisibleCells();}
+function moveAvatar_wait() { move_wait(gameState.avatar); gameState.avatar.determineVisibleCells();}
+function moveAvatar_R() { move_R(gameState.avatar); gameState.avatar.determineVisibleCells();}
+function moveAvatar_DL() { move_DL(gameState.avatar); gameState.avatar.determineVisibleCells();}
+function moveAvatar_D() { move_D(gameState.avatar); gameState.avatar.determineVisibleCells();}
+function moveAvatar_DR() { move_DR(gameState.avatar); gameState.avatar.determineVisibleCells();}
 
 function ascendStairs() {
     const curCell = getAvatarCell();
@@ -46,6 +47,7 @@ function ascendStairs() {
         gameState.avatar.x = stairsUp.connectsTo.x;
         gameState.avatar.y = stairsUp.connectsTo.y;
         gameState.avatar.z = stairsUp.connectsTo.z;
+        gameState.avatar.determineVisibleCells(gameState);
     } else {
         console.log("cannot ascend - no stairs up");
     }
@@ -68,6 +70,7 @@ function descendStairs() {
         gameState.avatar.x = stairsDown.connectsTo.x;
         gameState.avatar.y = stairsDown.connectsTo.y;
         gameState.avatar.z = stairsDown.connectsTo.z;
+        gameState.avatar.determineVisibleCells(gameState);
     } else {
         console.log("cannot descend - no stairs down");
     }

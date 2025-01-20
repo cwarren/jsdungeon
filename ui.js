@@ -125,8 +125,6 @@ function drawWorldLevel(worldLevel) {
 //   }
 
 function drawGridCell(cell, offsetX, offsetY, cellSize, gridSpacing) {
-    // Set fill color based on terrain type
-    // console.log("drawing cell ",cell);
     ctx.fillStyle = cell.color;
     ctx.fillRect(
       offsetX + cell.x * (cellSize + gridSpacing),
@@ -134,6 +132,18 @@ function drawGridCell(cell, offsetX, offsetY, cellSize, gridSpacing) {
       cellSize,
       cellSize
     );
+}
+
+function drawGridCellFaint(cell, offsetX, offsetY, cellSize, gridSpacing) {
+  ctx.fillStyle = cell.color;
+  ctx.globalAlpha = 0.6;
+  ctx.fillRect(
+    offsetX + cell.x * (cellSize + gridSpacing),
+    offsetY + cell.y * (cellSize + gridSpacing),
+    cellSize,
+    cellSize
+  );
+  ctx.globalAlpha = 1;
 }
 
 // Function to draw the game grid
@@ -146,9 +156,16 @@ function drawWorldLevelGrid(worldLevel) {
     for (let col = 0; col < worldLevel.levelWidth; col++) {
         for (let row = 0; row < worldLevel.levelHeight; row++) {   
             // console.log(`drawing cell at ${col}, ${row}`, worldLevel.grid[col][row]);
-            if (worldLevel.grid[col][row].isViewable) {
-              drawGridCell(worldLevel.grid[col][row], offsetX, offsetY, cellSize, gridSpacing);
+            const cell = worldLevel.grid[col][row];
+            if (gameState.avatar.visibleCells.has(cell)) {
+                drawGridCell(cell, offsetX, offsetY, cellSize, gridSpacing);
+            } else if (gameState.avatar.seenCells.has(cell)) {
+                drawGridCellFaint(cell, offsetX, offsetY, cellSize, gridSpacing);
             }
+
+            // if (worldLevel.grid[col][row].isViewable) {
+            //   drawGridCell(worldLevel.grid[col][row], offsetX, offsetY, cellSize, gridSpacing);
+            // }
         }
     }
   }
@@ -162,7 +179,10 @@ function drawWorldLevelStructures(worldLevel) {
 
   // Draw all structures in the level
   worldLevel.levelStructures.forEach(structure => {
-    drawStructureInWorldLevel(structure, offsetX, offsetY, cellSize, gridSpacing);
+    const structureCell = structure.getCell();
+    if (gameState.avatar.visibleCells.has(structureCell) || gameState.avatar.seenCells.has(structureCell)) {
+      drawStructureInWorldLevel(structure, offsetX, offsetY, cellSize, gridSpacing);
+    }
   });
 }
 
