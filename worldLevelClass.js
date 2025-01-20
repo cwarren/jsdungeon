@@ -1,4 +1,5 @@
 import { GridCell } from "./gridCellClass.js";
+import { Structure } from "./structureClass.js";
 
 const SUBDIVIDE_MIN_WIDTH = 6;
 const SUBDIVIDE_MIN_HEIGHT = 6;
@@ -14,6 +15,23 @@ class WorldLevel {
         this.levelHeight = levelHeight;
         this.grid = this.generateGrid_roomsAndCorridors_subdivide();
         this.levelEntities = [];
+        this.levelStructures = [];
+    }
+
+    addStairsDown() {
+        const stairsDownCell = this.getRandomEmptyCellOfTerrain("FLOOR",this.grid);
+        const stairsDown = new Structure(stairsDownCell.x,stairsDownCell.y,this.levelNumber,'STAIRS_DOWN','>');
+        stairsDownCell.structure = stairsDown;
+        this.levelStructures.push(stairsDown);
+    }
+
+    addStairsUpTo(stairsDown) {
+        const stairsUpCell = this.getRandomEmptyCellOfTerrain("FLOOR",this.grid);
+        const stairsUp = new Structure(stairsUpCell.x,stairsUpCell.y,this.levelNumber,'STAIRS_UP','<');
+        stairsUpCell.structure = stairsUp;
+        stairsDown.connectsTo = stairsUp;
+        stairsUp.connectsTo = stairsDown;
+        this.levelStructures.push(stairsUp);
     }
 
     generateGrid_empty(startingTerrain = "FLOOR") {
@@ -401,6 +419,32 @@ class WorldLevel {
             }
         }
         return null; // No matching cell found
+    }
+
+    getRandomCellOfTerrain(terrain, grid) {
+        let x = Math.floor(Math.random() * this.levelWidth);
+        let y = Math.floor(Math.random() * this.levelHeight);
+        return this.findCellTerrainNearPlace(terrain, x, y, grid);
+    }
+
+    findEmptyCellTerrainNearPlace(terrain, startX, startY, grid) {
+        const searchRadius = Math.max(this.levelWidth, this.levelHeight);
+        for (let radius = 0; radius < searchRadius; radius++) {
+            for (let y = Math.max(0, startY - radius); y <= Math.min(this.levelHeight - 1, startY + radius); y++) {
+                for (let x = Math.max(0, startX - radius); x <= Math.min(this.levelWidth - 1, startX + radius); x++) {
+                    if (grid[x][y].terrain === terrain && !grid[x][y].structure && !grid[x][y].entity) {
+                        return grid[x][y];
+                    }
+                }
+            }
+        }
+        return null; // No matching cell found
+    }
+
+    getRandomEmptyCellOfTerrain(terrain, grid) {
+        let x = Math.floor(Math.random() * this.levelWidth);
+        let y = Math.floor(Math.random() * this.levelHeight);
+        return this.findEmptyCellTerrainNearPlace(terrain, x, y, grid);
     }
 }
 

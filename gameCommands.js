@@ -1,4 +1,4 @@
-import { moveAvatar_UL, moveAvatar_U, moveAvatar_UR, moveAvatar_L, moveAvatar_wait, moveAvatar_R, moveAvatar_DL, moveAvatar_D, moveAvatar_DR } from "./gameActions.js";
+import { moveAvatar_UL, moveAvatar_U, moveAvatar_UR, moveAvatar_L, moveAvatar_wait, moveAvatar_R, moveAvatar_DL, moveAvatar_D, moveAvatar_DR, ascendStairs, descendStairs } from "./gameActions.js";
 // import { gameState } from "./gameplay.js";
 import { pushUIState, popUIState, setUIState, getCurrentUIState } from "./ui.js";
 
@@ -13,6 +13,9 @@ const gameActionsMap = {
     MOVE_DL: { name: "Move Down-Left", description: "Move diagonally down-left", action: moveAvatar_DL },
     MOVE_D: { name: "Move Down", description: "Move down", action: moveAvatar_D },
     MOVE_DR: { name: "Move Down-Right", description: "Move diagonally down-right", action: moveAvatar_DR },
+
+    TAKE_STAIRS_UP: { name: "Take stairs up", description: "Move to a higher level", action: ascendStairs },
+    TAKE_STAIRS_DOWN: { name: "Take stairs down", description: "Move to a lower level", action: descendStairs },
 };
 
 const keyBinding = {
@@ -25,6 +28,9 @@ const keyBinding = {
     "1": "MOVE_DL",
     "2": "MOVE_D",
     "3": "MOVE_DR",
+
+    "<": "TAKE_STAIRS_UP",
+    ">": "TAKE_STAIRS_DOWN",
 
     "C": "PUSH_CHARACTER_SHEET", 
     "I": "PUSH_INVENTORY_SCREEN",
