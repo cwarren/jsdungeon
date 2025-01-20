@@ -6,7 +6,7 @@ import { executeCommand } from "./gameCommands.js";
 // Define the level dimensions
 const levelDimensions = [
   [60, 40], // Level 1: 20x20 grid
-//   [15, 15]  // Level 2: 15x15 grid
+  [30, 20]  // Level 2: 15x15 grid
 ];
 
 // Initialize the game state

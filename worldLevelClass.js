@@ -1,11 +1,18 @@
 import { GridCell } from "./gridCellClass.js";
 
+const SUBDIVIDE_MIN_WIDTH = 6;
+const SUBDIVIDE_MIN_HEIGHT = 6;
+const SUBDIVIDE_MIN_DEPTH = 4;
+const SUBDIVIDE_MAX_DEPTH = 5;
+const MIN_ROOM_WIDTH = 3;
+const MIN_ROOM_HEIGHT = 3;
+
 class WorldLevel {
     constructor(levelNumber, levelWidth, levelHeight) {
         this.levelNumber = levelNumber;
         this.levelWidth = levelWidth;
         this.levelHeight = levelHeight;
-        this.grid = this.generateGrid_nest();
+        this.grid = this.generateGrid_roomsAndCorridors_subdivide();
         this.levelEntities = [];
     }
 
@@ -236,8 +243,8 @@ class WorldLevel {
         const roomSizeBasis = Math.floor(Math.min(this.levelWidth, this.levelHeight) / 5);
 
         for (let i = 0; i < numRooms; i++) {
-            const roomWidth = Math.floor(Math.random() * roomSizeBasis) + 3;
-            const roomHeight = Math.floor(Math.random() * roomSizeBasis) + 3;
+            const roomWidth = Math.floor(Math.random() * roomSizeBasis) + MIN_ROOM_WIDTH;
+            const roomHeight = Math.floor(Math.random() * roomSizeBasis) + MIN_ROOM_HEIGHT;
             let roomStartX = Math.floor(Math.random() * (this.levelWidth - roomWidth - 1)) + 1;
             let roomStartY = Math.floor(Math.random() * (this.levelHeight - roomHeight - 1)) + 1;
             while (grid[roomStartX][roomStartY].terrain == "FLOOR") {
@@ -277,71 +284,71 @@ class WorldLevel {
         return grid;
     }
 
+    
     generateGrid_roomsAndCorridors_subdivide() {
-        let grid = this.generateGrid_empty();
-        
-//!!!!!!!!!!!!!!!!!!! x and y flipped in grid refs
+        let grid = this.generateGrid_empty("WALL");
 
-        // // Start with all WALLs
-        // for (let y = 0; y < this.levelHeight; y++) {
-        //     for (let x = 0; x < this.levelWidth; x++) {
-        //         grid[y][x] = new GridCell(x, y, this, "WALL");
-        //     }
-        // }
+        let rooms = [];
+        const subdivideDepth = Math.floor(Math.random() * (SUBDIVIDE_MAX_DEPTH - SUBDIVIDE_MIN_DEPTH + 1)) + SUBDIVIDE_MIN_DEPTH;
 
-        // let rooms = [];
+        function subdivide(x, y, width, height, depth = 0) {
+            if (width < SUBDIVIDE_MIN_WIDTH || height < SUBDIVIDE_MIN_HEIGHT) return;
 
-        // function subdivide(x, y, width, height, depth = 0) {
-        //     if (width < 6 || height < 6) return;
+            const minRoomWidth = Math.max(MIN_ROOM_WIDTH,Math.floor(width * .4));
+            const minRoomHeigth = Math.max(MIN_ROOM_HEIGHT,Math.floor(height * .4));
             
-        //     const roomWidth = Math.max(3, Math.floor(Math.random() * (width - 2)));
-        //     const roomHeight = Math.max(3, Math.floor(Math.random() * (height - 2)));
-        //     const roomX = x + Math.floor(Math.random() * (width - roomWidth));
-        //     const roomY = y + Math.floor(Math.random() * (height - roomHeight));
+            const roomWidth = Math.max(minRoomWidth, Math.floor(Math.random() * (width - 3)));
+            const roomHeight = Math.max(minRoomHeigth, Math.floor(Math.random() * (height - 3)));
+            const roomX = x + Math.floor(Math.random() * (width - roomWidth));
+            const roomY = y + Math.floor(Math.random() * (height - roomHeight));
             
-        //     for (let ry = roomY; ry < roomY + roomHeight; ry++) {
-        //         for (let rx = roomX; rx < roomX + roomWidth; rx++) {
-        //             grid[ry][rx] = new GridCell(rx, ry, this, "FLOOR");
-        //         }
-        //     }
-        //     rooms.push({ x: roomX, y: roomY, width: roomWidth, height: roomHeight });
+            let addedRoom = false;
+            if ((depth > 1) && (Math.random() < .66)) {
+                for (let rx = roomX; rx < roomX + roomWidth; rx++) {
+                    for (let ry = roomY; ry < roomY + roomHeight; ry++) {
+                        grid[rx][ry] = new GridCell(rx, ry, this, "FLOOR");
+                    }
+                }
+                rooms.push({ x: roomX, y: roomY, width: roomWidth, height: roomHeight });
+                addedRoom = true;
+            }
 
-        //     if (depth < 3) {
-        //         const splitVertical = width > height;
-        //         const splitPoint = splitVertical
-        //             ? x + Math.floor(width / 2)
-        //             : y + Math.floor(height / 2);
+            if ((depth < subdivideDepth) && (!addedRoom || Math.random() < .5)) {
+                const splitVertical = width > height;
+                const splitPoint = splitVertical
+                    ? x + Math.floor(width / 2)
+                    : y + Math.floor(height / 2);
                 
-        //         if (splitVertical) {
-        //             subdivide(x, y, splitPoint - x, height, depth + 1);
-        //             subdivide(splitPoint + 1, y, x + width - splitPoint - 1, height, depth + 1);
-        //         } else {
-        //             subdivide(x, y, width, splitPoint - y, depth + 1);
-        //             subdivide(x, splitPoint + 1, width, y + height - splitPoint - 1, depth + 1);
-        //         }
-        //     }
-        // }
+                if (splitVertical) {
+                    subdivide(x, y, splitPoint - x, height, depth + 1);
+                    subdivide(splitPoint + 1, y, x + width - splitPoint - 1, height, depth + 1);
+                } else {
+                    subdivide(x, y, width, splitPoint - y, depth + 1);
+                    subdivide(x, splitPoint + 1, width, y + height - splitPoint - 1, depth + 1);
+                }
+            }
+        }
 
-        // subdivide(1, 1, this.levelWidth - 2, this.levelHeight - 2);
+        subdivide(1, 1, this.levelWidth - 2, this.levelHeight - 2);
 
-        // // Connect rooms with corridors
-        // for (let i = 1; i < rooms.length; i++) {
-        //     const prevRoom = rooms[i - 1];
-        //     const currRoom = rooms[i];
-        //     let x = prevRoom.x + Math.floor(prevRoom.width / 2);
-        //     let y = prevRoom.y + Math.floor(prevRoom.height / 2);
-        //     let targetX = currRoom.x + Math.floor(currRoom.width / 2);
-        //     let targetY = currRoom.y + Math.floor(currRoom.height / 2);
+        // Connect rooms with corridors
+        for (let i = 1; i < rooms.length; i++) {
+            const prevRoom = rooms[i - 1];
+            const currRoom = rooms[i];
+            let x = prevRoom.x + Math.floor(prevRoom.width / 2);
+            let y = prevRoom.y + Math.floor(prevRoom.height / 2);
+            let targetX = currRoom.x + Math.floor(currRoom.width / 2);
+            let targetY = currRoom.y + Math.floor(currRoom.height / 2);
             
-        //     while (x !== targetX) {
-        //         grid[y][x] = new GridCell(x, y, this, "FLOOR");
-        //         x += x < targetX ? 1 : -1;
-        //     }
-        //     while (y !== targetY) {
-        //         grid[y][x] = new GridCell(x, y, this, "FLOOR");
-        //         y += y < targetY ? 1 : -1;
-        //     }
-        // }
+            while (x !== targetX) {
+                grid[x][y] = new GridCell(x, y, this, "FLOOR");
+                x += x < targetX ? 1 : -1;
+            }
+            while (y !== targetY) {
+                grid[x][y] = new GridCell(x, y, this, "FLOOR");
+                y += y < targetY ? 1 : -1;
+            }
+        }
         
         return grid;
     }
@@ -354,9 +361,6 @@ class WorldLevel {
 
     generateGrid_puddles(puddleDensity = 0.12, puddleMaxSize = 3) {
         let grid = this.generateGrid_empty();
-        console.log("empty grid", grid);
-        // let puddleCell = new GridCell(0, 1, this, "WATER_SHALLOW");
-        // grid[0][1] = new GridCell(0, 1, this, "WATER_SHALLOW");
 
         const numPuddles = Math.floor(this.levelWidth * this.levelHeight * puddleDensity);
         for (let i = 0; i < numPuddles; i++) {
