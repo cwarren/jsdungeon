@@ -1,7 +1,9 @@
 import { moveAvatar_UL, moveAvatar_U, moveAvatar_UR, moveAvatar_L, moveAvatar_wait, moveAvatar_R, moveAvatar_DL, moveAvatar_D, moveAvatar_DR } from "./gameActions.js";
-import { gameState } from "./gameplay.js";
+// import { gameState } from "./gameplay.js";
+import { pushUIState, popUIState, setUIState, getCurrentUIState } from "./ui.js";
 
-const actionsMap = {
+
+const gameActionsMap = {
     MOVE_UL: { name: "Move Up-Left", description: "Move diagonally up-left", action: moveAvatar_UL },
     MOVE_U: { name: "Move Up", description: "Move up", action: moveAvatar_U },
     MOVE_UR: { name: "Move Up-Right", description: "Move diagonally up-right", action: moveAvatar_UR },
@@ -23,16 +25,44 @@ const keyBinding = {
     "1": "MOVE_DL",
     "2": "MOVE_D",
     "3": "MOVE_DR",
+
+    "C": "PUSH_CHARACTER_SHEET", 
+    "I": "PUSH_INVENTORY_SCREEN",
+    "E": "PUSH_EQUIPMENT_SCREEN",
+    "M": "PUSH_MAP_SCREEN",
+    "G": "PUSH_GAME_META",
+    "Escape": "POP_UI_STATE",  // Close the current UI screen
 };
 
-function executeCommand(key) {
+function executeGameCommand(key) {
     const actionKey = keyBinding[key];
-    if (actionKey && actionsMap[actionKey]) {
-        console.log(`Executing action: ${actionsMap[actionKey].name}`);
-        actionsMap[actionKey].action();
+    if (actionKey && gameActionsMap[actionKey]) {
+        console.log(`Executing action: ${gameActionsMap[actionKey].name}`);
+        gameActionsMap[actionKey].action();
+    } else if (actionKey) {
+        switch (actionKey) {
+            case "PUSH_CHARACTER_SHEET":
+                pushUIState("CHARACTER_SHEET");
+                break;
+            case "PUSH_INVENTORY_SCREEN":
+                pushUIState("INVENTORY");
+                break;
+            case "PUSH_EQUIPMENT_SCREEN":
+                pushUIState("EQUIPMENT");
+                break;
+            case "PUSH_MAP_SCREEN":
+                pushUIState("MAP_SCREEN");
+                break;
+            case "PUSH_GAME_META":
+                pushUIState("GAME_META");
+                break;
+            case "POP_UI_STATE":
+                popUIState();
+                break;
+        }
     } else {
         console.log(`No action bound for key: ${key}`);
     }
 }
 
-export { executeCommand, actionsMap, keyBinding };
+export { executeGameCommand as executeGameCommand, gameActionsMap, keyBinding };

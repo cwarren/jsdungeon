@@ -1,5 +1,5 @@
 import { gameState, initializeGameState } from "./gameplay.js";
-import { executeCommand } from "./gameCommands.js";
+import { executeGameCommand } from "./gameCommands.js";
 
 // On page load, initialize the game state, then draw it
 
@@ -32,6 +32,34 @@ const uiSettings = {
     gridCellSpacing: 1
 };
 
+let uiStateStack = ["GAMEPLAY"];  // Stack starts with gameplay as the default state
+
+// Function to get the current UI state
+function getCurrentUIState() {
+    return uiStateStack.length > 0 ? uiStateStack[uiStateStack.length - 1] : "GAMEPLAY";
+}
+
+// Function to push a new state onto the stack
+function pushUIState(newState) {
+    uiStateStack.push(newState);
+    resizeCanvas();  // Redraw to reflect new state
+}
+
+// Function to pop the top state off the stack
+function popUIState() {
+    if (uiStateStack.length > 1) {  // Prevent popping the last state
+        uiStateStack.pop();
+        resizeCanvas();  // Redraw to reflect new state
+    }
+}
+
+// Function to clear the stack and set a single state
+function setUIState(newState) {
+    uiStateStack = [newState];
+    resizeCanvas();  // Redraw to reflect new state
+}
+
+
 // Avatar movement path
 let avatarMovementPath = [];
 
@@ -40,13 +68,39 @@ function resizeCanvas() {
   canvas.width = window.innerWidth * 0.9;
   canvas.height = window.innerHeight * 0.9;
   drawUI();
-  drawGame(gameState);
 }
 
 // Draw the UI function (blank black canvas)
 function drawUI() {
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  switch (getCurrentUIState()) {
+    case "GAMEPLAY":
+      drawGame(gameState);
+      break;
+    case "CHARACTER_SHEET":
+      drawCharacterSheet(gameState);
+      break;
+    case "INVENTORY":
+      drawInventory(gameState);
+      break;
+    case "EQUIPMENT":
+      drawEquipment(gameState);
+      break;
+    case "GAME_META":
+      drawGameMeta();
+      break;
+    case "PROSE_SECTION":
+      drawProseSection(gameState);
+      break;
+    case "MAP_SCREEN":
+      drawMapScreen(gameState);
+      break;
+    case "CUSTOM_GRAPHICS":
+      drawCustomGraphics(gameState);
+      break;
+  }
 }
 
 // Function to draw the world level
@@ -203,7 +257,7 @@ let pressedKeys = new Set();
 window.addEventListener("keydown", (event) => {
   if (!pressedKeys.has(event.key)) {
       pressedKeys.add(event.key);
-      executeCommand(event.key);
+      executeGameCommand(event.key);
       resizeCanvas(); // Redraw game after executing a command
   }
 });
@@ -311,10 +365,52 @@ function drawGame(gameState) {
   drawWorldLevel(currentLevel);
 }
 
+function drawCharacterSheet() {
+  ctx.fillStyle = "white";
+  ctx.font = "20px Arial";
+  ctx.fillText("ui state: CHARACTER_SHEET", 50, 50);
+}
+
+function drawInventory() {
+  ctx.fillStyle = "white";
+  ctx.font = "20px Arial";
+  ctx.fillText("ui state: INVENTORY", 50, 50);
+}
+
+function drawEquipment() {
+  ctx.fillStyle = "white";
+  ctx.font = "20px Arial";
+  ctx.fillText("ui state: EQUIPMENT", 50, 50);
+}
+
+function drawGameMeta() {
+  ctx.fillStyle = "white";
+  ctx.font = "20px Arial";
+  ctx.fillText("ui state: GAME_META", 50, 50);
+}
+
+function drawProseSection() {
+  ctx.fillStyle = "white";
+  ctx.font = "20px Arial";
+  ctx.fillText("ui state: PROSE_SECTION", 50, 50);
+}
+
+function drawMapScreen() {
+  ctx.fillStyle = "white";
+  ctx.font = "20px Arial";
+  ctx.fillText("ui state: MAP_SCREEN", 50, 50);
+}
+
+function drawCustomGraphics() {
+  ctx.fillStyle = "white";
+  ctx.font = "20px Arial";
+  ctx.fillText("ui state: CUSTOM_GRAPHICS", 50, 50);
+}
+
 // Adjust canvas size and redraw game on window resize
 window.addEventListener("resize", resizeCanvas);
 
 // Now that gameState and canvas and such are set up, render the game
 resizeCanvas();
 
-export { resizeCanvas, drawGame, uiSettings };
+export { resizeCanvas, drawGame, uiSettings, pushUIState, popUIState, setUIState, getCurrentUIState };
