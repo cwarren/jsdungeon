@@ -145,8 +145,10 @@ function drawWorldLevelGrid(worldLevel) {
   
     for (let col = 0; col < worldLevel.levelWidth; col++) {
         for (let row = 0; row < worldLevel.levelHeight; row++) {   
-            // console.log(`drawing cell at ${col}, ${row}`, worldLevel.grid[col][row]);     
-            drawGridCell(worldLevel.grid[col][row], offsetX, offsetY, cellSize, gridSpacing);
+            // console.log(`drawing cell at ${col}, ${row}`, worldLevel.grid[col][row]);
+            if (worldLevel.grid[col][row].isViewable) {
+              drawGridCell(worldLevel.grid[col][row], offsetX, offsetY, cellSize, gridSpacing);
+            }
         }
     }
   }
@@ -257,6 +259,7 @@ canvas.addEventListener("click", (event) => {
         // console.log(`###### clicked at ${col} ${row}`);
         const clickedCell = currentLevel.grid[col][row];
         console.log("Clicked Cell:", clickedCell);
+        console.log("Clicked Cell Adjacencies:", clickedCell.getAdjacentCells());
     
         // Check if the avatar is in the clicked cell
         const avatar = gameState.avatar;
