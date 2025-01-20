@@ -16,6 +16,7 @@ class GridCell {
         this.entryMovementCost = type.entryMovementCost;
         this.isOpaque = type.isOpaque;
         this.isViewable = ! this.isOpaque; // cells are viewable if they are not opaque or are next to a non-opaque cell - the latter has to be calculated in a pass through during level generation
+        this.isVisible = false;
         this.color = type.color;
         this.structure = undefined;
         this.entity = undefined;
