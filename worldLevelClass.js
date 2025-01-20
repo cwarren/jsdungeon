@@ -14,6 +14,7 @@ class WorldLevel {
         this.levelWidth = levelWidth;
         this.levelHeight = levelHeight;
         this.grid = this.generateGrid_roomsAndCorridors_subdivide();
+        this.determineCellViewability();
         this.levelEntities = [];
         this.levelStructures = [];
     }
@@ -309,7 +310,7 @@ class WorldLevel {
         let rooms = [];
         const subdivideDepth = Math.floor(Math.random() * (SUBDIVIDE_MAX_DEPTH - SUBDIVIDE_MIN_DEPTH + 1)) + SUBDIVIDE_MIN_DEPTH;
 
-        function subdivide(x, y, width, height, depth = 0) {
+        function subdivide(worldLevel, x, y, width, height, depth = 0) {
             if (width < SUBDIVIDE_MIN_WIDTH || height < SUBDIVIDE_MIN_HEIGHT) return;
 
             const minRoomWidth = Math.max(MIN_ROOM_WIDTH,Math.floor(width * .4));
@@ -324,7 +325,7 @@ class WorldLevel {
             if ((depth > 1) && (Math.random() < .66)) {
                 for (let rx = roomX; rx < roomX + roomWidth; rx++) {
                     for (let ry = roomY; ry < roomY + roomHeight; ry++) {
-                        grid[rx][ry] = new GridCell(rx, ry, this, "FLOOR");
+                        grid[rx][ry] = new GridCell(rx, ry, worldLevel, "FLOOR");
                     }
                 }
                 rooms.push({ x: roomX, y: roomY, width: roomWidth, height: roomHeight });
@@ -338,16 +339,16 @@ class WorldLevel {
                     : y + Math.floor(height / 2);
                 
                 if (splitVertical) {
-                    subdivide(x, y, splitPoint - x, height, depth + 1);
-                    subdivide(splitPoint + 1, y, x + width - splitPoint - 1, height, depth + 1);
+                    subdivide(worldLevel, x, y, splitPoint - x, height, depth + 1);
+                    subdivide(worldLevel, splitPoint + 1, y, x + width - splitPoint - 1, height, depth + 1);
                 } else {
-                    subdivide(x, y, width, splitPoint - y, depth + 1);
-                    subdivide(x, splitPoint + 1, width, y + height - splitPoint - 1, depth + 1);
+                    subdivide(worldLevel, x, y, width, splitPoint - y, depth + 1);
+                    subdivide(worldLevel, x, splitPoint + 1, width, y + height - splitPoint - 1, depth + 1);
                 }
             }
         }
 
-        subdivide(1, 1, this.levelWidth - 2, this.levelHeight - 2);
+        subdivide(this, 1, 1, this.levelWidth - 2, this.levelHeight - 2);
 
         // Connect rooms with corridors
         for (let i = 1; i < rooms.length; i++) {
@@ -446,6 +447,25 @@ class WorldLevel {
         let y = Math.floor(Math.random() * this.levelHeight);
         return this.findEmptyCellTerrainNearPlace(terrain, x, y, grid);
     }
+
+    /**
+ * Determines which cells in the grid are viewable.
+ * A cell is viewable if it or any of its adjacent cells is not opaque.
+ */
+    determineCellViewability() {
+        for (let x = 0; x < this.levelWidth; x++) {
+            for (let y = 0; y < this.levelHeight; y++) {
+                let cell = this.grid[x][y];
+                if (!cell.isOpaque) {
+                    cell.isViewable = true; 
+                } else {
+                    let adjacentCells = cell.getAdjacentCells();
+                    cell.isViewable = GridCell.anyCellHasPropertyOfValue(adjacentCells, "isOpaque", false);
+                } 
+            }
+        }
+    }
+
 }
 
 export { WorldLevel };

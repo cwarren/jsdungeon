@@ -15,10 +15,42 @@ class GridCell {
         this.isTraversible = type.isTraversible;
         this.entryMovementCost = type.entryMovementCost;
         this.isOpaque = type.isOpaque;
+        this.isViewable = ! this.isOpaque; // cells are viewable if they are not opaque or are next to a non-opaque cell - the latter has to be calculated in a pass through during level generation
         this.color = type.color;
         this.structure = undefined;
         this.entity = undefined;
         // console.log("created cell", this);
+    }
+
+    getAdjacentCells() {
+        const adjacentCells = [];
+        const directions = [
+            { dx: -1, dy: -1 }, { dx: 0, dy: -1 }, { dx: 1, dy: -1 }, // Upper row
+            { dx: -1, dy: 0 },                  { dx: 1, dy: 0 },  // Sides
+            { dx: -1, dy: 1 }, { dx: 0, dy: 1 }, { dx: 1, dy: 1 }  // Lower row
+        ];
+
+        for (const { dx, dy } of directions) {
+            const newX = this.x + dx;
+            const newY = this.y + dy;
+
+            if (newX >= 0 && newX < this.worldLevel.levelWidth && newY >= 0 && newY < this.worldLevel.levelHeight) {
+                adjacentCells.push(this.worldLevel.grid[newX][newY]);
+            }
+        }
+
+        return adjacentCells;
+    }
+
+    /**
+ * Checks if any cell in the list has the specified property with the given value.
+ * @param {GridCell[]} cellList - List of cells to check.
+ * @param {string} propertyName - The property name to check.
+ * @param {*} targetValue - The target value to match.
+ * @returns {boolean} - True if any cell has the property equal to the target value, otherwise false.
+ */
+    static anyCellHasPropertyOfValue(cellList, propertyName, targetValue) {
+        return cellList.some(cell => cell[propertyName] === targetValue);
     }
 }
 
