@@ -1,4 +1,5 @@
 import { gameState, initializeGameState } from "./gameplay.js";
+import { executeCommand } from "./gameCommands.js";
 
 // On page load, initialize the game state, then draw it
 
@@ -192,6 +193,23 @@ canvas.addEventListener("click", (event) => {
         }
         resizeCanvas();
     }
+});
+
+
+// Track pressed keys to prevent repeat events
+let pressedKeys = new Set();
+
+// Capture keyboard input, execute commands, and prevent repeat events
+window.addEventListener("keydown", (event) => {
+  if (!pressedKeys.has(event.key)) {
+      pressedKeys.add(event.key);
+      executeCommand(event.key);
+      resizeCanvas(); // Redraw game after executing a command
+  }
+});
+
+window.addEventListener("keyup", (event) => {
+  pressedKeys.delete(event.key);
 });
 
 function determineCheapestMovementPath(startCell, endCell, worldLevel) {
