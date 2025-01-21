@@ -1,6 +1,5 @@
 import {applyCellularAutomataSmoothing} from "./gridUtils.js";
 import { GridCell } from "./gridCellClass.js";
-import { Structure } from "./structureClass.js";
 import { constrainValue } from "./util.js";
 
 const SUBDIVIDE_MIN_WIDTH = 6;
@@ -397,35 +396,32 @@ function generateGrid_town(width, height, numBuildings = 5, minSize = 4, maxSize
 }
 
 
-// generateGrid_puddles(puddleDensity = 0.12, puddleMaxSize = 3) {
-//     let grid = this.generateGrid_empty();
+function generateGrid_puddles(width, height, puddleDensity = 0.12, puddleMaxSize = 3) {
+    let grid = generateGrid_empty(width, height);
 
-//     const numPuddles = Math.floor(width * height * puddleDensity);
-//     for (let i = 0; i < numPuddles; i++) {
-//         let puddleX = Math.floor(Math.random() * width);
-//         let puddleY = Math.floor(Math.random() * height);
-//         let puddleSize = Math.floor(Math.random() * puddleMaxSize) + 1;
-//         grid[puddleX][puddleY] = GridCell.createDetachedAt(puddleX, puddleY, this, "WATER_SHALLOW");
+    const numPuddles = Math.floor(width * height * puddleDensity);
+    for (let i = 0; i < numPuddles; i++) {
+        let puddleX = Math.floor(Math.random() * width);
+        let puddleY = Math.floor(Math.random() * height);
+        let puddleSize = Math.floor(Math.random() * puddleMaxSize) + 1;
+        grid[puddleX][puddleY] = GridCell.createDetachedAt(puddleX, puddleY, "WATER_SHALLOW");
 
-//         // let puddleSpreadDirections = [[1, 0], [-1, 0], [0, 1], [0, -1]];
-//         let puddleSpreadDeltas = {"R": [1, 0],"L": [-1, 0],"D": [0, 1],"U": [0, -1]};
-//         let puddleSpreadDirections = Object.keys(puddleSpreadDeltas);
-//         let lastSpreadDir = "";
-//         for (let ps = 0; ps<puddleSize; ps++) {
-//             puddleSpreadDirections.sort(() => Math.random() - 0.5); // Shuffle directions for randomness
-//             let puddleSpreadDir = puddleSpreadDirections[0] != lastSpreadDir ? puddleSpreadDirections[0] : puddleSpreadDirections[1];
-//             let [dx, dy] = puddleSpreadDeltas[puddleSpreadDir];
-//             puddleX = constrainValue(puddleX + dx, 0, width-1);
-//             puddleY = constrainValue(puddleY + dy, 0, height-1);
-//             grid[puddleX][puddleY] = GridCell.createDetachedAt(puddleX, puddleY, this, "WATER_SHALLOW");
-//             lastSpreadDir = puddleSpreadDir;
-//         }
-//     }
+        let puddleSpreadDeltas = {"R": [1, 0],"L": [-1, 0],"D": [0, 1],"U": [0, -1]};
+        let puddleSpreadDirections = Object.keys(puddleSpreadDeltas);
+        let lastSpreadDir = "";
+        for (let ps = 0; ps<puddleSize; ps++) {
+            puddleSpreadDirections.sort(() => Math.random() - 0.5); 
+            let puddleSpreadDir = puddleSpreadDirections[0] != lastSpreadDir ? puddleSpreadDirections[0] : puddleSpreadDirections[1]; // spread in a different direction than last time
+            let [dx, dy] = puddleSpreadDeltas[puddleSpreadDir];
+            puddleX = constrainValue(puddleX + dx, 0, width-1);
+            puddleY = constrainValue(puddleY + dy, 0, height-1);
+            grid[puddleX][puddleY] = GridCell.createDetachedAt(puddleX, puddleY, "WATER_SHALLOW");
+            lastSpreadDir = puddleSpreadDir;
+        }
+    }
 
-//     // grid = this.applyCellularAutomataSmoothing(grid, "WATER_SHALLOW");
-
-//     return grid;
-// }
+    return grid;
+}
 
 export { 
     setWorldLevelForGridCells,
@@ -439,6 +435,6 @@ export {
     generateGrid_nest,
     generateGrid_roomsAndCorridors_random,
     generateGrid_roomsAndCorridors_subdivide,
-    generateGrid_town
-    
+    generateGrid_town,
+    generateGrid_puddles    
 };

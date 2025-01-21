@@ -13,7 +13,8 @@ import {
     generateGrid_nest,
     generateGrid_roomsAndCorridors_random,
     generateGrid_roomsAndCorridors_subdivide,
-    generateGrid_town
+    generateGrid_town,
+    generateGrid_puddles
 } from "./gridGeneration.js";
 
 // const SUBDIVIDE_MIN_WIDTH = 6;
@@ -45,7 +46,7 @@ class WorldLevel {
         } else if (levelType == "NEST") {
             this.grid = generateGrid_nest(levelWidth,levelHeight);
         } else if (levelType == "PUDDLES") {
-            this.grid = this.generateGrid_puddles(levelWidth,levelHeight);
+            this.grid = generateGrid_puddles(levelWidth,levelHeight);
         } else if (levelType == "RANDOM") {
             this.grid = generateGrid_random(levelWidth,levelHeight);
         } else if (levelType == "ROOMS_RANDOM") {
@@ -53,7 +54,7 @@ class WorldLevel {
         } else if (levelType == "ROOMS_SUBDIVIDE") {
             this.grid = generateGrid_roomsAndCorridors_subdivide(levelWidth,levelHeight);
         } else {
-            this.grid = this.generateGrid_empty(levelWidth,levelHeight);
+            this.grid = generateGrid_empty(levelWidth,levelHeight);
         }
         setWorldLevelForGridCells(this, this.grid);
         this.determineCellViewability();
@@ -82,90 +83,35 @@ class WorldLevel {
         stairsUp.connectsTo = stairsDown;
         this.levelStructures.push(stairsUp);
     }
+    
 
+    // generateGrid_puddles(puddleDensity = 0.12, puddleMaxSize = 3) {
+    //     let grid = this.generateGrid_empty();
 
-    // generateGrid_town(numBuildings = 5, minSize = 4, maxSize = 8) {
-    //     let grid = this.generateGrid_empty("FLOOR");
-    
-    //     // Function to create a building
-    //     const buildings = [];
-    
-    //     for (let i = 0; i < numBuildings; i++) {
-    //         let width = Math.floor(Math.random() * (maxSize - minSize + 1)) + minSize;
-    //         let height = Math.floor(Math.random() * (maxSize - minSize + 1)) + minSize;
-    //         let startX = Math.floor(Math.random() * (this.levelWidth - width - 3)) + 2;
-    //         let startY = Math.floor(Math.random() * (this.levelHeight - height - 3)) + 2;
-    
-    //         // Ensure no overlapping by checking against previous buildings - the "+ 1"'s in here ensure there's a least one space between buildings
-    //         let overlaps = buildings.some(building => 
-    //             startX < building.x + building.width + 1 &&
-    //             startX + width + 1 > building.x &&
-    //             startY < building.y + building.height + 1 &&
-    //             startY + height + 1 > building.y
-    //         );
-    //         if (overlaps) {
-    //             i--;
-    //             continue;
-    //         }
-    
-    //         buildings.push({ x: startX, y: startY, width, height });
-    
-    //         // Create the building with walls
-    //         let possibleDoors = []; // i.e. the perimeter cells of the building
-    //         for (let x = startX; x < startX + width; x++) {
-    //             for (let y = startY; y < startY + height; y++) {
-    //                 grid[x][y] = GridCell.createAttached(x, y, this, "WALL");
-    //                 if (y === startY || y === startY + height - 1 || x === startX || x === startX + width - 1) {
-    //                     possibleDoors.push([x, y]);
-    //                 }
-    //             }
-    //         }
-    
-    //         // Add a "door" by converting one random perimeter cell to FLOOR
-    //         let [doorX, doorY] = possibleDoors[Math.floor(Math.random() * possibleDoors.length)];
-    //         grid[doorX][doorY] = GridCell.createAttached(doorX, doorY, this, "FLOOR"); // Placeholder for a door
-    //     }
-    
-    //     // Surround the entire town with a one-cell-thick wall
-    //     for (let x = 0; x < this.levelWidth; x++) {
-    //         for (let y = 0; y < this.levelHeight; y++) {
-    //             if (x === 0 || y === 0 || x === this.levelWidth - 1 || y === this.levelHeight - 1) {
-    //                 grid[x][y] = GridCell.createAttached(x, y, this, "WALL");
-    //             }
+    //     const numPuddles = Math.floor(this.levelWidth * this.levelHeight * puddleDensity);
+    //     for (let i = 0; i < numPuddles; i++) {
+    //         let puddleX = Math.floor(Math.random() * this.levelWidth);
+    //         let puddleY = Math.floor(Math.random() * this.levelHeight);
+    //         let puddleSize = Math.floor(Math.random() * puddleMaxSize) + 1;
+    //         grid[puddleX][puddleY] = GridCell.createAttached(puddleX, puddleY, this, "WATER_SHALLOW");
+
+    //         // let puddleSpreadDirections = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+    //         let puddleSpreadDeltas = {"R": [1, 0],"L": [-1, 0],"D": [0, 1],"U": [0, -1]};
+    //         let puddleSpreadDirections = Object.keys(puddleSpreadDeltas);
+    //         let lastSpreadDir = "";
+    //         for (let ps = 0; ps<puddleSize; ps++) {
+    //             puddleSpreadDirections.sort(() => Math.random() - 0.5); // Shuffle directions for randomness
+    //             let puddleSpreadDir = puddleSpreadDirections[0] != lastSpreadDir ? puddleSpreadDirections[0] : puddleSpreadDirections[1];
+    //             let [dx, dy] = puddleSpreadDeltas[puddleSpreadDir];
+    //             puddleX = constrainValue(puddleX + dx, 0, this.levelWidth-1);
+    //             puddleY = constrainValue(puddleY + dy, 0, this.levelHeight-1);
+    //             grid[puddleX][puddleY] = GridCell.createAttached(puddleX, puddleY, this, "WATER_SHALLOW");
+    //             lastSpreadDir = puddleSpreadDir;
     //         }
     //     }
-    
+
     //     return grid;
     // }
-    
-
-    generateGrid_puddles(puddleDensity = 0.12, puddleMaxSize = 3) {
-        let grid = this.generateGrid_empty();
-
-        const numPuddles = Math.floor(this.levelWidth * this.levelHeight * puddleDensity);
-        for (let i = 0; i < numPuddles; i++) {
-            let puddleX = Math.floor(Math.random() * this.levelWidth);
-            let puddleY = Math.floor(Math.random() * this.levelHeight);
-            let puddleSize = Math.floor(Math.random() * puddleMaxSize) + 1;
-            grid[puddleX][puddleY] = GridCell.createAttached(puddleX, puddleY, this, "WATER_SHALLOW");
-
-            // let puddleSpreadDirections = [[1, 0], [-1, 0], [0, 1], [0, -1]];
-            let puddleSpreadDeltas = {"R": [1, 0],"L": [-1, 0],"D": [0, 1],"U": [0, -1]};
-            let puddleSpreadDirections = Object.keys(puddleSpreadDeltas);
-            let lastSpreadDir = "";
-            for (let ps = 0; ps<puddleSize; ps++) {
-                puddleSpreadDirections.sort(() => Math.random() - 0.5); // Shuffle directions for randomness
-                let puddleSpreadDir = puddleSpreadDirections[0] != lastSpreadDir ? puddleSpreadDirections[0] : puddleSpreadDirections[1];
-                let [dx, dy] = puddleSpreadDeltas[puddleSpreadDir];
-                puddleX = constrainValue(puddleX + dx, 0, this.levelWidth-1);
-                puddleY = constrainValue(puddleY + dy, 0, this.levelHeight-1);
-                grid[puddleX][puddleY] = GridCell.createAttached(puddleX, puddleY, this, "WATER_SHALLOW");
-                lastSpreadDir = puddleSpreadDir;
-            }
-        }
-
-        return grid;
-    }
 
     findCellTerrainNearPlace(terrain, startX, startY, grid) {
         const searchRadius = Math.max(this.levelWidth, this.levelHeight);
