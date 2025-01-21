@@ -1,8 +1,10 @@
 import { GridCell } from "./gridCellClass.js";
 import { Structure } from "./structureClass.js";
 import { constrainValue } from "./util.js";
-import {setWorldLevelForGridCells,
-    generateGrid_Empty} from "./gridGeneration.js"
+import {
+    setWorldLevelForGridCells,
+    generateGrid_empty, 
+    generateGrid_random} from "./gridGeneration.js"
 
 const SUBDIVIDE_MIN_WIDTH = 6;
 const SUBDIVIDE_MIN_HEIGHT = 6;
@@ -17,7 +19,7 @@ class WorldLevel {
         this.levelWidth = levelWidth;
         this.levelHeight = levelHeight;
         if (levelType == "EMPTY") {
-            this.grid = generateGrid_Empty(levelWidth,levelHeight);
+            this.grid = generateGrid_empty(levelWidth,levelHeight);
         } else if (levelType == "TOWN") {
             this.grid = this.generateGrid_town(levelWidth,levelHeight);
         } else if (levelType == "BURROW") {
@@ -35,7 +37,7 @@ class WorldLevel {
         } else if (levelType == "PUDDLES") {
             this.grid = this.generateGrid_puddles(levelWidth,levelHeight);
         } else if (levelType == "RANDOM") {
-            this.grid = this.generateGrid_random(levelWidth,levelHeight);
+            this.grid = generateGrid_random(levelWidth,levelHeight);
         } else if (levelType == "ROOMS_RANDOM") {
             this.grid = this.generateGrid_roomsAndCorridors_random(levelWidth,levelHeight);
         } else if (levelType == "ROOMS_SUBDIVIDE") {
