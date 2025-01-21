@@ -9,7 +9,7 @@ const SUBDIVIDE_MIN_DEPTH = 4;
 const SUBDIVIDE_MAX_DEPTH = 5;
 const MIN_ROOM_WIDTH = 3;
 const MIN_ROOM_HEIGHT = 3;
-
+const MAX_TOWN_BUILDING_ATTEMPTS = 200;
 
 function setWorldLevelForGridCells(worldLevel, grid) {
     // console.log("setWorldLevelForGridCells",worldLevel, grid);
@@ -340,59 +340,61 @@ function generateGrid_roomsAndCorridors_subdivide(width, height) {
     return grid;
 }
 
-// generateGrid_town(numBuildings = 5, minSize = 4, maxSize = 8) {
-//     let grid = this.generateGrid_empty("FLOOR");
+function generateGrid_town(width, height, numBuildings = 5, minSize = 4, maxSize = 8) {
+    let grid = generateGrid_empty(width, height);
 
-//     // Function to create a building
-//     const buildings = [];
+    // Function to create a building
+    const buildings = [];
+    let buildingAttempts = 0;
 
-//     for (let i = 0; i < numBuildings; i++) {
-//         let width = Math.floor(Math.random() * (maxSize - minSize + 1)) + minSize;
-//         let height = Math.floor(Math.random() * (maxSize - minSize + 1)) + minSize;
-//         let startX = Math.floor(Math.random() * (width - width - 3)) + 2;
-//         let startY = Math.floor(Math.random() * (height - height - 3)) + 2;
+    for (let i = 0; (i < numBuildings) && (buildingAttempts < MAX_TOWN_BUILDING_ATTEMPTS); i++) {
+        buildingAttempts++;
+        let buildingWidth = Math.floor(Math.random() * (maxSize - minSize + 1)) + minSize;
+        let buildingHeight = Math.floor(Math.random() * (maxSize - minSize + 1)) + minSize;
+        let startX = Math.floor(Math.random() * (width - buildingWidth - 3)) + 2;
+        let startY = Math.floor(Math.random() * (height - buildingHeight - 3)) + 2;
 
-//         // Ensure no overlapping by checking against previous buildings - the "+ 1"'s in here ensure there's a least one space between buildings
-//         let overlaps = buildings.some(building => 
-//             startX < building.x + building.width + 1 &&
-//             startX + width + 1 > building.x &&
-//             startY < building.y + building.height + 1 &&
-//             startY + height + 1 > building.y
-//         );
-//         if (overlaps) {
-//             i--;
-//             continue;
-//         }
+        // Ensure no overlapping by checking against previous buildings - the "+ 1" is in here ensure there's a least one space between buildings
+        let overlaps = buildings.some(building => 
+            startX < building.x + building.width + 1 &&
+            startX + buildingWidth + 1 > building.x &&
+            startY < building.y + building.height + 1 &&
+            startY + buildingHeight + 1 > building.y
+        );
+        if (overlaps) {
+            i--; // turn back the loop counter, which means we get the specified number buildings rather than "up to" the specified number of buildings
+            continue;
+        }
 
-//         buildings.push({ x: startX, y: startY, width, height });
+        buildings.push({ x: startX, y: startY, width: buildingWidth, height: buildingHeight });
 
-//         // Create the building with walls
-//         let possibleDoors = []; // i.e. the perimeter cells of the building
-//         for (let x = startX; x < startX + width; x++) {
-//             for (let y = startY; y < startY + height; y++) {
-//                 grid[x][y] = GridCell.createDetachedAt(x, y, "WALL");
-//                 if (y === startY || y === startY + height - 1 || x === startX || x === startX + width - 1) {
-//                     possibleDoors.push([x, y]);
-//                 }
-//             }
-//         }
+        // Create the building with walls
+        let possibleDoors = []; // i.e. the perimeter cells of the building
+        for (let x = startX; x < startX + buildingWidth; x++) {
+            for (let y = startY; y < startY + buildingHeight; y++) {
+                grid[x][y] = GridCell.createDetachedAt(x, y, "WALL");
+                if (y === startY || y === startY + buildingHeight - 1 || x === startX || x === startX + buildingWidth - 1) {
+                    possibleDoors.push([x, y]);
+                }
+            }
+        }
 
-//         // Add a "door" by converting one random perimeter cell to FLOOR
-//         let [doorX, doorY] = possibleDoors[Math.floor(Math.random() * possibleDoors.length)];
-//         grid[doorX][doorY] = GridCell.createDetachedAt(doorX, doorY, this, "FLOOR"); // Placeholder for a door
-//     }
+        // Add a "door" by converting one random perimeter cell to FLOOR
+        let [doorX, doorY] = possibleDoors[Math.floor(Math.random() * possibleDoors.length)];
+        grid[doorX][doorY] = GridCell.createDetachedAt(doorX, doorY, "FLOOR"); // Placeholder for a door
+    }
 
-//     // Surround the entire town with a one-cell-thick wall
-//     for (let x = 0; x < width; x++) {
-//         for (let y = 0; y < height; y++) {
-//             if (x === 0 || y === 0 || x === width - 1 || y === height - 1) {
-//                 grid[x][y] = GridCell.createDetachedAt(x, y, "WALL");
-//             }
-//         }
-//     }
+    // Surround the entire town with a one-cell-thick wall
+    for (let x = 0; x < width; x++) {
+        for (let y = 0; y < height; y++) {
+            if (x === 0 || y === 0 || x === width - 1 || y === height - 1) {
+                grid[x][y] = GridCell.createDetachedAt(x, y, "WALL");
+            }
+        }
+    }
 
-//     return grid;
-// }
+    return grid;
+}
 
 
 // generateGrid_puddles(puddleDensity = 0.12, puddleMaxSize = 3) {
@@ -437,5 +439,6 @@ export {
     generateGrid_nest,
     generateGrid_roomsAndCorridors_random,
     generateGrid_roomsAndCorridors_subdivide,
+    generateGrid_town
     
 };
