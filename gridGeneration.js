@@ -3,6 +3,14 @@ import { GridCell } from "./gridCellClass.js";
 import { Structure } from "./structureClass.js";
 import { constrainValue } from "./util.js";
 
+const SUBDIVIDE_MIN_WIDTH = 6;
+const SUBDIVIDE_MIN_HEIGHT = 6;
+const SUBDIVIDE_MIN_DEPTH = 4;
+const SUBDIVIDE_MAX_DEPTH = 5;
+const MIN_ROOM_WIDTH = 3;
+const MIN_ROOM_HEIGHT = 3;
+
+
 function setWorldLevelForGridCells(worldLevel, grid) {
     // console.log("setWorldLevelForGridCells",worldLevel, grid);
     grid.forEach(gridCol => {
@@ -172,165 +180,165 @@ function generateGrid_burrow(width, height) {
     return grid;
 }
 
-// generateGrid_nest() {
-//     let grid = this.generateGrid_empty("WALL");
+// similar to burrow, but preferentially follow previous direction, and re-set to start when hitting an edge
+function generateGrid_nest(width, height) {
+    let grid = generateGrid_empty(width, height, "WALL");
     
-//     // Determine starting location within the central 75% of the grid
-//     let startX = Math.floor(width * 0.125) + Math.floor(Math.random() * (width * 0.75));
-//     let startY = Math.floor(height * 0.125) + Math.floor(Math.random() * (height * 0.75));
+    // Determine starting location within the central 75% of the grid
+    let startX = Math.floor(width * 0.125) + Math.floor(Math.random() * (width * 0.75));
+    let startY = Math.floor(height * 0.125) + Math.floor(Math.random() * (height * 0.75));
     
-//     let x = startX;
-//     let y = startY;
-//     let lastDirection = Math.floor(Math.random() * 4);
-//     let burrowSize = (width * height * 0.2) + Math.floor(Math.random() * (width * height * 0.2));
-//     let maxBurrowAttempts = width * height * 0.6;
-//     // for (let i = 0; i < width * height * 0.3; i++) {
-//     let countBurrowed = 0;
-//     let countBurrowAttempts = 0;
-//     while ((countBurrowed < burrowSize) && (countBurrowAttempts < maxBurrowAttempts)) {
-//         countBurrowAttempts++;
-//         if (grid[x][y].terrain != "FLOOR") {
-//             countBurrowed++;
-//         }
-//         grid[x][y] = GridCell.createDetachedAt(x, y, "FLOOR");
-//         const tryDirection = Math.floor(Math.random() * 5);
-//         const direction = tryDirection == 4 ? lastDirection : tryDirection;
-//         if (direction === 0 && y > 1) y--; // Up
-//         if (direction === 1 && y < height - 2) y++; // Down
-//         if (direction === 2 && x > 1) x--; // Left
-//         if (direction === 3 && x < width - 2) x++; // Right
+    let x = startX;
+    let y = startY;
+    let lastDirection = Math.floor(Math.random() * 4);
+    let burrowSize = (width * height * 0.2) + Math.floor(Math.random() * (width * height * 0.2));
+    let maxBurrowAttempts = width * height * 0.6;
+    let countBurrowed = 0;
+    let countBurrowAttempts = 0;
+    while ((countBurrowed < burrowSize) && (countBurrowAttempts < maxBurrowAttempts)) {
+        countBurrowAttempts++;
+        if (grid[x][y].terrain != "FLOOR") {
+            countBurrowed++;
+        }
+        grid[x][y] = GridCell.createDetachedAt(x, y, "FLOOR");
+        const tryDirection = Math.floor(Math.random() * 5);
+        const direction = tryDirection == 4 ? lastDirection : tryDirection;
+        if (direction === 0 && y > 1) y--; // Up
+        if (direction === 1 && y < height - 2) y++; // Down
+        if (direction === 2 && x > 1) x--; // Left
+        if (direction === 3 && x < width - 2) x++; // Right
         
-//         if (y == 2 || y == height - 3 || x == 2 || x == width - 3) {
-//             x = startX;
-//             y = startY;
-//             lastDirection = Math.floor(Math.random() * 4);
-//         }
+        if (y == 2 || y == height - 3 || x == 2 || x == width - 3) {
+            x = startX;
+            y = startY;
+            lastDirection = Math.floor(Math.random() * 4);
+        }
         
-//         lastDirection = direction;
-//     }
+        lastDirection = direction;
+    }
     
-//     return grid;
-// }
+    return grid;
+}
 
-// generateGrid_roomsAndCorridors_random() {
-//     let grid = this.generateGrid_empty("WALL");
+function generateGrid_roomsAndCorridors_random(width, height) {
+    let grid = generateGrid_empty(width, height, "WALL");
     
-//     // // Define number of rooms
-//     const numRooms = Math.random() * Math.floor(width * height * 0.01)+4;
-//     const rooms = [];
+    // // Define number of rooms
+    const numRooms = Math.random() * Math.floor(width * height * 0.01)+4;
+    const rooms = [];
     
-//     const roomSizeBasis = Math.floor(Math.min(width, height) / 5);
+    const roomSizeBasis = Math.floor(Math.min(width, height) / 5);
 
-//     for (let i = 0; i < numRooms; i++) {
-//         const roomWidth = Math.floor(Math.random() * roomSizeBasis) + MIN_ROOM_WIDTH;
-//         const roomHeight = Math.floor(Math.random() * roomSizeBasis) + MIN_ROOM_HEIGHT;
-//         let roomStartX = Math.floor(Math.random() * (width - roomWidth - 1)) + 1;
-//         let roomStartY = Math.floor(Math.random() * (height - roomHeight - 1)) + 1;
-//         while (grid[roomStartX][roomStartY].terrain == "FLOOR") {
-//             roomStartX = Math.floor(Math.random() * (width - roomWidth - 1)) + 1;
-//             roomStartY = Math.floor(Math.random() * (height - roomHeight - 1)) + 1;
-//         }
+    for (let i = 0; i < numRooms; i++) {
+        const roomWidth = Math.floor(Math.random() * roomSizeBasis) + MIN_ROOM_WIDTH;
+        const roomHeight = Math.floor(Math.random() * roomSizeBasis) + MIN_ROOM_HEIGHT;
+        let roomStartX = Math.floor(Math.random() * (width - roomWidth - 1)) + 1;
+        let roomStartY = Math.floor(Math.random() * (height - roomHeight - 1)) + 1;
+        while (grid[roomStartX][roomStartY].terrain == "FLOOR") {
+            roomStartX = Math.floor(Math.random() * (width - roomWidth - 1)) + 1;
+            roomStartY = Math.floor(Math.random() * (height - roomHeight - 1)) + 1;
+        }
         
-//         for (let x = roomStartX; x < roomStartX + roomWidth; x++) {
-//             for (let y = roomStartY; y < roomStartY + roomHeight; y++) {
-//                 grid[x][y] = GridCell.createDetachedAt(x, y, "FLOOR");
-//             }
-//         }
-//         rooms.push({ x: roomStartX, y: roomStartY, width: roomWidth, height: roomHeight });
-//     }
+        for (let x = roomStartX; x < roomStartX + roomWidth; x++) {
+            for (let y = roomStartY; y < roomStartY + roomHeight; y++) {
+                grid[x][y] = GridCell.createDetachedAt(x, y, "FLOOR");
+            }
+        }
+        rooms.push({ x: roomStartX, y: roomStartY, width: roomWidth, height: roomHeight });
+    }
     
-//     // Connect rooms with corridors
-//     for (let i = 1; i < rooms.length; i++) {
-//         const prevRoom = rooms[i - 1];
-//         const currRoom = rooms[i];
-//         let x = prevRoom.x + Math.floor(prevRoom.width / 2);
-//         let y = prevRoom.y + Math.floor(prevRoom.height / 2);
-//         let targetX = currRoom.x + Math.floor(currRoom.width / 2);
-//         let targetY = currRoom.y + Math.floor(currRoom.height / 2);
+    // Connect rooms with corridors
+    for (let i = 1; i < rooms.length; i++) {
+        const prevRoom = rooms[i - 1];
+        const currRoom = rooms[i];
+        let x = prevRoom.x + Math.floor(prevRoom.width / 2);
+        let y = prevRoom.y + Math.floor(prevRoom.height / 2);
+        let targetX = currRoom.x + Math.floor(currRoom.width / 2);
+        let targetY = currRoom.y + Math.floor(currRoom.height / 2);
         
-//         while (x !== targetX || y !== targetY) {
-//             if (x !== targetX) {
-//                 x += Math.sign(targetX - x);
-//             } else if (y !== targetY) {
-//                 y += Math.sign(targetY - y);
-//             }
+        while (x !== targetX || y !== targetY) {
+            if (x !== targetX) {
+                x += Math.sign(targetX - x);
+            } else if (y !== targetY) {
+                y += Math.sign(targetY - y);
+            }
             
-//             grid[x][y] = GridCell.createDetachedAt(x, y, "FLOOR");
-//         }
-//     }
+            grid[x][y] = GridCell.createDetachedAt(x, y, "FLOOR");
+        }
+    }
 
     
-//     return grid;
-// }
+    return grid;
+}
 
 
-// generateGrid_roomsAndCorridors_subdivide() {
-//     let grid = this.generateGrid_empty("WALL");
+function generateGrid_roomsAndCorridors_subdivide(width, height) {
+    let grid = generateGrid_empty(width, height, "WALL");
 
-//     let rooms = [];
-//     const subdivideDepth = Math.floor(Math.random() * (SUBDIVIDE_MAX_DEPTH - SUBDIVIDE_MIN_DEPTH + 1)) + SUBDIVIDE_MIN_DEPTH;
+    let rooms = [];
+    const subdivideDepth = Math.floor(Math.random() * (SUBDIVIDE_MAX_DEPTH - SUBDIVIDE_MIN_DEPTH + 1)) + SUBDIVIDE_MIN_DEPTH;
 
-//     function subdivide(worldLevel, x, y, width, height, depth = 0) {
-//         if (width < SUBDIVIDE_MIN_WIDTH || height < SUBDIVIDE_MIN_HEIGHT) return;
+    function subdivide(x, y, width, height, depth = 0) {
+        if (width < SUBDIVIDE_MIN_WIDTH || height < SUBDIVIDE_MIN_HEIGHT) return;
 
-//         const minRoomWidth = Math.max(MIN_ROOM_WIDTH,Math.floor(width * .4));
-//         const minRoomHeigth = Math.max(MIN_ROOM_HEIGHT,Math.floor(height * .4));
+        const minRoomWidth = Math.max(MIN_ROOM_WIDTH,Math.floor(width * .4));
+        const minRoomHeigth = Math.max(MIN_ROOM_HEIGHT,Math.floor(height * .4));
         
-//         const roomWidth = Math.max(minRoomWidth, Math.floor(Math.random() * (width - 3)));
-//         const roomHeight = Math.max(minRoomHeigth, Math.floor(Math.random() * (height - 3)));
-//         const roomX = x + Math.floor(Math.random() * (width - roomWidth));
-//         const roomY = y + Math.floor(Math.random() * (height - roomHeight));
+        const roomWidth = Math.max(minRoomWidth, Math.floor(Math.random() * (width - 3)));
+        const roomHeight = Math.max(minRoomHeigth, Math.floor(Math.random() * (height - 3)));
+        const roomX = x + Math.floor(Math.random() * (width - roomWidth));
+        const roomY = y + Math.floor(Math.random() * (height - roomHeight));
         
-//         let addedRoom = false;
-//         if ((depth > 1) && (Math.random() < .66)) {
-//             for (let rx = roomX; rx < roomX + roomWidth; rx++) {
-//                 for (let ry = roomY; ry < roomY + roomHeight; ry++) {
-//                     grid[rx][ry] = GridCell.createDetachedAt(rx, ry, worldLevel, "FLOOR");
-//                 }
-//             }
-//             rooms.push({ x: roomX, y: roomY, width: roomWidth, height: roomHeight });
-//             addedRoom = true;
-//         }
+        let addedRoom = false;
+        if ((depth > 1) && (Math.random() < .66)) {
+            for (let rx = roomX; rx < roomX + roomWidth; rx++) {
+                for (let ry = roomY; ry < roomY + roomHeight; ry++) {
+                    grid[rx][ry] = GridCell.createDetachedAt(rx, ry, "FLOOR");
+                }
+            }
+            rooms.push({ x: roomX, y: roomY, width: roomWidth, height: roomHeight });
+            addedRoom = true;
+        }
 
-//         if ((depth < subdivideDepth) && (!addedRoom || Math.random() < .5)) {
-//             const splitVertical = width > height;
-//             const splitPoint = splitVertical
-//                 ? x + Math.floor(width / 2)
-//                 : y + Math.floor(height / 2);
+        if ((depth < subdivideDepth) && (!addedRoom || Math.random() < .5)) {
+            const splitVertical = width > height;
+            const splitPoint = splitVertical
+                ? x + Math.floor(width / 2)
+                : y + Math.floor(height / 2);
             
-//             if (splitVertical) {
-//                 subdivide(worldLevel, x, y, splitPoint - x, height, depth + 1);
-//                 subdivide(worldLevel, splitPoint + 1, y, x + width - splitPoint - 1, height, depth + 1);
-//             } else {
-//                 subdivide(worldLevel, x, y, width, splitPoint - y, depth + 1);
-//                 subdivide(worldLevel, x, splitPoint + 1, width, y + height - splitPoint - 1, depth + 1);
-//             }
-//         }
-//     }
+            if (splitVertical) {
+                subdivide(x, y, splitPoint - x, height, depth + 1);
+                subdivide(splitPoint + 1, y, x + width - splitPoint - 1, height, depth + 1);
+            } else {
+                subdivide(x, y, width, splitPoint - y, depth + 1);
+                subdivide(x, splitPoint + 1, width, y + height - splitPoint - 1, depth + 1);
+            }
+        }
+    }
 
-//     subdivide(this, 1, 1, width - 2, height - 2);
+    subdivide(1, 1, width - 2, height - 2);
 
-//     // Connect rooms with corridors
-//     for (let i = 1; i < rooms.length; i++) {
-//         const prevRoom = rooms[i - 1];
-//         const currRoom = rooms[i];
-//         let x = prevRoom.x + Math.floor(prevRoom.width / 2);
-//         let y = prevRoom.y + Math.floor(prevRoom.height / 2);
-//         let targetX = currRoom.x + Math.floor(currRoom.width / 2);
-//         let targetY = currRoom.y + Math.floor(currRoom.height / 2);
+    // Connect rooms with corridors
+    for (let i = 1; i < rooms.length; i++) {
+        const prevRoom = rooms[i - 1];
+        const currRoom = rooms[i];
+        let x = prevRoom.x + Math.floor(prevRoom.width / 2);
+        let y = prevRoom.y + Math.floor(prevRoom.height / 2);
+        let targetX = currRoom.x + Math.floor(currRoom.width / 2);
+        let targetY = currRoom.y + Math.floor(currRoom.height / 2);
         
-//         while (x !== targetX) {
-//             grid[x][y] = GridCell.createDetachedAt(x, y, "FLOOR");
-//             x += x < targetX ? 1 : -1;
-//         }
-//         while (y !== targetY) {
-//             grid[x][y] = GridCell.createDetachedAt(x, y, "FLOOR");
-//             y += y < targetY ? 1 : -1;
-//         }
-//     }
+        while (x !== targetX) {
+            grid[x][y] = GridCell.createDetachedAt(x, y, "FLOOR");
+            x += x < targetX ? 1 : -1;
+        }
+        while (y !== targetY) {
+            grid[x][y] = GridCell.createDetachedAt(x, y, "FLOOR");
+            y += y < targetY ? 1 : -1;
+        }
+    }
     
-//     return grid;
-// }
+    return grid;
+}
 
 // generateGrid_town(numBuildings = 5, minSize = 4, maxSize = 8) {
 //     let grid = this.generateGrid_empty("FLOOR");
@@ -426,5 +434,8 @@ export {
     generateGrid_caves_large,
     generateGrid_caves_huge,
     generateGrid_burrow,
+    generateGrid_nest,
+    generateGrid_roomsAndCorridors_random,
+    generateGrid_roomsAndCorridors_subdivide,
     
 };
