@@ -9,6 +9,7 @@ import {
     generateGrid_caves_shattered,
     generateGrid_caves_large,
     generateGrid_caves_huge,
+    generateGrid_burrow,
 } from "./gridGeneration.js";
 
 const SUBDIVIDE_MIN_WIDTH = 6;
@@ -28,7 +29,7 @@ class WorldLevel {
         } else if (levelType == "TOWN") {
             this.grid = this.generateGrid_town(levelWidth,levelHeight);
         } else if (levelType == "BURROW") {
-            this.grid = this.generateGrid_burrow(levelWidth,levelHeight);
+            this.grid = generateGrid_burrow(levelWidth,levelHeight);
         } else if (levelType == "CAVES") {
             this.grid = generateGrid_caves(levelWidth,levelHeight);
         } else if (levelType == "CAVES_HUGE") {
