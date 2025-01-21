@@ -10,6 +10,7 @@ class GridCell {
         const type = GridCell.TYPES[terrain] || GridCell.TYPES.FLOOR;
         this.x = x;
         this.y = y;
+        this.z = worldLevel.levelNumber;
         this.worldLevel = worldLevel;
         this.terrain = type.terrain;
         this.isTraversible = type.isTraversible;

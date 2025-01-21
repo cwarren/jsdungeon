@@ -400,7 +400,7 @@ class WorldLevel {
             buildings.push({ x: startX, y: startY, width, height });
     
             // Create the building with walls
-            let possibleDoors = [];
+            let possibleDoors = []; // i.e. the perimeter cells of the building
             for (let x = startX; x < startX + width; x++) {
                 for (let y = startY; y < startY + height; y++) {
                     grid[x][y] = new GridCell(x, y, this, "WALL");
@@ -411,16 +411,6 @@ class WorldLevel {
             }
     
             // Add a "door" by converting one random perimeter cell to FLOOR
-            // let possibleDoors = [];
-            // for (let x = startX; x < startX + width; x++) {
-            //     possibleDoors.push([x, startY]); // Top side
-            //     possibleDoors.push([x, startY + height - 1]); // Bottom side
-            // }
-            // for (let y = startY; y < startY + height; y++) {
-            //     possibleDoors.push([startX, y]); // Left side
-            //     possibleDoors.push([startX + width - 1, y]); // Right side
-            // }
-    
             let [doorX, doorY] = possibleDoors[Math.floor(Math.random() * possibleDoors.length)];
             grid[doorX][doorY] = new GridCell(doorX, doorY, this, "FLOOR"); // Placeholder for a door
         }
@@ -482,7 +472,7 @@ class WorldLevel {
         return null; // No matching cell found
     }
 
-    getRandomCellOfTerrain(terrain, grid) {
+    getRandomCellOfTerrainInGrid(terrain, grid) {
         let x = Math.floor(Math.random() * this.levelWidth);
         let y = Math.floor(Math.random() * this.levelHeight);
         return this.findCellTerrainNearPlace(terrain, x, y, grid);
