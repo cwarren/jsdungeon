@@ -14,22 +14,24 @@ function initializeGameState(levelDimensions) {
   
   const firstLevel = gameState.world[0];
   firstLevel.addStairsDown();
-  const centerX = Math.floor(firstLevel.levelWidth / 2);
-  const centerY = Math.floor(firstLevel.levelHeight / 2);
-  
-  // set up the avatar
-  const floorCell = firstLevel.findEmptyCellTerrainNearPlace("FLOOR", centerX, centerY, firstLevel.grid);
+
+  setUpAvatar(firstLevel);
+}
+
+function setUpAvatar(initialFloor) {
+  const centerX = Math.floor(initialFloor.levelWidth / 2);
+  const centerY = Math.floor(initialFloor.levelHeight / 2);
+  const floorCell = initialFloor.findEmptyCellTerrainNearPlace("FLOOR", centerX, centerY, initialFloor.grid);
   const avatarX = floorCell ? floorCell.x : centerX;
-  const avatarY = floorCell ? floorCell.y : centerY;  
+  const avatarY = floorCell ? floorCell.y : centerY; 
   const avatar = new Entity(avatarX, avatarY, 0, "player", "@");
+
   avatar.viewRadius = 9;
   gameState.avatar = avatar;
   avatar.determineVisibleCells(gameState);
-
 }
 
 function getAvatarCell() {
-  // return gameState.world[gameState.avatar.z].grid[gameState.avatar.x][gameState.avatar.y]
   return gameState.avatar.getCell();
 }
 
