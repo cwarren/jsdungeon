@@ -14,10 +14,14 @@ class WorldLevel {
         this.levelNumber = levelNumber;
         this.levelWidth = levelWidth;
         this.levelHeight = levelHeight;
-        this.grid = this.generateGrid_town();
+        this.grid = this.generateGrid_empty();
         this.determineCellViewability();
         this.levelEntities = [];
         this.levelStructures = [];
+    }
+
+    addEntity(ent) {
+        this.levelEntities.push(ent);
     }
 
     addStairsDown() {

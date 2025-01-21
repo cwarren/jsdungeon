@@ -1,5 +1,6 @@
 import { gameState, initializeGameState } from "./gameplay.js";
 import { executeGameCommand } from "./gameCommands.js";
+import { GridCell } from "./gridCellClass.js";
 
 // On page load, initialize the game state, then draw it
 
@@ -106,23 +107,13 @@ function drawUI() {
 
 // Function to draw the world level
 function drawWorldLevel(worldLevel) {
+  // console.log("gameState", gameState);
   drawWorldLevelGrid(worldLevel);
   drawWorldLevelStructures(worldLevel);
   drawWorldLevelItems(worldLevel);
   drawWorldLevelEntities(worldLevel);
 //   drawAvatarMovementPath();
 }
-
-// Function to draw a single grid cell
-// function drawGridCell(cell, offsetX, offsetY, cellSize, gridSpacing) {
-//     ctx.fillStyle = "#333"; // Dark grey for grid cells
-//     ctx.fillRect(
-//       offsetX + cell.x * (cellSize + gridSpacing),
-//       offsetY + cell.y * (cellSize + gridSpacing),
-//       cellSize,
-//       cellSize
-//     );
-//   }
 
 function drawGridCell(cell, offsetX, offsetY, cellSize, gridSpacing) {
     ctx.fillStyle = cell.color;
@@ -162,10 +153,6 @@ function drawWorldLevelGrid(worldLevel) {
             } else if (gameState.avatar.seenCells.has(cell)) {
                 drawGridCellFaint(cell, offsetX, offsetY, cellSize, gridSpacing);
             }
-
-            // if (worldLevel.grid[col][row].isViewable) {
-            //   drawGridCell(worldLevel.grid[col][row], offsetX, offsetY, cellSize, gridSpacing);
-            // }
         }
     }
   }
@@ -225,7 +212,9 @@ function drawWorldLevelEntities(worldLevel) {
 
   // Draw all entities in the level
   worldLevel.levelEntities.forEach(entity => {
-    drawEntityInWorldLevel(entity, offsetX, offsetY, cellSize, gridSpacing);
+    if (entity.isVisibleTo(gameState.avatar)) {
+      drawEntityInWorldLevel(entity, offsetX, offsetY, cellSize, gridSpacing);
+    }
   });
 
   // Draw the avatar if it's in this world level
@@ -311,25 +300,14 @@ window.addEventListener("keyup", (event) => {
   pressedKeys.delete(event.key);
 });
 
+// uses A-star algorithm
 function determineCheapestMovementPath(startCell, endCell, worldLevel) {
     // // Calculate Manhattan distance
     const manhattanDistance = Math.abs(startCell.x - endCell.x) + Math.abs(startCell.y - endCell.y);
 
-    // // Short-circuit if the Manhattan distance is more than 12
-    // if (manhattanDistance > 12) {
-    //     return [];
-    // }
-
     if (!endCell.isTraversible) {
         return []; // No path possible to non-traversible places
     }
-
-    const orthogonalDirections = [
-        { dx: 0, dy: -1 }, { dx: -1, dy: 0 }, { dx: 1, dy: 0 }, { dx: 0, dy: 1 }
-    ];
-    const diagonalDirections = [
-        { dx: -1, dy: -1 }, { dx: 1, dy: -1 }, { dx: -1, dy: 1 }, { dx: 1, dy: 1 }
-    ];
 
     class Node {
         constructor(cell, parent, g, h) {
@@ -387,11 +365,11 @@ function determineCheapestMovementPath(startCell, endCell, worldLevel) {
         };
 
         // Prioritize orthogonal moves over diagonal moves
-        for (const { dx, dy } of orthogonalDirections) {
+        for (const { dx, dy } of GridCell.ADJACENCY_DIRECTIONS_ORTHOGONAL) {
             tryMove(dx, dy, currentNode.cell.entryMovementCost);
         }
 
-        for (const { dx, dy } of diagonalDirections) {
+        for (const { dx, dy } of GridCell.ADJACENCY_DIRECTIONS_DIAGONAL) {
             tryMove(dx, dy, currentNode.cell.entryMovementCost * 1.4);
         }
     }
