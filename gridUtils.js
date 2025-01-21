@@ -1,5 +1,5 @@
-applyCellularAutomataSmoothing(grid, terrainToSmooth = "WALL") {
-    let newGrid = this.generateGrid_empty();
+function applyCellularAutomataSmoothing(grid, terrainToSmooth = "WALL") {
+    let newGrid = generateGrid_empty();
     grid.forEach((col, x) => {
         col.forEach((cell, y) => {
             let terrainCount = 0;

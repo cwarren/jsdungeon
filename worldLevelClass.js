@@ -1,6 +1,8 @@
 import { GridCell } from "./gridCellClass.js";
 import { Structure } from "./structureClass.js";
 import { constrainValue } from "./util.js";
+import {setWorldLevelForGridCells,
+    generateGrid_Empty} from "./gridGeneration.js"
 
 const SUBDIVIDE_MIN_WIDTH = 6;
 const SUBDIVIDE_MIN_HEIGHT = 6;
@@ -10,40 +12,43 @@ const MIN_ROOM_WIDTH = 3;
 const MIN_ROOM_HEIGHT = 3;
 
 class WorldLevel {
-    constructor(levelNumber, levelWidth, levelHeight, gridGen = "EMPTY") {
+    constructor(levelNumber, levelWidth, levelHeight, levelType = "EMPTY") {
         this.levelNumber = levelNumber;
         this.levelWidth = levelWidth;
         this.levelHeight = levelHeight;
-        if (gridGen == "EMPTY") {
-            this.grid = this.generateGrid_empty();
-        } else if (gridGen == "TOWN") {
-            this.grid = this.generateGrid_town();
-        } else if (gridGen == "BURROW") {
-            this.grid = this.generateGrid_burrow();
-        } else if (gridGen == "CAVES") {
-            this.grid = this.generateGrid_caves();
-        } else if (gridGen == "CAVES_HUGE") {
-            this.grid = this.generateGrid_caves_huge();
-        } else if (gridGen == "CAVES_LARGE") {
-            this.grid = this.generateGrid_caves_large();
-        } else if (gridGen == "CAVES_SHATTERED") {
-            this.grid = this.generateGrid_caves_shattered();
-        } else if (gridGen == "NEST") {
-            this.grid = this.generateGrid_nest();
-        } else if (gridGen == "PUDDLES") {
-            this.grid = this.generateGrid_puddles();
-        } else if (gridGen == "RANDOM") {
-            this.grid = this.generateGrid_random();
-        } else if (gridGen == "ROOMS_RANDOM") {
-            this.grid = this.generateGrid_roomsAndCorridors_random();
-        } else if (gridGen == "ROOMS_SUBDIVIDE") {
-            this.grid = this.generateGrid_roomsAndCorridors_subdivide();
+        if (levelType == "EMPTY") {
+            this.grid = generateGrid_Empty(levelWidth,levelHeight);
+        } else if (levelType == "TOWN") {
+            this.grid = this.generateGrid_town(levelWidth,levelHeight);
+        } else if (levelType == "BURROW") {
+            this.grid = this.generateGrid_burrow(levelWidth,levelHeight);
+        } else if (levelType == "CAVES") {
+            this.grid = this.generateGrid_caves(levelWidth,levelHeight);
+        } else if (levelType == "CAVES_HUGE") {
+            this.grid = this.generateGrid_caves_huge(levelWidth,levelHeight);
+        } else if (levelType == "CAVES_LARGE") {
+            this.grid = this.generateGrid_caves_large(levelWidth,levelHeight);
+        } else if (levelType == "CAVES_SHATTERED") {
+            this.grid = this.generateGrid_caves_shattered(levelWidth,levelHeight);
+        } else if (levelType == "NEST") {
+            this.grid = this.generateGrid_nest(levelWidth,levelHeight);
+        } else if (levelType == "PUDDLES") {
+            this.grid = this.generateGrid_puddles(levelWidth,levelHeight);
+        } else if (levelType == "RANDOM") {
+            this.grid = this.generateGrid_random(levelWidth,levelHeight);
+        } else if (levelType == "ROOMS_RANDOM") {
+            this.grid = this.generateGrid_roomsAndCorridors_random(levelWidth,levelHeight);
+        } else if (levelType == "ROOMS_SUBDIVIDE") {
+            this.grid = this.generateGrid_roomsAndCorridors_subdivide(levelWidth,levelHeight);
         } else {
-            this.grid = this.generateGrid_empty();
+            this.grid = this.generateGrid_empty(levelWidth,levelHeight);
         }
+        setWorldLevelForGridCells(this, this.grid);
         this.determineCellViewability();
+        this.levelType = levelType;
         this.levelEntities = [];
         this.levelStructures = [];
+        console.log("new world level", this);
     }
 
     addEntity(ent) {
