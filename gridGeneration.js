@@ -11,7 +11,7 @@ function setWorldLevelForGridCells(worldLevel, grid) {
     });
 }
 
-function generateGrid_Empty(width, height, startingTerrain = "FLOOR") {
+function generateGrid_empty(width, height, startingTerrain = "FLOOR") {
     const newGrid = Array.from({ length: width }, (_, col) =>
         Array.from({ length: height }, (_, row) => GridCell.createDetachedAt(col, row, startingTerrain))
      );
@@ -20,17 +20,17 @@ function generateGrid_Empty(width, height, startingTerrain = "FLOOR") {
 }
 
 
-// generateGrid_random() {
-//     const terrainTypes = Object.keys(GridCell.TYPES);
-//     const newGrid = Array.from({ length: this.levelWidth }, (_, col) =>
-//         Array.from({ length: this.levelHeight }, (_, row) => {
-//             const randomTerrain = terrainTypes[Math.floor(Math.random() * terrainTypes.length)];
-//             return GridCell.createAttached(col, row, this, randomTerrain);
-//         })
-//      );
-//     //  console.log("random grid", newGrid);
-//      return newGrid;
-// }
+function generateGrid_random(width, height) {
+    const terrainTypes = Object.keys(GridCell.TYPES);
+    const newGrid = Array.from({ length: width }, (_, col) =>
+        Array.from({ length: height }, (_, row) => {
+            const randomTerrain = terrainTypes[Math.floor(Math.random() * terrainTypes.length)];
+            return GridCell.createDetachedAt(col, row, randomTerrain);
+        })
+     );
+    //  console.log("random grid", newGrid);
+     return newGrid;
+}
 
 // generateGrid_variable_caves(smoothness = 2) {
 //     let grid = this.generateGrid_empty();
@@ -417,5 +417,6 @@ function generateGrid_Empty(width, height, startingTerrain = "FLOOR") {
 
 export { 
     setWorldLevelForGridCells,
-    generateGrid_Empty
+    generateGrid_empty,
+    generateGrid_random
 };
