@@ -16,6 +16,7 @@ class Entity {
     }
 
     placeAtCell(cell) {
+      // console.log("placing entity at cell", this, cell);
       this.x = cell.x;
       this.y = cell.y;
       this.z = cell.z;

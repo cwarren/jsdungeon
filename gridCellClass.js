@@ -17,6 +17,12 @@ class GridCell {
     static createDetached(terrain = "FLOOR") {
         return new GridCell(terrain);
     }
+    static createDetachedAt(x,y,terrain = "FLOOR") {
+        const newCell = new GridCell(terrain);
+        newCell.x = x;
+        newCell.y = y;
+        return newCell;
+    }
 
     static createAttached(x, y, worldLevel, terrain = "FLOOR") {
         const cell = GridCell.createDetached(terrain);
