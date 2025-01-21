@@ -10,14 +10,14 @@ const gameState = {
 };
 
 function initializeGameState(levelDimensions) {
-  gameState.world = levelDimensions.map(([width, height], index) => new WorldLevel(index, width, height));
+  gameState.world = levelDimensions.map(([width, height, genOption], index) => new WorldLevel(index, width, height, genOption));
   
   const firstLevel = gameState.world[0];
   firstLevel.addStairsDown();
 
   setUpAvatar(firstLevel);
 
-  populateLevelWithEntities(firstLevel);
+  // populateLevelWithEntities(firstLevel);
 }
 
 function setUpAvatar(initialFloor) {

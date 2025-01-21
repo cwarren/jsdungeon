@@ -10,11 +10,37 @@ const MIN_ROOM_WIDTH = 3;
 const MIN_ROOM_HEIGHT = 3;
 
 class WorldLevel {
-    constructor(levelNumber, levelWidth, levelHeight) {
+    constructor(levelNumber, levelWidth, levelHeight, gridGen = "EMPTY") {
         this.levelNumber = levelNumber;
         this.levelWidth = levelWidth;
         this.levelHeight = levelHeight;
-        this.grid = this.generateGrid_empty();
+        if (gridGen == "EMPTY") {
+            this.grid = this.generateGrid_empty();
+        } else if (gridGen == "TOWN") {
+            this.grid = this.generateGrid_town();
+        } else if (gridGen == "BURROW") {
+            this.grid = this.generateGrid_burrow();
+        } else if (gridGen == "CAVES") {
+            this.grid = this.generateGrid_caves();
+        } else if (gridGen == "CAVES_HUGE") {
+            this.grid = this.generateGrid_caves_huge();
+        } else if (gridGen == "CAVES_LARGE") {
+            this.grid = this.generateGrid_caves_large();
+        } else if (gridGen == "CAVES_SHATTERED") {
+            this.grid = this.generateGrid_caves_shattered();
+        } else if (gridGen == "NEST") {
+            this.grid = this.generateGrid_nest();
+        } else if (gridGen == "PUDDLES") {
+            this.grid = this.generateGrid_puddles();
+        } else if (gridGen == "RANDOM") {
+            this.grid = this.generateGrid_random();
+        } else if (gridGen == "ROOMS_RANDOM") {
+            this.grid = this.generateGrid_roomsAndCorridors_random();
+        } else if (gridGen == "ROOMS_SUBDIVIDE") {
+            this.grid = this.generateGrid_roomsAndCorridors_subdivide();
+        } else {
+            this.grid = this.generateGrid_empty();
+        }
         this.determineCellViewability();
         this.levelEntities = [];
         this.levelStructures = [];
@@ -40,20 +66,25 @@ class WorldLevel {
         this.levelStructures.push(stairsUp);
     }
 
+
     generateGrid_empty(startingTerrain = "FLOOR") {
-        return Array.from({ length: this.levelWidth }, (_, col) =>
-           Array.from({ length: this.levelHeight }, (_, row) => new GridCell(col, row, this, startingTerrain))
+        const newGrid = Array.from({ length: this.levelWidth }, (_, col) =>
+           Array.from({ length: this.levelHeight }, (_, row) => GridCell.createAttached(col, row, this, startingTerrain))
         );
+        // console.log("empty grid", newGrid);
+        return newGrid;
     }
 
     generateGrid_random() {
         const terrainTypes = Object.keys(GridCell.TYPES);
-        return Array.from({ length: this.levelHeight }, (_, y) =>
-            Array.from({ length: this.levelWidth }, (_, x) => {
+        const newGrid = Array.from({ length: this.levelWidth }, (_, col) =>
+            Array.from({ length: this.levelHeight }, (_, row) => {
                 const randomTerrain = terrainTypes[Math.floor(Math.random() * terrainTypes.length)];
-                return new GridCell(x, y, this, randomTerrain);
+                return GridCell.createAttached(col, row, this, randomTerrain);
             })
-        );
+         );
+        //  console.log("random grid", newGrid);
+         return newGrid;
     }
 
     applyCellularAutomataSmoothing(grid, terrainToSmooth = "WALL") {
@@ -73,7 +104,7 @@ class WorldLevel {
                     }
                 }
                 // console.log(`automata smoothing ${x} ${y}`);
-                newGrid[x][y] = new GridCell(x, y, this, terrainCount >= 5 ? terrainToSmooth : "FLOOR");
+                newGrid[x][y] = GridCell.createAttached(x, y, this, terrainCount >= 5 ? terrainToSmooth : "FLOOR");
             });
         });
         return newGrid;
@@ -87,10 +118,10 @@ class WorldLevel {
         for (let y = 0; y < this.levelHeight; y++) {
             for (let x = 0; x < this.levelWidth; x++) {
                 if (x === 0 || y === 0 || x === this.levelWidth - 1 || y === this.levelHeight - 1) {
-                    grid[x][y] = new GridCell(x, y, this, "WALL");
+                    grid[x][y] = GridCell.createAttached(x, y, this, "WALL");
                 } else {
                     const terrain = Math.random() < 0.45 ? "WALL" : "FLOOR";
-                    grid[x][y] = new GridCell(x, y, this, terrain);
+                    grid[x][y] = GridCell.createAttached(x, y, this, terrain);
                 }
             }
         }
@@ -101,10 +132,10 @@ class WorldLevel {
         for (let i = 0; i < quarterWidth; i++) {
             for (let j = 0; j < quarterHeight; j++) {
                 if (i + j < quarterWidth) {
-                    grid[i][j] = new GridCell(i, j, this, "WALL"); // Top-left corner
-                    grid[i][this.levelHeight - 1 - j] = new GridCell(i, this.levelHeight - 1 - j, this, "WALL"); // Bottom-left
-                    grid[this.levelWidth - 1 - i][j] = new GridCell(this.levelWidth - 1 - i, j, this, "WALL"); // Top-right
-                    grid[this.levelWidth - 1 - i][this.levelHeight - 1 - j] = new GridCell(this.levelWidth - 1 - i, this.levelHeight - 1 - j, this, "WALL"); // Bottom-right
+                    grid[i][j] = GridCell.createAttached(i, j, this, "WALL"); // Top-left corner
+                    grid[i][this.levelHeight - 1 - j] = GridCell.createAttached(i, this.levelHeight - 1 - j, this, "WALL"); // Bottom-left
+                    grid[this.levelWidth - 1 - i][j] = GridCell.createAttached(this.levelWidth - 1 - i, j, this, "WALL"); // Top-right
+                    grid[this.levelWidth - 1 - i][this.levelHeight - 1 - j] = GridCell.createAttached(this.levelWidth - 1 - i, this.levelHeight - 1 - j, this, "WALL"); // Bottom-right
                 }
             }
         }
@@ -160,17 +191,17 @@ class WorldLevel {
                 }
                 
                 if (ax >= 0 && ax < this.levelWidth && ay >= 0 && ay < this.levelHeight) {
-                    grid[ax][ay] = new GridCell(ax, ay, this, "FLOOR");
+                    grid[ax][ay] = GridCell.createAttached(ax, ay, this, "FLOOR");
                     
                     // Add some variation in corridor width
                     if (Math.random() < 0.3) {
                         let offsetX = Math.random() < 0.5 ? -1 : 1;
                         let offsetY = Math.random() < 0.5 ? -1 : 1;
                         if (ax + offsetX >= 0 && ax + offsetX < this.levelWidth) {
-                            grid[ax + offsetX][ay] = new GridCell(ax + offsetX, ay, this, "FLOOR");
+                            grid[ax + offsetX][ay] = GridCell.createAttached(ax + offsetX, ay, this, "FLOOR");
                         }
                         if (ay + offsetY >= 0 && ay + offsetY < this.levelHeight) {
-                            grid[ax][ay + offsetY] = new GridCell(ax, ay + offsetY, this, "FLOOR");
+                            grid[ax][ay + offsetY] = GridCell.createAttached(ax, ay + offsetY, this, "FLOOR");
                         }
                     }
                 }
@@ -206,7 +237,7 @@ class WorldLevel {
         let x = startX;
         let y = startY;
         for (let i = 0; i < this.levelWidth * this.levelHeight * 0.3; i++) {
-            grid[x][y] = new GridCell(x, y, this, "FLOOR");
+            grid[x][y] = GridCell.createAttached(x, y, this, "FLOOR");
             const direction = Math.floor(Math.random() * 4);
             if (direction === 0 && y > 1) y--; // Up
             if (direction === 1 && y < this.levelHeight - 2) y++; // Down
@@ -237,7 +268,7 @@ class WorldLevel {
             if (grid[x][y].terrain != "FLOOR") {
                 countBurrowed++;
             }
-            grid[x][y] = new GridCell(x, y, this, "FLOOR");
+            grid[x][y] = GridCell.createAttached(x, y, this, "FLOOR");
             const tryDirection = Math.floor(Math.random() * 5);
             const direction = tryDirection == 4 ? lastDirection : tryDirection;
             if (direction === 0 && y > 1) y--; // Up
@@ -278,7 +309,7 @@ class WorldLevel {
             
             for (let x = roomStartX; x < roomStartX + roomWidth; x++) {
                 for (let y = roomStartY; y < roomStartY + roomHeight; y++) {
-                    grid[x][y] = new GridCell(x, y, this, "FLOOR");
+                    grid[x][y] = GridCell.createAttached(x, y, this, "FLOOR");
                 }
             }
             rooms.push({ x: roomStartX, y: roomStartY, width: roomWidth, height: roomHeight });
@@ -300,7 +331,7 @@ class WorldLevel {
                     y += Math.sign(targetY - y);
                 }
                 
-                grid[x][y] = new GridCell(x, y, this, "FLOOR");
+                grid[x][y] = GridCell.createAttached(x, y, this, "FLOOR");
             }
         }
 
@@ -330,7 +361,7 @@ class WorldLevel {
             if ((depth > 1) && (Math.random() < .66)) {
                 for (let rx = roomX; rx < roomX + roomWidth; rx++) {
                     for (let ry = roomY; ry < roomY + roomHeight; ry++) {
-                        grid[rx][ry] = new GridCell(rx, ry, worldLevel, "FLOOR");
+                        grid[rx][ry] = GridCell.createAttached(rx, ry, worldLevel, "FLOOR");
                     }
                 }
                 rooms.push({ x: roomX, y: roomY, width: roomWidth, height: roomHeight });
@@ -365,11 +396,11 @@ class WorldLevel {
             let targetY = currRoom.y + Math.floor(currRoom.height / 2);
             
             while (x !== targetX) {
-                grid[x][y] = new GridCell(x, y, this, "FLOOR");
+                grid[x][y] = GridCell.createAttached(x, y, this, "FLOOR");
                 x += x < targetX ? 1 : -1;
             }
             while (y !== targetY) {
-                grid[x][y] = new GridCell(x, y, this, "FLOOR");
+                grid[x][y] = GridCell.createAttached(x, y, this, "FLOOR");
                 y += y < targetY ? 1 : -1;
             }
         }
@@ -407,7 +438,7 @@ class WorldLevel {
             let possibleDoors = []; // i.e. the perimeter cells of the building
             for (let x = startX; x < startX + width; x++) {
                 for (let y = startY; y < startY + height; y++) {
-                    grid[x][y] = new GridCell(x, y, this, "WALL");
+                    grid[x][y] = GridCell.createAttached(x, y, this, "WALL");
                     if (y === startY || y === startY + height - 1 || x === startX || x === startX + width - 1) {
                         possibleDoors.push([x, y]);
                     }
@@ -416,14 +447,14 @@ class WorldLevel {
     
             // Add a "door" by converting one random perimeter cell to FLOOR
             let [doorX, doorY] = possibleDoors[Math.floor(Math.random() * possibleDoors.length)];
-            grid[doorX][doorY] = new GridCell(doorX, doorY, this, "FLOOR"); // Placeholder for a door
+            grid[doorX][doorY] = GridCell.createAttached(doorX, doorY, this, "FLOOR"); // Placeholder for a door
         }
     
         // Surround the entire town with a one-cell-thick wall
         for (let x = 0; x < this.levelWidth; x++) {
             for (let y = 0; y < this.levelHeight; y++) {
                 if (x === 0 || y === 0 || x === this.levelWidth - 1 || y === this.levelHeight - 1) {
-                    grid[x][y] = new GridCell(x, y, this, "WALL");
+                    grid[x][y] = GridCell.createAttached(x, y, this, "WALL");
                 }
             }
         }
@@ -440,7 +471,7 @@ class WorldLevel {
             let puddleX = Math.floor(Math.random() * this.levelWidth);
             let puddleY = Math.floor(Math.random() * this.levelHeight);
             let puddleSize = Math.floor(Math.random() * puddleMaxSize) + 1;
-            grid[puddleX][puddleY] = new GridCell(puddleX, puddleY, this, "WATER_SHALLOW");
+            grid[puddleX][puddleY] = GridCell.createAttached(puddleX, puddleY, this, "WATER_SHALLOW");
 
             // let puddleSpreadDirections = [[1, 0], [-1, 0], [0, 1], [0, -1]];
             let puddleSpreadDeltas = {"R": [1, 0],"L": [-1, 0],"D": [0, 1],"U": [0, -1]};
@@ -452,7 +483,7 @@ class WorldLevel {
                 let [dx, dy] = puddleSpreadDeltas[puddleSpreadDir];
                 puddleX = constrainValue(puddleX + dx, 0, this.levelWidth-1);
                 puddleY = constrainValue(puddleY + dy, 0, this.levelHeight-1);
-                grid[puddleX][puddleY] = new GridCell(puddleX, puddleY, this, "WATER_SHALLOW");
+                grid[puddleX][puddleY] = GridCell.createAttached(puddleX, puddleY, this, "WATER_SHALLOW");
                 lastSpreadDir = puddleSpreadDir;
             }
         }
@@ -510,6 +541,7 @@ class WorldLevel {
         for (let x = 0; x < this.levelWidth; x++) {
             for (let y = 0; y < this.levelHeight; y++) {
                 let cell = this.grid[x][y];
+                // console.log(`cell ${x} ${y}`, cell);
                 if (!cell.isOpaque) {
                     cell.isViewable = true; 
                 } else {

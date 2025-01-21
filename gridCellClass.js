@@ -14,12 +14,21 @@ class GridCell {
     static ADJACENCY_DIRECTIONS_ORTHOGONAL = [{ dx: 0, dy: -1 }, { dx: -1, dy: 0 }, { dx: 1, dy: 0 }, { dx: 0, dy: 1 }];
     static ADJACENCY_DIRECTIONS_DIAGONAL = [{ dx: -1, dy: -1 }, { dx: 1, dy: -1 }, { dx: -1, dy: 1 }, { dx: 1, dy: 1 }];
 
-    constructor(x, y, worldLevel, terrain = "FLOOR") {
+    static createDetached(terrain = "FLOOR") {
+        return new GridCell(terrain);
+    }
+
+    static createAttached(x, y, worldLevel, terrain = "FLOOR") {
+        const cell = GridCell.createDetached(terrain);
+        cell.attatchToWorldLevel(x,y,worldLevel);
+        return cell;
+    }
+
+    constructor(terrain = "FLOOR") {
         const type = GridCell.TYPES[terrain] || GridCell.TYPES.FLOOR;
-        this.x = x;
-        this.y = y;
-        this.z = worldLevel.levelNumber;
-        this.worldLevel = worldLevel;
+        this.x = -1;
+        this.y = -1;
+        this.z = -1;
         this.terrain = type.terrain;
         this.isTraversible = type.isTraversible;
         this.entryMovementCost = type.entryMovementCost;
@@ -32,17 +41,33 @@ class GridCell {
         // console.log("created cell", this);
     }
 
+    setPosition(x,y,z=0) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    attatchToWorldLevel(x,y,worldLevel) {
+        this.x = x;
+        this.y = y;
+        this.setWorldLevel(worldLevel);
+    }
+
+    setWorldLevel(worldLevel) {
+        this.worldLevel = worldLevel;
+        this.z = worldLevel.levelNumber;
+    }
+
     getAdjacentCells() {
         const adjacentCells = [];
-        // const directions = [
-        //     { dx: -1, dy: -1 }, { dx: 0, dy: -1 }, { dx: 1, dy: -1 }, // Upper row
-        //     { dx: -1, dy: 0 },                  { dx: 1, dy: 0 },  // Sides
-        //     { dx: -1, dy: 1 }, { dx: 0, dy: 1 }, { dx: 1, dy: 1 }  // Lower row
-        // ];
 
+        // console.log('getAdjacentCells, this', this);
+        // console.log('getAdjacentCells, this.worldLevel', this.worldLevel);
+        // console.log('getAdjacentCells, this.worldLevel.grid', this.worldLevel.grid);
         for (const { dx, dy } of GridCell.ADJACENCY_DIRECTIONS) {
             const newX = this.x + dx;
             const newY = this.y + dy;
+            // console.log(`${newX},${newY}`);
 
             if (newX >= 0 && newX < this.worldLevel.levelWidth && newY >= 0 && newY < this.worldLevel.levelHeight) {
                 adjacentCells.push(this.worldLevel.grid[newX][newY]);
