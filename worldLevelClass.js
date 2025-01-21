@@ -1,5 +1,6 @@
 import { GridCell } from "./gridCellClass.js";
 import { Structure } from "./structureClass.js";
+import { constrainValue } from "./util.js";
 
 const SUBDIVIDE_MIN_WIDTH = 6;
 const SUBDIVIDE_MIN_HEIGHT = 6;
@@ -13,7 +14,7 @@ class WorldLevel {
         this.levelNumber = levelNumber;
         this.levelWidth = levelWidth;
         this.levelHeight = levelHeight;
-        this.grid = this.generateGrid_roomsAndCorridors_subdivide();
+        this.grid = this.generateGrid_town();
         this.determineCellViewability();
         this.levelEntities = [];
         this.levelStructures = [];
@@ -372,11 +373,70 @@ class WorldLevel {
         return grid;
     }
 
-    constrainValue(valToConstrain,min,max) {
-        if (valToConstrain < min) { return min; }   
-        if (valToConstrain > max) { return max; }
-        return valToConstrain;  
+    generateGrid_town(numBuildings = 5, minSize = 4, maxSize = 8) {
+        let grid = this.generateGrid_empty("FLOOR");
+    
+        // Function to create a building
+        const buildings = [];
+    
+        for (let i = 0; i < numBuildings; i++) {
+            let width = Math.floor(Math.random() * (maxSize - minSize + 1)) + minSize;
+            let height = Math.floor(Math.random() * (maxSize - minSize + 1)) + minSize;
+            let startX = Math.floor(Math.random() * (this.levelWidth - width - 3)) + 2;
+            let startY = Math.floor(Math.random() * (this.levelHeight - height - 3)) + 2;
+    
+            // Ensure no overlapping by checking against previous buildings - the "+ 1"'s in here ensure there's a least one space between buildings
+            let overlaps = buildings.some(building => 
+                startX < building.x + building.width + 1 &&
+                startX + width + 1 > building.x &&
+                startY < building.y + building.height + 1 &&
+                startY + height + 1 > building.y
+            );
+            if (overlaps) {
+                i--;
+                continue;
+            }
+    
+            buildings.push({ x: startX, y: startY, width, height });
+    
+            // Create the building with walls
+            let possibleDoors = [];
+            for (let x = startX; x < startX + width; x++) {
+                for (let y = startY; y < startY + height; y++) {
+                    grid[x][y] = new GridCell(x, y, this, "WALL");
+                    if (y === startY || y === startY + height - 1 || x === startX || x === startX + width - 1) {
+                        possibleDoors.push([x, y]);
+                    }
+                }
+            }
+    
+            // Add a "door" by converting one random perimeter cell to FLOOR
+            // let possibleDoors = [];
+            // for (let x = startX; x < startX + width; x++) {
+            //     possibleDoors.push([x, startY]); // Top side
+            //     possibleDoors.push([x, startY + height - 1]); // Bottom side
+            // }
+            // for (let y = startY; y < startY + height; y++) {
+            //     possibleDoors.push([startX, y]); // Left side
+            //     possibleDoors.push([startX + width - 1, y]); // Right side
+            // }
+    
+            let [doorX, doorY] = possibleDoors[Math.floor(Math.random() * possibleDoors.length)];
+            grid[doorX][doorY] = new GridCell(doorX, doorY, this, "FLOOR"); // Placeholder for a door
+        }
+    
+        // Surround the entire town with a one-cell-thick wall
+        for (let x = 0; x < this.levelWidth; x++) {
+            for (let y = 0; y < this.levelHeight; y++) {
+                if (x === 0 || y === 0 || x === this.levelWidth - 1 || y === this.levelHeight - 1) {
+                    grid[x][y] = new GridCell(x, y, this, "WALL");
+                }
+            }
+        }
+    
+        return grid;
     }
+    
 
     generateGrid_puddles(puddleDensity = 0.12, puddleMaxSize = 3) {
         let grid = this.generateGrid_empty();
@@ -396,8 +456,8 @@ class WorldLevel {
                 puddleSpreadDirections.sort(() => Math.random() - 0.5); // Shuffle directions for randomness
                 let puddleSpreadDir = puddleSpreadDirections[0] != lastSpreadDir ? puddleSpreadDirections[0] : puddleSpreadDirections[1];
                 let [dx, dy] = puddleSpreadDeltas[puddleSpreadDir];
-                puddleX = this.constrainValue(puddleX + dx, 0, this.levelWidth-1);
-                puddleY = this.constrainValue(puddleY + dy, 0, this.levelHeight-1);
+                puddleX = constrainValue(puddleX + dx, 0, this.levelWidth-1);
+                puddleY = constrainValue(puddleY + dy, 0, this.levelHeight-1);
                 grid[puddleX][puddleY] = new GridCell(puddleX, puddleY, this, "WATER_SHALLOW");
                 lastSpreadDir = puddleSpreadDir;
             }
