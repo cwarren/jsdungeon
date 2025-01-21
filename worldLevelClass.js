@@ -4,7 +4,12 @@ import { constrainValue } from "./util.js";
 import {
     setWorldLevelForGridCells,
     generateGrid_empty, 
-    generateGrid_random} from "./gridGeneration.js"
+    generateGrid_random,
+    generateGrid_caves,
+    generateGrid_caves_shattered,
+    generateGrid_caves_large,
+    generateGrid_caves_huge,
+} from "./gridGeneration.js";
 
 const SUBDIVIDE_MIN_WIDTH = 6;
 const SUBDIVIDE_MIN_HEIGHT = 6;
@@ -25,13 +30,13 @@ class WorldLevel {
         } else if (levelType == "BURROW") {
             this.grid = this.generateGrid_burrow(levelWidth,levelHeight);
         } else if (levelType == "CAVES") {
-            this.grid = this.generateGrid_caves(levelWidth,levelHeight);
+            this.grid = generateGrid_caves(levelWidth,levelHeight);
         } else if (levelType == "CAVES_HUGE") {
-            this.grid = this.generateGrid_caves_huge(levelWidth,levelHeight);
+            this.grid = generateGrid_caves_huge(levelWidth,levelHeight);
         } else if (levelType == "CAVES_LARGE") {
-            this.grid = this.generateGrid_caves_large(levelWidth,levelHeight);
+            this.grid = generateGrid_caves_large(levelWidth,levelHeight);
         } else if (levelType == "CAVES_SHATTERED") {
-            this.grid = this.generateGrid_caves_shattered(levelWidth,levelHeight);
+            this.grid = generateGrid_caves_shattered(levelWidth,levelHeight);
         } else if (levelType == "NEST") {
             this.grid = this.generateGrid_nest(levelWidth,levelHeight);
         } else if (levelType == "PUDDLES") {
@@ -71,167 +76,6 @@ class WorldLevel {
         stairsDown.connectsTo = stairsUp;
         stairsUp.connectsTo = stairsDown;
         this.levelStructures.push(stairsUp);
-    }
-
-
-    generateGrid_empty(startingTerrain = "FLOOR") {
-        const newGrid = Array.from({ length: this.levelWidth }, (_, col) =>
-           Array.from({ length: this.levelHeight }, (_, row) => GridCell.createAttached(col, row, this, startingTerrain))
-        );
-        // console.log("empty grid", newGrid);
-        return newGrid;
-    }
-
-    generateGrid_random() {
-        const terrainTypes = Object.keys(GridCell.TYPES);
-        const newGrid = Array.from({ length: this.levelWidth }, (_, col) =>
-            Array.from({ length: this.levelHeight }, (_, row) => {
-                const randomTerrain = terrainTypes[Math.floor(Math.random() * terrainTypes.length)];
-                return GridCell.createAttached(col, row, this, randomTerrain);
-            })
-         );
-        //  console.log("random grid", newGrid);
-         return newGrid;
-    }
-
-    applyCellularAutomataSmoothing(grid, terrainToSmooth = "WALL") {
-        let newGrid = this.generateGrid_empty();
-        grid.forEach((col, x) => {
-            col.forEach((cell, y) => {
-                let terrainCount = 0;
-                for (let dy = -1; dy <= 1; dy++) {
-                    for (let dx = -1; dx <= 1; dx++) {
-                        if (y + dy >= 0 && y + dy < this.levelHeight && x + dx >= 0 && x + dx < this.levelWidth) {
-                            if (grid[x + dx][y + dy].terrain === terrainToSmooth) {
-                                terrainCount++;
-                            }
-                        } else {
-                            terrainCount++; // Treat out-of-bounds as walls
-                        }
-                    }
-                }
-                // console.log(`automata smoothing ${x} ${y}`);
-                newGrid[x][y] = GridCell.createAttached(x, y, this, terrainCount >= 5 ? terrainToSmooth : "FLOOR");
-            });
-        });
-        return newGrid;
-    }
-
-    generateGrid_variable_caves(smoothness = 2) {
-        let grid = this.generateGrid_empty();
-        console.log("caves empty grid", grid);
-        
-        // Initialize all border cells as WALL
-        for (let y = 0; y < this.levelHeight; y++) {
-            for (let x = 0; x < this.levelWidth; x++) {
-                if (x === 0 || y === 0 || x === this.levelWidth - 1 || y === this.levelHeight - 1) {
-                    grid[x][y] = GridCell.createAttached(x, y, this, "WALL");
-                } else {
-                    const terrain = Math.random() < 0.45 ? "WALL" : "FLOOR";
-                    grid[x][y] = GridCell.createAttached(x, y, this, terrain);
-                }
-            }
-        }
-        
-        // Fill corners with WALL triangles
-        const quarterWidth = Math.floor(this.levelWidth / 4);
-        const quarterHeight = Math.floor(this.levelHeight / 4);
-        for (let i = 0; i < quarterWidth; i++) {
-            for (let j = 0; j < quarterHeight; j++) {
-                if (i + j < quarterWidth) {
-                    grid[i][j] = GridCell.createAttached(i, j, this, "WALL"); // Top-left corner
-                    grid[i][this.levelHeight - 1 - j] = GridCell.createAttached(i, this.levelHeight - 1 - j, this, "WALL"); // Bottom-left
-                    grid[this.levelWidth - 1 - i][j] = GridCell.createAttached(this.levelWidth - 1 - i, j, this, "WALL"); // Top-right
-                    grid[this.levelWidth - 1 - i][this.levelHeight - 1 - j] = GridCell.createAttached(this.levelWidth - 1 - i, this.levelHeight - 1 - j, this, "WALL"); // Bottom-right
-                }
-            }
-        }
-        
-        // Apply cellular automata smoothing
-        for (let i = 0; i < smoothness; i++) {
-            grid = this.applyCellularAutomataSmoothing(grid);
-        }
-    
-        // Ensure full connectivity using flood fill
-        let visited = new Set();
-        let regions = [];
-    
-        function floodFill(x, y, levelWidth, levelHeight, grid, visited, region) {
-            let stack = [[x, y]];
-            while (stack.length > 0) {
-                let [cx, cy] = stack.pop();
-                let key = `${cx},${cy}`;
-                if (!visited.has(key) && cx >= 0 && cy >= 0 && cx < levelWidth && cy < levelHeight && grid[cx][cy].terrain === "FLOOR") {
-                    visited.add(key);
-                    region.push([cx, cy]);
-                    stack.push([cx + 1, cy]);
-                    stack.push([cx - 1, cy]);
-                    stack.push([cx, cy + 1]);
-                    stack.push([cx, cy - 1]);
-                }
-            }
-        }
-        
-        // Identify disconnected regions
-        for (let y = 0; y < this.levelHeight; y++) {
-            for (let x = 0; x < this.levelWidth; x++) {
-                if (grid[x][y].terrain === "FLOOR" && !visited.has(`${x},${y}`)) {
-                    let region = [];
-                    floodFill(x, y, this.levelWidth, this.levelHeight, grid, visited, region);
-                    regions.push(region);
-                }
-            }
-        }
-
-        // Connect disconnected regions with winding, irregular paths
-        for (let i = 1; i < regions.length; i++) {
-            let regionA = regions[i - 1];
-            let regionB = regions[i];
-            let [ax, ay] = regionA[Math.floor(Math.random() * regionA.length)];
-            let [bx, by] = regionB[Math.floor(Math.random() * regionB.length)];
-            
-            while (ax !== bx || ay !== by) {
-                if (Math.random() < 0.7) {
-                    ax += Math.sign(bx - ax);
-                } else {
-                    ay += Math.sign(by - ay);
-                }
-                
-                if (ax >= 0 && ax < this.levelWidth && ay >= 0 && ay < this.levelHeight) {
-                    grid[ax][ay] = GridCell.createAttached(ax, ay, this, "FLOOR");
-                    
-                    // Add some variation in corridor width
-                    if (Math.random() < 0.3) {
-                        let offsetX = Math.random() < 0.5 ? -1 : 1;
-                        let offsetY = Math.random() < 0.5 ? -1 : 1;
-                        if (ax + offsetX >= 0 && ax + offsetX < this.levelWidth) {
-                            grid[ax + offsetX][ay] = GridCell.createAttached(ax + offsetX, ay, this, "FLOOR");
-                        }
-                        if (ay + offsetY >= 0 && ay + offsetY < this.levelHeight) {
-                            grid[ax][ay + offsetY] = GridCell.createAttached(ax, ay + offsetY, this, "FLOOR");
-                        }
-                    }
-                }
-            }
-        }
-
-        return grid;
-    }
-
-    generateGrid_caves() {
-        return this.generateGrid_variable_caves(3);
-    }
-
-    generateGrid_caves_shattered() {
-        return this.generateGrid_variable_caves(1);
-    }
-
-    generateGrid_caves_large() {
-        return this.generateGrid_variable_caves(5);
-    }
-
-    generateGrid_caves_huge() {
-        return this.generateGrid_variable_caves(11);
     }
 
     generateGrid_burrow() {
@@ -494,8 +338,6 @@ class WorldLevel {
                 lastSpreadDir = puddleSpreadDir;
             }
         }
-
-        // grid = this.applyCellularAutomataSmoothing(grid, "WATER_SHALLOW");
 
         return grid;
     }
