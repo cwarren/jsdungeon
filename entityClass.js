@@ -1,15 +1,47 @@
 import { gameState } from "./gameplay.js";
 
 class Entity {
-    constructor(x, y, z, type, displaySymbol = '?') {
-      this.x = x;
-      this.y = y;
-      this.z = z;
+
+    constructor(type) {
       this.type = type;
-      this.displaySymbol = displaySymbol;
-      this.viewRadius = 12;
+      this.displaySymbol = Entity.ENTITIES[type].displaySymbol;
+      this.displayColor = Entity.ENTITIES[type].displayColor;
+      this.viewRadius = Entity.ENTITIES[type].viewRadius;
       this.visibleCells = new Set();
       this.seenCells = new Set();
+    }
+
+    placeAt(x,y,z) {
+      this.x = x;
+      this.y = y;
+      if (z || z === 0) {
+        this.z = z;
+      }
+      gameState.world[this.z].grid[x][y].entity = this;
+    }
+
+    placeAtCell(cell) {
+      this.x = cell.x;
+      this.y = cell.y;
+      this.z = cell.z;
+      cell.entity = this;
+    }
+
+    static MAX_PLACEMENT_ATTEMPTS = 20;
+    placeRandomlyInWorldLevel(worldLevel, avoidCellSet) {
+      let possiblePlacementCell = worldLevel.getRandomCellOfTerrainInGrid("FLOOR", worldLevel.grid);
+      let placementAttempts = 1;
+      if (avoidCellSet) {  
+        while (avoidCellSet.has(possiblePlacementCell) && (placementAttempts < Entity.MAX_PLACEMENT_ATTEMPTS)) {
+          possiblePlacementCell = worldLevel.getRandomCellOfTerrainInGrid("FLOOR", worldLevel.grid);
+          placementAttempts++;
+        }
+      }
+      if (placementAttempts >= Entity.MAX_PLACEMENT_ATTEMPTS) {
+        console.log("could not place entity in world level - placement attempts exceed max placement attempts");
+      } else {
+        this.placeAtCell(possiblePlacementCell);
+      }
     }
 
     getCell() {
@@ -17,6 +49,7 @@ class Entity {
     }
 
     determineVisibleCells() {
+      // console.log("gameState", gameState);
       this.determineVisibleCellsInGrid(gameState.world[this.z].grid);
     }
 
@@ -95,6 +128,22 @@ class Entity {
       }
     }
   }
+
+  static ENTITIES_LIST = [
+    {type: "AVATAR", name: "Player", displaySymbol: "@", displayColor: "#fff", viewRadius: 9},
+    {type: "MOLD_PALE", name: "Pale Mold", displaySymbol: "m", displayColor: "#ddd", viewRadius: 2},
+  ];
+
+  static ENTITIES = {};
+  static initializeEntitiesFromList() {
+    Entity.ENTITIES_LIST.forEach((ent) => { Entity.ENTITIES[ent.type] = ent; })
+  }
+
+  static generateEntity(entityType) {
+
+  }
 }
+
+Entity.initializeEntitiesFromList();
   
 export { Entity };
