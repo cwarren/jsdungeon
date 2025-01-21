@@ -21,6 +21,24 @@ class Entity {
       this.determineVisibleCellsInGrid(gameState.world[this.z].grid);
     }
 
+  tryMove(dx, dy) {
+    const currentLevel = gameState.world.find(level => level.levelNumber === this.z);
+    if (!currentLevel) return;
+
+    const newX = this.x + dx;
+    const newY = this.y + dy;
+
+    if (newX >= 0 && newX < currentLevel.levelWidth && newY >= 0 && newY < currentLevel.levelHeight) {
+      const targetCell = currentLevel.grid[newX][newY];
+      if (targetCell.isTraversible) {
+        this.x = newX;
+        this.y = newY;
+      } else {
+        console.log("move prevented because target is not traversable", targetCell);
+      }
+    }
+  }
+
   /**
    * Determines visible cells within the grid using line-of-sight and view radius.
    * Uses Bresenham’s line algorithm for visibility checking.
