@@ -7,10 +7,10 @@ import { GridCell } from "./gridCellClass.js";
 // level width, level height, level gen type
 const worldLevelSpecifications = [
   // [30, 20, "TOWN"], 
-  // [30, 20, "ROOMS_SUBDIVIDE"], 
+  [30, 20, "ROOMS_SUBDIVIDE"], 
   // [30, 20, "ROOMS_RANDOM"], 
   // [30, 20, "PUDDLES"], 
-  [30, 20, "BURROW"], 
+  // [30, 20, "BURROW"], 
   // [30, 20, "NEST"], 
   // [30, 20, "CAVES_SHATTERED"], 
   // [30, 20, "CAVES"], 
