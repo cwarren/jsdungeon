@@ -35,7 +35,7 @@ function generateGrid_random(width, height) {
 
 function generateGrid_variable_caves(width, height, smoothness = 2) {
     let grid = generateGrid_empty(width, height);
-    console.log("caves empty grid", grid);
+    // console.log("caves empty grid", grid);
     
     // Initialize all border cells as WALL
     for (let y = 0; y < height; y++) {
@@ -150,27 +150,27 @@ function generateGrid_caves_huge(width, height) {
     return generateGrid_variable_caves(width, height, 11);
 }
 
-
-// generateGrid_burrow() {
-//     let grid = this.generateGrid_empty("WALL");
+function generateGrid_burrow(width, height) {
+    let grid = generateGrid_empty(width, height, "WALL");
     
-//     // Determine starting location within the central 75% of the grid
-//     let startX = Math.floor(width * 0.125) + Math.floor(Math.random() * (width * 0.75));
-//     let startY = Math.floor(height * 0.125) + Math.floor(Math.random() * (height * 0.75));
+    // Determine starting location within the central 75% of the grid
+    let startX = Math.floor(width * 0.125) + Math.floor(Math.random() * (width * 0.75));
+    let startY = Math.floor(height * 0.125) + Math.floor(Math.random() * (height * 0.75));
     
-//     let x = startX;
-//     let y = startY;
-//     for (let i = 0; i < width * height * 0.3; i++) {
-//         grid[x][y] = GridCell.createDetachedAt(x, y, "FLOOR");
-//         const direction = Math.floor(Math.random() * 4);
-//         if (direction === 0 && y > 1) y--; // Up
-//         if (direction === 1 && y < height - 2) y++; // Down
-//         if (direction === 2 && x > 1) x--; // Left
-//         if (direction === 3 && x < width - 2) x++; // Right
-//     }
+    // then carve out floors in a random walk (orthogonal)
+    let x = startX;
+    let y = startY;
+    for (let i = 0; i < width * height * 0.3; i++) {
+        grid[x][y] = GridCell.createDetachedAt(x, y, "FLOOR");
+        const direction = Math.floor(Math.random() * 4);
+        if (direction === 0 && y > 1) y--; // Up
+        if (direction === 1 && y < height - 2) y++; // Down
+        if (direction === 2 && x > 1) x--; // Left
+        if (direction === 3 && x < width - 2) x++; // Right
+    }
     
-//     return grid;
-// }
+    return grid;
+}
 
 // generateGrid_nest() {
 //     let grid = this.generateGrid_empty("WALL");
@@ -425,5 +425,6 @@ export {
     generateGrid_caves_shattered,
     generateGrid_caves_large,
     generateGrid_caves_huge,
+    generateGrid_burrow,
     
 };
