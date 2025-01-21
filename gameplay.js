@@ -16,6 +16,8 @@ function initializeGameState(levelDimensions) {
   firstLevel.addStairsDown();
 
   setUpAvatar(firstLevel);
+
+  populateLevelWithEntities(firstLevel);
 }
 
 function setUpAvatar(initialFloor) {
@@ -24,6 +26,14 @@ function setUpAvatar(initialFloor) {
 
   gameState.avatar = avatar;
   avatar.determineVisibleCells();
+}
+
+function populateLevelWithEntities(worldLevel) {
+  for (let i = 0; i<5; i++) {
+    const ent = new Entity("MOLD_PALE");
+    ent.placeRandomlyInWorldLevel(worldLevel);
+  }
+
 }
 
 function getAvatarCell() {

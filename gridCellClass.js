@@ -6,6 +6,14 @@ class GridCell {
         WATER_DEEP: { terrain: "WATER_DEEP", isTraversible: true, entryMovementCost: 120, isOpaque: false, color: "#00008B" }
     };
 
+    static ADJACENCY_DIRECTIONS = [
+        { dx: -1, dy: -1 }, { dx: 0, dy: -1 }, { dx: 1, dy: -1 }, // Upper row
+        { dx: -1, dy: 0 },                  { dx: 1, dy: 0 },  // Sides
+        { dx: -1, dy: 1 }, { dx: 0, dy: 1 }, { dx: 1, dy: 1 }  // Lower row
+    ];
+    static ADJACENCY_DIRECTIONS_ORTHOGONAL = [{ dx: 0, dy: -1 }, { dx: -1, dy: 0 }, { dx: 1, dy: 0 }, { dx: 0, dy: 1 }];
+    static ADJACENCY_DIRECTIONS_DIAGONAL = [{ dx: -1, dy: -1 }, { dx: 1, dy: -1 }, { dx: -1, dy: 1 }, { dx: 1, dy: 1 }];
+
     constructor(x, y, worldLevel, terrain = "FLOOR") {
         const type = GridCell.TYPES[terrain] || GridCell.TYPES.FLOOR;
         this.x = x;
@@ -26,13 +34,13 @@ class GridCell {
 
     getAdjacentCells() {
         const adjacentCells = [];
-        const directions = [
-            { dx: -1, dy: -1 }, { dx: 0, dy: -1 }, { dx: 1, dy: -1 }, // Upper row
-            { dx: -1, dy: 0 },                  { dx: 1, dy: 0 },  // Sides
-            { dx: -1, dy: 1 }, { dx: 0, dy: 1 }, { dx: 1, dy: 1 }  // Lower row
-        ];
+        // const directions = [
+        //     { dx: -1, dy: -1 }, { dx: 0, dy: -1 }, { dx: 1, dy: -1 }, // Upper row
+        //     { dx: -1, dy: 0 },                  { dx: 1, dy: 0 },  // Sides
+        //     { dx: -1, dy: 1 }, { dx: 0, dy: 1 }, { dx: 1, dy: 1 }  // Lower row
+        // ];
 
-        for (const { dx, dy } of directions) {
+        for (const { dx, dy } of GridCell.ADJACENCY_DIRECTIONS) {
             const newX = this.x + dx;
             const newY = this.y + dy;
 

@@ -12,12 +12,7 @@ class Entity {
     }
 
     placeAt(x,y,z) {
-      this.x = x;
-      this.y = y;
-      if (z || z === 0) {
-        this.z = z;
-      }
-      gameState.world[this.z].grid[x][y].entity = this;
+      placeAtCell(gameState.world[z ? z : 0].grid[x][y]);
     }
 
     placeAtCell(cell) {
@@ -25,6 +20,8 @@ class Entity {
       this.y = cell.y;
       this.z = cell.z;
       cell.entity = this;
+      cell.worldLevel.addEntity(this);
+      this.determineVisibleCells();
     }
 
     static MAX_PLACEMENT_ATTEMPTS = 20;
@@ -48,6 +45,10 @@ class Entity {
       return gameState.world[this.z].grid[this.x][this.y];
     }
 
+    isVisibleTo(otherEntity) {
+      return otherEntity.visibleCells.has(gameState.world[this.z].grid[this.x][this.y]);
+    }
+
     determineVisibleCells() {
       // console.log("gameState", gameState);
       this.determineVisibleCellsInGrid(gameState.world[this.z].grid);
@@ -62,13 +63,20 @@ class Entity {
 
       if (newX >= 0 && newX < currentLevel.levelWidth && newY >= 0 && newY < currentLevel.levelHeight) {
         const targetCell = currentLevel.grid[newX][newY];
-        if (targetCell.isTraversible) {
-          this.x = newX;
-          this.y = newY;
+        if (targetCell.entity) {
+          console.log("move prevented because target cell is already occupied", targetCell);
+        } else if (targetCell.isTraversible) {
+          this.confirmMove(targetCell);
         } else {
-          console.log("move prevented because target is not traversable", targetCell);
+          console.log("move prevented because target cell is not traversable", targetCell);
         }
       }
+    }
+
+    confirmMove(newCell) {
+      const oldCell = this.getCell();
+      oldCell.entity = undefined;
+      this.placeAtCell(newCell);
     }
 
   /**
@@ -137,10 +145,6 @@ class Entity {
   static ENTITIES = {};
   static initializeEntitiesFromList() {
     Entity.ENTITIES_LIST.forEach((ent) => { Entity.ENTITIES[ent.type] = ent; })
-  }
-
-  static generateEntity(entityType) {
-
   }
 }
 
