@@ -22,7 +22,7 @@ function initializeGameState(levelDimensions) {
 
 function setUpAvatar(initialFloor) {
   const avatar = new Entity("AVATAR");
-  avatar.placeRandomlyInWorldLevel(initialFloor);
+  initialFloor.placeEntityRandomly(avatar);
 
   gameState.avatar = avatar;
   avatar.determineVisibleCells();

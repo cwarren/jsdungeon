@@ -1,6 +1,6 @@
 import { gameState, getAvatarCell } from "./gameplay.js";
 
-function avatarMove(dx,dy) { gameState.avatar.tryMove(dx,dy); gameState.avatar.determineVisibleCells(); }
+function avatarMove(dx,dy) { gameState.avatar.tryMove(dx,dy); }
 function moveAvatar_UL()   { avatarMove(-1,-1) }
 function moveAvatar_U()    { avatarMove(0,-1) }
 function moveAvatar_UR()   { avatarMove(1,-1) }
@@ -16,13 +16,14 @@ function ascendStairs() {
     const stairsUp = curCell.structure;
     if (stairsUp && stairsUp.type == "STAIRS_UP") {
         gameState.currentLevel--;
-        gameState.avatar.x = stairsUp.connectsTo.x;
-        gameState.avatar.y = stairsUp.connectsTo.y;
-        gameState.avatar.z = stairsUp.connectsTo.z;
-        gameState.avatar.determineVisibleCells(gameState);
+        curCell.worldLevel.removeEntity(gameState.avatar);
+        const newCell = stairsUp.connectsTo.getCell();
+        gameState.avatar.placeAtCell(newCell);
+        newCell.worldLevel.addEntity(gameState.avatar);
     } else {
         console.log("cannot ascend - no stairs up");
     }
+    console.log("gameState after ascending", gameState);
 }
 
 // if needed, dynamically adds connecting stairs back up on the lower level, and
@@ -39,13 +40,14 @@ function descendStairs() {
                 lowerWorldLevel.addStairsDown();
             }
         }
-        gameState.avatar.x = stairsDown.connectsTo.x;
-        gameState.avatar.y = stairsDown.connectsTo.y;
-        gameState.avatar.z = stairsDown.connectsTo.z;
-        gameState.avatar.determineVisibleCells(gameState);
+        curCell.worldLevel.removeEntity(gameState.avatar);
+        const newCell = stairsDown.connectsTo.getCell()
+        gameState.avatar.placeAtCell(newCell);
+        newCell.worldLevel.addEntity(gameState.avatar);
     } else {
         console.log("cannot descend - no stairs down");
     }
+    console.log("gameState after descending", gameState);
 }
 
 

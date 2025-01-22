@@ -1,4 +1,5 @@
 import { gameState } from "./gameplay.js";
+import {getRandomCellOfTerrainInGrid} from "./gridUtils.js";
 
 class Entity {
 
@@ -21,25 +22,7 @@ class Entity {
       this.y = cell.y;
       this.z = cell.z;
       cell.entity = this;
-      cell.worldLevel.addEntity(this);
       this.determineVisibleCells();
-    }
-
-    static MAX_PLACEMENT_ATTEMPTS = 20;
-    placeRandomlyInWorldLevel(worldLevel, avoidCellSet) {
-      let possiblePlacementCell = worldLevel.getRandomCellOfTerrainInGrid("FLOOR", worldLevel.grid);
-      let placementAttempts = 1;
-      if (avoidCellSet) {  
-        while (avoidCellSet.has(possiblePlacementCell) && (placementAttempts < Entity.MAX_PLACEMENT_ATTEMPTS)) {
-          possiblePlacementCell = worldLevel.getRandomCellOfTerrainInGrid("FLOOR", worldLevel.grid);
-          placementAttempts++;
-        }
-      }
-      if (placementAttempts >= Entity.MAX_PLACEMENT_ATTEMPTS) {
-        console.log("could not place entity in world level - placement attempts exceed max placement attempts");
-      } else {
-        this.placeAtCell(possiblePlacementCell);
-      }
     }
 
     getCell() {

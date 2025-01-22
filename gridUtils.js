@@ -26,6 +26,74 @@ function applyCellularAutomataSmoothing(grid, terrainToSmooth = "WALL") {
     return newGrid;
 }
 
+function findCellOfTerrainNearPlace(terrain, startX, startY, grid) {
+    const levelWidth = grid.length;
+    const levelHeight = grid[0].length;
+    const searchRadius = Math.min(levelWidth, levelHeight);
+    for (let radius = 0; radius < searchRadius; radius++) {
+        for (let y = Math.max(0, startY - radius); y <= Math.min(levelHeight - 1, startY + radius); y++) {
+            for (let x = Math.max(0, startX - radius); x <= Math.min(levelWidth - 1, startX + radius); x++) {
+                if (grid[x][y].terrain === terrain) {
+                    return grid[x][y];
+                }
+            }
+        }
+    }
+    return null; // No matching cell found
+}
+
+function getRandomCellOfTerrainInGrid(terrain, grid) {
+    const levelWidth = grid.length;
+    const levelHeight = grid[0].length;
+    let x = Math.floor(Math.random() * levelWidth);
+    let y = Math.floor(Math.random() * levelHeight);
+    return findCellOfTerrainNearPlace(terrain, x, y, grid);
+}
+
+function findEmptyCellTerrainNearPlace(terrain, startX, startY, grid) {
+    const levelWidth = grid.length;
+    const levelHeight = grid[0].length;
+    const searchRadius = Math.max(levelWidth, levelHeight);
+    for (let radius = 0; radius < searchRadius; radius++) {
+        for (let x = Math.max(0, startX - radius); x <= Math.min(levelWidth - 1, startX + radius); x++) {
+            for (let y = Math.max(0, startY - radius); y <= Math.min(levelHeight - 1, startY + radius); y++) {
+                if (grid[x][y].terrain === terrain && !grid[x][y].structure && !grid[x][y].entity) {
+                    return grid[x][y];
+                }
+            }
+        }
+    }
+    return null; // No matching cell found
+}
+
+function getRandomEmptyCellOfTerrainInGrid(terrain, grid) {
+    const levelWidth = grid.length;
+    const levelHeight = grid[0].length;
+    let x = Math.floor(Math.random() * levelWidth);
+    let y = Math.floor(Math.random() * levelHeight);
+    return findEmptyCellTerrainNearPlace(terrain, x, y, grid);
+}
+
+/**
+ * Determines which cells in the grid are viewable.
+ * A cell is viewable if it or any of its adjacent cells is not opaque.
+ */
+function determineCellViewability(grid) {
+    const levelWidth = grid.length;
+    const levelHeight = grid[0].length;
+    for (let x = 0; x < levelWidth; x++) {
+        for (let y = 0; y < levelHeight; y++) {
+            let cell = grid[x][y];
+            // console.log(`cell ${x} ${y}`, cell);
+            if (!cell.isOpaque) {
+                cell.isViewable = true; 
+            } else {
+                let adjacentCells = cell.getAdjacentCells();
+                cell.isViewable = GridCell.anyCellHasPropertyOfValue(adjacentCells, "isOpaque", false);
+            } 
+        }
+    }
+}
 
 // uses A-star algorithm
 
@@ -105,4 +173,11 @@ function applyCellularAutomataSmoothing(grid, terrainToSmooth = "WALL") {
 //     return []; // No path found
 // }
 
-export {applyCellularAutomataSmoothing};
+export {
+    applyCellularAutomataSmoothing,
+    findCellOfTerrainNearPlace,
+    getRandomCellOfTerrainInGrid,
+    findEmptyCellTerrainNearPlace,
+    getRandomEmptyCellOfTerrainInGrid,
+    determineCellViewability
+};
