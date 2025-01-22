@@ -297,8 +297,9 @@ let pressedKeys = new Set();
 // Capture keyboard input, execute commands, and prevent repeat events
 window.addEventListener("keydown", (event) => {
   if (!pressedKeys.has(event.key)) {
+    console.log("key event", event);
       pressedKeys.add(event.key);
-      executeGameCommand(event.key);
+      executeGameCommand(event.key, event);
       resizeCanvas(); // Redraw game after executing a command
   }
 });

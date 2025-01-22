@@ -41,7 +41,7 @@ class Entity {
 
     takeTurn() {
       if (this.type == "AVATAR") {
-          console.log("Player's turn! Awaiting input...");
+          // console.log("Player's turn! Awaiting input...");
           return 0; // The game waits for player input
       } else {
           console.log(`${this.type} acts!`);
@@ -120,19 +120,36 @@ class Entity {
 
     const newX = this.x + dx;
     const newY = this.y + dy;
-
     if (newX >= 0 && newX < currentLevel.levelWidth && newY >= 0 && newY < currentLevel.levelHeight) {
       const targetCell = currentLevel.grid[newX][newY];
+      if (this.canMoveToCell(targetCell)) {
+        return this.confirmMove(targetCell);
+      }
       if (targetCell.entity) {
         console.log("move prevented because target cell is already occupied", targetCell);
         return 0;
-      } else if (targetCell.isTraversible) {
-        return this.confirmMove(targetCell);
       } else {
         console.log("move prevented because target cell is not traversable", targetCell);
         return 0;
       }
     }
+  }
+
+  canMoveToDeltas(dx,dy) {
+    const currentLevel = gameState.world.find(level => level.levelNumber === this.z);
+    if (!currentLevel) return false;
+
+    const newX = this.x + dx;
+    const newY = this.y + dy;
+    if (newX >= 0 && newX < currentLevel.levelWidth && newY >= 0 && newY < currentLevel.levelHeight) {
+      const targetCell = currentLevel.grid[newX][newY];
+      return this.canMoveToCell(targetCell);
+    }
+    return false;
+  }
+
+  canMoveToCell(cell) {
+    return cell.isTraversible && !cell.entity;
   }
 
   confirmMove(newCell) {
