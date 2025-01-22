@@ -2,7 +2,7 @@ import { gameActionsMap } from "./gameActions.js";
 // import { gameActionsMap, moveAvatar_UL, moveAvatar_U, moveAvatar_UR, moveAvatar_L, moveAvatar_wait, moveAvatar_R, moveAvatar_DL, moveAvatar_D, moveAvatar_DR, ascendStairs, descendStairs } from "./gameActions.js";
 // import { gameState } from "./gameplay.js";
 import { pushUIState, popUIState, setUIState, getCurrentUIState } from "./ui.js";
-import {handlePlayerAction} from "./gameTime.js";
+import {handlePlayerActionTime} from "./gameTime.js";
 
 
 // const gameActionsMap = {
@@ -47,9 +47,7 @@ function executeGameCommand(key) {
     if (actionKey && gameActionsMap[actionKey]) {
         console.log(`Executing action: ${gameActionsMap[actionKey].name}`);
         const actionTimeCost = gameActionsMap[actionKey].action();
-        if (actionTimeCost > 0) {
-            handlePlayerAction(actionTimeCost);
-        }
+        handlePlayerActionTime(actionTimeCost);
     } else if (actionKey) {
         switch (actionKey) {
             case "PUSH_CHARACTER_SHEET":
