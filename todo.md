@@ -1,12 +1,23 @@
-* running
-
-* resolve duped info between direction deltas in gameActions and adjacency directions in GridCell
-
-* combat system
+* when running, stop at structures (even through they can be moved through)
 
 * default actions / move-into actions
 * * attack, for hostile mobs
 * * * mob relationships / attitude
+
+* create a basic combat system
+* * health points
+* * attacking
+* * * dealing damage
+* * * taking damage
+* * * * tracking hostility (maybe - maybe too early for this)
+* * healing
+* * death (& removal from the world)
+
+* when running, turn corners when running in a corridor
+
+* clean up canMove tryMove stuff in Entity - some significant logic replication there that should be resolved
+
+* resolve duped info between direction deltas in gameActions and adjacency directions in GridCell
 
 * ui panes
 * * mini char
@@ -34,5 +45,6 @@
 * * move the turnQueue into the game state (so that if I do game saving the current queue will be saved)
 * * potential play exploit with stair traversal and action timing - think about how to resolve that
 * * * consider tracking time away from that level, and then advanced turns player-less for that duration (up to some not-too-high limit)
+* * keep an eye on time issues with running - seems OK at the moment, but tricky....
 
 
