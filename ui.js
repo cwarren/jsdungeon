@@ -6,6 +6,7 @@ import {advanceGameTime} from "./gameTime.js";
 
 // level width, level height, level gen type
 const worldLevelSpecifications = [
+  [15, 10, "EMPTY"], 
   [30, 20, "TOWN"], 
   [30, 20, "ROOMS_SUBDIVIDE"], 
   [30, 20, "ROOMS_RANDOM"], 
@@ -341,6 +342,18 @@ function drawGameMeta() {
   ctx.fillStyle = "white";
   ctx.font = "20px Arial";
   ctx.fillText("ui state: GAME_META", 50, 50);
+}
+
+function drawGameOver_Win() {
+  ctx.fillStyle = "white";
+  ctx.font = "20px Arial";
+  ctx.fillText("ui state: GAME_OVER_WIN", 50, 50);
+}
+
+function drawGameOver_Lose() {
+  ctx.fillStyle = "white";
+  ctx.font = "20px Arial";
+  ctx.fillText("ui state: GAME_OVER_LOSE", 50, 50);
 }
 
 function drawProseSection() {

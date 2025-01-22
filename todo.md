@@ -1,3 +1,11 @@
+* detail out some game modes and commands
+* * game meta
+* * * new game
+* * * back to current game (not possible if current game is over)
+* * game over - win (transitions to game meta, clearing UI stack)
+* * game over - lose (transitions to game meta, clearing UI stack)
+* * dev command to win or lose current game
+
 * default actions / move-into actions
 * * attack, for hostile mobs
 * * * mob relationships / attitude
@@ -32,6 +40,9 @@
 * * * move towards nearest visible mob to which current mob is hostile
 * * * flee from location
 * * * flee from hostile mobs
+
+* support for multi-input commands, e.g. first command is "dig" and second input is a direction, or first command is 'sleep' and second input is a duration
+* support for command confirmations, e.g. 'Are you sure you want to attack the town sheriff? (y/n)'
 
 * add grid overlayTopOntoBottom and grid carveTopIntoBottom into grid utils 
 
