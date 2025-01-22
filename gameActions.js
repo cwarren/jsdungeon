@@ -72,12 +72,16 @@ function ascendStairs() {
 
 // if needed, dynamically adds connecting stairs back up on the lower level, and
 // another stairs down on that lower level if it's not the deepest
+
 function descendStairs() {
     const curCell = getAvatarCell();
     const stairsDown = curCell.structure;
     if (stairsDown && stairsDown.type == "STAIRS_DOWN") {
         gameState.currentLevel++;
         const lowerWorldLevel = gameState.world[gameState.currentLevel]
+        if (! lowerWorldLevel.isGenerated()) {
+            lowerWorldLevel.generate();
+        }
         if (! stairsDown.connectsTo) {
             lowerWorldLevel.addStairsUpTo(stairsDown);
             if (gameState.currentLevel < gameState.world.length -1) {

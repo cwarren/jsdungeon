@@ -1,4 +1,3 @@
-
 * default actions / move-into actions
 * * attack, for hostile mobs
 * * * mob relationships / attitude
@@ -12,9 +11,11 @@
 * * healing
 * * death (& removal from the world)
 
-* when running, turn corners when running in a corridor
 * when running, stop if a mob becomes newly visible
+* when running, stop if a structure becomes newly visible
 * when running, stop if approaching a corner
+* when running, turn corners when running in a corridor
+* when running, change adjacency interrupts to interrupt on newly adjacent only
 
 * resolve duped info between direction deltas in gameActions and adjacency directions in GridCell
 
@@ -31,8 +32,6 @@
 * * * move towards nearest visible mob to which current mob is hostile
 * * * flee from location
 * * * flee from hostile mobs
-
-* make level generation dynamic rather than having them all created as part of world initialization
 
 * add grid overlayTopOntoBottom and grid carveTopIntoBottom into grid utils 
 
