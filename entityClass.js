@@ -1,5 +1,6 @@
 import { gameState } from "./gameplay.js";
-import {getRandomCellOfTerrainInGrid} from "./gridUtils.js";
+
+const DEFAULT_ACTION_TIME = 100;
 
 class Entity {
 
@@ -37,6 +38,20 @@ class Entity {
       // console.log("gameState", gameState);
       this.determineVisibleCellsInGrid(gameState.world[this.z].grid);
     }
+
+    takeTurn() {
+      if (this.type == "AVATAR") {
+          console.log("Player's turn! Awaiting input...");
+          return 0; // The game waits for player input
+      } else {
+          console.log(`${this.type} acts!`);
+          let actionTime = DEFAULT_ACTION_TIME;
+
+          // AI logic or automatic actions go here...
+
+          return actionTime; 
+      }
+  }
 
     tryMove(dx, dy) {
       const currentLevel = gameState.world.find(level => level.levelNumber === this.z);
@@ -134,4 +149,4 @@ class Entity {
 
 Entity.initializeEntitiesFromList();
   
-export { Entity };
+export { Entity, DEFAULT_ACTION_TIME };

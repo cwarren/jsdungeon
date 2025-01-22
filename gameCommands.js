@@ -1,22 +1,24 @@
-import { moveAvatar_UL, moveAvatar_U, moveAvatar_UR, moveAvatar_L, moveAvatar_wait, moveAvatar_R, moveAvatar_DL, moveAvatar_D, moveAvatar_DR, ascendStairs, descendStairs } from "./gameActions.js";
+import { gameActionsMap } from "./gameActions.js";
+// import { gameActionsMap, moveAvatar_UL, moveAvatar_U, moveAvatar_UR, moveAvatar_L, moveAvatar_wait, moveAvatar_R, moveAvatar_DL, moveAvatar_D, moveAvatar_DR, ascendStairs, descendStairs } from "./gameActions.js";
 // import { gameState } from "./gameplay.js";
 import { pushUIState, popUIState, setUIState, getCurrentUIState } from "./ui.js";
+import {handlePlayerAction} from "./gameTime.js";
 
 
-const gameActionsMap = {
-    MOVE_UL: { name: "Move Up-Left", description: "Move diagonally up-left", action: moveAvatar_UL },
-    MOVE_U: { name: "Move Up", description: "Move up", action: moveAvatar_U },
-    MOVE_UR: { name: "Move Up-Right", description: "Move diagonally up-right", action: moveAvatar_UR },
-    MOVE_L: { name: "Move Left", description: "Move left", action: moveAvatar_L },
-    MOVE_WAIT: { name: "Wait", description: "Stay in place", action: moveAvatar_wait },
-    MOVE_R: { name: "Move Right", description: "Move right", action: moveAvatar_R },
-    MOVE_DL: { name: "Move Down-Left", description: "Move diagonally down-left", action: moveAvatar_DL },
-    MOVE_D: { name: "Move Down", description: "Move down", action: moveAvatar_D },
-    MOVE_DR: { name: "Move Down-Right", description: "Move diagonally down-right", action: moveAvatar_DR },
+// const gameActionsMap = {
+//     MOVE_UL: { name: "Move Up-Left", description: "Move diagonally up-left", action: moveAvatar_UL },
+//     MOVE_U: { name: "Move Up", description: "Move up", action: moveAvatar_U },
+//     MOVE_UR: { name: "Move Up-Right", description: "Move diagonally up-right", action: moveAvatar_UR },
+//     MOVE_L: { name: "Move Left", description: "Move left", action: moveAvatar_L },
+//     MOVE_WAIT: { name: "Wait", description: "Stay in place", action: moveAvatar_wait },
+//     MOVE_R: { name: "Move Right", description: "Move right", action: moveAvatar_R },
+//     MOVE_DL: { name: "Move Down-Left", description: "Move diagonally down-left", action: moveAvatar_DL },
+//     MOVE_D: { name: "Move Down", description: "Move down", action: moveAvatar_D },
+//     MOVE_DR: { name: "Move Down-Right", description: "Move diagonally down-right", action: moveAvatar_DR },
 
-    TAKE_STAIRS_UP: { name: "Take stairs up", description: "Move to a higher level", action: ascendStairs },
-    TAKE_STAIRS_DOWN: { name: "Take stairs down", description: "Move to a lower level", action: descendStairs },
-};
+//     TAKE_STAIRS_UP: { name: "Take stairs up", description: "Move to a higher level", action: ascendStairs },
+//     TAKE_STAIRS_DOWN: { name: "Take stairs down", description: "Move to a lower level", action: descendStairs },
+// };
 
 const keyBinding = {
     "7": "MOVE_UL",
@@ -44,7 +46,10 @@ function executeGameCommand(key) {
     const actionKey = keyBinding[key];
     if (actionKey && gameActionsMap[actionKey]) {
         console.log(`Executing action: ${gameActionsMap[actionKey].name}`);
-        gameActionsMap[actionKey].action();
+        const actionTimeCost = gameActionsMap[actionKey].action();
+        if (actionTimeCost > 0) {
+            handlePlayerAction(actionTimeCost);
+        }
     } else if (actionKey) {
         switch (actionKey) {
             case "PUSH_CHARACTER_SHEET":
