@@ -16,13 +16,13 @@ import {
     generateGrid_town,
     generateGrid_puddles
 } from "./gridGeneration.js";
+import {
+    getRandomEmptyCellOfTerrainInGrid,
+    getRandomCellOfTerrainInGrid,
+    determineCellViewability
+} from "./gridUtils.js";
 
-// const SUBDIVIDE_MIN_WIDTH = 6;
-// const SUBDIVIDE_MIN_HEIGHT = 6;
-// const SUBDIVIDE_MIN_DEPTH = 4;
-// const SUBDIVIDE_MAX_DEPTH = 5;
-// const MIN_ROOM_WIDTH = 3;
-// const MIN_ROOM_HEIGHT = 3;
+const MAX_ENTITY_PLACEMENT_ATTEMPTS = 20;
 
 class WorldLevel {
     constructor(levelNumber, levelWidth, levelHeight, levelType = "EMPTY") {
@@ -57,121 +57,64 @@ class WorldLevel {
             this.grid = generateGrid_empty(levelWidth,levelHeight);
         }
         setWorldLevelForGridCells(this, this.grid);
-        this.determineCellViewability();
+        determineCellViewability(this.grid);
         this.levelType = levelType;
         this.levelEntities = [];
         this.levelStructures = [];
         console.log("new world level", this);
     }
 
+    placeEntityRandomly(entity, avoidCellSet) {
+      let possiblePlacementCell = getRandomCellOfTerrainInGrid("FLOOR", this.grid);
+      let placementAttempts = 1;
+      if (avoidCellSet) {  
+        while (avoidCellSet.has(possiblePlacementCell) && (placementAttempts < MAX_ENTITY_PLACEMENT_ATTEMPTS)) {
+          possiblePlacementCell = getRandomCellOfTerrainInGrid("FLOOR", this.grid);
+          placementAttempts++;
+        }
+      }
+      if (placementAttempts >= MAX_ENTITY_PLACEMENT_ATTEMPTS) {
+        console.log("could not place entity in world level - placement attempts exceed max placement attempts");
+      } else {
+        entity.placeAtCell(possiblePlacementCell);
+        this.addEntity(entity);
+      }
+    }
+
     addEntity(ent) {
         this.levelEntities.push(ent);
+        console.log("adding entity to level", this);
+    }
+
+    removeEntity(ent) {
+        const index = this.levelEntities.indexOf(ent);
+        
+        if (index !== -1) {
+            this.levelEntities.splice(index, 1);
+        }
+
+        // If the entity was occupying a cell, clear the reference
+        const cell = ent.getCell();
+        if (cell && cell.entity === ent) {
+            cell.entity = undefined;
+        }
     }
 
     addStairsDown() {
-        const stairsDownCell = this.getRandomEmptyCellOfTerrain("FLOOR",this.grid);
+        const stairsDownCell = getRandomEmptyCellOfTerrainInGrid("FLOOR",this.grid);
         const stairsDown = new Structure(stairsDownCell.x,stairsDownCell.y,this.levelNumber,'STAIRS_DOWN','>');
         stairsDownCell.structure = stairsDown;
         this.levelStructures.push(stairsDown);
     }
 
     addStairsUpTo(stairsDown) {
-        const stairsUpCell = this.getRandomEmptyCellOfTerrain("FLOOR",this.grid);
+        const stairsUpCell = getRandomEmptyCellOfTerrainInGrid("FLOOR",this.grid);
         const stairsUp = new Structure(stairsUpCell.x,stairsUpCell.y,this.levelNumber,'STAIRS_UP','<');
         stairsUpCell.structure = stairsUp;
         stairsDown.connectsTo = stairsUp;
         stairsUp.connectsTo = stairsDown;
         this.levelStructures.push(stairsUp);
     }
-    
-
-    // generateGrid_puddles(puddleDensity = 0.12, puddleMaxSize = 3) {
-    //     let grid = this.generateGrid_empty();
-
-    //     const numPuddles = Math.floor(this.levelWidth * this.levelHeight * puddleDensity);
-    //     for (let i = 0; i < numPuddles; i++) {
-    //         let puddleX = Math.floor(Math.random() * this.levelWidth);
-    //         let puddleY = Math.floor(Math.random() * this.levelHeight);
-    //         let puddleSize = Math.floor(Math.random() * puddleMaxSize) + 1;
-    //         grid[puddleX][puddleY] = GridCell.createAttached(puddleX, puddleY, this, "WATER_SHALLOW");
-
-    //         // let puddleSpreadDirections = [[1, 0], [-1, 0], [0, 1], [0, -1]];
-    //         let puddleSpreadDeltas = {"R": [1, 0],"L": [-1, 0],"D": [0, 1],"U": [0, -1]};
-    //         let puddleSpreadDirections = Object.keys(puddleSpreadDeltas);
-    //         let lastSpreadDir = "";
-    //         for (let ps = 0; ps<puddleSize; ps++) {
-    //             puddleSpreadDirections.sort(() => Math.random() - 0.5); // Shuffle directions for randomness
-    //             let puddleSpreadDir = puddleSpreadDirections[0] != lastSpreadDir ? puddleSpreadDirections[0] : puddleSpreadDirections[1];
-    //             let [dx, dy] = puddleSpreadDeltas[puddleSpreadDir];
-    //             puddleX = constrainValue(puddleX + dx, 0, this.levelWidth-1);
-    //             puddleY = constrainValue(puddleY + dy, 0, this.levelHeight-1);
-    //             grid[puddleX][puddleY] = GridCell.createAttached(puddleX, puddleY, this, "WATER_SHALLOW");
-    //             lastSpreadDir = puddleSpreadDir;
-    //         }
-    //     }
-
-    //     return grid;
-    // }
-
-    findCellTerrainNearPlace(terrain, startX, startY, grid) {
-        const searchRadius = Math.max(this.levelWidth, this.levelHeight);
-        for (let radius = 0; radius < searchRadius; radius++) {
-            for (let y = Math.max(0, startY - radius); y <= Math.min(this.levelHeight - 1, startY + radius); y++) {
-                for (let x = Math.max(0, startX - radius); x <= Math.min(this.levelWidth - 1, startX + radius); x++) {
-                    if (grid[x][y].terrain === terrain) {
-                        return grid[x][y];
-                    }
-                }
-            }
-        }
-        return null; // No matching cell found
-    }
-
-    getRandomCellOfTerrainInGrid(terrain, grid) {
-        let x = Math.floor(Math.random() * this.levelWidth);
-        let y = Math.floor(Math.random() * this.levelHeight);
-        return this.findCellTerrainNearPlace(terrain, x, y, grid);
-    }
-
-    findEmptyCellTerrainNearPlace(terrain, startX, startY, grid) {
-        const searchRadius = Math.max(this.levelWidth, this.levelHeight);
-        for (let radius = 0; radius < searchRadius; radius++) {
-            for (let y = Math.max(0, startY - radius); y <= Math.min(this.levelHeight - 1, startY + radius); y++) {
-                for (let x = Math.max(0, startX - radius); x <= Math.min(this.levelWidth - 1, startX + radius); x++) {
-                    if (grid[x][y].terrain === terrain && !grid[x][y].structure && !grid[x][y].entity) {
-                        return grid[x][y];
-                    }
-                }
-            }
-        }
-        return null; // No matching cell found
-    }
-
-    getRandomEmptyCellOfTerrain(terrain, grid) {
-        let x = Math.floor(Math.random() * this.levelWidth);
-        let y = Math.floor(Math.random() * this.levelHeight);
-        return this.findEmptyCellTerrainNearPlace(terrain, x, y, grid);
-    }
-
-    /**
- * Determines which cells in the grid are viewable.
- * A cell is viewable if it or any of its adjacent cells is not opaque.
- */
-    determineCellViewability() {
-        for (let x = 0; x < this.levelWidth; x++) {
-            for (let y = 0; y < this.levelHeight; y++) {
-                let cell = this.grid[x][y];
-                // console.log(`cell ${x} ${y}`, cell);
-                if (!cell.isOpaque) {
-                    cell.isViewable = true; 
-                } else {
-                    let adjacentCells = cell.getAdjacentCells();
-                    cell.isViewable = GridCell.anyCellHasPropertyOfValue(adjacentCells, "isOpaque", false);
-                } 
-            }
-        }
-    }
-
 }
 
 export { WorldLevel };
