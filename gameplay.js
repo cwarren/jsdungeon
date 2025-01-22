@@ -10,11 +10,14 @@ const gameState = {
   avatar: null
 };
 
-function initializeGameState(levelDimensions) {
-  gameState.world = levelDimensions.map(([width, height, genOption], index) => new WorldLevel(index, width, height, genOption));
-  
+function initializeGameState(levelSpecifications) {
+  gameState.world = levelSpecifications.map(([width, height, genOption], index) => new WorldLevel(index, width, height, genOption));
+  gameState.world[0].generate();
+
   const firstLevel = gameState.world[0];
-  firstLevel.addStairsDown();
+  if (gameState.world.length > 1) {
+    firstLevel.addStairsDown();
+  }
 
   setUpAvatar(firstLevel);
 
