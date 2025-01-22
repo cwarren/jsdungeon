@@ -21,7 +21,7 @@ function initializeGameState(levelSpecifications) {
 
   setUpAvatar(firstLevel);
 
-  // populateLevelWithEntities(firstLevel);
+  populateLevelWithEntities(firstLevel);
 
   initializeTurnSystem();
 }
@@ -37,7 +37,7 @@ function setUpAvatar(initialFloor) {
 function populateLevelWithEntities(worldLevel) {
   for (let i = 0; i<5; i++) {
     const ent = new Entity("MOLD_PALE");
-    ent.placeRandomlyInWorldLevel(worldLevel);
+    worldLevel.placeEntityRandomly(ent);
   }
 }
 

@@ -213,7 +213,7 @@ class Entity {
   // ENTITY DEFINITIONS
 
   static ENTITIES_LIST = [
-    {type: "AVATAR", name: "Player", displaySymbol: "@", displayColor: "#fff", viewRadius: 6},
+    {type: "AVATAR", name: "Player", displaySymbol: "@", displayColor: "#fff", viewRadius: 16},
     {type: "MOLD_PALE", name: "Pale Mold", displaySymbol: "m", displayColor: "#ddd", viewRadius: 2},
   ];
 
