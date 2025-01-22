@@ -32,6 +32,16 @@ class Entity {
     getCell() {
       return gameState.world[this.z].grid[this.x][this.y];
     }
+    getCellAtDelta(dx,dy) {
+      const currentLevel = gameState.world[this.z];
+      if (!currentLevel) { return null };
+      const newX = this.x + dx;
+      const newY = this.y + dy;
+      if (newX >= 0 && newX < currentLevel.levelWidth && newY >= 0 && newY < currentLevel.levelHeight) {
+        return currentLevel.grid[newX][newY];
+      }
+      return null;
+    }
 
     isVisibleTo(otherEntity) {
       return otherEntity.visibleCells.has(gameState.world[this.z].grid[this.x][this.y]);
@@ -118,41 +128,32 @@ class Entity {
   // action functions should return the time cost of the action!
 
   tryMove(dx, dy) {
-    const currentLevel = gameState.world.find(level => level.levelNumber === this.z);
+    const currentLevel = gameState.world[this.z];
     if (!currentLevel) return;
 
-    const newX = this.x + dx;
-    const newY = this.y + dy;
-    if (newX >= 0 && newX < currentLevel.levelWidth && newY >= 0 && newY < currentLevel.levelHeight) {
-      const targetCell = currentLevel.grid[newX][newY];
-      if (this.canMoveToCell(targetCell)) {
-        return this.confirmMove(targetCell);
-      }
-      if (targetCell.entity) {
-        console.log("move prevented because target cell is already occupied", targetCell);
-        return 0;
-      } else {
-        console.log("move prevented because target cell is not traversable", targetCell);
-        return 0;
-      }
+    const targetCell = this.getCellAtDelta(dx,dy);
+    if (!targetCell) { return 0; }
+    if (this.canMoveToCell(targetCell)) {
+      return this.confirmMove(targetCell);
     }
-  }
-
-  canMoveToDeltas(dx,dy) {
-    const currentLevel = gameState.world.find(level => level.levelNumber === this.z);
-    if (!currentLevel) return false;
-
-    const newX = this.x + dx;
-    const newY = this.y + dy;
-    if (newX >= 0 && newX < currentLevel.levelWidth && newY >= 0 && newY < currentLevel.levelHeight) {
-      const targetCell = currentLevel.grid[newX][newY];
-      return this.canMoveToCell(targetCell);
+    if (targetCell.entity) {
+      console.log("move prevented because target cell is already occupied", targetCell);
+      return 0;
+    } else {
+      console.log("move prevented because target cell is not traversable", targetCell);
+      return 0;
     }
-    return false;
   }
 
   canMoveToCell(cell) {
     return cell.isTraversible && !cell.entity;
+  }
+  canMoveToDeltas(dx,dy) {
+    const currentLevel = gameState.world[this.z];
+    if (!currentLevel) return false;
+    const targetCell = this.getCellAtDelta(dx,dy);
+    if (!targetCell) { return false; }
+    return this.canMoveToCell(targetCell);
   }
 
   confirmMove(newCell) {
@@ -160,6 +161,12 @@ class Entity {
       oldCell.entity = undefined;
       this.placeAtCell(newCell);
       return DEFAULT_ACTION_TIME;
+  }
+  confirmMoveDeltas(dx,dy) {
+    const oldCell = this.getCell();
+    oldCell.entity = undefined;
+    this.placeAtCell(this.getCellAtDelta(dx,dy));
+    return DEFAULT_ACTION_TIME;
   }
 
   startRunning(deltas) {
@@ -170,14 +177,36 @@ class Entity {
     this.isRunning = false;
     this.runDelta = null;
   }
+  canRunToDeltas(dx,dy) { // similar to canMoveTo, but more things will stop running
+    const targetCell = this.getCellAtDelta(dx,dy);
+    if (!targetCell) { return false; }
+    if (!this.canMoveToCell(targetCell)) { return false; }
+
+    // if the destination can be moved to, there are still other conditions that may interrupt running
+    // NOTE: taking damage will also stop running, though that's handled in the damage taking method
+    const curCell = this.getCell();
+    const adjCells = curCell.getAdjacentCells();
+    
+    const hasAdjacentInterrupt = adjCells.some(cell => 
+        !(cell.structure === undefined || cell.structure == null) ||  // stop if adjacent to a structure
+        !(cell.entity === undefined || cell.entity == null) // stop if adjacent to a mob
+      );
+    if (hasAdjacentInterrupt) { return false; }
+    
+    // TODO: add check to stop running when at a corner
+
+    // TODO: add check to stop running when a mob is newly visible
+
+    return true;
+  }
   continueRunning() {
     if (!this.isRunning) return 0;
     // console.log('running entity', this);
-    if (! this.canMoveToDeltas(this.runDelta.dx, this.runDelta.dy)) {
+    if (! this.canRunToDeltas(this.runDelta.dx, this.runDelta.dy)) {
       this.stopRunning();
       return 0;
     }
-    return this.tryMove(this.runDelta.dx, this.runDelta.dy); // tryMove returns the action cost
+    return this.confirmMoveDeltas(this.runDelta.dx, this.runDelta.dy); // confirmMoveDeltas actually does the move and returns the action cost
   }
 
   //================================================

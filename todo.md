@@ -1,4 +1,3 @@
-* when running, stop at structures (even through they can be moved through)
 
 * default actions / move-into actions
 * * attack, for hostile mobs
@@ -14,8 +13,8 @@
 * * death (& removal from the world)
 
 * when running, turn corners when running in a corridor
-
-* clean up canMove tryMove stuff in Entity - some significant logic replication there that should be resolved
+* when running, stop if a mob becomes newly visible
+* when running, stop if approaching a corner
 
 * resolve duped info between direction deltas in gameActions and adjacency directions in GridCell
 
