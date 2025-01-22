@@ -1,5 +1,6 @@
 import { Entity } from "./entityClass.js";
 import { WorldLevel } from "./worldLevelClass.js";
+import {initializeTurnSystem} from "./gameTime.js";
 
 const gameState = {
   score: 0,
@@ -18,6 +19,8 @@ function initializeGameState(levelDimensions) {
   setUpAvatar(firstLevel);
 
   // populateLevelWithEntities(firstLevel);
+
+  initializeTurnSystem();
 }
 
 function setUpAvatar(initialFloor) {
@@ -33,7 +36,6 @@ function populateLevelWithEntities(worldLevel) {
     const ent = new Entity("MOLD_PALE");
     ent.placeRandomlyInWorldLevel(worldLevel);
   }
-
 }
 
 function getAvatarCell() {

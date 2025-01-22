@@ -1,15 +1,34 @@
 import { gameState, getAvatarCell } from "./gameplay.js";
+import { DEFAULT_ACTION_TIME } from "./entityClass.js";
 
-function avatarMove(dx,dy) { gameState.avatar.tryMove(dx,dy); }
-function moveAvatar_UL()   { avatarMove(-1,-1) }
-function moveAvatar_U()    { avatarMove(0,-1) }
-function moveAvatar_UR()   { avatarMove(1,-1) }
-function moveAvatar_L()    { avatarMove(-1,0) }
-function moveAvatar_wait() { ; }
-function moveAvatar_R()    { avatarMove(1,0) }
-function moveAvatar_DL()   { avatarMove(-1,1) }
-function moveAvatar_D()    { avatarMove(0,1) }
-function moveAvatar_DR()   { avatarMove(1,1) }
+const gameActionsMap = {
+    MOVE_UL: { name: "Move Up-Left", description: "Move diagonally up-left", action: moveAvatar_UL },
+    MOVE_U: { name: "Move Up", description: "Move up", action: moveAvatar_U },
+    MOVE_UR: { name: "Move Up-Right", description: "Move diagonally up-right", action: moveAvatar_UR },
+    MOVE_L: { name: "Move Left", description: "Move left", action: moveAvatar_L },
+    MOVE_WAIT: { name: "Wait", description: "Stay in place", action: moveAvatar_wait },
+    MOVE_R: { name: "Move Right", description: "Move right", action: moveAvatar_R },
+    MOVE_DL: { name: "Move Down-Left", description: "Move diagonally down-left", action: moveAvatar_DL },
+    MOVE_D: { name: "Move Down", description: "Move down", action: moveAvatar_D },
+    MOVE_DR: { name: "Move Down-Right", description: "Move diagonally down-right", action: moveAvatar_DR },
+
+    TAKE_STAIRS_UP: { name: "Take stairs up", description: "Move to a higher level", action: ascendStairs },
+    TAKE_STAIRS_DOWN: { name: "Take stairs down", description: "Move to a lower level", action: descendStairs },
+};
+
+// IMPORTANT!!!!
+// action functions should return the time cost of the action!
+
+function avatarMove(dx,dy) { gameState.avatar.tryMove(dx,dy); return DEFAULT_ACTION_TIME; }
+function moveAvatar_UL()   { return avatarMove(-1,-1) }
+function moveAvatar_U()    { return avatarMove(0,-1) }
+function moveAvatar_UR()   { return avatarMove(1,-1) }
+function moveAvatar_L()    { return avatarMove(-1,0) }
+function moveAvatar_wait() { return DEFAULT_ACTION_TIME; }
+function moveAvatar_R()    { return avatarMove(1,0) }
+function moveAvatar_DL()   { return avatarMove(-1,1) }
+function moveAvatar_D()    { return avatarMove(0,1) }
+function moveAvatar_DR()   { return avatarMove(1,1) }
 
 function ascendStairs() {
     const curCell = getAvatarCell();
@@ -24,6 +43,7 @@ function ascendStairs() {
         console.log("cannot ascend - no stairs up");
     }
     console.log("gameState after ascending", gameState);
+    return 0;
 }
 
 // if needed, dynamically adds connecting stairs back up on the lower level, and
@@ -48,8 +68,9 @@ function descendStairs() {
         console.log("cannot descend - no stairs down");
     }
     console.log("gameState after descending", gameState);
+    return 0;
 }
 
 
-export { moveAvatar_UL, moveAvatar_U, moveAvatar_UR, moveAvatar_L, moveAvatar_wait, moveAvatar_R, moveAvatar_DL, moveAvatar_D, moveAvatar_DR,
+export { gameActionsMap, moveAvatar_UL, moveAvatar_U, moveAvatar_UR, moveAvatar_L, moveAvatar_wait, moveAvatar_R, moveAvatar_DL, moveAvatar_D, moveAvatar_DR,
          ascendStairs, descendStairs };
