@@ -68,7 +68,7 @@ const turnQueue = new TurnQueue();
 // Function to start or advance the game turn loop
 function advanceGameTime() {
     while (true) {
-        console.log("time passes...", turnQueue);
+        // console.log("time passes...", turnQueue);
         let activeEntity = turnQueue.nextTurn();
         if (!activeEntity) break; // No more entities to process
 

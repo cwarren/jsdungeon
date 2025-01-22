@@ -31,6 +31,16 @@ const keyBinding = {
     "2": "MOVE_D",
     "3": "MOVE_DR",
 
+    "CTRL-7": "RUN_UL",
+    "CTRL-8": "RUN_U",
+    "CTRL-9": "RUN_UR",
+    "CTRL-4": "RUN_L",
+    "CTRL-5": "SLEEP",
+    "CTRL-6": "RUN_R",
+    "CTRL-1": "RUN_DL",
+    "CTRL-2": "RUN_D",
+    "CTRL-3": "RUN_DR",
+
     "<": "TAKE_STAIRS_UP",
     ">": "TAKE_STAIRS_DOWN",
 
@@ -42,11 +52,15 @@ const keyBinding = {
     "Escape": "POP_UI_STATE",  // Close the current UI screen
 };
 
-function executeGameCommand(key) {
-    const actionKey = keyBinding[key];
+function executeGameCommand(key, event) {
+    let lookupKey = key;
+    if (key != "Control" && event.ctrlKey) {
+        lookupKey = 'CTRL-' + key; 
+    }
+    const actionKey = keyBinding[lookupKey];
     if (actionKey && gameActionsMap[actionKey]) {
         console.log(`Executing action: ${gameActionsMap[actionKey].name}`);
-        const actionTimeCost = gameActionsMap[actionKey].action();
+        const actionTimeCost = gameActionsMap[actionKey].action(key, event);
         handlePlayerActionTime(actionTimeCost);
     } else if (actionKey) {
         switch (actionKey) {
@@ -70,7 +84,7 @@ function executeGameCommand(key) {
                 break;
         }
     } else {
-        console.log(`No action bound for key: ${key}`);
+        console.log(`No action bound for key: ${lookupKey}`);
     }
 }
 

@@ -15,6 +15,28 @@ const gameActionsMap = {
 
     TAKE_STAIRS_UP: { name: "Take stairs up", description: "Move to a higher level", action: ascendStairs },
     TAKE_STAIRS_DOWN: { name: "Take stairs down", description: "Move to a lower level", action: descendStairs },
+
+    RUN_UL: { name: "Run", description: "Move repeatedly, starting in the given direction", action: runAvatar_UL },
+    RUN_U: { name: "Run", description: "Move repeatedly, starting in the given direction", action: runAvatar_U },
+    RUN_UR: { name: "Run", description: "Move repeatedly, starting in the given direction", action: runAvatar_UR },
+    RUN_L: { name: "Run", description: "Move repeatedly, starting in the given direction", action: runAvatar_L },
+    RUN_R: { name: "Run", description: "Move repeatedly, starting in the given direction", action: runAvatar_R },
+    RUN_DL: { name: "Run", description: "Move repeatedly, starting in the given direction", action: runAvatar_DL },
+    RUN_D: { name: "Run", description: "Move repeatedly, starting in the given direction", action: runAvatar_D },
+    RUN_DR: { name: "Run", description: "Move repeatedly, starting in the given direction", action: runAvatar_DR },
+    
+    SLEEP: { name: "Sleep", description: "Stay in the same space doing nothing until something happens or enough time has passed", action: sleepAvatar },
+};
+
+const DIRECTION_DELTAS = {
+    "UL": {dx: -1, dy: -1},
+    "U": {dx: 0, dy: -1},
+    "UR": {dx: 1, dy: -1},
+    "L": {dx: -1, dy: 0},
+    "R": {dx: 1, dy: 0},
+    "DL": {dx: -1, dy: 1},
+    "D": {dx: 0, dy: 1},
+    "DR": {dx: 1, dy: 1},
 };
 
 // IMPORTANT!!!!
@@ -74,6 +96,21 @@ function descendStairs() {
     return 0;
 }
 
+function runAvatar(deltas) {
+    console.log("run avatar", deltas);
+}
+function runAvatar_UL()   { return runAvatar(DIRECTION_DELTAS["UL"]) }
+function runAvatar_U()    { return runAvatar(DIRECTION_DELTAS["U"]) }
+function runAvatar_UR()   { return runAvatar(DIRECTION_DELTAS["UR"]) }
+function runAvatar_L()    { return runAvatar(DIRECTION_DELTAS["L"]) }
+function runAvatar_R()    { return runAvatar(DIRECTION_DELTAS["R"]) }
+function runAvatar_DL()   { return runAvatar(DIRECTION_DELTAS["DL"]) }
+function runAvatar_D()    { return runAvatar(DIRECTION_DELTAS["D"]) }
+function runAvatar_DR()   { return runAvatar(DIRECTION_DELTAS["DR"]) }
+
+function sleepAvatar(key, event) {
+    console.log(`${key} - sleep avatar`, event);    
+}
 
 export { gameActionsMap, moveAvatar_UL, moveAvatar_U, moveAvatar_UR, moveAvatar_L, moveAvatar_wait, moveAvatar_R, moveAvatar_DL, moveAvatar_D, moveAvatar_DR,
          ascendStairs, descendStairs };
