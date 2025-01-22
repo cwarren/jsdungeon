@@ -1,5 +1,7 @@
 import { gameState } from "./gameplay.js";
 
+const TIME_WRAP_LIMIT = 10000;
+
 // Priority queue for timing entities
 class TurnQueue {
     constructor() {
@@ -14,6 +16,10 @@ class TurnQueue {
     // Add an entity to the queue with a starting time
     addEntity(entity, initialTime = 0) {
         this.queue.push({ entity, time: initialTime });
+        this.ordering();
+    }
+
+    ordering() {
         this.queue.sort((a, b) => a.time - b.time); // Maintain order
     }
 
@@ -28,16 +34,31 @@ class TurnQueue {
         let actionCost = next.entity.takeTurn(); // Entity must implement takeTurn()
         this.timePasses(actionCost);
         
-        // Reschedule entity based on action cost
-        next.time += actionCost;
-        this.queue.push(next);
-        this.queue.sort((a, b) => a.time - b.time); // Maintain order
+        // Reschedule non-avatar entity based on action cost (avatar actions are handled separately)
+        if (next.entity.type != "AVATAR") {
+            next.time += actionCost;
+            this.queue.push(next);
+            this.ordering();
+            this.normalizeQueueTimes();
+        }
 
         return next.entity;
     }
 
     timePasses(someTime) {
         this.elapsedTime += someTime;
+    }
+
+    normalizeQueueTimes() {
+        if (this.queue.length === 0) return;
+
+        const minTime = this.queue[0].time;
+        
+        // If the minimum time is getting too large, normalize all entries
+        if (minTime > TIME_WRAP_LIMIT) {
+            console.log("Normalizing TurnQueue times to prevent overflow.");
+            this.queue.forEach(entry => entry.time -= minTime);
+        }
     }
 }
 
@@ -55,38 +76,36 @@ function advanceGameTime() {
             break; // Stop when it's the player's turn
         }
 
-        // Handle AI or environmental actions
+        // Handle other AI or environmental actions (if they're not already a part of the turn queue system... which they probably should be...)
     }
 }
 
-function handlePlayerAction(actionCost) {
+function handlePlayerActionTime(actionCost) {
+    if (actionCost <= 0) { return; }
+
     const player = gameState.avatar;
 
     // Reinsert player into turn queue with adjusted time
     turnQueue.addEntity(player, turnQueue.queue[0].time + actionCost);
     turnQueue.timePasses(actionCost);
+    turnQueue.normalizeQueueTimes();
 
     // Resume the turn loop after the player acts
-    advanceGameTurn();
+    advanceGameTime();
 }
 
 // Function to initialize turn-based time system
 function initializeTurnSystem() {
-    turnQueue.clear();
-
-    gameState.world[gameState.avatar.z].levelEntities.forEach(entity => {
-        turnQueue.addEntity(entity, 0);
-    });
-
+    initializeTurnSystem_mobsOnly();
     turnQueue.addEntity(gameState.avatar, -1); // Add player to the queue, at the front
 }
 
 function initializeTurnSystem_mobsOnly() {
     turnQueue.clear();
-    
-    gameState.world[gameState.avatar.z].levelEntities.forEach(entity => {
-        turnQueue.addEntity(entity, 0);
+    const levelEntities = gameState.world[gameState.avatar.z].levelEntities;
+    levelEntities.forEach(entity => {
+        turnQueue.addEntity(entity, Math.floor(Math.random() * levelEntities.length)); // shuffle them a bit
     });
 }
 
-export { turnQueue, advanceGameTime, initializeTurnSystem, initializeTurnSystem_mobsOnly, handlePlayerAction };
+export { turnQueue, advanceGameTime, initializeTurnSystem, initializeTurnSystem_mobsOnly, handlePlayerActionTime };

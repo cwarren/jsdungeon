@@ -1,5 +1,6 @@
 import { gameState, getAvatarCell } from "./gameplay.js";
 import { DEFAULT_ACTION_TIME } from "./entityClass.js";
+import {initializeTurnSystem_mobsOnly} from "./gameTime.js";
 
 const gameActionsMap = {
     MOVE_UL: { name: "Move Up-Left", description: "Move diagonally up-left", action: moveAvatar_UL },
@@ -19,7 +20,7 @@ const gameActionsMap = {
 // IMPORTANT!!!!
 // action functions should return the time cost of the action!
 
-function avatarMove(dx,dy) { gameState.avatar.tryMove(dx,dy); return DEFAULT_ACTION_TIME; }
+function avatarMove(dx,dy) { return gameState.avatar.tryMove(dx,dy); }
 function moveAvatar_UL()   { return avatarMove(-1,-1) }
 function moveAvatar_U()    { return avatarMove(0,-1) }
 function moveAvatar_UR()   { return avatarMove(1,-1) }
@@ -39,6 +40,7 @@ function ascendStairs() {
         const newCell = stairsUp.connectsTo.getCell();
         gameState.avatar.placeAtCell(newCell);
         newCell.worldLevel.addEntity(gameState.avatar);
+        initializeTurnSystem_mobsOnly();
     } else {
         console.log("cannot ascend - no stairs up");
     }
@@ -64,6 +66,7 @@ function descendStairs() {
         const newCell = stairsDown.connectsTo.getCell()
         gameState.avatar.placeAtCell(newCell);
         newCell.worldLevel.addEntity(gameState.avatar);
+        initializeTurnSystem_mobsOnly();
     } else {
         console.log("cannot descend - no stairs down");
     }

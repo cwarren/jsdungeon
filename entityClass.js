@@ -53,31 +53,6 @@ class Entity {
       }
   }
 
-    tryMove(dx, dy) {
-      const currentLevel = gameState.world.find(level => level.levelNumber === this.z);
-      if (!currentLevel) return;
-
-      const newX = this.x + dx;
-      const newY = this.y + dy;
-
-      if (newX >= 0 && newX < currentLevel.levelWidth && newY >= 0 && newY < currentLevel.levelHeight) {
-        const targetCell = currentLevel.grid[newX][newY];
-        if (targetCell.entity) {
-          console.log("move prevented because target cell is already occupied", targetCell);
-        } else if (targetCell.isTraversible) {
-          this.confirmMove(targetCell);
-        } else {
-          console.log("move prevented because target cell is not traversable", targetCell);
-        }
-      }
-    }
-
-    confirmMove(newCell) {
-      const oldCell = this.getCell();
-      oldCell.entity = undefined;
-      this.placeAtCell(newCell);
-    }
-
   /**
    * Determines visible cells within the grid using line-of-sight and view radius.
    * Uses Bresenham’s line algorithm for visibility checking.
@@ -136,8 +111,42 @@ class Entity {
     }
   }
 
+  // IMPORTANT!!!!
+  // action functions should return the time cost of the action!
+
+  tryMove(dx, dy) {
+    const currentLevel = gameState.world.find(level => level.levelNumber === this.z);
+    if (!currentLevel) return;
+
+    const newX = this.x + dx;
+    const newY = this.y + dy;
+
+    if (newX >= 0 && newX < currentLevel.levelWidth && newY >= 0 && newY < currentLevel.levelHeight) {
+      const targetCell = currentLevel.grid[newX][newY];
+      if (targetCell.entity) {
+        console.log("move prevented because target cell is already occupied", targetCell);
+        return 0;
+      } else if (targetCell.isTraversible) {
+        return this.confirmMove(targetCell);
+      } else {
+        console.log("move prevented because target cell is not traversable", targetCell);
+        return 0;
+      }
+    }
+  }
+
+  confirmMove(newCell) {
+      const oldCell = this.getCell();
+      oldCell.entity = undefined;
+      this.placeAtCell(newCell);
+      return DEFAULT_ACTION_TIME;
+  }
+
+  //================================================
+  // ENTITY DEFINITIONS
+
   static ENTITIES_LIST = [
-    {type: "AVATAR", name: "Player", displaySymbol: "@", displayColor: "#fff", viewRadius: 9},
+    {type: "AVATAR", name: "Player", displaySymbol: "@", displayColor: "#fff", viewRadius: 6},
     {type: "MOLD_PALE", name: "Pale Mold", displaySymbol: "m", displayColor: "#ddd", viewRadius: 2},
   ];
 
