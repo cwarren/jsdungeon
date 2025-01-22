@@ -16,15 +16,15 @@ const gameActionsMap = {
     TAKE_STAIRS_UP: { name: "Take stairs up", description: "Move to a higher level", action: ascendStairs },
     TAKE_STAIRS_DOWN: { name: "Take stairs down", description: "Move to a lower level", action: descendStairs },
 
-    RUN_UL: { name: "Run", description: "Move repeatedly, starting in the given direction", action: runAvatar_UL },
-    RUN_U: { name: "Run", description: "Move repeatedly, starting in the given direction", action: runAvatar_U },
-    RUN_UR: { name: "Run", description: "Move repeatedly, starting in the given direction", action: runAvatar_UR },
-    RUN_L: { name: "Run", description: "Move repeatedly, starting in the given direction", action: runAvatar_L },
-    RUN_R: { name: "Run", description: "Move repeatedly, starting in the given direction", action: runAvatar_R },
-    RUN_DL: { name: "Run", description: "Move repeatedly, starting in the given direction", action: runAvatar_DL },
-    RUN_D: { name: "Run", description: "Move repeatedly, starting in the given direction", action: runAvatar_D },
-    RUN_DR: { name: "Run", description: "Move repeatedly, starting in the given direction", action: runAvatar_DR },
-    
+    RUN_UL: { name: "Run UL", description: "Move repeatedly, starting in the given direction", action: runAvatar_UL },
+    RUN_U: { name: "Run U", description: "Move repeatedly, starting in the given direction", action: runAvatar_U },
+    RUN_UR: { name: "Run UR", description: "Move repeatedly, starting in the given direction", action: runAvatar_UR },
+    RUN_L: { name: "Run L", description: "Move repeatedly, starting in the given direction", action: runAvatar_L },
+    RUN_R: { name: "Run R", description: "Move repeatedly, starting in the given direction", action: runAvatar_R },
+    RUN_DL: { name: "Run DL", description: "Move repeatedly, starting in the given direction", action: runAvatar_DL },
+    RUN_D: { name: "Run D", description: "Move repeatedly, starting in the given direction", action: runAvatar_D },
+    RUN_DR: { name: "Run DR", description: "Move repeatedly, starting in the given direction", action: runAvatar_DR },
+
     SLEEP: { name: "Sleep", description: "Stay in the same space doing nothing until something happens or enough time has passed", action: sleepAvatar },
 };
 
@@ -97,7 +97,16 @@ function descendStairs() {
 }
 
 function runAvatar(deltas) {
-    console.log("run avatar", deltas);
+    // console.log("run avatar", deltas);
+    if (gameState.avatar.isRunning) return; // Prevent multiple runs
+
+    gameState.avatar.startRunning(deltas);
+
+    // gameState.avatar.isRunning = true;
+    // gameState.avatar.runningDirection = deltas;
+
+    // Perform the first move immediately
+    return gameState.avatar.continueRunning();
 }
 function runAvatar_UL()   { return runAvatar(DIRECTION_DELTAS["UL"]) }
 function runAvatar_U()    { return runAvatar(DIRECTION_DELTAS["U"]) }

@@ -11,6 +11,9 @@ class Entity {
       this.viewRadius = Entity.ENTITIES[type].viewRadius;
       this.visibleCells = new Set();
       this.seenCells = new Set();
+
+      this.isRunning = false;
+      this.runDelta = null;
     }
 
     placeAt(x,y,z) {
@@ -157,6 +160,24 @@ class Entity {
       oldCell.entity = undefined;
       this.placeAtCell(newCell);
       return DEFAULT_ACTION_TIME;
+  }
+
+  startRunning(deltas) {
+    this.isRunning = true;
+    this.runDelta = deltas;
+  }
+  stopRunning() {
+    this.isRunning = false;
+    this.runDelta = null;
+  }
+  continueRunning() {
+    if (!this.isRunning) return 0;
+    // console.log('running entity', this);
+    if (! this.canMoveToDeltas(this.runDelta.dx, this.runDelta.dy)) {
+      this.stopRunning();
+      return 0;
+    }
+    return this.tryMove(this.runDelta.dx, this.runDelta.dy); // tryMove returns the action cost
   }
 
   //================================================

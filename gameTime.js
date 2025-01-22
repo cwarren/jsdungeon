@@ -27,15 +27,21 @@ class TurnQueue {
     nextTurn() {
         if (this.queue.length === 0) return null;
 
-        // Get the entity with the lowest time cost (earliest turn)
         let next = this.queue.shift();
+        // console.log('next turn', next.entity);
 
         // Let the entity act
-        let actionCost = next.entity.takeTurn(); // Entity must implement takeTurn()
+        let actionCost;
+        if (next.entity.isRunning) {
+            actionCost = next.entity.continueRunning();
+        } else {
+            actionCost = next.entity.takeTurn(); // Default action
+        }
+        // let actionCost = next.entity.takeTurn(); // Entity must implement takeTurn()
         this.timePasses(actionCost);
         
         // Reschedule non-avatar entity based on action cost (avatar actions are handled separately)
-        if (next.entity.type != "AVATAR") {
+        if (next.entity.type != "AVATAR" || next.entity.isRunning) {
             next.time += actionCost;
             this.queue.push(next);
             this.ordering();
@@ -65,32 +71,36 @@ class TurnQueue {
 // Global game turn queue
 const turnQueue = new TurnQueue();
 
-// Function to start or advance the game turn loop
+// start or advance the game turn loop
 function advanceGameTime() {
     while (true) {
         // console.log("time passes...", turnQueue);
         let activeEntity = turnQueue.nextTurn();
         if (!activeEntity) break; // No more entities to process
 
-        if (activeEntity === gameState.avatar) {
-            break; // Stop when it's the player's turn
+        if (activeEntity === gameState.avatar && !activeEntity.isRunning) {
+            break; // Stop when it's the avatar's turn and the avatar is not running
         }
-
-        // Handle other AI or environmental actions (if they're not already a part of the turn queue system... which they probably should be...)
     }
 }
 
 function handlePlayerActionTime(actionCost) {
-    if (actionCost <= 0) { return; }
+    // console.log(`handling player action time of ${actionCost}`);
+    if (actionCost <= 0) return;
 
-    const player = gameState.avatar;
+    // If the avatar is running, immediately continue running
+    if (gameState.avatar.isRunning) {
+        turnQueue.addEntity(gameState.avatar, turnQueue.queue[0].time + actionCost);
+        turnQueue.timePasses(actionCost);
+        advanceGameTime();  // Keep the turns flowing for running
+        return;
+    }
 
-    // Reinsert player into turn queue with adjusted time
-    turnQueue.addEntity(player, turnQueue.queue[0].time + actionCost);
+    // Normal player action handling
+    turnQueue.addEntity(gameState.avatar, turnQueue.queue[0].time + actionCost);
     turnQueue.timePasses(actionCost);
     turnQueue.normalizeQueueTimes();
 
-    // Resume the turn loop after the player acts
     advanceGameTime();
 }
 
