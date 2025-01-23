@@ -2,7 +2,14 @@ import { gameState } from "./gameStateClass.js";
 import { DEFAULT_ACTION_TIME } from "./entityClass.js";
 import {initializeTurnSystem_mobsOnly} from "./gameTime.js";
 
+/* template for new action map entry:
+    ACTION_IDENTIFIER: { name: "Action name", description: "brief description of action", action: functionImplementingAction },
+*/
+
 const gameActionsMap = {
+    DEV_WIN_GAME: { name: "Win game", description: "(development action) Win the current game", action: DEV_winGame },
+    DEV_LOSE_GAME: { name: "Lose game", description: "(development action) Win the current game", action: DEV_loseGame },
+
     MOVE_UL: { name: "Move Up-Left", description: "Move diagonally up-left", action: moveAvatar_UL },
     MOVE_U: { name: "Move Up", description: "Move up", action: moveAvatar_U },
     MOVE_UR: { name: "Move Up-Right", description: "Move diagonally up-right", action: moveAvatar_UR },
@@ -41,6 +48,9 @@ const DIRECTION_DELTAS = {
 
 // IMPORTANT!!!!
 // action functions should return the time cost of the action!
+
+function DEV_winGame()  { gameState.winGame(); return 0; }
+function DEV_loseGame() { gameState.loseGame(); return 0; }
 
 function avatarMove(dx,dy) { return gameState.avatar.tryMove(dx,dy); }
 function moveAvatar_UL()   { return avatarMove(-1,-1) }
@@ -122,8 +132,7 @@ function runAvatar_D()    { return runAvatar(DIRECTION_DELTAS["D"]) }
 function runAvatar_DR()   { return runAvatar(DIRECTION_DELTAS["DR"]) }
 
 function sleepAvatar(key, event) {
-    console.log(`${key} - sleep avatar`, event);    
+    console.log(`${key} - sleep avatar (not yet implemented)`, event);    
 }
 
-export { gameActionsMap, moveAvatar_UL, moveAvatar_U, moveAvatar_UR, moveAvatar_L, moveAvatar_wait, moveAvatar_R, moveAvatar_DL, moveAvatar_D, moveAvatar_DR,
-         ascendStairs, descendStairs };
+export { gameActionsMap };

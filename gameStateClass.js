@@ -4,7 +4,7 @@ import { initializeTurnSystem } from "./gameTime.js";
 
 class GameState {
     constructor() {
-        this.score = 0;
+        this.score = 1;
         this.currentLevel = 0;
         this.isPlaying = false;
         this.status = "NEW";
@@ -27,6 +27,7 @@ class GameState {
         this.populateLevelWithEntities(firstLevel);
 
         this.status="ACTIVE";
+        this.isPlaying = true;
         initializeTurnSystem();
     }
 
@@ -47,6 +48,18 @@ class GameState {
 
     getAvatarCell() {
         return this.avatar ? this.avatar.getCell() : null;
+    }
+
+    winGame() {
+        console.log("winning the game");
+        this.status = "WON";
+        this.isPlaying = false;
+    }
+
+    loseGame() {
+        console.log("losing the game");
+        this.status = "LOST";
+        this.isPlaying = false;
     }
 }
 
