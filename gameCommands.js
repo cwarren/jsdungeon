@@ -1,89 +1,109 @@
 import { gameActionsMap } from "./gameActions.js";
-// import { gameActionsMap, moveAvatar_UL, moveAvatar_U, moveAvatar_UR, moveAvatar_L, moveAvatar_wait, moveAvatar_R, moveAvatar_DL, moveAvatar_D, moveAvatar_DR, ascendStairs, descendStairs } from "./gameActions.js";
+import { gameMetaActionsMap } from "./gameMetaActions.js";
 import { pushUIState, popUIState, setUIState, getCurrentUIState } from "./ui.js";
-import {handlePlayerActionTime} from "./gameTime.js";
-
-
-// const gameActionsMap = {
-//     MOVE_UL: { name: "Move Up-Left", description: "Move diagonally up-left", action: moveAvatar_UL },
-//     MOVE_U: { name: "Move Up", description: "Move up", action: moveAvatar_U },
-//     MOVE_UR: { name: "Move Up-Right", description: "Move diagonally up-right", action: moveAvatar_UR },
-//     MOVE_L: { name: "Move Left", description: "Move left", action: moveAvatar_L },
-//     MOVE_WAIT: { name: "Wait", description: "Stay in place", action: moveAvatar_wait },
-//     MOVE_R: { name: "Move Right", description: "Move right", action: moveAvatar_R },
-//     MOVE_DL: { name: "Move Down-Left", description: "Move diagonally down-left", action: moveAvatar_DL },
-//     MOVE_D: { name: "Move Down", description: "Move down", action: moveAvatar_D },
-//     MOVE_DR: { name: "Move Down-Right", description: "Move diagonally down-right", action: moveAvatar_DR },
-
-//     TAKE_STAIRS_UP: { name: "Take stairs up", description: "Move to a higher level", action: ascendStairs },
-//     TAKE_STAIRS_DOWN: { name: "Take stairs down", description: "Move to a lower level", action: descendStairs },
-// };
+import { handlePlayerActionTime } from "./gameTime.js";
 
 const keyBinding = {
-    "7": "MOVE_UL",
-    "8": "MOVE_U",
-    "9": "MOVE_UR",
-    "4": "MOVE_L",
-    "5": "MOVE_WAIT",
-    "6": "MOVE_R",
-    "1": "MOVE_DL",
-    "2": "MOVE_D",
-    "3": "MOVE_DR",
+    "GAMEPLAY":
+    {
+        "7": "MOVE_UL",
+        "8": "MOVE_U",
+        "9": "MOVE_UR",
+        "4": "MOVE_L",
+        "5": "MOVE_WAIT",
+        "6": "MOVE_R",
+        "1": "MOVE_DL",
+        "2": "MOVE_D",
+        "3": "MOVE_DR",
 
-    "CTRL-7": "RUN_UL",
-    "CTRL-8": "RUN_U",
-    "CTRL-9": "RUN_UR",
-    "CTRL-4": "RUN_L",
-    "CTRL-5": "SLEEP",
-    "CTRL-6": "RUN_R",
-    "CTRL-1": "RUN_DL",
-    "CTRL-2": "RUN_D",
-    "CTRL-3": "RUN_DR",
+        "CTRL-7": "RUN_UL",
+        "CTRL-8": "RUN_U",
+        "CTRL-9": "RUN_UR",
+        "CTRL-4": "RUN_L",
+        "CTRL-5": "SLEEP",
+        "CTRL-6": "RUN_R",
+        "CTRL-1": "RUN_DL",
+        "CTRL-2": "RUN_D",
+        "CTRL-3": "RUN_DR",
 
-    "<": "TAKE_STAIRS_UP",
-    ">": "TAKE_STAIRS_DOWN",
+        "<": "TAKE_STAIRS_UP",
+        ">": "TAKE_STAIRS_DOWN",
 
-    "C": "PUSH_CHARACTER_SHEET", 
-    "I": "PUSH_INVENTORY_SCREEN",
-    "E": "PUSH_EQUIPMENT_SCREEN",
-    "M": "PUSH_MAP_SCREEN",
-    "G": "PUSH_GAME_META",
-    "Escape": "POP_UI_STATE",  // Close the current UI screen
+        "l": "DEV_LOSE_GAME",
+        "w": "DEV_WIN_GAME",
+
+        "C": "PUSH_CHARACTER_SHEET",
+        "I": "PUSH_INVENTORY_SCREEN",
+        "E": "PUSH_EQUIPMENT_SCREEN",
+        "M": "PUSH_MAP_SCREEN",
+        "G": "POP_UI_STATE", // GAME_META is the base game state, so from game play popping state gets you back to game meta
+        "Escape": "POP_UI_STATE",
+    },
+    "CHARACTER_SHEET": {
+        "Escape": "POP_UI_STATE",
+    },
+    "INVENTORY": {
+        "Escape": "POP_UI_STATE",
+    },
+    "EQUIPMENT": {
+        "Escape": "POP_UI_STATE",
+    },
+    "MAP_SCREEN": {
+        "Escape": "POP_UI_STATE",
+    },
+    "GAME_META": {
+        "N": "NEW_GAME",
+        "A": "ABANDON_GAME",
+        "Escape": "PUSH_GAMEPLAY",
+    },
 };
+
+const actionMaps = {
+    "GAMEPLAY": gameActionsMap,
+    "GAME_META": gameMetaActionsMap,
+};
+
+// TODO: pull these into a separate file
+const uiActionsMap = {
+    "PUSH_GAMEPLAY": uiGamePlay,
+    "PUSH_CHARACTER_SHEET": uiCharacterSheet,
+    "PUSH_INVENTORY_SCREEN": uiInventory,
+    "PUSH_EQUIPMENT_SCREEN": uiEquipment,
+    "PUSH_MAP_SCREEN": uiMap,
+    "PUSH_GAME_META": uiGameMeta,
+    "POP_UI_STATE": popUIState
+};
+function uiGamePlay() { pushUIState("GAMEPLAY"); } // TODO: add more logic here - game play requires an active game
+function uiCharacterSheet() { pushUIState("CHARACTER_SHEET"); }
+function uiInventory() { pushUIState("INVENTORY"); }
+function uiEquipment() { pushUIState("EQUIPMENT"); }
+function uiMap() { pushUIState("MAP_SCREEN"); }
+function uiGameMeta() { pushUIState("GAME_META"); }
 
 function executeGameCommand(key, event) {
     let lookupKey = key;
     if (key != "Control" && event.ctrlKey) {
-        lookupKey = 'CTRL-' + key; 
+        lookupKey = 'CTRL-' + key;
     }
-    const actionKey = keyBinding[lookupKey];
-    if (actionKey && gameActionsMap[actionKey]) {
-        console.log(`Executing action: ${gameActionsMap[actionKey].name}`);
-        const actionTimeCost = gameActionsMap[actionKey].action(key, event);
+    const uiState = getCurrentUIState();
+    const actionKey = keyBinding[uiState][lookupKey];
+    if (!actionKey) {
+        console.log(`No action bound for key: ${uiState} ${lookupKey}`);
+        return;
+    }
+
+    // UI control actions take priority
+    if (uiActionsMap[actionKey]) {
+        uiActionsMap[actionKey]();
+        return;
+    }
+
+    const actionMap = actionMaps[uiState];
+    const actionDef = actionMap[actionKey];
+    console.log(`Executing action: ${actionDef.name}`);
+    const actionTimeCost = actionDef.action(key, event);
+    if (uiState == "GAMEPLAY") {
         handlePlayerActionTime(actionTimeCost);
-    } else if (actionKey) {
-        switch (actionKey) {
-            case "PUSH_CHARACTER_SHEET":
-                pushUIState("CHARACTER_SHEET");
-                break;
-            case "PUSH_INVENTORY_SCREEN":
-                pushUIState("INVENTORY");
-                break;
-            case "PUSH_EQUIPMENT_SCREEN":
-                pushUIState("EQUIPMENT");
-                break;
-            case "PUSH_MAP_SCREEN":
-                pushUIState("MAP_SCREEN");
-                break;
-            case "PUSH_GAME_META":
-                pushUIState("GAME_META");
-                break;
-            case "POP_UI_STATE":
-                popUIState();
-                break;
-        }
-    } else {
-        console.log(`No action bound for key: ${lookupKey}`);
     }
 }
 

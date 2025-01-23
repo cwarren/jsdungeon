@@ -1,5 +1,4 @@
 import { gameState } from "./gameStateClass.js";
-// import { gameState, initializeGameState } from "./gameplay.js";
 import { executeGameCommand } from "./gameCommands.js";
 import {advanceGameTime} from "./gameTime.js";
 
@@ -43,7 +42,7 @@ const uiSettings = {
     gridCellSpacing: 1
 };
 
-let uiStateStack = ["GAMEPLAY"];  // Stack starts with gameplay as the default state
+let uiStateStack = ["GAME_META","GAMEPLAY"];  // Stack starts with gameplay as the default state
 
 // Function to get the current UI state
 function getCurrentUIState() {
