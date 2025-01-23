@@ -1,4 +1,4 @@
-import { gameState, getAvatarCell } from "./gameplay.js";
+import { gameState } from "./gameStateClass.js";
 import { DEFAULT_ACTION_TIME } from "./entityClass.js";
 import {initializeTurnSystem_mobsOnly} from "./gameTime.js";
 
@@ -54,7 +54,7 @@ function moveAvatar_D()    { return avatarMove(0,1) }
 function moveAvatar_DR()   { return avatarMove(1,1) }
 
 function ascendStairs() {
-    const curCell = getAvatarCell();
+    const curCell = gameState.getAvatarCell();
     const stairsUp = curCell.structure;
     if (stairsUp && stairsUp.type == "STAIRS_UP") {
         gameState.currentLevel--;
@@ -74,7 +74,7 @@ function ascendStairs() {
 // another stairs down on that lower level if it's not the deepest
 
 function descendStairs() {
-    const curCell = getAvatarCell();
+    const curCell = gameState.getAvatarCell();
     const stairsDown = curCell.structure;
     if (stairsDown && stairsDown.type == "STAIRS_DOWN") {
         gameState.currentLevel++;

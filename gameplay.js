@@ -1,11 +1,16 @@
+// DEPRECATED - use gameStateClass instead
+
 import { Entity } from "./entityClass.js";
 import { WorldLevel } from "./worldLevelClass.js";
 import {initializeTurnSystem} from "./gameTime.js";
+
+const gameStatuses = ["NEW","ACTIVE","WON","LOST"];
 
 const gameState = {
   score: 0,
   currentLevel: 0,
   isPlaying: false,
+  status: "NEW",
   world: [],
   avatar: null
 };

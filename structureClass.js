@@ -1,4 +1,4 @@
-import { gameState } from "./gameplay.js";
+import { gameState } from "./gameStateClass.js";
 
 class Structure {
     constructor(x, y, z, type, displaySymbol = '?') {

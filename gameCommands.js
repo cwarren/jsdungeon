@@ -1,6 +1,5 @@
 import { gameActionsMap } from "./gameActions.js";
 // import { gameActionsMap, moveAvatar_UL, moveAvatar_U, moveAvatar_UR, moveAvatar_L, moveAvatar_wait, moveAvatar_R, moveAvatar_DL, moveAvatar_D, moveAvatar_DR, ascendStairs, descendStairs } from "./gameActions.js";
-// import { gameState } from "./gameplay.js";
 import { pushUIState, popUIState, setUIState, getCurrentUIState } from "./ui.js";
 import {handlePlayerActionTime} from "./gameTime.js";
 

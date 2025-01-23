@@ -1,4 +1,5 @@
-import { gameState, initializeGameState } from "./gameplay.js";
+import { gameState } from "./gameStateClass.js";
+// import { gameState, initializeGameState } from "./gameplay.js";
 import { executeGameCommand } from "./gameCommands.js";
 import {advanceGameTime} from "./gameTime.js";
 
@@ -20,7 +21,7 @@ const worldLevelSpecifications = [
   [30, 20, "EMPTY"], 
   [30, 20, "RANDOM"], 
 ];
-initializeGameState(worldLevelSpecifications);
+gameState.initialize(worldLevelSpecifications);
 
 // Create and initialize the canvas
 const canvas = document.createElement("canvas");
