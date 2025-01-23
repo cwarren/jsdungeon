@@ -12,6 +12,8 @@ class GameState {
         this.avatar = null;
     }
 
+    static statuses = ["NEW","ACTIVE","WON","LOST","ABANDONED"];
+
     initialize(levelSpecifications) {
         this.world = levelSpecifications.map(([width, height, genOption], index) => new WorldLevel(index, width, height, genOption));
         this.world[0].generate();
@@ -23,6 +25,8 @@ class GameState {
 
         this.setUpAvatar(firstLevel);
         this.populateLevelWithEntities(firstLevel);
+
+        this.status="ACTIVE";
         initializeTurnSystem();
     }
 
