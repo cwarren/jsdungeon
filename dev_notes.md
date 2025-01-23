@@ -4,6 +4,9 @@
 1.a. the actions map for the UI (see gameActions.js as an example) (likely empy initially, or calling stubbed functions)
 1.b. the implementations of the actions (not present, or maybe stubbed with just a console log of the action)
 
+template for new action map entry:
+    ACTION_IDENTIFIER: { name: "Action name", description: "brief description of action", action: functionImplementingAction },
+
 2. add to UI actions the action to switch to the new UI mode
 
 3. add to ui.js...
@@ -11,7 +14,7 @@
 3.b. a case in drawUI to route to the new mode
 
 4. add to gameCommands...
-4.a. import of the new actions map
+4.a. import of the new actions map and add an entry for it in actionMaps
 4.b. key bindings to get into the new mode from the appropriate modes (typically a PUSH_<NEW_MODE> binding)
 4.c. key bindings for the new mode to leave (Escape -> pop ui state)
 

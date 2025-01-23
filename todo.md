@@ -1,3 +1,8 @@
+* implement a help screen system
+* * generate help text from keybindings & actions
+* * general prose
+* * ui mode
+
 * detail out some game modes and commands
 * * game meta
 * * * new game
