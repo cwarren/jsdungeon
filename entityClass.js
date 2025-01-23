@@ -1,4 +1,4 @@
-import { gameState } from "./gameplay.js";
+import { gameState } from "./gameStateClass.js";
 
 const DEFAULT_ACTION_TIME = 100;
 

@@ -1,4 +1,4 @@
-import { gameState } from "./gameplay.js";
+import { gameState } from "./gameStateClass.js";
 
 const TIME_WRAP_LIMIT = 10000;
 
