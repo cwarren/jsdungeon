@@ -22,3 +22,10 @@ template for new action map entry:
 
 6. tackle the specialized functionality of the new game mode, implemention relevant ui drawws, actions, and key bindings as needed
 
+# To add support for a new action to an existing UI mode
+
+1. in the relevant actions file
+1.a. add an entry in the action map
+1.b. implement (or at least stub) the function for the action
+
+2. add a key binding for it in the appropriate section in gameCommans 
