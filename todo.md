@@ -1,15 +1,9 @@
+
 * implement a help screen system
+* * trigger via ?
 * * generate help text from keybindings & actions
 * * general prose
 * * ui mode
-
-* detail out some game modes and commands
-* * game meta
-* * * new game
-* * * back to current game (not possible if current game is over)
-* * game over - win (transitions to game meta, clearing UI stack)
-* * game over - lose (transitions to game meta, clearing UI stack)
-* * dev command to win or lose current game
 
 * default actions / move-into actions
 * * attack, for hostile mobs

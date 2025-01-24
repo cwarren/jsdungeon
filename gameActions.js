@@ -1,6 +1,7 @@
 import { gameState } from "./gameStateClass.js";
 import { DEFAULT_ACTION_TIME } from "./entityClass.js";
 import {initializeTurnSystem_mobsOnly} from "./gameTime.js";
+import { pushUIState, resetUIState } from "./ui.js";
 
 /* template for new action map entry:
     ACTION_IDENTIFIER: { name: "Action name", description: "brief description of action", action: functionImplementingAction },
@@ -49,8 +50,18 @@ const DIRECTION_DELTAS = {
 // IMPORTANT!!!!
 // action functions should return the time cost of the action!
 
-function DEV_winGame()  { gameState.winGame(); return 0; }
-function DEV_loseGame() { gameState.loseGame(); return 0; }
+function DEV_winGame()  { 
+    gameState.winGame();
+    resetUIState();
+    pushUIState("GAME_OVER");
+    return 0;
+}
+function DEV_loseGame() {
+    gameState.loseGame();
+    resetUIState();
+    pushUIState("GAME_OVER");
+    return 0;
+}
 
 function avatarMove(dx,dy) { return gameState.avatar.tryMove(dx,dy); }
 function moveAvatar_UL()   { return avatarMove(-1,-1) }

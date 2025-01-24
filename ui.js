@@ -20,7 +20,11 @@ const worldLevelSpecifications = [
   [30, 20, "EMPTY"], 
   [30, 20, "RANDOM"], 
 ];
-gameState.initialize(worldLevelSpecifications);
+
+function initializeGameWorld() { // this is a hack until I pull this stuff out to a better location
+  gameState.initialize(worldLevelSpecifications);
+}
+initializeGameWorld();
 
 // Create and initialize the canvas
 const canvas = document.createElement("canvas");
@@ -69,6 +73,9 @@ function setUIState(newState) {
     resizeCanvas();  // Redraw to reflect new state
 }
 
+function resetUIState() {
+  uiStateStack = ["GAME_META"];
+}
 
 // Avatar movement path
 let avatarMovementPath = [];
@@ -79,6 +86,18 @@ function resizeCanvas() {
   canvas.height = window.innerHeight * 0.9;
   drawUI();
 }
+
+const uiStates = [
+  "GAMEPLAY",
+  "CHARACTER_SHEET",
+  "INVENTORY",
+  "EQUIPMENT",
+  "MAP_SCREEN",
+  "GAME_META",
+  "GAME_OVER",
+  "PROSE_SECTION",
+  "CUSTOM_GRAPHICS",
+];
 
 // Draw the UI function (blank black canvas)
 function drawUI() {
@@ -100,6 +119,9 @@ function drawUI() {
       break;
     case "GAME_META":
       drawGameMeta();
+      break;
+    case "GAME_OVER":
+      drawGameOver();
       break;
     case "PROSE_SECTION":
       drawProseSection(gameState);
@@ -344,16 +366,14 @@ function drawGameMeta() {
   ctx.fillText("ui state: GAME_META", 50, 50);
 }
 
-function drawGameOver_Win() {
+function drawGameOver() {
   ctx.fillStyle = "white";
   ctx.font = "20px Arial";
-  ctx.fillText("ui state: GAME_OVER_WIN", 50, 50);
-}
-
-function drawGameOver_Lose() {
-  ctx.fillStyle = "white";
-  ctx.font = "20px Arial";
-  ctx.fillText("ui state: GAME_OVER_LOSE", 50, 50);
+  ctx.fillText("ui state: GAME_OVER", 50, 50);
+  let gameStateMessage = "You won! :)";
+  if (gameState.status == "LOST") { gameStateMessage = "You lost. :("; }
+  if (gameState.status == "ABANDONED") { gameStateMessage = "You abandoned that game."; }
+  ctx.fillText(gameStateMessage, 100, 100);
 }
 
 function drawProseSection() {
@@ -382,4 +402,4 @@ resizeCanvas();
 
 advanceGameTime();
 
-export { resizeCanvas, drawGame, uiSettings, pushUIState, popUIState, setUIState, getCurrentUIState };
+export { initializeGameWorld, resizeCanvas, drawGame, uiSettings, pushUIState, popUIState, setUIState, resetUIState, getCurrentUIState };
