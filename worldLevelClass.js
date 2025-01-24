@@ -35,7 +35,7 @@ class WorldLevel {
         this.levelStructures = [];
         this.stairsDown = null;
         this.stairsUp = null;
-        console.log("new world level", this);
+        // console.log("new world level", this);
     }
 
     static levelTypeToGenFunction = {
@@ -87,7 +87,7 @@ class WorldLevel {
 
     addEntity(ent) {
         this.levelEntities.push(ent);
-        console.log("adding entity to level", this);
+        // console.log("adding entity to level", this);
     }
 
     removeEntity(ent) {
