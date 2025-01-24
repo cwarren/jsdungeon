@@ -1,6 +1,8 @@
 import { GameState, gameState } from "./gameStateClass.js";
 import { gameActionsMap } from "./gameActions.js";
 import { gameMetaActionsMap } from "./gameMetaActions.js";
+import { textActionsMap } from "./textActions.js";
+import { uiActionsMap } from "./uiActions.js";
 import { pushUIState, popUIState, setUIState, resetUIState, getCurrentUIState } from "./ui.js";
 import { handlePlayerActionTime } from "./gameTime.js";
 
@@ -39,59 +41,48 @@ const keyBinding = {
         "M": "PUSH_MAP_SCREEN",
         "G": "POP_UI_STATE", // GAME_META is the base game state, so from game play popping state gets you back to game meta
         "Escape": "POP_UI_STATE",
+        "?": "PUSH_HELP",
     },
     "CHARACTER_SHEET": {
         "Escape": "POP_UI_STATE",
+        "?": "PUSH_HELP",
     },
     "INVENTORY": {
         "Escape": "POP_UI_STATE",
+        "?": "PUSH_HELP",
     },
     "EQUIPMENT": {
         "Escape": "POP_UI_STATE",
+        "?": "PUSH_HELP",
     },
     "MAP_SCREEN": {
         "Escape": "POP_UI_STATE",
+        "?": "PUSH_HELP",
     },
     "GAME_META": {
         "N": "NEW_GAME",
         "A": "ABANDON_GAME",
         "Escape": "PUSH_GAMEPLAY",
+        "?": "PUSH_HELP",
     },
     "GAME_OVER": {
         "Escape": "POP_UI_STATE",
-    }
+    },
+    "HELP": {
+        "ArrowUp": "LINE_UP",
+        "ArrowDown": "LINE_DOWN",
+        "PageUp": "SCROLL_UP",
+        "PageDown": "SCROLL_DOWN",
+        "Escape": "POP_UI_STATE",
+        "?": "PUSH_HELP",
+    },
 };
 
 const actionMaps = {
     "GAMEPLAY": gameActionsMap,
     "GAME_META": gameMetaActionsMap,
+    "HELP": textActionsMap,
 };
-
-// TODO: pull these into a separate file
-const uiActionsMap = {
-    "PUSH_GAMEPLAY": uiGamePlay,
-    "PUSH_CHARACTER_SHEET": uiCharacterSheet,
-    "PUSH_INVENTORY_SCREEN": uiInventory,
-    "PUSH_EQUIPMENT_SCREEN": uiEquipment,
-    "PUSH_MAP_SCREEN": uiMap,
-    "PUSH_GAME_META": uiGameMeta,
-    "POP_UI_STATE": popUIState
-};
-function uiGamePlay() { 
-    // go to game play if there's an active game, otherwise show the game over screen
-    if (gameState.status == 'ACTIVE') {
-        pushUIState("GAMEPLAY");
-    } else if (GameState.statusesGameOver.includes(gameState.status)) {
-        pushUIState("GAME_OVER");
-    } else {
-        resetUIState();
-    }
-}
-function uiCharacterSheet() { pushUIState("CHARACTER_SHEET"); }
-function uiInventory() { pushUIState("INVENTORY"); }
-function uiEquipment() { pushUIState("EQUIPMENT"); }
-function uiMap() { pushUIState("MAP_SCREEN"); }
-function uiGameMeta() { pushUIState("GAME_META"); }
 
 function executeGameCommand(key, event) {
     let lookupKey = key;
@@ -105,9 +96,9 @@ function executeGameCommand(key, event) {
         return;
     }
 
-    // UI control actions take priority
+    // UI control actions are special and also take priority
     if (uiActionsMap[actionKey]) {
-        uiActionsMap[actionKey]();
+        uiActionsMap[actionKey].action();
         return;
     }
 
@@ -120,4 +111,4 @@ function executeGameCommand(key, event) {
     }
 }
 
-export { executeGameCommand as executeGameCommand, gameActionsMap, keyBinding };
+export { executeGameCommand as executeGameCommand, gameActionsMap, keyBinding, actionMaps };

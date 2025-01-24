@@ -1,6 +1,9 @@
 import { gameState } from "./gameStateClass.js";
-import { executeGameCommand } from "./gameCommands.js";
+import { executeGameCommand, keyBinding, actionMaps } from "./gameCommands.js";
+import { uiActionsMap } from "./uiActions.js";
 import {advanceGameTime} from "./gameTime.js";
+import { TextBlock } from "./textBlockClass.js";
+import { createHelpText } from "./util.js";
 
 // On page load, initialize the game state, then draw it, then start game turns
 
@@ -45,6 +48,18 @@ const uiSettings = {
     baseCellSize: 30,
     gridCellSpacing: 1
 };
+
+
+const helpTextBlocks = {};
+function initializeHelpTextBlocks(keyBindings, actionMaps) {
+    for (const commandSet in keyBindings) {
+        if (actionMaps[commandSet]) {
+            helpTextBlocks[commandSet] = new TextBlock(createHelpText(keyBindings[commandSet], actionMaps[commandSet], uiActionsMap));
+        }
+    }
+}
+initializeHelpTextBlocks(keyBinding, actionMaps);
+console.log("helpTextBlocks", helpTextBlocks);
 
 let uiStateStack = ["GAME_META","GAMEPLAY"];  // Stack starts with gameplay as the default state
 
@@ -125,6 +140,10 @@ function drawUI() {
       break;
     case "PROSE_SECTION":
       drawProseSection(gameState);
+      break;
+    case "HELP":
+      console.log("uiStateStack", uiStateStack);
+      drawHelp();
       break;
     case "MAP_SCREEN":
       drawMapScreen(gameState);
@@ -381,6 +400,31 @@ function drawProseSection() {
   ctx.font = "20px Arial";
   ctx.fillText("ui state: PROSE_SECTION", 50, 50);
 }
+
+function drawHelp() {
+  ctx.fillStyle = "white";
+  ctx.font = "20px Arial";
+  const lineHeight = 24; // Space between lines
+  const startX = 50;
+  let startY = 50;
+
+  const helpFor = uiStateStack[uiStateStack.length - 2]; // help is always in the context of the screen in which it was called
+  const helpTextBlock = helpTextBlocks[helpFor];
+
+  if (!helpTextBlock) {
+      ctx.fillText("No help text available", startX, startY);
+      return;
+  }
+
+  const displayTextRows = helpTextBlock.getDisplayTextRows();
+  
+  for (let i = 0; i < displayTextRows.length; i++) {
+      if (startY + lineHeight > canvas.height) break; // Stop drawing if the current line would go below the bottom of the canvas
+      ctx.fillText(displayTextRows[i], startX, startY);
+      startY += lineHeight;
+  }
+}
+
 
 function drawMapScreen() {
   ctx.fillStyle = "white";
