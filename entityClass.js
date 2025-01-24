@@ -4,73 +4,53 @@ const DEFAULT_ACTION_TIME = 100;
 
 class Entity {
 
-    constructor(type) {
-      this.type = type;
-      this.displaySymbol = Entity.ENTITIES[type].displaySymbol;
-      this.displayColor = Entity.ENTITIES[type].displayColor;
-      this.viewRadius = Entity.ENTITIES[type].viewRadius;
-      this.visibleCells = new Set();
-      this.seenCells = new Set();
+  constructor(type) {
+    this.type = type;
+    this.displaySymbol = Entity.ENTITIES[type].displaySymbol;
+    this.displayColor = Entity.ENTITIES[type].displayColor;
+    this.viewRadius = Entity.ENTITIES[type].viewRadius;
+    this.visibleCells = new Set();
+    this.seenCells = new Set();
 
-      this.isRunning = false;
-      this.runDelta = null;
+    this.isRunning = false;
+    this.runDelta = null;
+  }
+
+
+  //======================================================================
+  // INSPECTION & INFORMATION
+
+  getCell() {
+    return gameState.world[this.z].grid[this.x][this.y];
+  }
+  getCellAtDelta(dx, dy) {
+    const currentLevel = gameState.world[this.z];
+    if (!currentLevel) { return null };
+    const newX = this.x + dx;
+    const newY = this.y + dy;
+    if (newX >= 0 && newX < currentLevel.levelWidth && newY >= 0 && newY < currentLevel.levelHeight) {
+      return currentLevel.grid[newX][newY];
     }
+    return null;
+  }
 
-    placeAt(x,y,z) {
-      placeAtCell(gameState.world[z ? z : 0].grid[x][y]);
-    }
+  //======================================================================
+  // VISION
 
-    placeAtCell(cell) {
-      // console.log("placing entity at cell", this, cell);
-      this.x = cell.x;
-      this.y = cell.y;
-      this.z = cell.z;
-      cell.entity = this;
-      this.determineVisibleCells();
-    }
+  isVisibleTo(otherEntity) {
+    return otherEntity.visibleCells.has(gameState.world[this.z].grid[this.x][this.y]);
+  }
 
-    getCell() {
-      return gameState.world[this.z].grid[this.x][this.y];
-    }
-    getCellAtDelta(dx,dy) {
-      const currentLevel = gameState.world[this.z];
-      if (!currentLevel) { return null };
-      const newX = this.x + dx;
-      const newY = this.y + dy;
-      if (newX >= 0 && newX < currentLevel.levelWidth && newY >= 0 && newY < currentLevel.levelHeight) {
-        return currentLevel.grid[newX][newY];
-      }
-      return null;
-    }
-
-    isVisibleTo(otherEntity) {
-      return otherEntity.visibleCells.has(gameState.world[this.z].grid[this.x][this.y]);
-    }
-
-    determineVisibleCells() {
-      // console.log("gameState", gameState);
-      this.determineVisibleCellsInGrid(gameState.world[this.z].grid);
-    }
-
-    takeTurn() {
-      if (this.type == "AVATAR") {
-          // console.log("Player's turn! Awaiting input...");
-          return 0; // The game waits for player input
-      } else {
-          console.log(`${this.type} acts!`);
-          let actionTime = DEFAULT_ACTION_TIME;
-
-          // AI logic or automatic actions go here...
-
-          return actionTime; 
-      }
+  determineVisibleCells() {
+    // console.log("gameState", gameState);
+    this.determineVisibleCellsInGrid(gameState.world[this.z].grid);
   }
 
   /**
-   * Determines visible cells within the grid using line-of-sight and view radius.
-   * Uses Bresenham’s line algorithm for visibility checking.
-   * @param {Array} grid - The grid representing the world level.
-   */
+    * Determines visible cells within the grid using line-of-sight and view radius.
+    * Uses Bresenham’s line algorithm for visibility checking.
+    * @param {Array} grid - The grid representing the world level.
+    */
   determineVisibleCellsInGrid(grid) {
     this.visibleCells = new Set();
     const worldWidth = grid.length;
@@ -124,14 +104,37 @@ class Entity {
     }
   }
 
+  //======================================================================
+  // AI
+
+  takeTurn() {
+    if (this.type == "AVATAR") {
+      // console.log("Player's turn! Awaiting input...");
+      return 0; // The game waits for player input
+    } else {
+      console.log(`${this.type} acts!`);
+      let actionTime = DEFAULT_ACTION_TIME;
+
+      // AI logic or automatic actions go here...
+
+      return actionTime;
+    }
+  }
+
+
+  //======================================================================
+  // ACTIONS
   // IMPORTANT!!!!
   // action functions should return the time cost of the action!
+
+  // ------------------
+  // MOVEMENT & LOCATION
 
   tryMove(dx, dy) {
     const currentLevel = gameState.world[this.z];
     if (!currentLevel) return;
 
-    const targetCell = this.getCellAtDelta(dx,dy);
+    const targetCell = this.getCellAtDelta(dx, dy);
     if (!targetCell) { return 0; }
     if (this.canMoveToCell(targetCell)) {
       return this.confirmMove(targetCell);
@@ -145,27 +148,40 @@ class Entity {
     }
   }
 
+  placeAt(x, y, z) {
+    placeAtCell(gameState.world[z ? z : 0].grid[x][y]);
+  }
+
+  placeAtCell(cell) {
+    // console.log("placing entity at cell", this, cell);
+    this.x = cell.x;
+    this.y = cell.y;
+    this.z = cell.z;
+    cell.entity = this;
+    this.determineVisibleCells();
+  }
+
   canMoveToCell(cell) {
     return cell.isTraversible && !cell.entity;
   }
-  canMoveToDeltas(dx,dy) {
+  canMoveToDeltas(dx, dy) {
     const currentLevel = gameState.world[this.z];
     if (!currentLevel) return false;
-    const targetCell = this.getCellAtDelta(dx,dy);
+    const targetCell = this.getCellAtDelta(dx, dy);
     if (!targetCell) { return false; }
     return this.canMoveToCell(targetCell);
   }
 
   confirmMove(newCell) {
-      const oldCell = this.getCell();
-      oldCell.entity = undefined;
-      this.placeAtCell(newCell);
-      return DEFAULT_ACTION_TIME;
-  }
-  confirmMoveDeltas(dx,dy) {
     const oldCell = this.getCell();
     oldCell.entity = undefined;
-    this.placeAtCell(this.getCellAtDelta(dx,dy));
+    this.placeAtCell(newCell);
+    return DEFAULT_ACTION_TIME;
+  }
+  confirmMoveDeltas(dx, dy) {
+    const oldCell = this.getCell();
+    oldCell.entity = undefined;
+    this.placeAtCell(this.getCellAtDelta(dx, dy));
     return DEFAULT_ACTION_TIME;
   }
 
@@ -177,8 +193,8 @@ class Entity {
     this.isRunning = false;
     this.runDelta = null;
   }
-  canRunToDeltas(dx,dy) { // similar to canMoveTo, but more things will stop running
-    const targetCell = this.getCellAtDelta(dx,dy);
+  canRunToDeltas(dx, dy) { // similar to canMoveTo, but more things will stop running
+    const targetCell = this.getCellAtDelta(dx, dy);
     if (!targetCell) { return false; }
     if (!this.canMoveToCell(targetCell)) { return false; }
 
@@ -186,13 +202,13 @@ class Entity {
     // NOTE: taking damage will also stop running, though that's handled in the damage taking method
     const curCell = this.getCell();
     const adjCells = curCell.getAdjacentCells();
-    
-    const hasAdjacentInterrupt = adjCells.some(cell => 
-        !(cell.structure === undefined || cell.structure == null) ||  // stop if adjacent to a structure
-        !(cell.entity === undefined || cell.entity == null) // stop if adjacent to a mob
-      );
+
+    const hasAdjacentInterrupt = adjCells.some(cell =>
+      !(cell.structure === undefined || cell.structure == null) ||  // stop if adjacent to a structure
+      !(cell.entity === undefined || cell.entity == null) // stop if adjacent to a mob
+    );
     if (hasAdjacentInterrupt) { return false; }
-    
+
     // TODO: add check to stop running when at a corner
 
     // TODO: add check to stop running when a mob is newly visible
@@ -202,7 +218,7 @@ class Entity {
   continueRunning() {
     if (!this.isRunning) return 0;
     // console.log('running entity', this);
-    if (! this.canRunToDeltas(this.runDelta.dx, this.runDelta.dy)) {
+    if (!this.canRunToDeltas(this.runDelta.dx, this.runDelta.dy)) {
       this.stopRunning();
       return 0;
     }
@@ -210,11 +226,13 @@ class Entity {
   }
 
   //================================================
+  //================================================
+  //================================================
   // ENTITY DEFINITIONS
 
   static ENTITIES_LIST = [
-    {type: "AVATAR", name: "Player", displaySymbol: "@", displayColor: "#fff", viewRadius: 16},
-    {type: "MOLD_PALE", name: "Pale Mold", displaySymbol: "m", displayColor: "#ddd", viewRadius: 2},
+    { type: "AVATAR", name: "Player", displaySymbol: "@", displayColor: "#fff", viewRadius: 16 },
+    { type: "MOLD_PALE", name: "Pale Mold", displaySymbol: "m", displayColor: "#ddd", viewRadius: 2 },
   ];
 
   static ENTITIES = {};
@@ -224,5 +242,5 @@ class Entity {
 }
 
 Entity.initializeEntitiesFromList();
-  
+
 export { Entity, DEFAULT_ACTION_TIME };

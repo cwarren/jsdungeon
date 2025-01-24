@@ -1,10 +1,3 @@
-
-* implement a help screen system
-* * trigger via ?
-* * generate help text from keybindings & actions
-* * general prose
-* * ui mode
-
 * default actions / move-into actions
 * * attack, for hostile mobs
 * * * mob relationships / attitude
