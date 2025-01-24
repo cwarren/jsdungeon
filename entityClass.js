@@ -1,4 +1,6 @@
 import { gameState } from "./gameStateClass.js";
+import { Damage } from "./damageClass.js";
+import { constrainValue } from "./util.js";
 
 const DEFAULT_ACTION_TIME = 100;
 
@@ -14,6 +16,13 @@ class Entity {
 
     this.isRunning = false;
     this.runDelta = null;
+
+    this.initialHealth = 10;
+    this.health = 10;
+    this.damagedBy = []; // array of {damageSource, damage}
+
+    this.baseKillPoints = 10; // worth this many advancement points when killed
+    this.currentAdvancementPoints = 0;
   }
 
 
@@ -32,6 +41,25 @@ class Entity {
       return currentLevel.grid[newX][newY];
     }
     return null;
+  }
+
+  static RELATIONSHIPS = ["TAMED_BY", "FRIENDLY_TO", "NEUTRAL_TO", "HOSTILE_TO", "VIOLENT_TO"];
+  getRelationshipTo(otherEntity) {
+    return "HOSTILE_TO"; // defaults to "murderhobo" (at least for development)
+  }
+
+  getDefaultActionFor(otherEntity) {
+    const relationship = this.getRelationshipTo(otherEntity);
+    if (["HOSTILE_TO", "VIOLENT_TO"].includes(relationship)) {
+      return "ATTACK"
+    }
+    if (["FRIENDLY_TO", "NEUTRAL_TO"].includes(relationship)) {
+      return "BUMP";
+    }
+    if (["TAMED_BY"].includes(relationship)) {
+      return "SWAP";
+    }
+    return "ATTACK";
   }
 
   //======================================================================
@@ -105,6 +133,15 @@ class Entity {
   }
 
   //======================================================================
+  // ADVANCEMENT
+
+  receiveAdvancementPoints(points) {
+    console.log(`${this.type} receiving ${points} advancement points`);
+    this.currentAdvancementPoints += points;
+  }
+
+
+  //======================================================================
   // AI
 
   takeTurn() {
@@ -128,7 +165,7 @@ class Entity {
   // action functions should return the time cost of the action!
 
   // ------------------
-  // MOVEMENT & LOCATION
+  // ACTIONS - MOVEMENT & LOCATION
 
   tryMove(dx, dy) {
     const currentLevel = gameState.world[this.z];
@@ -140,7 +177,19 @@ class Entity {
       return this.confirmMove(targetCell);
     }
     if (targetCell.entity) {
-      console.log("move prevented because target cell is already occupied", targetCell);
+      const defaultAction = this.getDefaultActionFor(targetCell.entity);
+      if (defaultAction == 'ATTACK') {
+        return this.attack(targetCell.entity);
+      }
+      if (defaultAction == 'BUMP') {
+        console.log("move prevented because target cell is already occupied", targetCell);
+        return 0;
+      }
+      if (defaultAction == 'SWAP') {
+        console.log("SWAP ACTION NOT YET IMPLEMENTED", targetCell);
+        return 0;
+      }
+      console.log(`unknown action ${defaultAction}, doing nothing`);
       return 0;
     } else {
       console.log("move prevented because target cell is not traversable", targetCell);
@@ -223,6 +272,68 @@ class Entity {
       return 0;
     }
     return this.confirmMoveDeltas(this.runDelta.dx, this.runDelta.dy); // confirmMoveDeltas actually does the move and returns the action cost
+  }
+
+  // ------------------
+  // ACTIONS - COMBAT & HEALTH
+
+  attack(otherEntity) {
+    console.log(`${this.type} attacking ${otherEntity.type}`);
+    otherEntity.takeDamageFrom(this.getAttackDamage(), this);
+    console.log("attacker", this);
+    console.log("defender", otherEntity);
+    return DEFAULT_ACTION_TIME;
+  }
+
+  getAttackDamage() {
+    return new Damage(2);
+  }
+
+  takeDamageFrom(dam, otherEntity) {
+    dam.amount = constrainValue(dam.amount, 0, this.health + 1);
+    this.health -= dam.amount;
+
+    let existingEntry = this.damagedBy.find(entry => entry.damageSource === otherEntity);
+    if (existingEntry) {
+      existingEntry.damage.amount += dam.amount;
+    } else {
+      this.damagedBy.push({ "damageSource": otherEntity, "damage": dam });
+    }
+
+    if (this.health <= 0) {
+      this.die();
+    }
+  }
+
+  // assign death credits, remove this entity from the game
+  die() {
+    console.log(`${this.type} has died.`);
+
+    const killCredits = this.getDeathCredits();
+    killCredits.forEach(entry => {
+      if (entry.damageSource && typeof entry.damageSource.receiveAdvancementPoints === "function") {
+        const advancementPoints = Math.floor(this.baseKillPoints * entry.proportionalDamage);
+        entry.damageSource.receiveAdvancementPoints(advancementPoints);
+      }
+    });
+
+    gameState.world[this.z].removeEntity(this);
+
+    this.damagedBy = [];
+    this.visibleCells.clear();
+    this.seenCells.clear();
+  }
+
+  // get proportional responsibility for damage dealt to this entity
+  getDeathCredits() {
+    let totalDamage = this.damagedBy.reduce((sum, entry) => sum + entry.damage.amount, 0);
+    if (totalDamage === 0) {
+      return []; // No damage dealt, return an empty array
+    }
+    return this.damagedBy.map(entry => ({
+      damageSource: entry.damageSource,
+      proportionalDamage: entry.damage.amount / totalDamage
+    }));
   }
 
   //================================================

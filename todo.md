@@ -8,8 +8,13 @@
 * * * dealing damage
 * * * taking damage
 * * * * tracking hostility (maybe - maybe too early for this)
-* * healing
 * * death (& removal from the world)
+
+* move game timing into game state
+
+* add a debug command to dump game state
+
+* healing
 
 * when running, stop if a mob becomes newly visible
 * when running, stop if a structure becomes newly visible
@@ -47,5 +52,6 @@
 * * potential play exploit with stair traversal and action timing - think about how to resolve that
 * * * consider tracking time away from that level, and then advanced turns player-less for that duration (up to some not-too-high limit)
 * * keep an eye on time issues with running - seems OK at the moment, but tricky....
-
+* seems to be something weird with the turn-taking system and maybe not all entities being added to it
+* had a situation where an entity was shown, but didn't actually exist (at least, not in the cell shown)
 
