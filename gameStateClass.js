@@ -2,8 +2,15 @@ import { Entity } from "./entityClass.js";
 import { WorldLevel } from "./worldLevelClass.js";
 import { initializeTurnSystem } from "./gameTime.js";
 
+
 class GameState {
     constructor() {
+        this.reset();
+    }
+    static statuses = ["NEW","ACTIVE","WON","LOST","ABANDONED"];
+    static statusesGameOver = ["WON","LOST","ABANDONED"];
+
+    reset() {
         this.score = 1;
         this.currentLevel = 0;
         this.isPlaying = false;
@@ -11,8 +18,6 @@ class GameState {
         this.world = [];
         this.avatar = null;
     }
-
-    static statuses = ["NEW","ACTIVE","WON","LOST","ABANDONED"];
 
     initialize(levelSpecifications) {
         this.world = levelSpecifications.map(([width, height, genOption], index) => new WorldLevel(index, width, height, genOption));
@@ -61,9 +66,16 @@ class GameState {
         this.status = "LOST";
         this.isPlaying = false;
     }
+
+    abandonGame() {
+        console.log("abandoning the game");
+        this.status = "ABANDONED";
+        this.isPlaying = false;
+    }
+
 }
 
 // Create a single instance to maintain the game's state globally
 const gameState = new GameState();
 
-export { gameState };
+export { GameState, gameState };

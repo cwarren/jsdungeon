@@ -1,4 +1,8 @@
-import { gameState } from "./gameStateClass.js";
+import { GameState, gameState } from "./gameStateClass.js";
+import { initializeGameWorld, pushUIState, resetUIState } from "./ui.js";
+
+
+//=====================
 
 const gameMetaActionsMap = {
     NEW_GAME: { name: "New Game", description: "Start a new game (current game must not be active)", action: startNewGame },
@@ -7,16 +11,34 @@ const gameMetaActionsMap = {
 
 function startNewGame() {
     console.log("startNewGame", gameState);
-    // TODO: implement this
+    if (GameState.statusesGameOver.includes(gameState.status)) {
+        gameState.reset();
+        initializeGameWorld();
+        resetUIState();
+        pushUIState("GAMEPLAY");
+    } else {
+        console.log("Cannot start a new game because there's a game in progress.");
+    }
     return 0;
 }
-
 
 function abandonCurrentGame() {
     console.log("abandonCurrentGame", gameState);
-    // TODO: implement this
+    if (gameState.status == 'ACTIVE') {
+        gameState.abandonGame();
+        resetUIState();
+        pushUIState("GAME_OVER");
+    } else {
+        console.log("Cannot abandon a game that's already over")
+    }
     return 0;
 }
+
+//=====================
+
+//=====================
+
+//=====================
 
 
 export { gameMetaActionsMap };

@@ -1,6 +1,7 @@
+import { GameState, gameState } from "./gameStateClass.js";
 import { gameActionsMap } from "./gameActions.js";
 import { gameMetaActionsMap } from "./gameMetaActions.js";
-import { pushUIState, popUIState, setUIState, getCurrentUIState } from "./ui.js";
+import { pushUIState, popUIState, setUIState, resetUIState, getCurrentUIState } from "./ui.js";
 import { handlePlayerActionTime } from "./gameTime.js";
 
 const keyBinding = {
@@ -56,6 +57,9 @@ const keyBinding = {
         "A": "ABANDON_GAME",
         "Escape": "PUSH_GAMEPLAY",
     },
+    "GAME_OVER": {
+        "Escape": "POP_UI_STATE",
+    }
 };
 
 const actionMaps = {
@@ -73,7 +77,16 @@ const uiActionsMap = {
     "PUSH_GAME_META": uiGameMeta,
     "POP_UI_STATE": popUIState
 };
-function uiGamePlay() { pushUIState("GAMEPLAY"); } // TODO: add more logic here - game play requires an active game
+function uiGamePlay() { 
+    // go to game play if there's an active game, otherwise show the game over screen
+    if (gameState.status == 'ACTIVE') {
+        pushUIState("GAMEPLAY");
+    } else if (GameState.statusesGameOver.includes(gameState.status)) {
+        pushUIState("GAME_OVER");
+    } else {
+        resetUIState();
+    }
+}
 function uiCharacterSheet() { pushUIState("CHARACTER_SHEET"); }
 function uiInventory() { pushUIState("INVENTORY"); }
 function uiEquipment() { pushUIState("EQUIPMENT"); }
