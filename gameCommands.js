@@ -4,7 +4,7 @@ import { gameMetaActionsMap } from "./gameMetaActions.js";
 import { textActionsMap } from "./textActions.js";
 import { uiActionsMap } from "./uiActions.js";
 import { pushUIState, popUIState, setUIState, resetUIState, getCurrentUIState } from "./ui.js";
-import { handlePlayerActionTime } from "./gameTime.js";
+// import { handlePlayerActionTime } from "./gameTime.js";
 
 const keyBinding = {
     "GAMEPLAY":
@@ -34,6 +34,7 @@ const keyBinding = {
 
         "l": "DEV_LOSE_GAME",
         "w": "DEV_WIN_GAME",
+        "%": "DEV_DUMP_GAME_STATE",
 
         "C": "PUSH_CHARACTER_SHEET",
         "I": "PUSH_INVENTORY_SCREEN",
@@ -107,7 +108,7 @@ function executeGameCommand(key, event) {
     console.log(`Executing action: ${actionDef.name}`);
     const actionTimeCost = actionDef.action(key, event);
     if (uiState == "GAMEPLAY") {
-        handlePlayerActionTime(actionTimeCost);
+        gameState.handlePlayerActionTime(actionTimeCost);
     }
 }
 

@@ -1,7 +1,7 @@
 import { gameState } from "./gameStateClass.js";
 import { executeGameCommand, keyBinding, actionMaps } from "./gameCommands.js";
 import { uiActionsMap } from "./uiActions.js";
-import {advanceGameTime} from "./gameTime.js";
+// import {advanceGameTime} from "./gameTime.js";
 import { TextBlock } from "./textBlockClass.js";
 import { createHelpText } from "./util.js";
 
@@ -444,6 +444,6 @@ window.addEventListener("resize", resizeCanvas);
 // Now that gameState and canvas and such are set up, render the game
 resizeCanvas();
 
-advanceGameTime();
+gameState.advanceGameTime();
 
 export { initializeGameWorld, resizeCanvas, drawGame, uiSettings, pushUIState, popUIState, setUIState, resetUIState, getCurrentUIState };

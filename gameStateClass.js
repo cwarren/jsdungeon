@@ -1,6 +1,7 @@
 import { Entity } from "./entityClass.js";
 import { WorldLevel } from "./worldLevelClass.js";
-import { initializeTurnSystem } from "./gameTime.js";
+import { TurnQueue } from "./gameTime.js";
+
 
 
 class GameState {
@@ -17,6 +18,7 @@ class GameState {
         this.status = "NEW";
         this.world = [];
         this.avatar = null;
+        this.turnQueue = new TurnQueue();
     }
 
     initialize(levelSpecifications) {
@@ -33,7 +35,7 @@ class GameState {
 
         this.status="ACTIVE";
         this.isPlaying = true;
-        initializeTurnSystem();
+        this.initializeTurnSystem();
     }
 
     setUpAvatar(initialFloor) {
@@ -55,6 +57,9 @@ class GameState {
         return this.avatar ? this.avatar.getCell() : null;
     }
 
+    //=====================
+    // GAME MANAGEMENT
+
     winGame() {
         console.log("winning the game");
         this.status = "WON";
@@ -71,6 +76,55 @@ class GameState {
         console.log("abandoning the game");
         this.status = "ABANDONED";
         this.isPlaying = false;
+    }
+
+    //=====================
+    // TIME
+    advanceGameTime() {
+        while (true) {
+            // console.log("time passes...", turnQueue);
+            let activeEntity = this.turnQueue.nextTurn();
+            if (!activeEntity) break; // No more entities to process
+    
+            if (activeEntity === this.avatar && !activeEntity.isRunning) {
+                break; // Stop when it's the avatar's turn and the avatar is not running
+            }
+        }
+    }
+
+    handlePlayerActionTime(actionCost) {
+        // console.log(`handling player action time of ${actionCost}`);
+        if (actionCost <= 0) return;
+    
+        // If the avatar is running, immediately continue running
+        if (this.avatar.isRunning) {
+            this.turnQueue.addEntity(this.avatar, this.turnQueue.queue[0].time + actionCost);
+            this.turnQueue.timePasses(actionCost);
+            this.advanceGameTime();  // Keep the turns flowing for running
+            return;
+        }
+    
+        // Normal player action handling
+        this.turnQueue.addEntity(this.avatar, this.turnQueue.queue[0].time + actionCost);
+        this.turnQueue.timePasses(actionCost);
+        this.turnQueue.normalizeQueueTimes();
+    
+        this.advanceGameTime();
+    }
+
+    initializeTurnSystem() {
+        this.initializeTurnSystem_mobsOnly();
+        this.turnQueue.addEntity(this.avatar, -1); // Add player to the queue, at the front
+    }
+
+    initializeTurnSystem_mobsOnly() {
+        this.turnQueue.clear();
+        const levelEntities = this.world[this.avatar.z].levelEntities;
+        levelEntities.forEach(entity => {
+            if (entity.type != "AVATAR") {
+                this.turnQueue.addEntity(entity, Math.floor(Math.random() * levelEntities.length)); // shuffle them a bit
+            }
+        });
     }
 
 }
