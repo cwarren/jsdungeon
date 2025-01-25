@@ -1,8 +1,6 @@
-import { gameState } from "./gameStateClass.js";
-
 const TIME_WRAP_LIMIT = 10000;
 
-// Priority queue for timing entities
+// Priority queue for timing entities, supporting an action cost / action point system
 class TurnQueue {
     constructor() {
         this.queue = [];
@@ -17,6 +15,10 @@ class TurnQueue {
     addEntity(entity, initialTime = 0) {
         this.queue.push({ entity, time: initialTime });
         this.ordering();
+    }
+
+    removeEntity(entity) {
+        this.queue = this.queue.filter(entry => entry.entity !== entity);
     }
 
     ordering() {
@@ -68,54 +70,4 @@ class TurnQueue {
     }
 }
 
-// Global game turn queue
-const turnQueue = new TurnQueue();
-
-// start or advance the game turn loop
-function advanceGameTime() {
-    while (true) {
-        // console.log("time passes...", turnQueue);
-        let activeEntity = turnQueue.nextTurn();
-        if (!activeEntity) break; // No more entities to process
-
-        if (activeEntity === gameState.avatar && !activeEntity.isRunning) {
-            break; // Stop when it's the avatar's turn and the avatar is not running
-        }
-    }
-}
-
-function handlePlayerActionTime(actionCost) {
-    // console.log(`handling player action time of ${actionCost}`);
-    if (actionCost <= 0) return;
-
-    // If the avatar is running, immediately continue running
-    if (gameState.avatar.isRunning) {
-        turnQueue.addEntity(gameState.avatar, turnQueue.queue[0].time + actionCost);
-        turnQueue.timePasses(actionCost);
-        advanceGameTime();  // Keep the turns flowing for running
-        return;
-    }
-
-    // Normal player action handling
-    turnQueue.addEntity(gameState.avatar, turnQueue.queue[0].time + actionCost);
-    turnQueue.timePasses(actionCost);
-    turnQueue.normalizeQueueTimes();
-
-    advanceGameTime();
-}
-
-// Function to initialize turn-based time system
-function initializeTurnSystem() {
-    initializeTurnSystem_mobsOnly();
-    turnQueue.addEntity(gameState.avatar, -1); // Add player to the queue, at the front
-}
-
-function initializeTurnSystem_mobsOnly() {
-    turnQueue.clear();
-    const levelEntities = gameState.world[gameState.avatar.z].levelEntities;
-    levelEntities.forEach(entity => {
-        turnQueue.addEntity(entity, Math.floor(Math.random() * levelEntities.length)); // shuffle them a bit
-    });
-}
-
-export { turnQueue, advanceGameTime, initializeTurnSystem, initializeTurnSystem_mobsOnly, handlePlayerActionTime };
+export { TurnQueue };

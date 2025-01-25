@@ -1,6 +1,6 @@
 import { gameState } from "./gameStateClass.js";
 import { DEFAULT_ACTION_TIME } from "./entityClass.js";
-import {initializeTurnSystem_mobsOnly} from "./gameTime.js";
+// import {initializeTurnSystem_mobsOnly} from "./gameTime.js";
 import { pushUIState, resetUIState } from "./ui.js";
 
 /* template for new action map entry:
@@ -10,6 +10,7 @@ import { pushUIState, resetUIState } from "./ui.js";
 const gameActionsMap = {
     DEV_WIN_GAME: { name: "Win game", description: "(development action) Win the current game", action: DEV_winGame },
     DEV_LOSE_GAME: { name: "Lose game", description: "(development action) Win the current game", action: DEV_loseGame },
+    DEV_DUMP_GAME_STATE: { name: "Dump game state", description: "(development action) write the game state to the console", action: DEV_dumpGameState },
 
     MOVE_UL: { name: "Move Up-Left", description: "Move diagonally up-left", action: moveAvatar_UL },
     MOVE_U: { name: "Move Up", description: "Move up", action: moveAvatar_U },
@@ -62,6 +63,10 @@ function DEV_loseGame() {
     pushUIState("GAME_OVER");
     return 0;
 }
+function DEV_dumpGameState() {
+    console.log("### dump game state", gameState);
+    return 0;
+}
 
 function avatarMove(dx,dy) { return gameState.avatar.tryMove(dx,dy); }
 function moveAvatar_UL()   { return avatarMove(-1,-1) }
@@ -83,7 +88,7 @@ function ascendStairs() {
         const newCell = stairsUp.connectsTo.getCell();
         gameState.avatar.placeAtCell(newCell);
         newCell.worldLevel.addEntity(gameState.avatar);
-        initializeTurnSystem_mobsOnly();
+        gameState.initializeTurnSystem_mobsOnly();
     } else {
         console.log("cannot ascend - no stairs up");
     }
@@ -113,7 +118,7 @@ function descendStairs() {
         const newCell = stairsDown.connectsTo.getCell()
         gameState.avatar.placeAtCell(newCell);
         newCell.worldLevel.addEntity(gameState.avatar);
-        initializeTurnSystem_mobsOnly();
+        gameState.initializeTurnSystem_mobsOnly();
     } else {
         console.log("cannot descend - no stairs down");
     }

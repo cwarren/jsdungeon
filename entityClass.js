@@ -318,6 +318,7 @@ class Entity {
     });
 
     gameState.world[this.z].removeEntity(this);
+    gameState.turnQueue.removeEntity(this);
 
     this.damagedBy = [];
     this.visibleCells.clear();
