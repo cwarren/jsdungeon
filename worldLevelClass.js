@@ -77,6 +77,7 @@ class WorldLevel {
         return this.grid != null;
     }
     populate() {
+        devTrace(2,"populating level");
         console.log("world level population (TO BE IMPLEMENTED)");
     }
 
@@ -93,8 +94,7 @@ class WorldLevel {
       if (placementAttempts >= MAX_ENTITY_PLACEMENT_ATTEMPTS) {
         console.log("could not place entity in world level - placement attempts exceed max placement attempts");
       } else {
-        entity.placeAtCell(possiblePlacementCell);
-        this.addEntity(entity);
+        this.addEntity(entity, possiblePlacementCell);
       }
     }
 
@@ -163,20 +163,13 @@ class WorldLevel {
     }
 
     handleAvatarEnteringLevel(entryCell) {
-        // * * * * calc standard turns since avatar left the level
-        // * * * * if less than threshold, resume time as normal, otherwise
-        // * * * * * remove the avatar from the turn queue for the new level
-        // * * * * * advance time for the level being entered for the time since avatar left, up to some limit (~100 std turns)
-        // * * * * * add the avatar to the front of the queue for the level being entered
         devTrace(2,"handle avatat entering level at a cell", this, entryCell);
         let timeOnPreviousLevel = constrainValue(this.gameState.avatar.timeOnLevel,0,MAX_TIME_AWAY_TO_CARE_ABOUT);
         this.gameState.avatar.resetTimeOnLevel();
         this.gameState.setTurnQueue(this.turnQueue);
         if (timeOnPreviousLevel >= DEFAULT_ACTION_TIME) {
             this.turnQueue.runTimeFor(timeOnPreviousLevel);
-            // this.gameState.avatar.placeAtCell(entryCell);
-            this.addEntity(this.gameState.avatar, entryCell);
-            // this.gameState.avatar.placeAtCell(this.gameState.avatar.getCell());
+            this.addEntityAtBeginningOfTurnQueue(this.gameState.avatar, entryCell);
         }
     }
 }
