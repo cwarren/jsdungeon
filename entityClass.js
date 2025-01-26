@@ -145,17 +145,17 @@ class Entity {
   // AI
 
   takeTurn() {
-    if (this.type == "AVATAR") {
-      // console.log("Player's turn! Awaiting input...");
-      return 0; // The game waits for player input
-    } else {
+    // if (this.type == "AVATAR") {
+    //   // console.log("Player's turn! Awaiting input...");
+    //   return 0; // The game waits for player input
+    // } else {
       console.log(`${this.type} acts!`);
       let actionTime = DEFAULT_ACTION_TIME;
 
       // AI logic or automatic actions go here...
 
       return actionTime;
-    }
+    // }
   }
 
 

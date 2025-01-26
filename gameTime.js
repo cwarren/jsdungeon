@@ -56,7 +56,8 @@ class TurnQueue {
         }
         this.timePasses(actionCost);
         
-        // Reschedule non-avatar entity based on action cost (avatar actions are handled separately)
+        // Reschedule non-avatar entity based on action cost (avatar actions are handled separately, in gameState.handlePlayerActionTime)
+        // also, running entities (including avatar) are always rescheduled
         if (next.entity.type != "AVATAR" || next.entity.isRunning) {
             next.time += actionCost;
             this.queue.push(next);

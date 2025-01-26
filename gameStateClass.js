@@ -1,5 +1,6 @@
 import { Entity } from "./entityClass.js";
 import { WorldLevel } from "./worldLevelClass.js";
+import { Avatar } from "./avatarClass.js";
 
 
 class GameState {
@@ -37,7 +38,8 @@ class GameState {
     }
 
     setUpAvatar(initialFloor) {
-        const avatar = new Entity("AVATAR");
+        // const avatar = new Entity("AVATAR");
+        const avatar = new Avatar();
         initialFloor.placeEntityRandomly(avatar);
 
         this.avatar = avatar;

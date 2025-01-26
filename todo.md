@@ -1,7 +1,5 @@
 * handle turns / timing for differnt world levels
-* * give each world level it's own turn queue
 * * * when entering a level
-* * * * if no turn queue, initialize one, otherwise
 * * * * calc standard turns since avatar left the level
 * * * * if less than threshold, resume time as normal, otherwise
 * * * * * remove the avatar from the turn queue for the new level
@@ -45,8 +43,9 @@
 * create an item container class
 
 * CHECK AND FIX
-* * seems to be something weird with the turn-taking system and maybe not all entities being added to it
 * * had a situation where an entity was shown, but didn't actually exist (at least, not in the cell shown)
+* * * cell that the entity was in loses the reference to the entity, and the entity is still in the turn queue (maybe a timing issue with entity death?)
+* * * intermittent, low-occurence issue - hard to track down cause :(
 * * potential play exploit with stair traversal and action timing - think about how to resolve that
 * * * consider tracking time away from that level, and then advanced turns player-less for that duration (up to some not-too-high limit)
 * * keep an eye on time issues with running - seems OK at the moment, but tricky....
