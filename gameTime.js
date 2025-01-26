@@ -13,8 +13,23 @@ class TurnQueue {
 
     // Add an entity to the queue with a starting time
     addEntity(entity, initialTime = 0) {
+        console.log(`adding ${entity.type} to turn queue`);
         this.queue.push({ entity, time: initialTime });
         this.ordering();
+    }
+    setEntities(entityList) {
+        this.clear();
+        entityList.forEach(entity => {
+            this.addEntity(entity, Math.floor(Math.random() * entityList.length * 2)); // shuffle them a bit
+        });
+    }
+    setEntitiesSansAvatar(entityList) {
+        this.clear();
+        entityList.forEach(entity => {
+            if (entity.type != "AVATAR") {
+                this.addEntity(entity, Math.floor(Math.random() * entityList.length * 2)); // shuffle them a bit
+            }
+        });
     }
 
     removeEntity(entity) {
@@ -30,7 +45,7 @@ class TurnQueue {
         if (this.queue.length === 0) return null;
 
         let next = this.queue.shift();
-        // console.log('next turn', next.entity);
+        console.log('next turn', next.entity);
 
         // Let the entity act
         let actionCost;
@@ -39,7 +54,6 @@ class TurnQueue {
         } else {
             actionCost = next.entity.takeTurn(); // Default action
         }
-        // let actionCost = next.entity.takeTurn(); // Entity must implement takeTurn()
         this.timePasses(actionCost);
         
         // Reschedule non-avatar entity based on action cost (avatar actions are handled separately)

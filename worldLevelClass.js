@@ -21,11 +21,13 @@ import {
     getRandomCellOfTerrainInGrid,
     determineCellViewability
 } from "./gridUtils.js";
+import { TurnQueue } from "./gameTime.js";
 
 const MAX_ENTITY_PLACEMENT_ATTEMPTS = 20;
 
 class WorldLevel {
-    constructor(levelNumber, levelWidth, levelHeight, levelType = "EMPTY") {
+    constructor(gameState, levelNumber, levelWidth, levelHeight, levelType = "EMPTY") {
+        this.gameState = gameState;
         this.levelNumber = levelNumber;
         this.levelWidth = levelWidth;
         this.levelHeight = levelHeight;
@@ -35,6 +37,7 @@ class WorldLevel {
         this.levelStructures = [];
         this.stairsDown = null;
         this.stairsUp = null;
+        this.turnQueue = new TurnQueue();
         // console.log("new world level", this);
     }
 
@@ -63,9 +66,14 @@ class WorldLevel {
         this.grid = gridGenFunction(this.levelWidth,this.levelHeight);
         setWorldLevelForGridCells(this, this.grid);
         determineCellViewability(this.grid);
+
+        this.populate();
     }
     isGenerated() {
         return this.grid != null;
+    }
+    populate() {
+        console.log("world level population");
     }
 
     placeEntityRandomly(entity, avoidCellSet) {
@@ -81,12 +89,13 @@ class WorldLevel {
         console.log("could not place entity in world level - placement attempts exceed max placement attempts");
       } else {
         entity.placeAtCell(possiblePlacementCell);
-        this.addEntity(entity);
+        this.addEntity(entity,Math.floor(Math.random()*99)+1);
       }
     }
 
     addEntity(ent) {
         this.levelEntities.push(ent);
+        this.turnQueue.addEntity(ent);
         // console.log("adding entity to level", this);
     }
 
@@ -102,6 +111,8 @@ class WorldLevel {
         if (cell && cell.entity === ent) {
             cell.entity = undefined;
         }
+
+        this.turnQueue.removeEntity(ent);
     }
 
     addStairsDown() {
@@ -120,6 +131,15 @@ class WorldLevel {
         stairsDown.connectsTo = stairsUp;
         stairsUp.connectsTo = stairsDown;
         this.levelStructures.push(stairsUp);
+    }
+
+    handleAvatarEnteringLevel() {
+        // * * * * calc standard turns since avatar left the level
+        // * * * * if less than threshold, resume time as normal, otherwise
+        // * * * * * remove the avatar from the turn queue for the new level
+        // * * * * * advance time for the level being entered for the time since avatar left, up to some limit (~100 std turns)
+        // * * * * * add the avatar to the front of the queue for the level being entered
+        this.gameState.setTurnQueue(this.turnQueue);
     }
 }
 

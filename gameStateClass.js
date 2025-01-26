@@ -1,7 +1,5 @@
 import { Entity } from "./entityClass.js";
 import { WorldLevel } from "./worldLevelClass.js";
-import { TurnQueue } from "./gameTime.js";
-
 
 
 class GameState {
@@ -18,11 +16,11 @@ class GameState {
         this.status = "NEW";
         this.world = [];
         this.avatar = null;
-        this.turnQueue = new TurnQueue();
+        this.currentTurnQueue = null; // each world level has it's own turn queue; this is set as the avatar goes up and down levels
     }
 
     initialize(levelSpecifications) {
-        this.world = levelSpecifications.map(([width, height, genOption], index) => new WorldLevel(index, width, height, genOption));
+        this.world = levelSpecifications.map(([width, height, genOption], index) => new WorldLevel(this, index, width, height, genOption));
         this.world[0].generate();
 
         const firstLevel = this.world[0];
@@ -35,7 +33,7 @@ class GameState {
 
         this.status="ACTIVE";
         this.isPlaying = true;
-        this.initializeTurnSystem();
+        this.currentTurnQueue = firstLevel.turnQueue;
     }
 
     setUpAvatar(initialFloor) {
@@ -80,10 +78,15 @@ class GameState {
 
     //=====================
     // TIME
+
+    setTurnQueue(turnQueue) {
+        this.currentTurnQueue = turnQueue;
+    }
+
     advanceGameTime() {
         while (true) {
-            // console.log("time passes...", turnQueue);
-            let activeEntity = this.turnQueue.nextTurn();
+            // console.log("time passes...", currentTurnQueue);
+            let activeEntity = this.currentTurnQueue.nextTurn();
             if (!activeEntity) break; // No more entities to process
     
             if (activeEntity === this.avatar && !activeEntity.isRunning) {
@@ -98,33 +101,18 @@ class GameState {
     
         // If the avatar is running, immediately continue running
         if (this.avatar.isRunning) {
-            this.turnQueue.addEntity(this.avatar, this.turnQueue.queue[0].time + actionCost);
-            this.turnQueue.timePasses(actionCost);
+            this.currentTurnQueue.addEntity(this.avatar, this.currentTurnQueue.queue[0].time + actionCost);
+            this.currentTurnQueue.timePasses(actionCost);
             this.advanceGameTime();  // Keep the turns flowing for running
             return;
         }
     
         // Normal player action handling
-        this.turnQueue.addEntity(this.avatar, this.turnQueue.queue[0].time + actionCost);
-        this.turnQueue.timePasses(actionCost);
-        this.turnQueue.normalizeQueueTimes();
+        this.currentTurnQueue.addEntity(this.avatar, (this.currentTurnQueue.queue[0] ? this.currentTurnQueue.queue[0].time : 0) + actionCost);
+        this.currentTurnQueue.timePasses(actionCost);
+        this.currentTurnQueue.normalizeQueueTimes();
     
         this.advanceGameTime();
-    }
-
-    initializeTurnSystem() {
-        this.initializeTurnSystem_mobsOnly();
-        this.turnQueue.addEntity(this.avatar, -1); // Add player to the queue, at the front
-    }
-
-    initializeTurnSystem_mobsOnly() {
-        this.turnQueue.clear();
-        const levelEntities = this.world[this.avatar.z].levelEntities;
-        levelEntities.forEach(entity => {
-            if (entity.type != "AVATAR") {
-                this.turnQueue.addEntity(entity, Math.floor(Math.random() * levelEntities.length)); // shuffle them a bit
-            }
-        });
     }
 
 }

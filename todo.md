@@ -1,6 +1,17 @@
-* move game timing into game state
+* handle turns / timing for differnt world levels
+* * give each world level it's own turn queue
+* * * when entering a level
+* * * * if no turn queue, initialize one, otherwise
+* * * * calc standard turns since avatar left the level
+* * * * if less than threshold, resume time as normal, otherwise
+* * * * * remove the avatar from the turn queue for the new level
+* * * * * advance time for the level being entered for the time since avatar left, up to some limit (~100 std turns)
+* * * * * add the avatar to the front of the queue for the level being entered
 
-* healing
+* mobs on other levels
+
+* healing over time
+* * healing rate for entities
 
 * when running, stop if a mob becomes newly visible
 * when running, stop if a structure becomes newly visible

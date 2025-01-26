@@ -84,11 +84,9 @@ function ascendStairs() {
     const stairsUp = curCell.structure;
     if (stairsUp && stairsUp.type == "STAIRS_UP") {
         gameState.currentLevel--;
-        curCell.worldLevel.removeEntity(gameState.avatar);
         const newCell = stairsUp.connectsTo.getCell();
         gameState.avatar.placeAtCell(newCell);
-        newCell.worldLevel.addEntity(gameState.avatar);
-        gameState.initializeTurnSystem_mobsOnly();
+        newCell.worldLevel.handleAvatarEnteringLevel();
     } else {
         console.log("cannot ascend - no stairs up");
     }
@@ -114,11 +112,9 @@ function descendStairs() {
                 lowerWorldLevel.addStairsDown();
             }
         }
-        curCell.worldLevel.removeEntity(gameState.avatar);
-        const newCell = stairsDown.connectsTo.getCell()
+        const newCell = stairsDown.connectsTo.getCell();
         gameState.avatar.placeAtCell(newCell);
-        newCell.worldLevel.addEntity(gameState.avatar);
-        gameState.initializeTurnSystem_mobsOnly();
+        newCell.worldLevel.handleAvatarEnteringLevel();
     } else {
         console.log("cannot descend - no stairs down");
     }
@@ -131,9 +127,6 @@ function runAvatar(deltas) {
     if (gameState.avatar.isRunning) return; // Prevent multiple runs
 
     gameState.avatar.startRunning(deltas);
-
-    // gameState.avatar.isRunning = true;
-    // gameState.avatar.runningDirection = deltas;
 
     // Perform the first move immediately
     return gameState.avatar.continueRunning();
