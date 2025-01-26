@@ -1,6 +1,7 @@
 import { Entity } from "./entityClass.js";
 import { WorldLevel } from "./worldLevelClass.js";
 import { Avatar } from "./avatarClass.js";
+import { devTrace } from "./util.js";
 
 
 class GameState {
@@ -11,6 +12,7 @@ class GameState {
     static statusesGameOver = ["WON","LOST","ABANDONED"];
 
     reset() {
+        devTrace(3,"resetting game state");
         this.score = 1;
         this.currentLevel = 0;
         this.isPlaying = false;
@@ -21,6 +23,7 @@ class GameState {
     }
 
     initialize(levelSpecifications) {
+        devTrace(4,"initializing game state from level specs", levelSpecifications);
         this.world = levelSpecifications.map(([width, height, genOption], index) => new WorldLevel(this, index, width, height, genOption));
         this.world[0].generate();
 
@@ -38,7 +41,7 @@ class GameState {
     }
 
     setUpAvatar(initialFloor) {
-        // const avatar = new Entity("AVATAR");
+        devTrace(3, "setting up avatar in game state on initial floor", initialFloor);
         const avatar = new Avatar();
         initialFloor.placeEntityRandomly(avatar);
 
@@ -47,6 +50,7 @@ class GameState {
     }
 
     populateLevelWithEntities(worldLevel) {
+        devTrace(4, "populating world level with entities", worldLevel);
         for (let i = 0; i < 5; i++) {
             const ent = new Entity("MOLD_PALE");
             worldLevel.placeEntityRandomly(ent);
@@ -54,6 +58,7 @@ class GameState {
     }
 
     getAvatarCell() {
+        devTrace(6,"getting avatar cell via game state");
         return this.avatar ? this.avatar.getCell() : null;
     }
 
@@ -61,19 +66,19 @@ class GameState {
     // GAME MANAGEMENT
 
     winGame() {
-        console.log("winning the game");
+        devTrace(1,"winning the game");
         this.status = "WON";
         this.isPlaying = false;
     }
 
     loseGame() {
-        console.log("losing the game");
+        devTrace(1,"losing the game");
         this.status = "LOST";
         this.isPlaying = false;
     }
 
     abandonGame() {
-        console.log("abandoning the game");
+        devTrace(1,"abandoning the game");
         this.status = "ABANDONED";
         this.isPlaying = false;
     }
@@ -82,10 +87,12 @@ class GameState {
     // TIME
 
     setTurnQueue(turnQueue) {
+        devTrace(4,"setting game state turn queue", turnQueue);
         this.currentTurnQueue = turnQueue;
     }
 
     advanceGameTime() {
+        devTrace(5,"advanding game time via game state");
         while (true) {
             // console.log("time passes...", currentTurnQueue);
             let activeEntity = this.currentTurnQueue.nextTurn();
@@ -98,20 +105,21 @@ class GameState {
     }
 
     handlePlayerActionTime(actionCost) {
-        // console.log(`handling player action time of ${actionCost}`);
+        devTrace(4,`handling player action time of ${actionCost} in game state`);
         if (actionCost <= 0) return;
+        this.avatar.addTimeOnLevel(actionCost);
     
         // If the avatar is running, immediately continue running
         if (this.avatar.isRunning) {
             this.currentTurnQueue.addEntity(this.avatar, this.currentTurnQueue.queue[0].time + actionCost);
-            this.currentTurnQueue.timePasses(actionCost);
+            // this.currentTurnQueue.timePasses(actionCost);
             this.advanceGameTime();  // Keep the turns flowing for running
             return;
         }
     
         // Normal player action handling
         this.currentTurnQueue.addEntity(this.avatar, (this.currentTurnQueue.queue[0] ? this.currentTurnQueue.queue[0].time : 0) + actionCost);
-        this.currentTurnQueue.timePasses(actionCost);
+        // this.currentTurnQueue.timePasses(actionCost);
         this.currentTurnQueue.normalizeQueueTimes();
     
         this.advanceGameTime();

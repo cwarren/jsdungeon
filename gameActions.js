@@ -2,6 +2,8 @@ import { gameState } from "./gameStateClass.js";
 import { DEFAULT_ACTION_TIME } from "./entityClass.js";
 // import {initializeTurnSystem_mobsOnly} from "./gameTime.js";
 import { pushUIState, resetUIState } from "./ui.js";
+import { devTrace } from "./util.js";
+
 
 /* template for new action map entry:
     ACTION_IDENTIFIER: { name: "Action name", description: "brief description of action", action: functionImplementingAction },
@@ -80,13 +82,16 @@ function moveAvatar_D()    { return avatarMove(0,1) }
 function moveAvatar_DR()   { return avatarMove(1,1) }
 
 function ascendStairs() {
+    devTrace(3,'action - ascend stairs');
     const curCell = gameState.getAvatarCell();
     const stairsUp = curCell.structure;
     if (stairsUp && stairsUp.type == "STAIRS_UP") {
+        console.log("going up stairs");
+        curCell.worldLevel.removeEntity(gameState.avatar);
         gameState.currentLevel--;
         const newCell = stairsUp.connectsTo.getCell();
-        gameState.avatar.placeAtCell(newCell);
-        newCell.worldLevel.handleAvatarEnteringLevel();
+        newCell.worldLevel.handleAvatarEnteringLevel(newCell);
+        // gameState.avatar.placeAtCell(newCell);
     } else {
         console.log("cannot ascend - no stairs up");
     }
@@ -98,9 +103,12 @@ function ascendStairs() {
 // another stairs down on that lower level if it's not the deepest
 
 function descendStairs() {
+    devTrace(3,'action - descend stairs');
     const curCell = gameState.getAvatarCell();
     const stairsDown = curCell.structure;
     if (stairsDown && stairsDown.type == "STAIRS_DOWN") {
+        console.log("going down stairs");
+        curCell.worldLevel.removeEntity(gameState.avatar);
         gameState.currentLevel++;
         const lowerWorldLevel = gameState.world[gameState.currentLevel]
         if (! lowerWorldLevel.isGenerated()) {
@@ -113,8 +121,8 @@ function descendStairs() {
             }
         }
         const newCell = stairsDown.connectsTo.getCell();
-        gameState.avatar.placeAtCell(newCell);
-        newCell.worldLevel.handleAvatarEnteringLevel();
+        newCell.worldLevel.handleAvatarEnteringLevel(newCell);
+        // gameState.avatar.placeAtCell(newCell);
     } else {
         console.log("cannot descend - no stairs down");
     }
@@ -123,7 +131,7 @@ function descendStairs() {
 }
 
 function runAvatar(deltas) {
-    // console.log("run avatar", deltas);
+    devTrace(7,`action - run avatar to deltas ${dx},${dy}`);
     if (gameState.avatar.isRunning) return; // Prevent multiple runs
 
     gameState.avatar.startRunning(deltas);
@@ -141,7 +149,7 @@ function runAvatar_D()    { return runAvatar(DIRECTION_DELTAS["D"]) }
 function runAvatar_DR()   { return runAvatar(DIRECTION_DELTAS["DR"]) }
 
 function sleepAvatar(key, event) {
-    console.log(`${key} - sleep avatar (not yet implemented)`, event);    
+    devTrace(3,`${key} - sleep avatar (not yet implemented)`, event);
 }
 
 export { gameActionsMap };

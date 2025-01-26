@@ -22,4 +22,11 @@ function createHelpText(keyBindings, actionMap, secondaryActionMap) {
     return helpText;
 }
 
-export { constrainValue, createHelpText };
+const DEV_TRACE_LEVEL = 5;
+function devTrace(level, msg, ...objects) {
+    if (level <= DEV_TRACE_LEVEL) {
+        console.log(msg, ...objects);
+    }
+}
+
+export { constrainValue, createHelpText, devTrace };

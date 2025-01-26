@@ -1,6 +1,6 @@
 import { gameState } from "./gameStateClass.js";
 import { Damage } from "./damageClass.js";
-import { constrainValue } from "./util.js";
+import { constrainValue, devTrace } from "./util.js";
 
 const DEFAULT_ACTION_TIME = 100;
 
@@ -30,9 +30,11 @@ class Entity {
   // INSPECTION & INFORMATION
 
   getCell() {
+    devTrace(6,"getting cell for entity", this);
     return gameState.world[this.z].grid[this.x][this.y];
   }
   getCellAtDelta(dx, dy) {
+    devTrace(6,`getting cell at delta ${dx},${dy} for entity`, this);
     const currentLevel = gameState.world[this.z];
     if (!currentLevel) { return null };
     const newX = this.x + dx;
@@ -45,10 +47,12 @@ class Entity {
 
   static RELATIONSHIPS = ["TAMED_BY", "FRIENDLY_TO", "NEUTRAL_TO", "HOSTILE_TO", "VIOLENT_TO"];
   getRelationshipTo(otherEntity) {
+    devTrace(6, "getting entity relationship",this,otherEntity);
     return "HOSTILE_TO"; // defaults to "murderhobo" (at least for development)
   }
 
   getDefaultActionFor(otherEntity) {
+    devTrace(5, "getting default action",this,otherEntity);
     const relationship = this.getRelationshipTo(otherEntity);
     if (["HOSTILE_TO", "VIOLENT_TO"].includes(relationship)) {
       return "ATTACK"
@@ -66,11 +70,12 @@ class Entity {
   // VISION
 
   isVisibleTo(otherEntity) {
+    devTrace(7,"checking if this is visible to entity", this, otherEntity);
     return otherEntity.visibleCells.has(gameState.world[this.z].grid[this.x][this.y]);
   }
 
   determineVisibleCells() {
-    // console.log("gameState", gameState);
+    devTrace(7,`determine visible cells for ${this.type}`);
     this.determineVisibleCellsInGrid(gameState.world[this.z].grid);
   }
 
@@ -80,10 +85,12 @@ class Entity {
     * @param {Array} grid - The grid representing the world level.
     */
   determineVisibleCellsInGrid(grid) {
+    devTrace(7,`determine visible cells in grid`, this, grid);
     this.visibleCells = new Set();
     const worldWidth = grid.length;
     const worldHeight = grid[0].length;
 
+    // TODO: pull this into a library
     function computeBresenhamLine(x0, y0, x1, y1) {
       let points = [];
       let dx = Math.abs(x1 - x0);
@@ -136,7 +143,7 @@ class Entity {
   // ADVANCEMENT
 
   receiveAdvancementPoints(points) {
-    console.log(`${this.type} receiving ${points} advancement points`);
+    devTrace(2,`${this.type} receiving ${points} advancement points`);
     this.currentAdvancementPoints += points;
   }
 
@@ -149,7 +156,7 @@ class Entity {
     //   // console.log("Player's turn! Awaiting input...");
     //   return 0; // The game waits for player input
     // } else {
-      console.log(`${this.type} acts!`);
+      devTrace(2,`${this.type} acts!`, this);
       let actionTime = DEFAULT_ACTION_TIME;
 
       // AI logic or automatic actions go here...
@@ -168,6 +175,7 @@ class Entity {
   // ACTIONS - MOVEMENT & LOCATION
 
   tryMove(dx, dy) {
+    devTrace(6,`${this.type} trying to move ${dx},${dy}`, this);
     const currentLevel = gameState.world[this.z];
     if (!currentLevel) return;
 
@@ -198,22 +206,31 @@ class Entity {
   }
 
   placeAt(x, y, z) {
-    placeAtCell(gameState.world[z ? z : 0].grid[x][y]);
+    devTrace(5,`placing at location ${x} ${y} ${z}`, this);
+    return placeAtCell(gameState.world[z ? z : 0].grid[x][y]);
   }
 
   placeAtCell(cell) {
-    // console.log("placing entity at cell", this, cell);
+    devTrace(5,`placing at cell ${cell.x} ${cell.y} ${cell.z}`, this, cell);
+    console.log("placing entity at cell", this, cell);
+    if (cell.entity) {
+      console.log("cannot place entity in occupied cell", this, cell);
+      return false;
+    } 
     this.x = cell.x;
     this.y = cell.y;
     this.z = cell.z;
     cell.entity = this;
     this.determineVisibleCells();
+    return true;
   }
 
   canMoveToCell(cell) {
+    devTrace(7,"checking if entity can move to cell", this, cell);
     return cell.isTraversible && !cell.entity;
   }
   canMoveToDeltas(dx, dy) {
+    devTrace(7,`checking if entity can move to deltas ${dx},${dy}`, this);
     const currentLevel = gameState.world[this.z];
     if (!currentLevel) return false;
     const targetCell = this.getCellAtDelta(dx, dy);
@@ -222,12 +239,14 @@ class Entity {
   }
 
   confirmMove(newCell) {
+    devTrace(6,"confirming move to cell", this, newCell);
     const oldCell = this.getCell();
     oldCell.entity = undefined;
     this.placeAtCell(newCell);
     return DEFAULT_ACTION_TIME;
   }
   confirmMoveDeltas(dx, dy) {
+    devTrace(6,`confirming move to deltas ${dx},${dy}`, this);
     const oldCell = this.getCell();
     oldCell.entity = undefined;
     this.placeAtCell(this.getCellAtDelta(dx, dy));
@@ -235,14 +254,17 @@ class Entity {
   }
 
   startRunning(deltas) {
+    devTrace(8,"starting running", this);
     this.isRunning = true;
     this.runDelta = deltas;
   }
   stopRunning() {
+    devTrace(8,"stopping running", this);
     this.isRunning = false;
     this.runDelta = null;
   }
   canRunToDeltas(dx, dy) { // similar to canMoveTo, but more things will stop running
+    devTrace(7,`checking run to deltas ${dx},${dy}`, this);
     const targetCell = this.getCellAtDelta(dx, dy);
     if (!targetCell) { return false; }
     if (!this.canMoveToCell(targetCell)) { return false; }
@@ -265,8 +287,8 @@ class Entity {
     return true;
   }
   continueRunning() {
+    devTrace(7,'continue running entity', this);
     if (!this.isRunning) return 0;
-    // console.log('running entity', this);
     if (!this.canRunToDeltas(this.runDelta.dx, this.runDelta.dy)) {
       this.stopRunning();
       return 0;
@@ -278,7 +300,7 @@ class Entity {
   // ACTIONS - COMBAT & HEALTH
 
   attack(otherEntity) {
-    console.log(`${this.type} attacking ${otherEntity.type}`);
+    devTrace(3,`${this.type} attacking ${otherEntity.type}`);
     otherEntity.takeDamageFrom(this.getAttackDamage(), this);
     console.log("attacker", this);
     console.log("defender", otherEntity);
@@ -286,10 +308,12 @@ class Entity {
   }
 
   getAttackDamage() {
+    devTrace(6,"getting attack damage for entity", this);
     return new Damage(2);
   }
 
   takeDamageFrom(dam, otherEntity) {
+    devTrace(4,"taking attack damage from entity", this, dam, otherEntity);
     dam.amount = constrainValue(dam.amount, 0, this.health + 1);
     this.health -= dam.amount;
 
@@ -307,7 +331,7 @@ class Entity {
 
   // assign death credits, remove this entity from the game
   die() {
-    console.log(`${this.type} has died.`);
+    devTrace(2,`${this.type} has died.`, this);
 
     const killCredits = this.getDeathCredits();
     killCredits.forEach(entry => {
@@ -326,6 +350,7 @@ class Entity {
 
   // get proportional responsibility for damage dealt to this entity
   getDeathCredits() {
+    devTrace(6,"determining death credits for entity", this);
     let totalDamage = this.damagedBy.reduce((sum, entry) => sum + entry.damage.amount, 0);
     if (totalDamage === 0) {
       return []; // No damage dealt, return an empty array

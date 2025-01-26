@@ -1,6 +1,6 @@
 import { GridCell } from "./gridCellClass.js";
 import { Structure } from "./structureClass.js";
-import { constrainValue } from "./util.js";
+import { constrainValue, devTrace } from "./util.js";
 import {
     setWorldLevelForGridCells,
     generateGrid_empty, 
@@ -22,8 +22,10 @@ import {
     determineCellViewability
 } from "./gridUtils.js";
 import { TurnQueue } from "./gameTime.js";
+import { DEFAULT_ACTION_TIME } from "./entityClass.js";
 
 const MAX_ENTITY_PLACEMENT_ATTEMPTS = 20;
+const MAX_TIME_AWAY_TO_CARE_ABOUT = DEFAULT_ACTION_TIME * 100;
 
 class WorldLevel {
     constructor(gameState, levelNumber, levelWidth, levelHeight, levelType = "EMPTY") {
@@ -38,6 +40,7 @@ class WorldLevel {
         this.stairsDown = null;
         this.stairsUp = null;
         this.turnQueue = new TurnQueue();
+        this.timeOfAvatarDeparture = 0;
         // console.log("new world level", this);
     }
 
@@ -59,6 +62,7 @@ class WorldLevel {
     };
 
     generate() {
+        devTrace(1,"generating world level");
         let gridGenFunction = WorldLevel.levelTypeToGenFunction[this.levelType];
         if (! gridGenFunction) {
             gridGenFunction = WorldLevel.levelTypeToGenFunction["DEFAULT"];
@@ -73,15 +77,16 @@ class WorldLevel {
         return this.grid != null;
     }
     populate() {
-        console.log("world level population");
+        console.log("world level population (TO BE IMPLEMENTED)");
     }
 
     placeEntityRandomly(entity, avoidCellSet) {
-      let possiblePlacementCell = getRandomCellOfTerrainInGrid("FLOOR", this.grid);
+        devTrace(3,`placing entity ${entity.type} randomly in world level`, this, entity, avoidCellSet);
+      let possiblePlacementCell = getRandomEmptyCellOfTerrainInGrid("FLOOR", this.grid);
       let placementAttempts = 1;
       if (avoidCellSet) {  
         while (avoidCellSet.has(possiblePlacementCell) && (placementAttempts < MAX_ENTITY_PLACEMENT_ATTEMPTS)) {
-          possiblePlacementCell = getRandomCellOfTerrainInGrid("FLOOR", this.grid);
+          possiblePlacementCell = getRandomEmptyCellOfTerrainInGrid("FLOOR", this.grid);
           placementAttempts++;
         }
       }
@@ -89,17 +94,34 @@ class WorldLevel {
         console.log("could not place entity in world level - placement attempts exceed max placement attempts");
       } else {
         entity.placeAtCell(possiblePlacementCell);
-        this.addEntity(entity,Math.floor(Math.random()*99)+1);
+        this.addEntity(entity);
       }
     }
 
-    addEntity(ent) {
+    addEntity(ent, atCell = null) {
+        devTrace(3,`adding entity ${ent.type} to level`, this);
         this.levelEntities.push(ent);
+        if (atCell) {
+            ent.placeAtCell(atCell);
+        } else {
+            ent.placeAtCell(ent.getCell());
+        }
         this.turnQueue.addEntity(ent);
-        // console.log("adding entity to level", this);
+    }
+
+    addEntityAtBeginningOfTurnQueue(ent, atCell = null) {
+        devTrace(3,`adding entity ${ent.type} to level, at beginning of turn queue`, this);
+        this.levelEntities.push(ent);
+        if (atCell) {
+            ent.placeAtCell(atCell);
+        } else {
+            ent.placeAtCell(ent.getCell());
+        }
+        this.turnQueue.addEntityAtBeginningOfTurnQueue(ent);
     }
 
     removeEntity(ent) {
+        devTrace(3,`removing entity ${ent.type} from level`, this);
         const index = this.levelEntities.indexOf(ent);
         
         if (index !== -1) {
@@ -116,6 +138,7 @@ class WorldLevel {
     }
 
     addStairsDown() {
+        devTrace(4, "adding stairs down for level", this);
         const stairsDownCell = getRandomEmptyCellOfTerrainInGrid("FLOOR",this.grid);
         const stairsDown = new Structure(stairsDownCell.x,stairsDownCell.y,this.levelNumber,'STAIRS_DOWN','>');
         this.stairsDown = stairsDown;
@@ -124,6 +147,7 @@ class WorldLevel {
     }
 
     addStairsUpTo(stairsDown) {
+        devTrace(4, "adding stairs up for level", this);
         const stairsUpCell = getRandomEmptyCellOfTerrainInGrid("FLOOR",this.grid);
         const stairsUp = new Structure(stairsUpCell.x,stairsUpCell.y,this.levelNumber,'STAIRS_UP','<');
         this.stairsUp = stairsUp;
@@ -133,13 +157,27 @@ class WorldLevel {
         this.levelStructures.push(stairsUp);
     }
 
-    handleAvatarEnteringLevel() {
+    trackAvatarDepartureTime() {
+        devTrace(5,`avatar left level at ${this.turnQueue.elapsedTime}`,this);
+        this.timeOfAvatarDeparture = this.turnQueue.elapsedTime;
+    }
+
+    handleAvatarEnteringLevel(entryCell) {
         // * * * * calc standard turns since avatar left the level
         // * * * * if less than threshold, resume time as normal, otherwise
         // * * * * * remove the avatar from the turn queue for the new level
         // * * * * * advance time for the level being entered for the time since avatar left, up to some limit (~100 std turns)
         // * * * * * add the avatar to the front of the queue for the level being entered
+        devTrace(2,"handle avatat entering level at a cell", this, entryCell);
+        let timeOnPreviousLevel = constrainValue(this.gameState.avatar.timeOnLevel,0,MAX_TIME_AWAY_TO_CARE_ABOUT);
+        this.gameState.avatar.resetTimeOnLevel();
         this.gameState.setTurnQueue(this.turnQueue);
+        if (timeOnPreviousLevel >= DEFAULT_ACTION_TIME) {
+            this.turnQueue.runTimeFor(timeOnPreviousLevel);
+            // this.gameState.avatar.placeAtCell(entryCell);
+            this.addEntity(this.gameState.avatar, entryCell);
+            // this.gameState.avatar.placeAtCell(this.gameState.avatar.getCell());
+        }
     }
 }
 

@@ -46,7 +46,10 @@
 * * had a situation where an entity was shown, but didn't actually exist (at least, not in the cell shown)
 * * * cell that the entity was in loses the reference to the entity, and the entity is still in the turn queue (maybe a timing issue with entity death?)
 * * * intermittent, low-occurence issue - hard to track down cause :(
+* * * * NOTE: probably solved - ensured entity placement cells are empty (likely issue was an entity placed in an already occupied cell detached the previous entity in that cell)
 * * potential play exploit with stair traversal and action timing - think about how to resolve that
 * * * consider tracking time away from that level, and then advanced turns player-less for that duration (up to some not-too-high limit)
 * * keep an eye on time issues with running - seems OK at the moment, but tricky....
+
+* * when ascending or descending stairs, the turn queue ends up with an extra entry for the avatar
 

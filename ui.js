@@ -3,7 +3,7 @@ import { executeGameCommand, keyBinding, actionMaps } from "./gameCommands.js";
 import { uiActionsMap } from "./uiActions.js";
 // import {advanceGameTime} from "./gameTime.js";
 import { TextBlock } from "./textBlockClass.js";
-import { createHelpText } from "./util.js";
+import { createHelpText, devTrace } from "./util.js";
 
 // On page load, initialize the game state, then draw it, then start game turns
 
