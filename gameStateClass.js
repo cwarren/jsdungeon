@@ -111,16 +111,12 @@ class GameState {
         // If the avatar is running, immediately continue running
         if (this.avatar.isRunning) {
             this.currentTurnQueue.addEntity(this.avatar, this.currentTurnQueue.queue[0].time + actionCost);
-            // this.currentTurnQueue.timePasses(actionCost);
             this.advanceGameTime();  // Keep the turns flowing for running
             return;
         }
     
-        // Normal player action handling
-        this.currentTurnQueue.addEntity(this.avatar, (this.currentTurnQueue.queue[0] ? this.currentTurnQueue.queue[0].time : 0) + actionCost);
-        // this.currentTurnQueue.timePasses(actionCost);
+        this.currentTurnQueue.addEntity(this.avatar, this.avatar.actionStartingTime + actionCost);
         this.currentTurnQueue.normalizeQueueTimes();
-    
         this.advanceGameTime();
     }
 

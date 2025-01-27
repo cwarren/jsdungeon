@@ -76,10 +76,10 @@ class TurnQueue {
         if (gameState.status != "ACTIVE") return null;
 
         let next = this.queue.shift();
-        devTrace(5,'--- turn of entity', next);
+        devTrace(5,`-- entity ${next.entity.type} acting at ${next.time}`, next);
         this.timePasses(next.time - this.previousActionTime);
         this.previousActionTime = next.time;
-        console.log('next turn', next.entity);
+        next.entity.setActionStartingTime(next.time);
 
         // Let the entity act
         let actionCost;

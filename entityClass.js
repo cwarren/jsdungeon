@@ -27,6 +27,8 @@ class Entity {
 
     this.baseKillPoints = 10; // worth this many advancement points when killed
     this.currentAdvancementPoints = 0;
+
+    this.actionStartingTime = 0;
   }
 
 
@@ -207,6 +209,10 @@ class Entity {
   // ACTIONS
   // IMPORTANT!!!!
   // action functions should return the time cost of the action!
+
+  setActionStartingTime(actionStartingTime) {
+    this.actionStartingTime = actionStartingTime;
+  }
 
   // ------------------
   // ACTIONS - MOVEMENT & LOCATION
@@ -425,10 +431,10 @@ class Entity {
   // ENTITY DEFINITIONS
 
   static ENTITIES_LIST = [
-    { type: "AVATAR", name: "Player", displaySymbol: "@", displayColor: "#fff", viewRadius: 16, initialHealthRoll: "10", baseActionCost: 100 },
+    { type: "AVATAR", name: "Player", displaySymbol: "@", displayColor: "#fff", viewRadius: 16, initialHealthRoll: "150", baseActionCost: 100 },
     { type: "MOLD_PALE", name: "Pale Mold", displaySymbol: "m", displayColor: "#ddd",
-      viewRadius: 2, initialHealthRoll: "2d6+4", baseActionCost: 120,
-      meleeAttack: {damager: new Damager("1d4-1"), actionCost: 80}
+      viewRadius: 2, initialHealthRoll: "2d6+40", baseActionCost: 500,
+      meleeAttack: {damager: new Damager("1d4-1",[],0), actionCost: 99}
     },
   ];
 
