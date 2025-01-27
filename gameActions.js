@@ -1,5 +1,5 @@
 import { gameState } from "./gameStateClass.js";
-import { DEFAULT_ACTION_TIME } from "./entityClass.js";
+import { DEFAULT_ACTION_COST } from "./entityClass.js";
 // import {initializeTurnSystem_mobsOnly} from "./gameTime.js";
 import { pushUIState, resetUIState } from "./ui.js";
 import { devTrace } from "./util.js";
@@ -75,7 +75,7 @@ function moveAvatar_UL()   { return avatarMove(-1,-1) }
 function moveAvatar_U()    { return avatarMove(0,-1) }
 function moveAvatar_UR()   { return avatarMove(1,-1) }
 function moveAvatar_L()    { return avatarMove(-1,0) }
-function moveAvatar_wait() { return DEFAULT_ACTION_TIME; }
+function moveAvatar_wait() { return DEFAULT_ACTION_COST; }
 function moveAvatar_R()    { return avatarMove(1,0) }
 function moveAvatar_DL()   { return avatarMove(-1,1) }
 function moveAvatar_D()    { return avatarMove(0,1) }

@@ -1,3 +1,4 @@
+import { gameState } from "./gameStateClass.js";
 import { devTrace } from "./util.js";
 
 const TIME_WRAP_LIMIT = 10000;
@@ -72,6 +73,7 @@ class TurnQueue {
     nextTurn() {
         devTrace(4,`do next turn on turn queue`, this);
         if (this.queue.length === 0) return null;
+        if (gameState.status != "ACTIVE") return null;
 
         let next = this.queue.shift();
         devTrace(5,'--- turn of entity', next);

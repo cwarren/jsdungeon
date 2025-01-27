@@ -1,15 +1,20 @@
-* handle turns / timing for differnt world levels
-* * * when entering a level
-* * * * calc standard turns since avatar left the level
-* * * * if less than threshold, resume time as normal, otherwise
-* * * * * remove the avatar from the turn queue for the new level
-* * * * * advance time for the level being entered for the time since avatar left, up to some limit (~100 std turns)
-* * * * * add the avatar to the front of the queue for the level being entered
-
-* mobs on other levels
+* more mobs
+* * mobs on other levels
+* * more mob types spec-ed
+* * more detailed info in mob type specs
 
 * healing over time
 * * healing rate for entities
+
+* mob AI movement
+* * basic movement stuff
+* * * local random walk
+* * * random destination
+* * * move towards nearest visible mob to which current mob is hostile
+* * * flee from location
+* * * flee from hostile mobs
+
+* currently on avatar death the UI is left in gameplay mode - should probably switch it to lost mode (and similar for game won (don't need to worry about abandon, since that only happens from meta screen and is already covered))
 
 * when running, stop if a mob becomes newly visible
 * when running, stop if a structure becomes newly visible
@@ -24,15 +29,6 @@
 * * messages
 * * info
 
-* mob AI basics
-* * if adjacent to a hostile mob, attack it
-* * basic movement stuff
-* * * local random walk
-* * * random destination
-* * * move towards nearest visible mob to which current mob is hostile
-* * * flee from location
-* * * flee from hostile mobs
-
 * support for multi-input commands, e.g. first command is "dig" and second input is a direction, or first command is 'sleep' and second input is a duration
 * support for command confirmations, e.g. 'Are you sure you want to attack the town sheriff? (y/n)'
 
@@ -43,13 +39,5 @@
 * create an item container class
 
 * CHECK AND FIX
-* * had a situation where an entity was shown, but didn't actually exist (at least, not in the cell shown)
-* * * cell that the entity was in loses the reference to the entity, and the entity is still in the turn queue (maybe a timing issue with entity death?)
-* * * intermittent, low-occurence issue - hard to track down cause :(
-* * * * NOTE: probably solved - ensured entity placement cells are empty (likely issue was an entity placed in an already occupied cell detached the previous entity in that cell)
-* * potential play exploit with stair traversal and action timing - think about how to resolve that
-* * * consider tracking time away from that level, and then advanced turns player-less for that duration (up to some not-too-high limit)
 * * keep an eye on time issues with running - seems OK at the moment, but tricky....
-
-* * when ascending or descending stairs, the turn queue ends up with an extra entry for the avatar
 

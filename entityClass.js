@@ -1,8 +1,9 @@
 import { gameState } from "./gameStateClass.js";
 import { Damage } from "./damageClass.js";
-import { constrainValue, devTrace } from "./util.js";
+import { Damager } from "./damagerClass.js";
+import { rollDice, getRandomListItem, constrainValue, devTrace } from "./util.js";
 
-const DEFAULT_ACTION_TIME = 100;
+const DEFAULT_ACTION_COST = 100;
 
 class Entity {
 
@@ -14,11 +15,14 @@ class Entity {
     this.visibleCells = new Set();
     this.seenCells = new Set();
 
+    this.baseActionCost = Entity.ENTITIES[type].baseActionCost || DEFAULT_ACTION_COST;
+    this.meleeAttack = Entity.ENTITIES[type].meleeAttack;
+
     this.isRunning = false;
     this.runDelta = null;
 
-    this.initialHealth = 10;
-    this.health = 10;
+    this.initialHealth = rollDice(Entity.ENTITIES[type].initialHealthRoll);
+    this.health = this.initialHealth;
     this.damagedBy = []; // array of {damageSource, damage}
 
     this.baseKillPoints = 10; // worth this many advancement points when killed
@@ -45,25 +49,18 @@ class Entity {
     return null;
   }
 
-  static RELATIONSHIPS = ["TAMED_BY", "FRIENDLY_TO", "NEUTRAL_TO", "HOSTILE_TO", "VIOLENT_TO"];
-  getRelationshipTo(otherEntity) {
-    devTrace(6, "getting entity relationship",this,otherEntity);
-    return "HOSTILE_TO"; // defaults to "murderhobo" (at least for development)
+  getAdjacentCells() {
+    devTrace(8,"getting cells adjacent to entity", this);
+    return this.getCell().getAdjacentCells();
   }
 
-  getDefaultActionFor(otherEntity) {
-    devTrace(5, "getting default action",this,otherEntity);
-    const relationship = this.getRelationshipTo(otherEntity);
-    if (["HOSTILE_TO", "VIOLENT_TO"].includes(relationship)) {
-      return "ATTACK"
-    }
-    if (["FRIENDLY_TO", "NEUTRAL_TO"].includes(relationship)) {
-      return "BUMP";
-    }
-    if (["TAMED_BY"].includes(relationship)) {
-      return "SWAP";
-    }
-    return "ATTACK";
+  getAdjacentEntities() {
+    devTrace(7,"getting entities adjacent to entity", this);
+    const adjCells = this.getAdjacentCells();
+    const adjEntities = [];
+    adjCells.forEach( cell => { if (cell.entity) { adjEntities.push(cell.entity); } }); 
+    devTrace(5,"other entities adjacent to this entity", this, adjEntities);
+    return adjEntities;
   }
 
   //======================================================================
@@ -152,19 +149,59 @@ class Entity {
   // AI
 
   takeTurn() {
-    // if (this.type == "AVATAR") {
-    //   // console.log("Player's turn! Awaiting input...");
-    //   return 0; // The game waits for player input
-    // } else {
       devTrace(2,`${this.type} acts!`, this);
-      let actionTime = DEFAULT_ACTION_TIME;
+      let actionTime = this.baseActionCost;
 
       // AI logic or automatic actions go here...
+      const adjCost = this.dealWithAdjacentEntities();
+      if (adjCost > 0) { return adjCost; }
 
       return actionTime;
-    // }
   }
 
+  static RELATIONSHIPS = ["TAMED_BY", "FRIENDLY_TO", "NEUTRAL_TO", "HOSTILE_TO", "VIOLENT_TO"];
+  getRelationshipTo(otherEntity) {
+    devTrace(6, "getting entity relationship",this,otherEntity);
+    return "HOSTILE_TO"; // defaults to "murderhobo" (at least for development)
+  }
+
+  getDefaultActionFor(otherEntity) {
+    devTrace(5, "getting default action",this,otherEntity);
+    const relationship = this.getRelationshipTo(otherEntity);
+    if (["HOSTILE_TO", "VIOLENT_TO"].includes(relationship)) {
+      return "ATTACK"
+    }
+    if (["FRIENDLY_TO", "NEUTRAL_TO"].includes(relationship)) {
+      return "BUMP";
+    }
+    if (["TAMED_BY"].includes(relationship)) {
+      return "SWAP";
+    }
+    return "ATTACK";
+  }
+
+  getEntitiesThatDamagedMe() {
+    return this.damagedBy.map(damBy => damBy.damageSource);
+  }
+
+  dealWithAdjacentEntities() {
+    const hostiles = [];
+    const superHostiles = [];
+    const toRetaliate = this.getEntitiesThatDamagedMe();
+    this.getAdjacentEntities().forEach(adjEnt => {
+      if (toRetaliate.includes(adjEnt)) { superHostiles.push(adjEnt); }
+      else if (["HOSTILE_TO", "VIOLENT_TO"].includes(this.getRelationshipTo(adjEnt))) { hostiles.push(adjEnt); }
+    });
+    let entityToAttack = null;
+    if (superHostiles.length > 0) {
+      entityToAttack = getRandomListItem(superHostiles);
+    } else if (hostiles.length > 0) {
+      // check to see if any of them have damaged this entity before - prioritize those, in order of damage done to me, breaking ties at random
+      entityToAttack = getRandomListItem(hostiles);
+    }
+    if (entityToAttack) { return this.doMeleeAttackOn(entityToAttack); }
+    return 0;
+  }
 
   //======================================================================
   // ACTIONS
@@ -187,7 +224,7 @@ class Entity {
     if (targetCell.entity) {
       const defaultAction = this.getDefaultActionFor(targetCell.entity);
       if (defaultAction == 'ATTACK') {
-        return this.attack(targetCell.entity);
+        return this.doMeleeAttackOn(targetCell.entity);
       }
       if (defaultAction == 'BUMP') {
         console.log("move prevented because target cell is already occupied", targetCell);
@@ -242,14 +279,14 @@ class Entity {
     const oldCell = this.getCell();
     oldCell.entity = undefined;
     this.placeAtCell(newCell);
-    return DEFAULT_ACTION_TIME;
+    return DEFAULT_ACTION_COST;
   }
   confirmMoveDeltas(dx, dy) {
     devTrace(6,`confirming move to deltas ${dx},${dy}`, this);
     const oldCell = this.getCell();
     oldCell.entity = undefined;
     this.placeAtCell(this.getCellAtDelta(dx, dy));
-    return DEFAULT_ACTION_TIME;
+    return DEFAULT_ACTION_COST;
   }
 
   startRunning(deltas) {
@@ -303,12 +340,34 @@ class Entity {
     otherEntity.takeDamageFrom(this.getAttackDamage(), this);
     console.log("attacker", this);
     console.log("defender", otherEntity);
-    return DEFAULT_ACTION_TIME;
+    return DEFAULT_ACTION_COST;
   }
 
   getAttackDamage() {
     devTrace(6,"getting attack damage for entity", this);
     return new Damage(2);
+  }
+
+  doMeleeAttackOn(otherEntity) {
+    devTrace(3,`${this.type} doing melee attack on ${otherEntity.type}`, this, otherEntity);
+    if (this.meleeAttack) {
+      otherEntity.takeDamageFrom(this.getMeleeAttackDamage(), this);
+      return this.getMeleeAttackActionCost(); 
+    }
+    devTrace(4,`${this.type} has no melee attack`);
+    return 0;
+  }
+
+  getMeleeAttackDamage() {
+    devTrace(6,"getting melee attack damage for entity", this);
+    if (this.meleeAttack) { return this.meleeAttack.damager.getDamage(); }
+    return new Damage(0);
+  }
+
+  getMeleeAttackActionCost() {
+    devTrace(6,"getting melee attack action cost for entity", this);
+    if (this.meleeAttack) { return this.meleeAttack.actionCost; }
+    return DEFAULT_ACTION_COST;
   }
 
   takeDamageFrom(dam, otherEntity) {
@@ -366,8 +425,11 @@ class Entity {
   // ENTITY DEFINITIONS
 
   static ENTITIES_LIST = [
-    { type: "AVATAR", name: "Player", displaySymbol: "@", displayColor: "#fff", viewRadius: 16 },
-    { type: "MOLD_PALE", name: "Pale Mold", displaySymbol: "m", displayColor: "#ddd", viewRadius: 2 },
+    { type: "AVATAR", name: "Player", displaySymbol: "@", displayColor: "#fff", viewRadius: 16, initialHealthRoll: "10", baseActionCost: 100 },
+    { type: "MOLD_PALE", name: "Pale Mold", displaySymbol: "m", displayColor: "#ddd",
+      viewRadius: 2, initialHealthRoll: "2d6+4", baseActionCost: 120,
+      meleeAttack: {damager: new Damager("1d4-1"), actionCost: 80}
+    },
   ];
 
   static ENTITIES = {};
@@ -378,4 +440,4 @@ class Entity {
 
 Entity.initializeEntitiesFromList();
 
-export { Entity, DEFAULT_ACTION_TIME };
+export { Entity, DEFAULT_ACTION_COST };

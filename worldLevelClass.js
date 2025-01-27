@@ -22,10 +22,10 @@ import {
     determineCellViewability
 } from "./gridUtils.js";
 import { TurnQueue } from "./gameTime.js";
-import { DEFAULT_ACTION_TIME } from "./entityClass.js";
+import { DEFAULT_ACTION_COST } from "./entityClass.js";
 
 const MAX_ENTITY_PLACEMENT_ATTEMPTS = 20;
-const MAX_TIME_AWAY_TO_CARE_ABOUT = DEFAULT_ACTION_TIME * 100;
+const MAX_TIME_AWAY_TO_CARE_ABOUT = DEFAULT_ACTION_COST * 100;
 
 class WorldLevel {
     constructor(gameState, levelNumber, levelWidth, levelHeight, levelType = "EMPTY") {
@@ -167,7 +167,7 @@ class WorldLevel {
         let timeOnPreviousLevel = constrainValue(this.gameState.avatar.timeOnLevel,0,MAX_TIME_AWAY_TO_CARE_ABOUT);
         this.gameState.avatar.resetTimeOnLevel();
         this.gameState.setTurnQueue(this.turnQueue);
-        if (timeOnPreviousLevel >= DEFAULT_ACTION_TIME) {
+        if (timeOnPreviousLevel >= DEFAULT_ACTION_COST) {
             this.turnQueue.runTimeFor(timeOnPreviousLevel);
             this.addEntityAtBeginningOfTurnQueue(this.gameState.avatar, entryCell);
         }

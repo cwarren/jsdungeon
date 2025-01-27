@@ -51,7 +51,7 @@ class GameState {
 
     populateLevelWithEntities(worldLevel) {
         devTrace(4, "populating world level with entities", worldLevel);
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 1; i++) {
             const ent = new Entity("MOLD_PALE");
             worldLevel.placeEntityRandomly(ent);
         }
@@ -93,8 +93,7 @@ class GameState {
 
     advanceGameTime() {
         devTrace(5,"advanding game time via game state");
-        while (true) {
-            // console.log("time passes...", currentTurnQueue);
+        while (this.status == 'ACTIVE') {
             let activeEntity = this.currentTurnQueue.nextTurn();
             if (!activeEntity) break; // No more entities to process
     

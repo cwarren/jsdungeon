@@ -1,12 +1,14 @@
-import { Entity, DEFAULT_ACTION_TIME } from "./entityClass.js";
+import { Entity, DEFAULT_ACTION_COST } from "./entityClass.js";
 import { gameState } from "./gameStateClass.js";
-import { devTrace } from "./util.js";
+import { devTrace, rollDice } from "./util.js";
+import { Damage } from "./damageClass.js";
 
 
 class Avatar extends Entity {
   constructor() {
     super("AVATAR");
     this.timeOnLevel = 0;
+    this.meleeAttack = true;
   }
 
   resetTimeOnLevel() {
@@ -28,6 +30,17 @@ class Avatar extends Entity {
     devTrace(1,"Avatar has died.");
     gameState.loseGame();
     super.die();
+  }
+
+  getMeleeAttackDamage() {
+    devTrace(6,"getting melee attack damage for avatar", this);
+    return new Damage(rollDice("1d4"));
+  }
+
+  getMeleeAttackActionCost() {
+    devTrace(6,"getting melee attack action cost for avatar", this);
+    if (this.baseActionCost) return this.baseActionCost;
+    return DEFAULT_ACTION_COST;
   }
 }
 
