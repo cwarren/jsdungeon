@@ -4,6 +4,7 @@ import { Damager } from "./damagerClass.js";
 import { rollDice, getRandomListItem, constrainValue, devTrace } from "./util.js";
 
 const DEFAULT_ACTION_COST = 100;
+const DEFAULT_NATURAL_HEALING_TICKS = 250;
 
 class Entity {
 
@@ -23,12 +24,15 @@ class Entity {
 
     this.initialHealth = rollDice(Entity.ENTITIES[type].initialHealthRoll);
     this.health = this.initialHealth;
+    this.naturalHealingRate = Entity.ENTITIES[type].naturalHealingRate;
+    this.naturalHealingTicks = Entity.ENTITIES[type].naturalHealingTicks ? Entity.ENTITIES[type].naturalHealingTicks : DEFAULT_NATURAL_HEALING_TICKS;
     this.damagedBy = []; // array of {damageSource, damage}
 
     this.baseKillPoints = 10; // worth this many advancement points when killed
     this.currentAdvancementPoints = 0;
 
     this.actionStartingTime = 0;
+    this.lastNaturalHealTime = 0;
   }
 
 
@@ -151,12 +155,13 @@ class Entity {
   // AI
 
   takeTurn() {
-      devTrace(2,`${this.type} acts!`, this);
+      devTrace(2,`${this.type} acts at ${this.actionStartingTime}`, this);
       let actionTime = this.baseActionCost;
+      this.healNaturally(this.actionStartingTime);
 
       // AI logic or automatic actions go here...
-      const adjCost = this.dealWithAdjacentEntities();
-      if (adjCost > 0) { return adjCost; }
+      const adjacentsCost = this.dealWithAdjacentEntities();
+      if (adjacentsCost > 0) { return adjacentsCost; }
 
       return actionTime;
   }
@@ -425,16 +430,32 @@ class Entity {
     }));
   }
 
+  healNaturally(currentTime) {
+    devTrace(6,"healNaturally for entity", this);
+    const enoughTimePassed = (currentTime - this.lastNaturalHealTime) >= this.naturalHealingTicks;
+    const anythingToHeal = this.health < this.initialHealth;
+    const healingCount = Math.floor( (currentTime - this.lastNaturalHealTime) / this.naturalHealingTicks);
+    if (enoughTimePassed && anythingToHeal) {
+      const healAmt = healingCount * (this.naturalHealingRate * this.initialHealth);
+      devTrace(5,`natural healing occurs for ${this.type} at ${currentTime} based on last natural healing time ${this.lastNaturalHealTime}, heal count of ${healingCount} restoring ${healAmt}`, this);
+      this.health = constrainValue(this.health + healAmt, 0, this.initialHealth);
+    }
+    if (enoughTimePassed) {
+      this.lastNaturalHealTime += healingCount * this.naturalHealingTicks;
+    }
+  }
+
   //================================================
   //================================================
   //================================================
   // ENTITY DEFINITIONS
 
   static ENTITIES_LIST = [
-    { type: "AVATAR", name: "Player", displaySymbol: "@", displayColor: "#fff", viewRadius: 16, initialHealthRoll: "150", baseActionCost: 100 },
+    { type: "AVATAR", name: "Player", displaySymbol: "@", displayColor: "#fff", 
+      viewRadius: 16, initialHealthRoll: "150", baseActionCost: 100, naturalHealingRate: .001 },
     { type: "MOLD_PALE", name: "Pale Mold", displaySymbol: "m", displayColor: "#ddd",
-      viewRadius: 2, initialHealthRoll: "2d6+40", baseActionCost: 500,
-      meleeAttack: {damager: new Damager("1d4-1",[],0), actionCost: 99}
+      viewRadius: 2, initialHealthRoll: "2d6+40", baseActionCost: 210, naturalHealingRate: .002,
+      meleeAttack: {damager: new Damager("1d4-1",[],0), actionCost: 80}
     },
   ];
 

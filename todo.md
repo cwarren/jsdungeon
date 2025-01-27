@@ -1,18 +1,18 @@
-* more mobs
-* * mobs on other levels
-* * more mob types spec-ed
-* * more detailed info in mob type specs
-
-* healing over time
-* * healing rate for entities
-
 * mob AI movement
+* * create a basic mob that should move
 * * basic movement stuff
 * * * local random walk
 * * * random destination
 * * * move towards nearest visible mob to which current mob is hostile
 * * * flee from location
 * * * flee from hostile mobs
+
+* more mobs
+* * mobs on other levels
+* * more mob types spec-ed
+* * more detailed info in mob type specs
+
+* healing currently is checked when an entity takes it's turn, which could lead to some weird healing bursts for slow-acting entities. Consider moving it to a global check (anchored at world level, triggered by game time?)
 
 * currently on avatar death the UI is left in gameplay mode - should probably switch it to lost mode (and similar for game won (don't need to worry about abandon, since that only happens from meta screen and is already covered))
 
@@ -37,6 +37,8 @@
 * create an item class
 
 * create an item container class
+
+* create AI modules that can be plugged into entities rather than stuffing all the options directly in the entity class
 
 * CHECK AND FIX
 * * keep an eye on time issues with running - seems OK at the moment, but tricky....

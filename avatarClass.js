@@ -23,6 +23,7 @@ class Avatar extends Entity {
   // Override takeTurn to allow UI interaction
   takeTurn() {
     devTrace(2,"Avatar's turn - waiting for player input.");
+    this.healNaturally(this.actionStartingTime);
     return 0; // Player actions are handled through input, not automatic turns
   }
 
