@@ -2,9 +2,12 @@ import { gameState } from "./gameStateClass.js";
 import { Damage } from "./damageClass.js";
 import { Damager } from "./damagerClass.js";
 import { rollDice, getRandomListItem, constrainValue, devTrace } from "./util.js";
+import { GridCell } from "./gridCellClass.js";
 
 const DEFAULT_ACTION_COST = 100;
 const DEFAULT_NATURAL_HEALING_TICKS = 250;
+
+const DEFAULT_MOVEMENT = { movementType: "STATIONARY", actionCost: DEFAULT_ACTION_COST};
 
 class Entity {
 
@@ -27,6 +30,8 @@ class Entity {
     this.naturalHealingRate = Entity.ENTITIES[type].naturalHealingRate;
     this.naturalHealingTicks = Entity.ENTITIES[type].naturalHealingTicks ? Entity.ENTITIES[type].naturalHealingTicks : DEFAULT_NATURAL_HEALING_TICKS;
     this.damagedBy = []; // array of {damageSource, damage}
+
+    this.movement = Entity.ENTITIES[type].movement || DEFAULT_MOVEMENT;
 
     this.baseKillPoints = 10; // worth this many advancement points when killed
     this.currentAdvancementPoints = 0;
@@ -163,6 +168,12 @@ class Entity {
       const adjacentsCost = this.dealWithAdjacentEntities();
       if (adjacentsCost > 0) { return adjacentsCost; }
 
+      if (this.movement.movementType == 'STATIONARY') { return this.movement.actionCost; }
+
+      if (this.movement.movementType == 'STEP_AIMLESS') { return this.moveStepAimless(); }
+      if (this.movement.movementType == 'WANDER_AIMLESS') { return this.moveWanderAimless(); }
+      if (this.movement.movementType == 'WANDER_AGGRESSIVE') { return this.moveWanderAggressive(); }
+
       return actionTime;
   }
 
@@ -290,14 +301,14 @@ class Entity {
     const oldCell = this.getCell();
     oldCell.entity = undefined;
     this.placeAtCell(newCell);
-    return DEFAULT_ACTION_COST;
+    return this.movement.actionCost;
   }
   confirmMoveDeltas(dx, dy) {
     devTrace(6,`confirming move to deltas ${dx},${dy}`, this);
     const oldCell = this.getCell();
     oldCell.entity = undefined;
     this.placeAtCell(this.getCellAtDelta(dx, dy));
-    return DEFAULT_ACTION_COST;
+    return this.movement.actionCost;
   }
 
   startRunning(deltas) {
@@ -342,6 +353,30 @@ class Entity {
     }
     return this.confirmMoveDeltas(this.runDelta.dx, this.runDelta.dy); // confirmMoveDeltas actually does the move and returns the action cost
   }
+
+  // ------------------
+  // ACTIONS - MOVEMENT TYPE IMPLEMENTATIONS
+
+  moveStepAimless() { // random dir, may bump into walls and such
+    devTrace(5,`move aimless for ${this.type}`);
+    const randomDir = getRandomListItem(GridCell.ADJACENCY_DIRECTIONS);
+    return this.tryMove(randomDir.dx, randomDir.dy);
+  }
+
+  // TO IMPLEMENT
+  moveWanderAimless() { // pick a random spot, then head there
+    devTrace(5,`wander aimless for ${this.type}`);
+    const randomDir = getRandomListItem(GridCell.ADJACENCY_DIRECTIONS);
+    return this.tryMove(randomDir.dx, randomDir.dy);
+  }
+
+  // TO IMPLEMENT
+  moveWanderAggressive() { // if hostile in view, head towards it, otherwise wanderAimless
+    devTrace(5,`wander aggressive for ${this.type}`);
+    const randomDir = getRandomListItem(GridCell.ADJACENCY_DIRECTIONS);
+    return this.tryMove(randomDir.dx, randomDir.dy);
+  }
+
 
   // ------------------
   // ACTIONS - COMBAT & HEALTH
@@ -454,8 +489,24 @@ class Entity {
     { type: "AVATAR", name: "Player", displaySymbol: "@", displayColor: "#fff", 
       viewRadius: 16, initialHealthRoll: "150", baseActionCost: 100, naturalHealingRate: .001 },
     { type: "MOLD_PALE", name: "Pale Mold", displaySymbol: "m", displayColor: "#ddd",
-      viewRadius: 2, initialHealthRoll: "2d6+40", baseActionCost: 210, naturalHealingRate: .002,
-      meleeAttack: {damager: new Damager("1d4-1",[],0), actionCost: 80}
+      viewRadius: 2, initialHealthRoll: "2d6+4", baseActionCost: 210, naturalHealingRate: .002,
+      meleeAttack: {damager: new Damager("1d4-1",[],0), actionCost: 80},
+      movement: { movementType: "STATIONARY", actionCost: 210},
+    },
+    { type: "WORM_VINE", name: "Worm Vine", displaySymbol: "w", displayColor: "#6C4",
+      viewRadius: 2, initialHealthRoll: "2d6+4", baseActionCost: 100, naturalHealingRate: .001,
+      meleeAttack: {damager: new Damager("1d3-1",[],0), actionCost: 100},
+      movement: { movementType: "STEP_AIMLESS", actionCost: 100},
+    },
+    { type: "RAT_INSIDIOUS", name: "Insidious Rat", displaySymbol: "r", displayColor: "#654",
+      viewRadius: 2, initialHealthRoll: "1d6+3", baseActionCost: 100, naturalHealingRate: .001,
+      meleeAttack: {damager: new Damager("1d3-1",[],0), actionCost: 100},
+      movement: { movementType: "WANDER_AIMLESS", actionCost: 100},
+    },
+    { type: "RAT_MALIGN", name: "Malign Rat", displaySymbol: "r", displayColor: "#321",
+      viewRadius: 4, initialHealthRoll: "3d4+6", baseActionCost: 100, naturalHealingRate: .001,
+      meleeAttack: {damager: new Damager("1d5",[],0), actionCost: 100},
+      movement: { movementType: "WANDER_AGGRESSIVE", actionCost: 100},
     },
   ];
 

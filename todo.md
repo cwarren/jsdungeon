@@ -1,11 +1,10 @@
 * mob AI movement
 * * create a basic mob that should move
 * * basic movement stuff
-* * * local random walk
-* * * random destination
-* * * move towards nearest visible mob to which current mob is hostile
-* * * flee from location
-* * * flee from hostile mobs
+* * * random destination (WANDER_AIMLESS)
+* * * move towards nearest visible mob to which current mob is hostile, or aimless otherwise (WANDER_AGGRESSIVE)
+* * * advanced - flee from location
+* * * advanced - flee from hostile mobs
 
 * more mobs
 * * mobs on other levels
@@ -15,6 +14,10 @@
 * healing currently is checked when an entity takes it's turn, which could lead to some weird healing bursts for slow-acting entities. Consider moving it to a global check (anchored at world level, triggered by game time?)
 
 * currently on avatar death the UI is left in gameplay mode - should probably switch it to lost mode (and similar for game won (don't need to worry about abandon, since that only happens from meta screen and is already covered))
+
+* when an entity dies, remove it from the damagedBy lists of other entities
+* * maybe have to add to entities a list of thing's they've damaged... though that could get messy, especially for the avatar
+* * decide whether death credits able to go to already dead things is a feature or a bug...
 
 * when running, stop if a mob becomes newly visible
 * when running, stop if a structure becomes newly visible

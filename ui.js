@@ -224,7 +224,7 @@ function drawWorldLevelStructures(worldLevel) {
 
 // Function to draw an entity in the world level
 function drawStructureInWorldLevel(structure, offsetX, offsetY, cellSize, gridSpacing) {
-  ctx.fillStyle = "white";
+  ctx.fillStyle = structure.displayColor;
   ctx.font = `${cellSize * 0.8}px Arial`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
@@ -241,7 +241,7 @@ function drawWorldLevelItems(worldLevel) {
 
 // Function to draw an entity in the world level
 function drawEntityInWorldLevel(entity, offsetX, offsetY, cellSize, gridSpacing) {
-  ctx.fillStyle = "white";
+  ctx.fillStyle = entity.displayColor;
   ctx.font = `${cellSize * 0.8}px Arial`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
