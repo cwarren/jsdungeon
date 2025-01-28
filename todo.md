@@ -1,13 +1,23 @@
-* mob AI movement
-* * create a basic mob that should move
-* * basic movement stuff
-* * * random destination (WANDER_AIMLESS)
-* * * move towards nearest visible mob to which current mob is hostile, or aimless otherwise (WANDER_AGGRESSIVE)
-* * * advanced - flee from location
-* * * advanced - flee from hostile mobs
+* revisit entity relationships
+* * maybe default entity relation, then relation type lists for exceptions?
+* * maybe a super default for the avatar - all entities hostile to avatar unless there's an explicit exception?
+* * * maybe a default on the recipient side instead
+logic:
+1. relation = get default "what others think of me" from target, if it exists
+2. if self has any relation overrides, check those for target and relation = that override
+3. if relation not set, relation = get default "what I think of others" from self if it exists
+4. if still not set, relation is NEUTRAL_TO
 
-* more mobs
+* more mob stuff
+* * stats for mobs / stat system (what they are and mean; what effect they have)
 * * mobs on other levels
+* * * random mobs for level
+* * * * gating mobs by depth
+* * * * gating mobs by level type
+* * * * advancing weaker mobs for deeper than normal levels (by degree out-of-depth)
+* * * * * implement basic mob advancement using advancement points, then give out-of-depth mobs extra advancement points
+* * dynamically calculated baseKillPoints, depending on mob power levels
+* * * eventually, a few different formulas coded for this, and mob spec indicates which to use
 * * more mob types spec-ed
 * * more detailed info in mob type specs
 
@@ -32,16 +42,47 @@
 * * messages
 * * info
 
+* grid display enhancements
+* * zoom in / out
+* * center on avatar
+* * map view - very zoomed out, to fit screen; centered on level center, not avatar, structures and avatar drawn larger than cells; avatar highlighted
+* * * maybe base size and center on seen cells, not whole level (track up-est, down-est, left-est, and right-est seen cells to aid in these calcs)
+
 * support for multi-input commands, e.g. first command is "dig" and second input is a direction, or first command is 'sleep' and second input is a duration
 * support for command confirmations, e.g. 'Are you sure you want to attack the town sheriff? (y/n)'
+* support for targeted commands, first of which is look / examine
 
-* add grid overlayTopOntoBottom and grid carveTopIntoBottom into grid utils 
+* add grid overlayTopOntoBottom and grid carveTopIntoBottom into grid utils
+* * chance for a level to have puddles (overlay)
+* * chance for a level to have a river through it (carve)
 
-* create an item class
+
+* create a basic item class
 
 * create an item container class
 
+* equipment
+* * slots
+* * equippables
+* * UI mode
+* * entity calcs use equipped things
+
 * create AI modules that can be plugged into entities rather than stuffing all the options directly in the entity class
+
+* activate-able items
+
+* mob AI movement
+* * trigger moveFlee when life is low (reset to normal when sufficiently healed)
+* * advanced - flee from location
+* * very advanced - flee from hostile mobs
+
+* richer combat
+
+* ranged combat
+
+* magic (probably use activate-able items under the hood...?)
+
+* special traits (e.g. extra mana channels, which lets an avatar equip more magic items than normal)
 
 * CHECK AND FIX
 * * keep an eye on time issues with running - seems OK at the moment, but tricky....
