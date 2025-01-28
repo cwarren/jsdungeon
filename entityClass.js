@@ -3,6 +3,7 @@ import { Damage } from "./damageClass.js";
 import { Damager } from "./damagerClass.js";
 import { rollDice, getRandomListItem, constrainValue, devTrace } from "./util.js";
 import { GridCell } from "./gridCellClass.js";
+import { getRandomCellOfTerrainInGrid, determineCheapestMovementPath } from "./gridUtils.js"; 
 
 const DEFAULT_ACTION_COST = 100;
 const DEFAULT_NATURAL_HEALING_TICKS = 250;
@@ -32,6 +33,8 @@ class Entity {
     this.damagedBy = []; // array of {damageSource, damage}
 
     this.movement = Entity.ENTITIES[type].movement || DEFAULT_MOVEMENT;
+    this.destinationCell = null;
+    this.movementPath = [];
 
     this.baseKillPoints = 10; // worth this many advancement points when killed
     this.currentAdvancementPoints = 0;
@@ -264,6 +267,11 @@ class Entity {
     }
   }
 
+  tryMoveToCell(targetCell) {
+    const targetDeltas = this.getCell().getDeltaToOtherCell(targetCell);
+    return this.tryMove(targetDeltas.dx, targetDeltas.dy); 
+  }
+
   placeAt(x, y, z) {
     devTrace(5,`placing at location ${x} ${y} ${z}`, this);
     return placeAtCell(gameState.world[z ? z : 0].grid[x][y]);
@@ -364,10 +372,35 @@ class Entity {
   }
 
   // TO IMPLEMENT
-  moveWanderAimless() { // pick a random spot, then head there
-    devTrace(5,`wander aimless for ${this.type}`);
-    const randomDir = getRandomListItem(GridCell.ADJACENCY_DIRECTIONS);
-    return this.tryMove(randomDir.dx, randomDir.dy);
+  // moveWanderAimless() { // pick a random spot, then head there
+  //   devTrace(5,`wander aimless for ${this.type}`);
+  //   const randomDir = getRandomListItem(GridCell.ADJACENCY_DIRECTIONS);
+  //   return this.tryMove(randomDir.dx, randomDir.dy);
+  // }
+
+  moveWanderAimless() {
+    devTrace(5,`moveWanderAimless for ${this.type}`, this);
+
+    // If no destination, pick one and set the path
+    if (!this.destinationCell || this.movementPath.length === 0) {
+        const grid = gameState.world[this.z].grid;
+        this.destinationCell = getRandomCellOfTerrainInGrid("FLOOR", grid); // NOTE: explicitly not a random empty cell!
+        devTrace(4,`setting wandering destination`, this.destinationCell);
+
+        if (this.destinationCell) {
+            this.movementPath = determineCheapestMovementPath(this.getCell(), this.destinationCell, gameState.world[this.z]);
+            this.movementPath.shift(); // remove the starting cell, which is the entity's current location (don't step on self as first move along the path!)
+        }
+    }
+
+    // If there's a path, follow it
+    if (this.movementPath.length > 0) {
+        devTrace(5,`moving along movement path`, this.movementPath);
+        const nextCell = this.movementPath.shift();  // Move to the next step in path
+        return this.tryMoveToCell(nextCell);
+    }
+
+    return this.movement.actionCost;  // Default action cost if no valid move
   }
 
   // TO IMPLEMENT
@@ -427,6 +460,10 @@ class Entity {
     } else {
       this.damagedBy.push({ "damageSource": otherEntity, "damage": dam });
     }
+
+    // Reset movement plans on damage
+    this.destinationCell = null;
+    this.movementPath = [];
 
     if (this.health <= 0) {
       this.die();

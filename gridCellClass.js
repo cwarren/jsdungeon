@@ -83,6 +83,10 @@ class GridCell {
         return adjacentCells;
     }
 
+    getDeltaToOtherCell(otherCell) {
+        return {dx: otherCell.x - this.x, dy: otherCell.y - this.y};
+    }
+
     /**
  * Checks if any cell in the list has the specified property with the given value.
  * @param {GridCell[]} cellList - List of cells to check.
