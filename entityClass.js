@@ -3,12 +3,12 @@ import { Damage } from "./damageClass.js";
 import { Damager } from "./damagerClass.js";
 import { rollDice, getRandomListItem, constrainValue, devTrace } from "./util.js";
 import { GridCell } from "./gridCellClass.js";
-import { getRandomCellOfTerrainInGrid, determineCheapestMovementPath } from "./gridUtils.js"; 
+import { getRandomCellOfTerrainInGrid, determineCheapestMovementPath } from "./gridUtils.js";
 
 const DEFAULT_ACTION_COST = 100;
 const DEFAULT_NATURAL_HEALING_TICKS = 250;
 
-const DEFAULT_MOVEMENT = { movementType: "STATIONARY", actionCost: DEFAULT_ACTION_COST};
+const DEFAULT_MOVEMENT = { movementType: "STATIONARY", actionCost: DEFAULT_ACTION_COST };
 
 class Entity {
 
@@ -48,11 +48,11 @@ class Entity {
   // INSPECTION & INFORMATION
 
   getCell() {
-    devTrace(6,"getting cell for entity", this);
+    devTrace(6, "getting cell for entity", this);
     return gameState.world[this.z].grid[this.x][this.y];
   }
   getCellAtDelta(dx, dy) {
-    devTrace(6,`getting cell at delta ${dx},${dy} for entity`, this);
+    devTrace(6, `getting cell at delta ${dx},${dy} for entity`, this);
     const currentLevel = gameState.world[this.z];
     if (!currentLevel) { return null };
     const newX = this.x + dx;
@@ -64,16 +64,16 @@ class Entity {
   }
 
   getAdjacentCells() {
-    devTrace(8,"getting cells adjacent to entity", this);
+    devTrace(8, "getting cells adjacent to entity", this);
     return this.getCell().getAdjacentCells();
   }
 
   getAdjacentEntities() {
-    devTrace(7,"getting entities adjacent to entity", this);
+    devTrace(7, "getting entities adjacent to entity", this);
     const adjCells = this.getAdjacentCells();
     const adjEntities = [];
-    adjCells.forEach( cell => { if (cell.entity) { adjEntities.push(cell.entity); } }); 
-    devTrace(5,"other entities adjacent to this entity", this, adjEntities);
+    adjCells.forEach(cell => { if (cell.entity) { adjEntities.push(cell.entity); } });
+    devTrace(5, "other entities adjacent to this entity", this, adjEntities);
     return adjEntities;
   }
 
@@ -81,12 +81,12 @@ class Entity {
   // VISION
 
   isVisibleTo(otherEntity) {
-    devTrace(7,"checking if this is visible to entity", this, otherEntity);
+    devTrace(7, "checking if this is visible to entity", this, otherEntity);
     return otherEntity.visibleCells.has(gameState.world[this.z].grid[this.x][this.y]);
   }
 
   determineVisibleCells() {
-    devTrace(7,`determine visible cells for ${this.type}`);
+    devTrace(7, `determine visible cells for ${this.type}`);
     this.determineVisibleCellsInGrid(gameState.world[this.z].grid);
   }
 
@@ -96,7 +96,7 @@ class Entity {
     * @param {Array} grid - The grid representing the world level.
     */
   determineVisibleCellsInGrid(grid) {
-    devTrace(7,`determine visible cells in grid`, this, grid);
+    devTrace(7, `determine visible cells in grid`, this, grid);
     this.visibleCells = new Set();
     const worldWidth = grid.length;
     const worldHeight = grid[0].length;
@@ -154,7 +154,7 @@ class Entity {
   // ADVANCEMENT
 
   receiveAdvancementPoints(points) {
-    devTrace(2,`${this.type} receiving ${points} advancement points`);
+    devTrace(2, `${this.type} receiving ${points} advancement points`);
     this.currentAdvancementPoints += points;
   }
 
@@ -163,31 +163,31 @@ class Entity {
   // AI
 
   takeTurn() {
-      devTrace(2,`${this.type} acts at ${this.actionStartingTime}`, this);
-      let actionTime = this.baseActionCost;
-      this.healNaturally(this.actionStartingTime);
+    devTrace(2, `${this.type} acts at ${this.actionStartingTime}`, this);
+    let actionTime = this.baseActionCost;
+    this.healNaturally(this.actionStartingTime);
 
-      // AI logic or automatic actions go here...
-      const adjacentsCost = this.dealWithAdjacentEntities();
-      if (adjacentsCost > 0) { return adjacentsCost; }
+    // AI logic or automatic actions go here...
+    const adjacentsCost = this.dealWithAdjacentEntities();
+    if (adjacentsCost > 0) { return adjacentsCost; }
 
-      if (this.movement.movementType == 'STATIONARY') { return this.movement.actionCost; }
+    if (this.movement.movementType == 'STATIONARY') { return this.movement.actionCost; }
 
-      if (this.movement.movementType == 'STEP_AIMLESS') { return this.moveStepAimless(); }
-      if (this.movement.movementType == 'WANDER_AIMLESS') { return this.moveWanderAimless(); }
-      if (this.movement.movementType == 'WANDER_AGGRESSIVE') { return this.moveWanderAggressive(); }
+    if (this.movement.movementType == 'STEP_AIMLESS') { return this.moveStepAimless(); }
+    if (this.movement.movementType == 'WANDER_AIMLESS') { return this.moveWanderAimless(); }
+    if (this.movement.movementType == 'WANDER_AGGRESSIVE') { return this.moveWanderAggressive(); }
 
-      return actionTime;
+    return actionTime;
   }
 
   static RELATIONSHIPS = ["TAMED_BY", "FRIENDLY_TO", "NEUTRAL_TO", "HOSTILE_TO", "VIOLENT_TO"];
   getRelationshipTo(otherEntity) {
-    devTrace(6, "getting entity relationship",this,otherEntity);
+    devTrace(6, "getting entity relationship", this, otherEntity);
     return "HOSTILE_TO"; // defaults to "murderhobo" (at least for development)
   }
 
   getDefaultActionFor(otherEntity) {
-    devTrace(5, "getting default action",this,otherEntity);
+    devTrace(5, "getting default action", this, otherEntity);
     const relationship = this.getRelationshipTo(otherEntity);
     if (["HOSTILE_TO", "VIOLENT_TO"].includes(relationship)) {
       return "ATTACK"
@@ -237,7 +237,7 @@ class Entity {
   // ACTIONS - MOVEMENT & LOCATION
 
   tryMove(dx, dy) {
-    devTrace(6,`${this.type} trying to move ${dx},${dy}`, this);
+    devTrace(6, `${this.type} trying to move ${dx},${dy}`, this);
     const currentLevel = gameState.world[this.z];
     if (!currentLevel) return;
 
@@ -269,20 +269,20 @@ class Entity {
 
   tryMoveToCell(targetCell) {
     const targetDeltas = this.getCell().getDeltaToOtherCell(targetCell);
-    return this.tryMove(targetDeltas.dx, targetDeltas.dy); 
+    return this.tryMove(targetDeltas.dx, targetDeltas.dy);
   }
 
   placeAt(x, y, z) {
-    devTrace(5,`placing at location ${x} ${y} ${z}`, this);
+    devTrace(5, `placing at location ${x} ${y} ${z}`, this);
     return placeAtCell(gameState.world[z ? z : 0].grid[x][y]);
   }
 
   placeAtCell(cell) {
-    devTrace(5,`placing at cell ${cell.x} ${cell.y} ${cell.z}`, this, cell);
+    devTrace(5, `placing at cell ${cell.x} ${cell.y} ${cell.z}`, this, cell);
     if (cell.entity) {
       console.log("cannot place entity in occupied cell", this, cell);
       return false;
-    } 
+    }
     this.x = cell.x;
     this.y = cell.y;
     this.z = cell.z;
@@ -292,11 +292,11 @@ class Entity {
   }
 
   canMoveToCell(cell) {
-    devTrace(7,"checking if entity can move to cell", this, cell);
+    devTrace(7, "checking if entity can move to cell", this, cell);
     return cell.isTraversible && !cell.entity;
   }
   canMoveToDeltas(dx, dy) {
-    devTrace(7,`checking if entity can move to deltas ${dx},${dy}`, this);
+    devTrace(7, `checking if entity can move to deltas ${dx},${dy}`, this);
     const currentLevel = gameState.world[this.z];
     if (!currentLevel) return false;
     const targetCell = this.getCellAtDelta(dx, dy);
@@ -305,14 +305,14 @@ class Entity {
   }
 
   confirmMove(newCell) {
-    devTrace(6,"confirming move to cell", this, newCell);
+    devTrace(6, "confirming move to cell", this, newCell);
     const oldCell = this.getCell();
     oldCell.entity = undefined;
     this.placeAtCell(newCell);
     return this.movement.actionCost;
   }
   confirmMoveDeltas(dx, dy) {
-    devTrace(6,`confirming move to deltas ${dx},${dy}`, this);
+    devTrace(6, `confirming move to deltas ${dx},${dy}`, this);
     const oldCell = this.getCell();
     oldCell.entity = undefined;
     this.placeAtCell(this.getCellAtDelta(dx, dy));
@@ -320,17 +320,17 @@ class Entity {
   }
 
   startRunning(deltas) {
-    devTrace(8,"starting running", this);
+    devTrace(8, "starting running", this);
     this.isRunning = true;
     this.runDelta = deltas;
   }
   stopRunning() {
-    devTrace(8,"stopping running", this);
+    devTrace(8, "stopping running", this);
     this.isRunning = false;
     this.runDelta = null;
   }
   canRunToDeltas(dx, dy) { // similar to canMoveTo, but more things will stop running
-    devTrace(7,`checking run to deltas ${dx},${dy}`, this);
+    devTrace(7, `checking run to deltas ${dx},${dy}`, this);
     const targetCell = this.getCellAtDelta(dx, dy);
     if (!targetCell) { return false; }
     if (!this.canMoveToCell(targetCell)) { return false; }
@@ -353,7 +353,7 @@ class Entity {
     return true;
   }
   continueRunning() {
-    devTrace(7,'continue running entity', this);
+    devTrace(7, 'continue running entity', this);
     if (!this.isRunning) return 0;
     if (!this.canRunToDeltas(this.runDelta.dx, this.runDelta.dy)) {
       this.stopRunning();
@@ -366,56 +366,77 @@ class Entity {
   // ACTIONS - MOVEMENT TYPE IMPLEMENTATIONS
 
   moveStepAimless() { // random dir, may bump into walls and such
-    devTrace(5,`move aimless for ${this.type}`);
+    devTrace(5, `move aimless for ${this.type}`);
     const randomDir = getRandomListItem(GridCell.ADJACENCY_DIRECTIONS);
     return this.tryMove(randomDir.dx, randomDir.dy);
   }
 
-  // TO IMPLEMENT
-  // moveWanderAimless() { // pick a random spot, then head there
-  //   devTrace(5,`wander aimless for ${this.type}`);
-  //   const randomDir = getRandomListItem(GridCell.ADJACENCY_DIRECTIONS);
-  //   return this.tryMove(randomDir.dx, randomDir.dy);
-  // }
 
   moveWanderAimless() {
-    devTrace(5,`moveWanderAimless for ${this.type}`, this);
+    devTrace(5, `moveWanderAimless for ${this.type}`, this);
 
     // If no destination, pick one and set the path
     if (!this.destinationCell || this.movementPath.length === 0) {
-        const grid = gameState.world[this.z].grid;
-        this.destinationCell = getRandomCellOfTerrainInGrid("FLOOR", grid); // NOTE: explicitly not a random empty cell!
-        devTrace(4,`setting wandering destination`, this.destinationCell);
+      const grid = gameState.world[this.z].grid;
+      this.destinationCell = getRandomCellOfTerrainInGrid("FLOOR", grid); // NOTE: explicitly not a random empty cell!
+      devTrace(4, `setting wandering destination`, this.destinationCell);
 
-        if (this.destinationCell) {
-            this.movementPath = determineCheapestMovementPath(this.getCell(), this.destinationCell, gameState.world[this.z]);
-            this.movementPath.shift(); // remove the starting cell, which is the entity's current location (don't step on self as first move along the path!)
+      if (this.destinationCell) {
+        this.movementPath = determineCheapestMovementPath(this.getCell(), this.destinationCell, gameState.world[this.z]);
+        if (this.movementPath.length > 0) {
+          this.movementPath.shift(); // Remove starting cell to avoid stepping on self
         }
+      }
     }
 
     // If there's a path, follow it
     if (this.movementPath.length > 0) {
-        devTrace(5,`moving along movement path`, this.movementPath);
-        const nextCell = this.movementPath.shift();  // Move to the next step in path
-        return this.tryMoveToCell(nextCell);
+      devTrace(5, `moving along movement path`, this.movementPath);
+      const nextCell = this.movementPath.shift();  // Move to the next step in path
+      return this.tryMoveToCell(nextCell);
     }
 
     return this.movement.actionCost;  // Default action cost if no valid move
   }
 
-  // TO IMPLEMENT
   moveWanderAggressive() { // if hostile in view, head towards it, otherwise wanderAimless
-    devTrace(5,`wander aggressive for ${this.type}`);
-    const randomDir = getRandomListItem(GridCell.ADJACENCY_DIRECTIONS);
-    return this.tryMove(randomDir.dx, randomDir.dy);
-  }
+    devTrace(5, `wander aggressive for ${this.type}`);
 
+    let closestHostile = null;
+    let closestDistance = Infinity;
+
+    this.visibleCells.forEach(cell => {
+      if (cell.entity && cell.entity !== this && ["HOSTILE_TO", "VIOLENT_TO"].includes(this.getRelationshipTo(cell.entity))) {
+        let dist = Math.abs(this.x - cell.x) + Math.abs(this.y - cell.y);
+        if (dist < closestDistance) {
+          closestHostile = cell.entity;
+          closestDistance = dist;
+        }
+      }
+    });
+
+    if (closestHostile) {
+      devTrace(4, `wander aggressive - targeting ${closestHostile.type}`, this, closestHostile);
+      this.destinationCell = closestHostile.getCell();
+      this.movementPath = determineCheapestMovementPath(this.getCell(), this.destinationCell, gameState.world[this.z]);
+      if (this.movementPath.length > 0) {
+        this.movementPath.shift(); // Remove starting cell to avoid stepping on self
+      }
+    }
+
+    if (this.movementPath.length > 0) {
+      const nextCell = this.movementPath.shift();
+      return this.tryMoveToCell(nextCell);
+    }
+
+    return this.moveWanderAimless();
+  }
 
   // ------------------
   // ACTIONS - COMBAT & HEALTH
 
   attack(otherEntity) {
-    devTrace(3,`${this.type} attacking ${otherEntity.type}`);
+    devTrace(3, `${this.type} attacking ${otherEntity.type}`);
     otherEntity.takeDamageFrom(this.getAttackDamage(), this);
     console.log("attacker", this);
     console.log("defender", otherEntity);
@@ -423,34 +444,34 @@ class Entity {
   }
 
   getAttackDamage() {
-    devTrace(6,"getting attack damage for entity", this);
+    devTrace(6, "getting attack damage for entity", this);
     return new Damage(2);
   }
 
   doMeleeAttackOn(otherEntity) {
-    devTrace(3,`${this.type} doing melee attack on ${otherEntity.type}`, this, otherEntity);
+    devTrace(3, `${this.type} doing melee attack on ${otherEntity.type}`, this, otherEntity);
     if (this.meleeAttack) {
       otherEntity.takeDamageFrom(this.getMeleeAttackDamage(), this);
-      return this.getMeleeAttackActionCost(); 
+      return this.getMeleeAttackActionCost();
     }
-    devTrace(4,`${this.type} has no melee attack`);
+    devTrace(4, `${this.type} has no melee attack`);
     return 0;
   }
 
   getMeleeAttackDamage() {
-    devTrace(6,"getting melee attack damage for entity", this);
+    devTrace(6, "getting melee attack damage for entity", this);
     if (this.meleeAttack) { return this.meleeAttack.damager.getDamage(); }
     return new Damage(0);
   }
 
   getMeleeAttackActionCost() {
-    devTrace(6,"getting melee attack action cost for entity", this);
+    devTrace(6, "getting melee attack action cost for entity", this);
     if (this.meleeAttack) { return this.meleeAttack.actionCost; }
     return DEFAULT_ACTION_COST;
   }
 
   takeDamageFrom(dam, otherEntity) {
-    devTrace(4,"taking attack damage from entity", this, dam, otherEntity);
+    devTrace(4, "taking attack damage from entity", this, dam, otherEntity);
     dam.amount = constrainValue(dam.amount, 0, this.health + 1);
     this.health -= dam.amount;
 
@@ -472,7 +493,7 @@ class Entity {
 
   // assign death credits, remove this entity from the game
   die() {
-    devTrace(2,`${this.type} has died.`, this);
+    devTrace(2, `${this.type} has died.`, this);
 
     const killCredits = this.getDeathCredits();
     killCredits.forEach(entry => {
@@ -491,7 +512,7 @@ class Entity {
 
   // get proportional responsibility for damage dealt to this entity
   getDeathCredits() {
-    devTrace(6,"determining death credits for entity", this);
+    devTrace(6, "determining death credits for entity", this);
     let totalDamage = this.damagedBy.reduce((sum, entry) => sum + entry.damage.amount, 0);
     if (totalDamage === 0) {
       return []; // No damage dealt, return an empty array
@@ -503,13 +524,13 @@ class Entity {
   }
 
   healNaturally(currentTime) {
-    devTrace(6,"healNaturally for entity", this);
+    devTrace(6, "healNaturally for entity", this);
     const enoughTimePassed = (currentTime - this.lastNaturalHealTime) >= this.naturalHealingTicks;
     const anythingToHeal = this.health < this.initialHealth;
-    const healingCount = Math.floor( (currentTime - this.lastNaturalHealTime) / this.naturalHealingTicks);
+    const healingCount = Math.floor((currentTime - this.lastNaturalHealTime) / this.naturalHealingTicks);
     if (enoughTimePassed && anythingToHeal) {
       const healAmt = healingCount * (this.naturalHealingRate * this.initialHealth);
-      devTrace(5,`natural healing occurs for ${this.type} at ${currentTime} based on last natural healing time ${this.lastNaturalHealTime}, heal count of ${healingCount} restoring ${healAmt}`, this);
+      devTrace(5, `natural healing occurs for ${this.type} at ${currentTime} based on last natural healing time ${this.lastNaturalHealTime}, heal count of ${healingCount} restoring ${healAmt}`, this);
       this.health = constrainValue(this.health + healAmt, 0, this.initialHealth);
     }
     if (enoughTimePassed) {
@@ -523,27 +544,33 @@ class Entity {
   // ENTITY DEFINITIONS
 
   static ENTITIES_LIST = [
-    { type: "AVATAR", name: "Player", displaySymbol: "@", displayColor: "#fff", 
-      viewRadius: 16, initialHealthRoll: "150", baseActionCost: 100, naturalHealingRate: .001 },
-    { type: "MOLD_PALE", name: "Pale Mold", displaySymbol: "m", displayColor: "#ddd",
+    {
+      type: "AVATAR", name: "Player", displaySymbol: "@", displayColor: "#fff",
+      viewRadius: 16, initialHealthRoll: "150", baseActionCost: 100, naturalHealingRate: .001
+    },
+    {
+      type: "MOLD_PALE", name: "Pale Mold", displaySymbol: "m", displayColor: "#ddd",
       viewRadius: 2, initialHealthRoll: "2d6+4", baseActionCost: 210, naturalHealingRate: .002,
-      meleeAttack: {damager: new Damager("1d4-1",[],0), actionCost: 80},
-      movement: { movementType: "STATIONARY", actionCost: 210},
+      meleeAttack: { damager: new Damager("1d4-1", [], 0), actionCost: 80 },
+      movement: { movementType: "STATIONARY", actionCost: 210 },
     },
-    { type: "WORM_VINE", name: "Worm Vine", displaySymbol: "w", displayColor: "#6C4",
+    {
+      type: "WORM_VINE", name: "Worm Vine", displaySymbol: "w", displayColor: "#6C4",
       viewRadius: 2, initialHealthRoll: "2d6+4", baseActionCost: 100, naturalHealingRate: .001,
-      meleeAttack: {damager: new Damager("1d3-1",[],0), actionCost: 100},
-      movement: { movementType: "STEP_AIMLESS", actionCost: 100},
+      meleeAttack: { damager: new Damager("1d3-1", [], 0), actionCost: 100 },
+      movement: { movementType: "STEP_AIMLESS", actionCost: 100 },
     },
-    { type: "RAT_INSIDIOUS", name: "Insidious Rat", displaySymbol: "r", displayColor: "#654",
+    {
+      type: "RAT_INSIDIOUS", name: "Insidious Rat", displaySymbol: "r", displayColor: "#654",
       viewRadius: 2, initialHealthRoll: "1d6+3", baseActionCost: 100, naturalHealingRate: .001,
-      meleeAttack: {damager: new Damager("1d3-1",[],0), actionCost: 100},
-      movement: { movementType: "WANDER_AIMLESS", actionCost: 100},
+      meleeAttack: { damager: new Damager("1d3-1", [], 0), actionCost: 100 },
+      movement: { movementType: "WANDER_AIMLESS", actionCost: 100 },
     },
-    { type: "RAT_MALIGN", name: "Malign Rat", displaySymbol: "r", displayColor: "#321",
+    {
+      type: "RAT_MALIGN", name: "Malign Rat", displaySymbol: "r", displayColor: "#321",
       viewRadius: 4, initialHealthRoll: "3d4+6", baseActionCost: 100, naturalHealingRate: .001,
-      meleeAttack: {damager: new Damager("1d5",[],0), actionCost: 100},
-      movement: { movementType: "WANDER_AGGRESSIVE", actionCost: 100},
+      meleeAttack: { damager: new Damager("1d5", [], 0), actionCost: 100 },
+      movement: { movementType: "WANDER_AGGRESSIVE", actionCost: 100 },
     },
   ];
 

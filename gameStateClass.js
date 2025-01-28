@@ -63,10 +63,10 @@ class GameState {
             const ent = new Entity("RAT_INSIDIOUS");
             worldLevel.placeEntityRandomly(ent);
         }
-        // for (let i = 0; i < 2; i++) {
-        //     const ent = new Entity("RAT_MALIGN");
-        //     worldLevel.placeEntityRandomly(ent);
-        // }
+        for (let i = 0; i < 2; i++) {
+            const ent = new Entity("RAT_MALIGN");
+            worldLevel.placeEntityRandomly(ent);
+        }
     }
 
     getAvatarCell() {
