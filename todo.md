@@ -1,3 +1,6 @@
+to start server: 
+PS E:\code\jsdungeon> docker-compose up --build
+
 * revisit entity relationships
 * * maybe default entity relation, then relation type lists for exceptions?
 * * maybe a super default for the avatar - all entities hostile to avatar unless there's an explicit exception?
