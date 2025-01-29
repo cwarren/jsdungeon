@@ -1,6 +1,9 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
+* resolving another timing issue - when avatar re-enters a level it's put on the queue twice - once at the beginning and again based on it's previous action time; level stalls until avatar time has caught back up, then avatar is double counted
+* * soln - when ascenging or descending, don't re-add the avatar to the queue as a matter of course; only do that during the ascent/descent handler
+
 * revisit entity relationships
 * * maybe default entity relation, then relation type lists for exceptions?
 * * maybe a super default for the avatar - all entities hostile to avatar unless there's an explicit exception?
@@ -10,6 +13,10 @@ logic:
 2. if self has any relation overrides, check those for target and relation = that override
 3. if relation not set, relation = get default "what I think of others" from self if it exists
 4. if still not set, relation is NEUTRAL_TO
+
+* shift bulk of determineVisibleCells into grid utils
+
+* move world level specs from ui into game state (new game)
 
 * more mob stuff
 * * stats for mobs / stat system (what they are and mean; what effect they have)
@@ -40,10 +47,7 @@ logic:
 
 * resolve duped info between direction deltas in gameActions and adjacency directions in GridCell
 
-* ui panes
-* * mini char
-* * messages
-* * info
+* ? refactor UI stuff into UI Manager objects (diff for each display area)
 
 * grid display enhancements
 * * zoom in / out

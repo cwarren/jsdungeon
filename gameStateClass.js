@@ -2,7 +2,7 @@ import { Entity } from "./entityClass.js";
 import { WorldLevel } from "./worldLevelClass.js";
 import { Avatar } from "./avatarClass.js";
 import { devTrace } from "./util.js";
-
+import { ageMessages } from "./uiUtil.js";
 
 class GameState {
     constructor() {
@@ -119,6 +119,7 @@ class GameState {
         devTrace(4,`handling player action time of ${actionCost} in game state`);
         if (actionCost <= 0) return;
         this.avatar.addTimeOnLevel(actionCost);
+        ageMessages();
     
         // If the avatar is running, immediately continue running
         if (this.avatar.isRunning) {

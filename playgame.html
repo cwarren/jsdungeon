@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roguelike Game</title>
+    <style>
+        body {
+            display: grid;
+            grid-template-columns: 1fr 2fr 2fr 1fr;
+            grid-template-rows: 3fr 1fr;
+            gap: 5px;
+            height: 100vh;
+            padding: 5px;
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        #charmini {
+            grid-column: 1;
+            grid-row: 1;
+            background-color: #222;
+            padding: 10px;
+        }
+
+        #main {
+            grid-column: 2 / span 2;
+            grid-row: 1;
+            background-color: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevents accidental scrolling */
+        }
+
+        #listdisplay {
+            grid-column: 4;
+            grid-row: 1;
+            background-color: #222;
+            padding: 10px;
+        }
+
+        #messages {
+            grid-column: 1 / span 2;
+            grid-row: 2;
+            background-color: #333;
+            padding: 10px;
+            overflow-y: auto;
+            height: 100%;
+        }
+
+        #info {
+            grid-column: 3  / span 2;
+            grid-row: 2;
+            background-color: #222;
+            padding: 10px;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="charmini"></div>
+    <div id="main">
+        <canvas id="gameCanvas"></canvas>
+    </div>
+    <div id="listdisplay"></div>
+    <div id="messages"></div>
+    <div id="info"></div>
+
+    <script type="module">
+        import { gameState } from "./gameStateClass.js";
+        import { resizeCanvas, drawGame } from "./ui.js";
+
+        function updateGameUI() {
+            drawGame(gameState);
+        }
+
+        // Initialize the game
+        resizeCanvas();
+        updateGameUI();
+
+        // Handle resizing
+        window.addEventListener("resize", resizeCanvas);
+    </script>
+</body>
+
+</html>

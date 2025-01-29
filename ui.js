@@ -8,6 +8,7 @@ import { createHelpText, devTrace } from "./util.js";
 // On page load, initialize the game state, then draw it, then start game turns
 
 // level width, level height, level gen type
+// TODO: this kind of thing should be moved to gameState, and be incorporated into "new game" code
 const worldLevelSpecifications = [
   [15, 10, "EMPTY"], 
   [30, 20, "TOWN"], 
@@ -24,27 +25,27 @@ const worldLevelSpecifications = [
   [30, 20, "RANDOM"], 
 ];
 
+
 function initializeGameWorld() { // this is a hack until I pull this stuff out to a better location
   gameState.initialize(worldLevelSpecifications);
 }
 initializeGameWorld();
 
-// Create and initialize the canvas
-const canvas = document.createElement("canvas");
-const ctx = canvas.getContext("2d");
-document.body.appendChild(canvas);
+// UI Elements
+// const charMiniElement = document.getElementById("charmini");
+// const mainElement = document.getElementById("main");
+// const listDisplayElement = document.getElementById("listdisplay");
+// const messagesElement = document.getElementById("messages");
+// const infoElement = document.getElementById("info");
 
-// Style the canvas container to center it
-canvas.style.position = "absolute";
-canvas.style.top = "50%";
-canvas.style.left = "50%";
-canvas.style.transform = "translate(-50%, -50%)";
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
 
 // UI settings
 const uiSettings = {
     zoomFactorMin: 0.3,
     zoomFactorMax: 3,
-    zoomFactor: .5,
+    zoomFactor: .6,
     baseCellSize: 30,
     gridCellSpacing: 1
 };
@@ -425,7 +426,6 @@ function drawHelp() {
   }
 }
 
-
 function drawMapScreen() {
   ctx.fillStyle = "white";
   ctx.font = "20px Arial";
@@ -438,6 +438,8 @@ function drawCustomGraphics() {
   ctx.fillText("ui state: CUSTOM_GRAPHICS", 50, 50);
 }
 
+//############################################################################
+
 // Adjust canvas size and redraw game on window resize
 window.addEventListener("resize", resizeCanvas);
 
@@ -446,4 +448,7 @@ resizeCanvas();
 
 gameState.advanceGameTime();
 
-export { initializeGameWorld, resizeCanvas, drawGame, uiSettings, pushUIState, popUIState, setUIState, resetUIState, getCurrentUIState };
+export {
+  initializeGameWorld,
+  resizeCanvas, drawGame, uiSettings, pushUIState, popUIState, setUIState, resetUIState, getCurrentUIState,
+};

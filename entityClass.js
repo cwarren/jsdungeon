@@ -5,6 +5,7 @@ import { rollDice, getRandomListItem, constrainValue, devTrace } from "./util.js
 import { GridCell } from "./gridCellClass.js";
 import { getRandomCellOfTerrainInGrid, determineCheapestMovementPath } from "./gridUtils.js";
 import { ENTITIES_DEFINITIONS } from "./entityDefinitions.js";
+import { addMessage } from "./uiUtil.js";
 
 const DEFAULT_ACTION_COST = 100;
 const DEFAULT_NATURAL_HEALING_TICKS = 250;
@@ -15,6 +16,7 @@ class Entity {
 
   constructor(type) {
     this.type = type;
+    this.name = Entity.ENTITIES[type].name;
     this.displaySymbol = Entity.ENTITIES[type].displaySymbol;
     this.displayColor = Entity.ENTITIES[type].displayColor;
     this.viewRadius = Entity.ENTITIES[type].viewRadius;
@@ -437,10 +439,9 @@ class Entity {
   // ACTIONS - COMBAT & HEALTH
 
   attack(otherEntity) {
-    devTrace(3, `${this.type} attacking ${otherEntity.type}`);
+    devTrace(3, `${this.type} attacking ${otherEntity.type}`, this, otherEntity);
     otherEntity.takeDamageFrom(this.getAttackDamage(), this);
-    console.log("attacker", this);
-    console.log("defender", otherEntity);
+    addMessage(`{this.name} attacks ${otherEntity.name}`);
     return DEFAULT_ACTION_COST;
   }
 
@@ -483,6 +484,8 @@ class Entity {
       this.damagedBy.push({ "damageSource": otherEntity, "damage": dam });
     }
 
+    addMessage(`${this.name} takes ${dam.amount} damage from ${otherEntity.name}`);
+
     // Reset movement plans on damage
     this.destinationCell = null;
     this.movementPath = [];
@@ -505,6 +508,7 @@ class Entity {
     });
 
     gameState.world[this.z].removeEntity(this);
+    addMessage(`${this.name} dies`);
 
     this.damagedBy = [];
     this.visibleCells.clear();
@@ -533,6 +537,7 @@ class Entity {
       const healAmt = healingCount * (this.naturalHealingRate * this.initialHealth);
       devTrace(5, `natural healing occurs for ${this.type} at ${currentTime} based on last natural healing time ${this.lastNaturalHealTime}, heal count of ${healingCount} restoring ${healAmt}`, this);
       this.health = constrainValue(this.health + healAmt, 0, this.initialHealth);
+      // addMessage(`Natural healing of ${healAmt} for ${this.name}`);
     }
     if (enoughTimePassed) {
       this.lastNaturalHealTime += healingCount * this.naturalHealingTicks;
