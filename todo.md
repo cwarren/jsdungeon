@@ -1,9 +1,6 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* resolving another timing issue - when avatar re-enters a level it's put on the queue twice - once at the beginning and again based on it's previous action time; level stalls until avatar time has caught back up, then avatar is double counted
-* * soln - when ascenging or descending, don't re-add the avatar to the queue as a matter of course; only do that during the ascent/descent handler
-
 * revisit entity relationships
 * * maybe default entity relation, then relation type lists for exceptions?
 * * maybe a super default for the avatar - all entities hostile to avatar unless there's an explicit exception?
@@ -86,6 +83,10 @@ logic:
 * richer combat
 
 * ranged combat
+
+* when entering a level for the first time then time runs based on time on previous level - this should not happen when entering a level for the first time
+* * though, it doesn't really break things... just means some mobs may fight if they're hostile to each other... which shouldn't be much of a problem outside development, since eventually most mobs will not be hostile to each other...
+
 
 * magic (probably use activate-able items under the hood...?)
 

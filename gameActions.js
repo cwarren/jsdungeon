@@ -91,12 +91,11 @@ function ascendStairs() {
         gameState.currentLevel--;
         const newCell = stairsUp.connectsTo.getCell();
         newCell.worldLevel.handleAvatarEnteringLevel(newCell);
-        // gameState.avatar.placeAtCell(newCell);
     } else {
         console.log("cannot ascend - no stairs up");
     }
     console.log("gameState after ascending", gameState);
-    return 0;
+    return gameState.avatar.baseActionCost;
 }
 
 // if needed, dynamically adds connecting stairs back up on the lower level, and
@@ -122,12 +121,11 @@ function descendStairs() {
         }
         const newCell = stairsDown.connectsTo.getCell();
         newCell.worldLevel.handleAvatarEnteringLevel(newCell);
-        // gameState.avatar.placeAtCell(newCell);
     } else {
         console.log("cannot descend - no stairs down");
     }
     console.log("gameState after descending", gameState);
-    return 0;
+    return gameState.avatar.baseActionCost;
 }
 
 function runAvatar(deltas) {

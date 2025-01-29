@@ -16,30 +16,26 @@ class TurnQueue {
         this.queue = [];
     }
 
-    // Add an entity to the queue with a starting time
-    // addEntity(entity, initialTime = 0) {
-    //     console.log(`adding ${entity.type} to turn queue`);
-    //     this.queue.push({ entity, time: initialTime });
-    //     this.ordering();
-    // }
     addEntity(entity, initialTime = null) {
         devTrace(4,`add entity to turn queue at ${initialTime}`, entity, this);
         let assignedTime = initialTime;
         if (assignedTime === null) {
             const lastTime = this.queue.length > 0 ? this.queue[this.queue.length - 1].time : 0;
             assignedTime = lastTime + 1;
-        }
-        // const lastTime = this.queue.length > 0 ? this.queue[this.queue.length - 1].time : 0;
-        // const assignedTime = initialTime !== null ? initialTime : lastTime + 1;
-    
-        console.log(`Adding ${entity.type} to turn queue at time ${assignedTime}`);
+        }    
+        devTrace(7,`Adding ${entity.type} to turn queue at time ${assignedTime}`);
+        devTrace(7,"before", ...this.queue);
         this.queue.push({ entity, time: assignedTime });
+        devTrace(7,"after", ...this.queue);
         this.ordering();
     }
     addEntityAtBeginningOfTurnQueue(entity) {
         devTrace(4,`add entity to turn queue at beginning`, entity, this);
         const initialTime = this.queue[0] ? this.queue[0].time -1 : 0;
+        devTrace(7,`Adding ${entity.type} to turn queue beginning, at time ${initialTime}`);
+        devTrace(7,"before", ...this.queue);
         this.queue.push({ entity, time: initialTime });
+        devTrace(7,"after", ...this.queue);
         this.ordering();
     }
     setEntities(entityList) {
@@ -60,7 +56,7 @@ class TurnQueue {
     }
 
     removeEntity(entity) {
-        devTrace(4,`remove entity from turn`, entity, this);
+        devTrace(4,`remove entity from turn queue`, entity, this);
         this.queue = this.queue.filter(entry => entry.entity !== entity);
     }
 
@@ -69,16 +65,18 @@ class TurnQueue {
         this.queue.sort((a, b) => a.time - b.time); // Maintain order
     }
 
-    // Pop the next entity to act
     nextTurn() {
         devTrace(4,`do next turn on turn queue`, this);
         if (this.queue.length === 0) return null;
         if (gameState.status != "ACTIVE") return null;
 
         let next = this.queue.shift();
-        devTrace(5,`-- entity ${next.entity.type} acting at ${next.time}`, next);
         this.timePasses(next.time - this.previousActionTime);
         this.previousActionTime = next.time;
+        
+        if (next.entity == "TIME_MARKER") return next.entity; // TIME_MARKER is a special indicator, set by runTimeFor
+
+        devTrace(5,`-- entity ${next.entity.type} acting at ${next.time}`, next);
         next.entity.setActionStartingTime(next.time);
 
         // Let the entity act
@@ -109,10 +107,15 @@ class TurnQueue {
     runTimeFor(ticks) {
         devTrace(5,`running time ${ticks} on turn queue`, this);
         const targetTime = this.elapsedTime + ticks;
-        while (this.elapsedTime < targetTime) {
-            let activeEntity = this.nextTurn();
+        this.queue.push({ entity: "TIME_MARKER", time: targetTime });
+        this.ordering();
+        let activeEntity = this.nextTurn();
+        while (activeEntity != "TIME_MARKER") {
+            activeEntity = this.nextTurn();
             if (!activeEntity) break; // No more entities to process
         }
+        this.elapsedTime = targetTime;
+        this.previousActionTime = targetTime;
     }
 
     normalizeQueueTimes() {
