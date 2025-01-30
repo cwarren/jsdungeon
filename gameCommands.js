@@ -85,31 +85,48 @@ const actionMaps = {
     "HELP": textActionsMap,
 };
 
-function executeGameCommand(key, event) {
-    let lookupKey = key;
-    if (key != "Control" && event.ctrlKey) {
-        lookupKey = 'CTRL-' + key;
+function getLookupKey(key, event) {
+    if (key !== "Control" && event.ctrlKey) {
+        return 'CTRL-' + key;
     }
+    return key;
+}
+
+function getActionKey(uiState, lookupKey) {
+    return keyBinding[uiState][lookupKey];
+}
+
+function executeUIAction(actionKey) {
+    if (uiActionsMap[actionKey]) {
+        uiActionsMap[actionKey].action();
+        return true;
+    }
+    return false;
+}
+
+function executeGameAction(actionDef, key, event) {
+    console.log(`Executing action: ${actionDef.name}`);
+    const actionTimeCost = actionDef.action(key, event);
+    gameState.handlePlayerActionTime(actionTimeCost);
+}
+
+function executeGameCommand(key, event) {
+    const lookupKey = getLookupKey(key, event);
     const uiState = getCurrentUIState();
-    const actionKey = keyBinding[uiState][lookupKey];
+    const actionKey = getActionKey(uiState, lookupKey);
+
     if (!actionKey) {
         console.log(`No action bound for key: ${uiState} ${lookupKey}`);
         return;
     }
 
-    // UI control actions are special and also take priority
-    if (uiActionsMap[actionKey]) {
-        uiActionsMap[actionKey].action();
+    if (executeUIAction(actionKey)) {
         return;
     }
 
     const actionMap = actionMaps[uiState];
     const actionDef = actionMap[actionKey];
-    console.log(`Executing action: ${actionDef.name}`);
-    const actionTimeCost = actionDef.action(key, event);
-    if (uiState == "GAMEPLAY") {
-        gameState.handlePlayerActionTime(actionTimeCost);
-    }
+    executeGameAction(actionDef, key, event);
 }
 
-export { executeGameCommand as executeGameCommand, gameActionsMap, keyBinding, actionMaps };
+export { executeGameCommand, getLookupKey, getActionKey, executeUIAction, executeGameAction, gameActionsMap, keyBinding, actionMaps };
