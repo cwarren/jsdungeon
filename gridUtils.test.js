@@ -1,4 +1,4 @@
-import { findCellOfTerrainNearPlace, getRandomCellOfTerrainInGrid, findEmptyCellTerrainNearPlace, getRandomEmptyCellOfTerrainInGrid, determineCellViewability, applyCellularAutomataSmoothing } from './gridUtils';
+import { findCellOfTerrainNearPlace, getRandomCellOfTerrainInGrid, findEmptyCellTerrainNearPlace, getRandomEmptyCellOfTerrainInGrid, determineCellViewability, applyCellularAutomataSmoothing, computeBresenhamLine } from './gridUtils';
 import { GridCell } from './gridCellClass';
 
 describe('findCellOfTerrainNearPlace', () => {
@@ -194,5 +194,55 @@ describe('applyCellularAutomataSmoothing', () => {
         grid[0][1].terrain = 'WALL';
         const smoothedGrid = applyCellularAutomataSmoothing(grid, 'WALL');
         expect(smoothedGrid[1][1].terrain).toBe('WALL');
+    });
+});
+
+describe('computeBresenhamLine', () => {
+    test('should compute a straight horizontal line', () => {
+        const result = computeBresenhamLine(0, 0, 5, 0);
+        expect(result).toEqual([
+            [0, 0],
+            [1, 0],
+            [2, 0],
+            [3, 0],
+            [4, 0],
+            [5, 0]
+        ]);
+    });
+
+    test('should compute a straight vertical line', () => {
+        const result = computeBresenhamLine(0, 0, 0, 5);
+        expect(result).toEqual([
+            [0, 0],
+            [0, 1],
+            [0, 2],
+            [0, 3],
+            [0, 4],
+            [0, 5]
+        ]);
+    });
+
+    test('should compute a diagonal line', () => {
+        const result = computeBresenhamLine(0, 0, 5, 5);
+        expect(result).toEqual([
+            [0, 0],
+            [1, 1],
+            [2, 2],
+            [3, 3],
+            [4, 4],
+            [5, 5]
+        ]);
+    });
+
+    test('should compute a line with a steep slope', () => {
+        const result = computeBresenhamLine(0, 0, 2, 5);
+        expect(result).toEqual([
+            [0, 0],
+            [0, 1],
+            [1, 2],
+            [1, 3],
+            [2, 4],
+            [2, 5]
+        ]);
     });
 });
