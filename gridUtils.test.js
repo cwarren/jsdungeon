@@ -1,4 +1,4 @@
-import { findCellOfTerrainNearPlace, getRandomCellOfTerrainInGrid, findEmptyCellTerrainNearPlace, getRandomEmptyCellOfTerrainInGrid } from './gridUtils';
+import { findCellOfTerrainNearPlace, getRandomCellOfTerrainInGrid, findEmptyCellTerrainNearPlace, getRandomEmptyCellOfTerrainInGrid, determineCellViewability } from './gridUtils';
 import { GridCell } from './gridCellClass';
 
 describe('findCellOfTerrainNearPlace', () => {
@@ -110,5 +110,48 @@ describe('getRandomEmptyCellOfTerrainInGrid', () => {
         }));
         const result = getRandomEmptyCellOfTerrainInGrid('WALL', grid);
         expect(result).toBeNull();
+    });
+});
+
+describe('determineCellViewability', () => {
+    let worldLevel;
+
+    beforeEach(() => {
+        worldLevel = {
+            levelNumber: 1,
+            levelWidth: 10,
+            levelHeight: 10,
+        };
+        worldLevel.grid = Array.from({ length: 10 }, (_, x) =>
+            Array.from({ length: 10 }, (_, y) => {
+                const cell = new GridCell('WALL');
+                cell.setPosition(x, y, 1);
+                cell.setWorldLevel(worldLevel);
+                return cell;
+            })
+        );
+    });
+
+    test('should determine if a cell is viewable', () => {
+        worldLevel.grid[5][5].isOpaque = false;
+        determineCellViewability(worldLevel.grid);
+        expect(worldLevel.grid[5][5].isViewable).toBe(true);
+    });
+
+    test('should determine if a cell is not viewable', () => {
+        worldLevel.grid[5][5].isOpaque = true;
+        worldLevel.grid[4][5].isOpaque = true;
+        worldLevel.grid[6][5].isOpaque = true;
+        worldLevel.grid[5][4].isOpaque = true;
+        worldLevel.grid[5][6].isOpaque = true;
+        determineCellViewability(worldLevel.grid);
+        expect(worldLevel.grid[5][5].isViewable).toBe(false);
+    });
+
+    test('should determine if a cell is viewable due to adjacent non-opaque cell', () => {
+        worldLevel.grid[5][5].isOpaque = true;
+        worldLevel.grid[4][5].isOpaque = false;
+        determineCellViewability(worldLevel.grid);
+        expect(worldLevel.grid[5][5].isViewable).toBe(true);
     });
 });
