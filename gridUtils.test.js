@@ -1,4 +1,4 @@
-import { findCellOfTerrainNearPlace, getRandomCellOfTerrainInGrid, findEmptyCellTerrainNearPlace, getRandomEmptyCellOfTerrainInGrid, determineCellViewability } from './gridUtils';
+import { findCellOfTerrainNearPlace, getRandomCellOfTerrainInGrid, findEmptyCellTerrainNearPlace, getRandomEmptyCellOfTerrainInGrid, determineCellViewability, applyCellularAutomataSmoothing } from './gridUtils';
 import { GridCell } from './gridCellClass';
 
 describe('findCellOfTerrainNearPlace', () => {
@@ -153,5 +153,46 @@ describe('determineCellViewability', () => {
         worldLevel.grid[4][5].isOpaque = false;
         determineCellViewability(worldLevel.grid);
         expect(worldLevel.grid[5][5].isViewable).toBe(true);
+    });
+});
+
+describe('applyCellularAutomataSmoothing', () => {
+    let grid;
+
+    beforeEach(() => {
+        grid = Array.from({ length: 10 }, (_, x) =>
+            Array.from({ length: 10 }, (_, y) => {
+                const cell = new GridCell('FLOOR');
+                cell.setPosition(x, y, 1);
+                return cell;
+            })
+        );
+    });
+
+    test('should smooth the grid using cellular automata', () => {
+        const smoothedGrid = applyCellularAutomataSmoothing(grid, 'WALL');
+        expect(smoothedGrid).toBeDefined();
+        expect(smoothedGrid.length).toBe(10);
+        expect(smoothedGrid[0].length).toBe(10);
+    });
+
+    test('should convert cells to FLOOR if they have fewer than 5 WALL neighbors', () => {
+        grid[1][1].terrain = 'WALL';
+        grid[1][2].terrain = 'FLOOR';
+        grid[2][1].terrain = 'FLOOR';
+        grid[2][2].terrain = 'FLOOR';
+        grid[0][1].terrain = 'FLOOR';
+        const smoothedGrid = applyCellularAutomataSmoothing(grid, 'WALL');
+        expect(smoothedGrid[1][1].terrain).toBe('FLOOR');
+    });
+
+    test('should keep cells as WALL if they have 5 or more WALL neighbors', () => {
+        grid[1][1].terrain = 'WALL';
+        grid[1][2].terrain = 'WALL';
+        grid[2][1].terrain = 'WALL';
+        grid[2][2].terrain = 'WALL';
+        grid[0][1].terrain = 'WALL';
+        const smoothedGrid = applyCellularAutomataSmoothing(grid, 'WALL');
+        expect(smoothedGrid[1][1].terrain).toBe('WALL');
     });
 });
