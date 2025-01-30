@@ -19,7 +19,6 @@ function applyCellularAutomataSmoothing(grid, terrainToSmooth = "WALL") {
                     }
                 }
             }
-            // console.log(`automata smoothing ${x} ${y}`);
             newGrid[x][y] =GridCell.createDetachedAt(x, y, terrainCount >= 5 ? terrainToSmooth : "FLOOR");
         });
     });
@@ -96,7 +95,6 @@ function determineCellViewability(grid) {
 }
 
 // uses A-star algorithm
-
 function determineCheapestMovementPath(startCell, endCell, worldLevel) {
     if (!endCell.isTraversible) {
         return [];  // No path to an untraversable location
