@@ -67,20 +67,16 @@ class GridCell {
     getAdjacentCells() {
         const adjacentCells = [];
 
-        // console.log('getAdjacentCells, this', this);
-        // console.log('getAdjacentCells, this.worldLevel', this.worldLevel);
-        // console.log('getAdjacentCells, this.worldLevel.grid', this.worldLevel.grid);
         for (const { dx, dy } of GridCell.ADJACENCY_DIRECTIONS) {
             const newX = this.x + dx;
             const newY = this.y + dy;
-            // console.log(`${newX},${newY}`);
 
             if (newX >= 0 && newX < this.worldLevel.levelWidth && newY >= 0 && newY < this.worldLevel.levelHeight) {
                 adjacentCells.push(this.worldLevel.grid[newX][newY]);
             }
         }
 
-        return adjacentCells;
+        return adjacentCells; 
     }
 
     getDeltaToOtherCell(otherCell) {
