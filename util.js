@@ -94,4 +94,22 @@ function devTrace(level, msg, ...objects) {
     }
 }
 
-export { rollDice, rollDiceGroup, generateRandomDiceString, getRandomListItem, getListIntersection, constrainValue, createHelpText, devTrace };
+function formatNumberForMessage(num) {
+    if (Number.isInteger(num)) {
+        return num.toString();
+    } else {
+        return `about ${Math.round(num)}`;
+    }
+}
+
+export {
+    rollDice,
+    rollDiceGroup,
+    generateRandomDiceString,
+    getRandomListItem,
+    getListIntersection,
+    constrainValue,
+    createHelpText,
+    devTrace,
+    formatNumberForMessage
+};
