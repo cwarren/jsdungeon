@@ -22,6 +22,10 @@ class TextBlock {
     scrollDown(scrollRows = 1) {
         this.rowCursor = constrainValue(this.rowCursor + scrollRows, 0, this.textRows.length);
     }
-  }
+
+    scrollTo(row) {
+        this.rowCursor = constrainValue(row, 0, this.textRows.length);
+    }
+}
   
-  export { TextBlock };
+export { TextBlock };

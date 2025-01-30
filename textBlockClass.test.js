@@ -22,8 +22,22 @@ describe('TextBlock', () => {
         expect(textBlock.getDisplayTextRows()).toEqual(["Line 1", "Line 2", "Line 3", "Line 4", "Line 5"]);
     });
 
+    test('scrollTo should set the cursor to the given value, bounded by 0 and the length of textRows', () => {
+        textBlock.scrollTo(3);
+        expect(textBlock.rowCursor).toBe(3);
+        expect(textBlock.getDisplayTextRows()).toEqual(["Line 4", "Line 5"]);
+
+        textBlock.scrollTo(-1);
+        expect(textBlock.rowCursor).toBe(0);
+        expect(textBlock.getDisplayTextRows()).toEqual(["Line 1", "Line 2", "Line 3", "Line 4", "Line 5"]);
+
+        textBlock.scrollTo(10);
+        expect(textBlock.rowCursor).toBe(5);
+        expect(textBlock.getDisplayTextRows()).toEqual([]);
+    });
+
     test('should scroll up', () => {
-        textBlock.scrollDown(3);
+        textBlock.scrollTo(3);
         textBlock.scrollUp(1);
         expect(textBlock.rowCursor).toBe(2);
         expect(textBlock.getDisplayTextRows()).toEqual(["Line 3", "Line 4", "Line 5"]);
@@ -46,4 +60,6 @@ describe('TextBlock', () => {
         expect(textBlock.rowCursor).toBe(5);
         expect(textBlock.getDisplayTextRows()).toEqual([]);
     });
+
+
 });
