@@ -1,4 +1,4 @@
-import { findCellOfTerrainNearPlace, getRandomCellOfTerrainInGrid, findEmptyCellTerrainNearPlace, getRandomEmptyCellOfTerrainInGrid, determineCellViewability, applyCellularAutomataSmoothing, computeBresenhamLine } from './gridUtils';
+import { findCellOfTerrainNearPlace, getRandomCellOfTerrainInGrid, findEmptyCellTerrainNearPlace, getRandomEmptyCellOfTerrainInGrid, determineCellViewability, applyCellularAutomataSmoothing, computeBresenhamLine, determineCheapestMovementPath } from './gridUtils';
 import { GridCell } from './gridCellClass';
 
 describe('findCellOfTerrainNearPlace', () => {
@@ -244,5 +244,55 @@ describe('computeBresenhamLine', () => {
             [2, 4],
             [2, 5]
         ]);
+    });
+});
+
+describe('determineCheapestMovementPath', () => {
+    let worldLevel;
+
+    beforeEach(() => {
+        worldLevel = {
+            levelNumber: 1,
+            levelWidth: 10,
+            levelHeight: 10,
+        };
+        worldLevel.grid = Array.from({ length: 10 }, (_, x) =>
+            Array.from({ length: 10 }, (_, y) => {
+                const cell = new GridCell('FLOOR');
+                cell.setPosition(x, y, 1);
+                cell.setWorldLevel(worldLevel);
+                cell.isTraversible = true;
+                cell.entryMovementCost = 1;
+                return cell;
+            })
+        );
+    });
+
+    test('should find the cheapest path between two cells', () => {
+        const startCell = worldLevel.grid[0][0];
+        const endCell = worldLevel.grid[9][9];
+        const path = determineCheapestMovementPath(startCell, endCell, worldLevel);
+        expect(path.length).toBeGreaterThan(0);
+        expect(path[0]).toBe(startCell);
+        expect(path[path.length - 1]).toBe(endCell);
+    });
+
+    test('should return an empty path if the end cell is not traversible', () => {
+        const startCell = worldLevel.grid[0][0];
+        const endCell = worldLevel.grid[9][9];
+        endCell.isTraversible = false;
+        const path = determineCheapestMovementPath(startCell, endCell, worldLevel);
+        expect(path).toEqual([]);
+    });
+
+    test('should find the cheapest path avoiding non-traversible cells', () => {
+        const startCell = worldLevel.grid[0][0];
+        const endCell = worldLevel.grid[9][9];
+        worldLevel.grid[5][5].isTraversible = false;
+        const path = determineCheapestMovementPath(startCell, endCell, worldLevel);
+        expect(path.length).toBeGreaterThan(0);
+        expect(path[0]).toBe(startCell);
+        expect(path[path.length - 1]).toBe(endCell);
+        expect(path).not.toContain(worldLevel.grid[5][5]);
     });
 });
