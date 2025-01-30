@@ -1,7 +1,7 @@
 import { gameState } from "./gameStateClass.js";
 import { Damage } from "./damageClass.js";
 import { Damager } from "./damagerClass.js";
-import { rollDice, getRandomListItem, constrainValue, devTrace } from "./util.js";
+import { rollDice, getRandomListItem, constrainValue, devTrace, formatNumberForMessage } from "./util.js";
 import { GridCell } from "./gridCellClass.js";
 import { getRandomCellOfTerrainInGrid, determineCheapestMovementPath, computeBresenhamLine } from "./gridUtils.js";
 import { ENTITIES_DEFINITIONS } from "./entityDefinitions.js";
@@ -422,7 +422,7 @@ class Entity {
   attack(otherEntity) {
     devTrace(3, `${this.type} attacking ${otherEntity.type}`, this, otherEntity);
     otherEntity.takeDamageFrom(this.getAttackDamage(), this);
-    addMessage(`{this.name} attacks ${otherEntity.name}`);
+    addMessage(`${this.name} attacks ${otherEntity.name}`);
     return DEFAULT_ACTION_COST;
   }
 
@@ -465,7 +465,7 @@ class Entity {
       this.damagedBy.push({ "damageSource": otherEntity, "damage": dam });
     }
 
-    addMessage(`${this.name} takes ${dam.amount} damage from ${otherEntity.name}`);
+    addMessage(`${this.name} takes ${formatNumberForMessage(dam.amount)} damage from ${otherEntity.name}`);
 
     // Reset movement plans on damage
     this.destinationCell = null;
