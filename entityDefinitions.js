@@ -3,7 +3,7 @@ import { Damager } from "./damagerClass.js";
 const ENTITIES_DEFINITIONS = [
     {
       type: "AVATAR", name: "Player", displaySymbol: "@", displayColor: "#fff",
-      viewRadius: 16, initialHealthRoll: "150", baseActionCost: 100, naturalHealingRate: .001
+      viewRadius: 8, initialHealthRoll: "150", baseActionCost: 100, naturalHealingRate: .001
     },
     {
       type: "MOLD_PALE", name: "Pale Mold", displaySymbol: "m", displayColor: "#ddd",

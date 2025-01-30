@@ -3,7 +3,7 @@ import { Damage } from "./damageClass.js";
 import { Damager } from "./damagerClass.js";
 import { rollDice, getRandomListItem, constrainValue, devTrace } from "./util.js";
 import { GridCell } from "./gridCellClass.js";
-import { getRandomCellOfTerrainInGrid, determineCheapestMovementPath } from "./gridUtils.js";
+import { getRandomCellOfTerrainInGrid, determineCheapestMovementPath, computeBresenhamLine } from "./gridUtils.js";
 import { ENTITIES_DEFINITIONS } from "./entityDefinitions.js";
 import { addMessage } from "./uiUtil.js";
 
@@ -103,25 +103,6 @@ class Entity {
     this.visibleCells = new Set();
     const worldWidth = grid.length;
     const worldHeight = grid[0].length;
-
-    // TODO: pull this into a library
-    function computeBresenhamLine(x0, y0, x1, y1) {
-      let points = [];
-      let dx = Math.abs(x1 - x0);
-      let dy = Math.abs(y1 - y0);
-      let sx = (x0 < x1) ? 1 : -1;
-      let sy = (y0 < y1) ? 1 : -1;
-      let err = dx - dy;
-
-      while (true) {
-        points.push([x0, y0]);
-        if (x0 === x1 && y0 === y1) break;
-        let e2 = 2 * err;
-        if (e2 > -dy) { err -= dy; x0 += sx; }
-        if (e2 < dx) { err += dx; y0 += sy; }
-      }
-      return points;
-    }
 
     for (let dx = -this.viewRadius; dx <= this.viewRadius; dx++) {
       for (let dy = -this.viewRadius; dy <= this.viewRadius; dy++) {

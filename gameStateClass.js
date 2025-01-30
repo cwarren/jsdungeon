@@ -123,7 +123,7 @@ class GameState {
     
         // If the avatar is running, immediately continue running
         if (this.avatar.isRunning) {
-            this.currentTurnQueue.addEntity(this.avatar, this.currentTurnQueue.queue[0].time + actionCost);
+            this.currentTurnQueue.addEntity(this.avatar, this.avatar.actionStartingTime + actionCost);
             this.advanceGameTime();  // Keep the turns flowing for running
             return;
         }

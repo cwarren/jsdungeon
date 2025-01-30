@@ -129,7 +129,7 @@ function descendStairs() {
 }
 
 function runAvatar(deltas) {
-    devTrace(7,`action - run avatar to deltas ${dx},${dy}`);
+    devTrace(7,`action - run avatar to deltas ${deltas.dx},${deltas.dy}`);
     if (gameState.avatar.isRunning) return; // Prevent multiple runs
 
     gameState.avatar.startRunning(deltas);

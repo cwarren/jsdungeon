@@ -1,6 +1,20 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
+* truncate or round numbers in message strings to integers
+* * maybe get fancy and add "a bit more than" and "a bit less than" prefixes
+
+* add messages
+* * ascent & descent (with hooks for avatar knowldedge of level)
+
+* add info text for current level (change when level changes)(with hooks for avatar knowldedge of level)
+
+* update minichar display...
+* * when things start
+* * when avatar status changes (override status-changing methods - call parent, then update minichar)
+* * avatar has a getMiniCharBlock function, which generates text to display depending on avatar status
+* * NOTE: may have to set mini char font to fixed width
+
 * revisit entity relationships
 * * maybe default entity relation, then relation type lists for exceptions?
 * * maybe a super default for the avatar - all entities hostile to avatar unless there's an explicit exception?
@@ -17,6 +31,9 @@ logic:
 
 * more mob stuff
 * * stats for mobs / stat system (what they are and mean; what effect they have)
+* * simple status sheets for mobs (for display in info block)
+
+* more more mob stuff
 * * mobs on other levels
 * * * random mobs for level
 * * * * gating mobs by depth
