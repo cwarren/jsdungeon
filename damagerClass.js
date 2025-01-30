@@ -8,7 +8,7 @@ class Damager {
       this.minDamage = minDamage;
     }
     getDamage() {
-        return new Damage(rollDice(this.amountDiceStr), ...this.types, this.minDamage);
+        return new Damage(rollDice(this.amountDiceStr), [...this.types], this.minDamage);
     }
   }
   
