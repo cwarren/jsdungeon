@@ -233,9 +233,6 @@ class Entity {
 
   tryMove(dx, dy) {
     devTrace(6, `${this.type} trying to move ${dx},${dy}`, this);
-    const currentLevel = gameState.world[this.location.z];
-    if (!currentLevel) return;
-
     const targetCell = this.location.getCellAtDelta(dx, dy);
     if (!targetCell) { return 0; }
     if (this.canMoveToCell(targetCell)) {
@@ -268,8 +265,6 @@ class Entity {
   }
   canMoveToDeltas(dx, dy) {
     devTrace(7, `checking if entity can move to deltas ${dx},${dy}`, this);
-    const currentLevel = gameState.world[this.location.z];
-    if (!currentLevel) return false;
     const targetCell = this.location.getCellAtDelta(dx, dy);
     if (!targetCell) { return false; }
     return this.canMoveToCell(targetCell);

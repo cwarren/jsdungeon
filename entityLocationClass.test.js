@@ -101,4 +101,14 @@ describe('EntityLocation', () => {
     expect(entityLocation.y).toBe(5);
     expect(entityLocation.z).toBe(0);
   });
+
+  test('should get the correct world level', () => {
+    const worldLevel = entityLocation.getWorldLevel();
+    expect(worldLevel).toEqual(gameState.world[0]);
+  });
+
+  test('should throw error if entity is not on a valid level', () => {
+    entityLocation.z = 1; // Invalid level
+    expect(() => entityLocation.getWorldLevel()).toThrow(`Entity ${entity.type} is not on a valid level`);
+  });
 });

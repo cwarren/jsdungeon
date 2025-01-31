@@ -49,6 +49,14 @@ class EntityLocation {
     this.ofEntity.determineVisibleCells();
     return true;
   }
+
+  getWorldLevel() {
+    const currentLevel = gameState.world[this.z];
+    if (!currentLevel) {
+      throw new Error(`Entity ${this.ofEntity.type} is not on a valid level`);
+    };
+    return currentLevel;
+  }
 }
 
 export { EntityLocation };
