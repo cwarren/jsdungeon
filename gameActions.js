@@ -130,9 +130,9 @@ function descendStairs() {
 
 function runAvatar(deltas) {
     devTrace(7,`action - run avatar to deltas ${deltas.dx},${deltas.dy}`);
-    if (gameState.avatar.isRunning) return; // Prevent multiple runs
+    if (gameState.avatar.movement.isRunning) return; // Prevent multiple runs
 
-    gameState.avatar.startRunning(deltas);
+    gameState.avatar.movement.startRunning(deltas);
 
     // Perform the first move immediately
     return gameState.avatar.continueRunning();

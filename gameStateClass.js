@@ -59,14 +59,14 @@ class GameState {
         //     const ent = new Entity("WORM_VINE");
         //     worldLevel.placeEntityRandomly(ent);
         // }
-        for (let i = 0; i < 1; i++) {
-            const ent = new Entity("RAT_INSIDIOUS");
-            worldLevel.placeEntityRandomly(ent);
-        }
-        for (let i = 0; i < 2; i++) {
-            const ent = new Entity("RAT_MALIGN");
-            worldLevel.placeEntityRandomly(ent);
-        }
+        // for (let i = 0; i < 1; i++) {
+        //     const ent = new Entity("RAT_INSIDIOUS");
+        //     worldLevel.placeEntityRandomly(ent);
+        // }
+        // for (let i = 0; i < 2; i++) {
+        //     const ent = new Entity("RAT_MALIGN");
+        //     worldLevel.placeEntityRandomly(ent);
+        // }
     }
 
     getAvatarCell() {
@@ -109,7 +109,7 @@ class GameState {
             let activeEntity = this.currentTurnQueue.nextTurn();
             if (!activeEntity) break; // No more entities to process
     
-            if (activeEntity === this.avatar && !activeEntity.isRunning) {
+            if (activeEntity === this.avatar && !activeEntity.movement.isRunning) {
                 break; // Stop when it's the avatar's turn and the avatar is not running
             }
         }
@@ -122,7 +122,7 @@ class GameState {
         ageMessages();
     
         // If the avatar is running, immediately continue running
-        if (this.avatar.isRunning) {
+        if (this.avatar.movement.isRunning) {
             this.currentTurnQueue.addEntity(this.avatar, this.avatar.actionStartingTime + actionCost);
             this.advanceGameTime();  // Keep the turns flowing for running
             return;

@@ -1,4 +1,4 @@
-import { EntityMovement, DEFAULT_MOVEMENT_ACTION_COST, DEFAULT_MOVEMENT_SPEC } from './entityMovementClass';
+import { EntityMovement, DEFAULT_MOVEMENT_SPEC } from './entityMovementClass';
 
 jest.mock('./util', () => ({
   devTrace: jest.fn(),
@@ -18,6 +18,7 @@ describe('EntityMovement', () => {
           return false;
         }
         targetCell.entity = entity;
+        entity.determineVisibleCells();
         return true;
       }),
     };
@@ -25,6 +26,7 @@ describe('EntityMovement', () => {
       type: 'testEntity',
       location: entityLocation,
       handleAttemptedMoveIntoOccupiedCell: jest.fn(() => 0),
+      determineVisibleCells: jest.fn(() => 0),
     };
     entityMovement = new EntityMovement(entity);
   });
@@ -34,13 +36,15 @@ describe('EntityMovement', () => {
     expect(entityMovement.location).toBe(entityLocation);
     expect(entityMovement.isRunning).toBe(false);
     expect(entityMovement.runDelta).toBeNull();
-    expect(entityMovement.movementSpec).toEqual({ movementType: "STATIONARY", actionCost: 100 });
+    expect(entityMovement.type).toBe(DEFAULT_MOVEMENT_SPEC.movementType);
+    expect(entityMovement.actionCost).toBe(DEFAULT_MOVEMENT_SPEC.actionCost);
   });
 
   test('should try to move to a cell and succeed', () => {
     const resultMovementCost = entityMovement.tryMove(1, 1);
-    expect(resultMovementCost).toBe(DEFAULT_MOVEMENT_ACTION_COST);
+    expect(resultMovementCost).toBe(DEFAULT_MOVEMENT_SPEC.actionCost);
     expect(entityLocation.getCellAtDelta).toHaveBeenCalledWith(1, 1);
+    expect(entity.determineVisibleCells).toHaveBeenCalled();
   });
 
   test('should try to move slowly to a cell and succeed', () => {
@@ -48,6 +52,7 @@ describe('EntityMovement', () => {
     const resultMovementCost = entityMovement.tryMove(1, 1);
     expect(resultMovementCost).toBe(325);
     expect(entityLocation.getCellAtDelta).toHaveBeenCalledWith(1, 1);
+    expect(entity.determineVisibleCells).toHaveBeenCalled();
   });
 
   test('should try to move to a cell and fail due to non-traversible cell', () => {
@@ -68,8 +73,9 @@ describe('EntityMovement', () => {
     const targetCell = { x: 6, y: 6, z: 0, entity: null, isTraversible: true };
     entityLocation.getCell = jest.fn(() => ({ x: 5, y: 5, z: 0, entity: null, getDeltaToOtherCell: jest.fn(() => ({ dx: 1, dy: 1 })) }));
     const resultMovementCost = entityMovement.tryMoveToCell(targetCell);
-    expect(resultMovementCost).toBe(DEFAULT_MOVEMENT_ACTION_COST);
+    expect(resultMovementCost).toBe(DEFAULT_MOVEMENT_SPEC.actionCost);
     expect(entityLocation.getCell).toHaveBeenCalled();
+    expect(entity.determineVisibleCells).toHaveBeenCalled();
   });
 
   test('should check if can move to a cell and return true', () => {
@@ -102,8 +108,23 @@ describe('EntityMovement', () => {
     const oldCell = { x: 5, y: 5, z: 0, entity: entity };
     entityLocation.getCell = jest.fn(() => oldCell);
     const resultMovementCost = entityMovement.confirmMove(newCell);
-    expect(resultMovementCost).toBe(DEFAULT_MOVEMENT_ACTION_COST);
+    expect(resultMovementCost).toBe(DEFAULT_MOVEMENT_SPEC.actionCost);
     expect(oldCell.entity).toBeUndefined();
     expect(newCell.entity).toBe(entity);
+    expect(entity.determineVisibleCells).toHaveBeenCalled();
+  });
+
+  test('should confirm move to deltas', () => {
+    const oldCell = { x: 5, y: 5, z: 0, entity: entity };
+    const newCell = { x: 6, y: 6, z: 0, entity: null, isTraversible: true };
+    entityLocation.getCell = jest.fn(() => oldCell);
+    entityLocation.getCellAtDelta = jest.fn((dx, dy) => newCell);
+
+    const resultMovementCost = entityMovement.confirmMoveDeltas(1, 1);
+    expect(resultMovementCost).toBe(100);
+    expect(oldCell.entity).toBeUndefined();
+    expect(newCell.entity).toBe(entity);
+    expect(entityLocation.placeAtCell).toHaveBeenCalledWith(newCell);
+    expect(entity.determineVisibleCells).toHaveBeenCalled();
   });
 });

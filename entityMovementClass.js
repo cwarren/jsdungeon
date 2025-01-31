@@ -1,6 +1,4 @@
 import { devTrace } from "./util.js";
-// import { gameState } from "./gameStateClass.js";
-// import { determineCheapestMovementPath } from "./gridUtils.js";
 
 const DEFAULT_MOVEMENT_ACTION_COST = 100;
 const DEFAULT_MOVEMENT_SPEC = { movementType: "STATIONARY", actionCost: DEFAULT_MOVEMENT_ACTION_COST };
@@ -11,7 +9,8 @@ class EntityMovement {
         this.location = ofEntity.location;
         this.isRunning = false;
         this.runDelta = null;
-        this.movementSpec = movementSpec;
+        this.type = movementSpec.movementType;
+        this.actionCost = movementSpec.actionCost;
     }
 
     // MOVEMENT METHODS
@@ -40,6 +39,7 @@ class EntityMovement {
         devTrace(7, "checking if entity can move to cell", this.ofEntity, targetCell);
         return targetCell.isTraversible && !targetCell.entity;
     }
+
     canMoveToDeltas(dx, dy) {
         devTrace(7, `checking if entity can move to deltas ${dx},${dy}`, this);
         const targetCell = this.location.getCellAtDelta(dx, dy);
@@ -48,24 +48,25 @@ class EntityMovement {
     }
 
     confirmMove(targetCell) {
+        // console.log("confirmMove", targetCell);
         devTrace(6, "confirming move to cell", this.ofEntity, targetCell);
         const oldCell = this.location.getCell();
         oldCell.entity = undefined;
         this.location.placeAtCell(targetCell);
-        return this.movementSpec.actionCost;
+        return this.actionCost;
     }
     confirmMoveDeltas(dx, dy) {
-        devTrace(6, `confirming move to deltas ${dx},${dy}`, this);
+        devTrace(6, `confirming move to deltas ${dx},${dy}`, this.ofEntity);
         const oldCell = this.location.getCell();
         oldCell.entity = undefined;
         this.location.placeAtCell(this.location.getCellAtDelta(dx, dy));
-        return this.movementSpec.actionCost;
+        return this.actionCost;
     }
 
     // RUNNING METHODS
 
     canRunToDeltas(dx, dy) { // similar to canMoveTo, but more things will stop running
-        devTrace(7, `checking run to deltas ${dx},${dy}`, this);
+        devTrace(8, `checking run to deltas ${dx},${dy}`, this.ofEntity);
         const targetCell = this.location.getCellAtDelta(dx, dy);
         if (!targetCell) { return false; }
         if (!this.canMoveToCell(targetCell)) { return false; }
@@ -86,7 +87,7 @@ class EntityMovement {
         return true;
     }
     continueRunning() {
-        devTrace(7, 'continue running entity', this);
+        devTrace(7, 'continue running entity', this.ofEntity);
         if (!this.isRunning) return 0;
         if (!this.canRunToDeltas(this.runDelta.dx, this.runDelta.dy)) {
             this.stopRunning();
@@ -95,12 +96,12 @@ class EntityMovement {
         return this.confirmMoveDeltas(this.runDelta.dx, this.runDelta.dy); // confirmMoveDeltas actually does the move and returns the action cost
     }
     startRunning(deltas) {
-        devTrace(8, "starting running", this);
+        devTrace(5, "starting running", this);
         this.isRunning = true;
         this.runDelta = deltas;
     }
     stopRunning() {
-        devTrace(8, "stopping running", this);
+        devTrace(5, "stopping running", this);
         this.isRunning = false;
         this.runDelta = null;
     }

@@ -8,10 +8,9 @@ import { ENTITIES_DEFINITIONS } from "./entityDefinitions.js";
 import { addMessage } from "./uiUtil.js";
 import { EntityHealth } from "./entityHealthClass.js";
 import { EntityLocation } from "./entityLocationClass.js";
+import { EntityMovement } from "./entityMovementClass.js";
 
 const DEFAULT_ACTION_COST = 100;
-
-const DEFAULT_MOVEMENT = { movementType: "STATIONARY", actionCost: DEFAULT_ACTION_COST };
 
 class Entity {
 
@@ -38,9 +37,7 @@ class Entity {
       Entity.ENTITIES[type].naturalHealingTicks
     );
 
-    this.isRunning = false;
-    this.runDelta = null;
-    this.movement = Entity.ENTITIES[type].movementSpec || DEFAULT_MOVEMENT;
+    this.movement =  new EntityMovement(this, Entity.ENTITIES[type].movementSpec);
 
     this.destinationCell = null;
     this.movementPath = [];
@@ -83,8 +80,8 @@ class Entity {
   }
 
   determineVisibleCells() {
-    devTrace(7, `determine visible cells for ${this.type}`);
-    this.determineVisibleCellsInGrid(gameState.world[this.location.z].grid);
+    devTrace(5, `determine visible cells for ${this.type}`);
+    this.determineVisibleCellsInGrid(this.location.getWorldLevel().grid);
   }
 
   /**
@@ -93,7 +90,7 @@ class Entity {
     * @param {Array} grid - The grid representing the world level.
     */
   determineVisibleCellsInGrid(grid) {
-    devTrace(7, `determine visible cells in grid`, this, grid);
+    devTrace(5, `determine visible cells in grid`, this, grid);
     this.visibleCells = new Set();
     const worldWidth = grid.length;
     const worldHeight = grid[0].length;
@@ -149,11 +146,11 @@ class Entity {
     const adjacentsCost = this.dealWithAdjacentEntities();
     if (adjacentsCost > 0) { return adjacentsCost; }
 
-    if (this.movement.movementType == 'STATIONARY') { return this.movement.actionCost; }
+    if (this.movement.type == 'STATIONARY') { return this.movement.actionCost; }
 
-    if (this.movement.movementType == 'STEP_AIMLESS') { return this.moveStepAimless(); }
-    if (this.movement.movementType == 'WANDER_AIMLESS') { return this.moveWanderAimless(); }
-    if (this.movement.movementType == 'WANDER_AGGRESSIVE') { return this.moveWanderAggressive(); }
+    if (this.movement.type == 'STEP_AIMLESS') { return this.moveStepAimless(); }
+    if (this.movement.type == 'WANDER_AIMLESS') { return this.moveWanderAimless(); }
+    if (this.movement.type == 'WANDER_AGGRESSIVE') { return this.moveWanderAggressive(); }
 
     return actionTime;
   }
@@ -233,23 +230,25 @@ class Entity {
   // ACTIONS - MOVEMENT & LOCATION
 
   tryMove(dx, dy) {
-    devTrace(6, `${this.type} trying to move ${dx},${dy}`, this);
-    const targetCell = this.location.getCellAtDelta(dx, dy);
-    if (!targetCell) { return 0; }
-    if (this.canMoveToCell(targetCell)) {
-      return this.confirmMove(targetCell);
-    }
-    if (targetCell.entity) {
-      return this.handleAttemptedMoveIntoOccupiedCell(targetCell);
-    } else {
-      console.log("move prevented because target cell is not traversable", targetCell);
-      return 0;
-    }
+    return this.movement.tryMove(dx, dy);
+    // devTrace(6, `${this.type} trying to move ${dx},${dy}`, this);
+    // const targetCell = this.location.getCellAtDelta(dx, dy);
+    // if (!targetCell) { return 0; }
+    // if (this.canMoveToCell(targetCell)) {
+    //   return this.confirmMove(targetCell);
+    // }
+    // if (targetCell.entity) {
+    //   return this.handleAttemptedMoveIntoOccupiedCell(targetCell);
+    // } else {
+    //   console.log("move prevented because target cell is not traversable", targetCell);
+    //   return 0;
+    // }
   }
 
   tryMoveToCell(targetCell) {
-    const targetDeltas = this.location.getCell().getDeltaToOtherCell(targetCell);
-    return this.tryMove(targetDeltas.dx, targetDeltas.dy);
+    return this.movement.tryMoveToCell(targetCell);
+    // const targetDeltas = this.location.getCell().getDeltaToOtherCell(targetCell);
+    // return this.tryMove(targetDeltas.dx, targetDeltas.dy);
   }
 
   placeAt(x, y, z) {
@@ -261,75 +260,82 @@ class Entity {
   }
 
   canMoveToCell(cell) {
-    devTrace(7, "checking if entity can move to cell", this, cell);
-    return cell.isTraversible && !cell.entity;
+    return this.movement.canMoveToCell(cell);
+    // devTrace(7, "checking if entity can move to cell", this, cell);
+    // return cell.isTraversible && !cell.entity;
   }
   canMoveToDeltas(dx, dy) {
-    devTrace(7, `checking if entity can move to deltas ${dx},${dy}`, this);
-    const targetCell = this.location.getCellAtDelta(dx, dy);
-    if (!targetCell) { return false; }
-    return this.canMoveToCell(targetCell);
+    return this.movement.canMoveToDeltas(dx, dy);
+    // devTrace(7, `checking if entity can move to deltas ${dx},${dy}`, this);
+    // const targetCell = this.location.getCellAtDelta(dx, dy);
+    // if (!targetCell) { return false; }
+    // return this.canMoveToCell(targetCell);
   }
 
   confirmMove(newCell) {
-    devTrace(6, "confirming move to cell", this, newCell);
-    const oldCell = this.location.getCell();
-    oldCell.entity = undefined;
-    this.placeAtCell(newCell);
-    return this.movement.actionCost;
+    return this.movement.confirmMove(newCell);
+    // devTrace(6, "confirming move to cell", this, newCell);
+    // const oldCell = this.location.getCell();
+    // oldCell.entity = undefined;
+    // this.placeAtCell(newCell);
+    // return this.movement.actionCost;
   }
   confirmMoveDeltas(dx, dy) {
-    devTrace(6, `confirming move to deltas ${dx},${dy}`, this);
-    const oldCell = this.location.getCell();
-    oldCell.entity = undefined;
-    this.placeAtCell(this.location.getCellAtDelta(dx, dy));
-    return this.movement.actionCost;
+    return this.movement.confirmMoveDeltas(dx, dy);
+    // devTrace(6, `confirming move to deltas ${dx},${dy}`, this);
+    // const oldCell = this.location.getCell();
+    // oldCell.entity = undefined;
+    // this.placeAtCell(this.location.getCellAtDelta(dx, dy));
+    // return this.movement.actionCost;
   }
 
-  // ^^^^^^^^^
   startRunning(deltas) {
-    devTrace(8, "starting running", this);
-    this.isRunning = true;
-    this.runDelta = deltas;
+    this.movement.startRunning(deltas);
+    // devTrace(8, "starting running", this);
+    // this.isRunning = true;
+    // this.runDelta = deltas;
   }
-  // ^^^^^^^^^
+ 
   stopRunning() {
-    devTrace(8, "stopping running", this);
-    this.isRunning = false;
-    this.runDelta = null;
+    this.movement.stopRunning();
+    // devTrace(8, "stopping running", this);
+    // this.isRunning = false;
+    // this.runDelta = null;
   }
   canRunToDeltas(dx, dy) { // similar to canMoveTo, but more things will stop running
-    devTrace(7, `checking run to deltas ${dx},${dy}`, this);
-    const targetCell = this.location.getCellAtDelta(dx, dy);
-    if (!targetCell) { return false; }
-    if (!this.canMoveToCell(targetCell)) { return false; }
+    return this.movement.canRunToDeltas(dx, dy);
+    // devTrace(7, `checking run to deltas ${dx},${dy}`, this);
+    // const targetCell = this.location.getCellAtDelta(dx, dy);
+    // if (!targetCell) { return false; }
+    // if (!this.canMoveToCell(targetCell)) { return false; }
 
-    // if the destination can be moved to, there are still other conditions that may interrupt running
-    // NOTE: taking damage will also stop running, though that's handled in the damage taking method
-    const curCell = this.location.getCell();
-    const adjCells = curCell.getAdjacentCells();
+    // // if the destination can be moved to, there are still other conditions that may interrupt running
+    // // NOTE: taking damage will also stop running, though that's handled in the damage taking method
+    // const curCell = this.location.getCell();
+    // const adjCells = curCell.getAdjacentCells();
 
-    const hasAdjacentInterrupt = adjCells.some(cell =>
-      !(cell.structure === undefined || cell.structure == null) ||  // stop if adjacent to a structure
-      !(cell.entity === undefined || cell.entity == null) // stop if adjacent to a mob
-    );
-    if (hasAdjacentInterrupt) { return false; }
+    // const hasAdjacentInterrupt = adjCells.some(cell =>
+    //   !(cell.structure === undefined || cell.structure == null) ||  // stop if adjacent to a structure
+    //   !(cell.entity === undefined || cell.entity == null) // stop if adjacent to a mob
+    // );
+    // if (hasAdjacentInterrupt) { return false; }
 
-    // TODO: add check to stop running when at a corner
+    // // TODO: add check to stop running when at a corner
 
-    // TODO: add check to stop running when a mob is newly visible
+    // // TODO: add check to stop running when a mob is newly visible
 
-    return true;
+    // return true;
   }
   // ^^^^^^^^^
   continueRunning() {
-    devTrace(7, 'continue running entity', this);
-    if (!this.isRunning) return 0;
-    if (!this.canRunToDeltas(this.runDelta.dx, this.runDelta.dy)) {
-      this.stopRunning();
-      return 0;
-    }
-    return this.confirmMoveDeltas(this.runDelta.dx, this.runDelta.dy); // confirmMoveDeltas actually does the move and returns the action cost
+    return this.movement.continueRunning();
+    // devTrace(7, 'continue running entity', this);
+    // if (!this.isRunning) return 0;
+    // if (!this.canRunToDeltas(this.runDelta.dx, this.runDelta.dy)) {
+    //   this.stopRunning();
+    //   return 0;
+    // }
+    // return this.confirmMoveDeltas(this.runDelta.dx, this.runDelta.dy); // confirmMoveDeltas actually does the move and returns the action cost
   }
 
   // ------------------
@@ -347,7 +353,8 @@ class Entity {
 
     // If no destination, pick one and set the path
     if (!this.destinationCell || this.movementPath.length === 0) {
-      const grid = gameState.world[this.location.z].grid;
+      // const grid = gameState.world[this.location.z].grid;
+      const grid = this.location.getWorldLevel().grid;
       this.destinationCell = getRandomCellOfTerrainInGrid("FLOOR", grid); // NOTE: explicitly not a random empty cell!
       devTrace(4, `setting wandering destination`, this.destinationCell);
 
@@ -358,12 +365,11 @@ class Entity {
         }
       }
     }
-
-    // If there's a path, follow it
-    if (this.movementPath.length > 0) {
+    
+    if (this.movementPath.length > 0) { // If there's a path, follow it
       devTrace(5, `moving along movement path`, this.movementPath);
       const nextCell = this.movementPath.shift();  // Move to the next step in path
-      return this.tryMoveToCell(nextCell);
+      return this.movement.tryMoveToCell(nextCell);
     }
 
     return this.movement.actionCost;  // Default action cost if no valid move
@@ -377,7 +383,7 @@ class Entity {
 
     this.visibleCells.forEach(cell => {
       if (cell.entity && cell.entity !== this && ["HOSTILE_TO", "VIOLENT_TO"].includes(this.getRelationshipTo(cell.entity))) {
-        let dist = Math.abs(this.location.x - cell.x) + Math.abs(this.location.y - cell.y);
+        let dist = Math.abs(this.location.x - cell.x) + Math.abs(this.location.y - cell.y); // we only need relative distance for this, so manhattan is fine here
         if (dist < closestDistance) {
           closestHostile = cell.entity;
           closestDistance = dist;
@@ -396,7 +402,7 @@ class Entity {
 
     if (this.movementPath.length > 0) {
       const nextCell = this.movementPath.shift();
-      return this.tryMoveToCell(nextCell);
+      return this.movement.tryMoveToCell(nextCell);
     }
 
     return this.moveWanderAimless();

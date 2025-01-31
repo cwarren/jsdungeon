@@ -94,6 +94,7 @@ describe('TurnQueue', () => {
             type: 'test',
             setActionStartingTime: jest.fn(),
             takeTurn: jest.fn().mockReturnValue(10),
+            movement: { isRunning: false },
         };
         turnQueue.addEntity(entity, 5);
         const result = turnQueue.nextTurn();
