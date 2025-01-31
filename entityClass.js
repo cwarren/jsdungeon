@@ -66,7 +66,7 @@ class Entity {
 
   getAdjacentEntities() {
     devTrace(7, "getting entities adjacent to entity", this);
-    const adjCells = this.getAdjacentCells();
+    const adjCells = this.location.getAdjacentCells();
     const adjEntities = [];
     adjCells.forEach(cell => { if (cell.entity) { adjEntities.push(cell.entity); } });
     devTrace(5, "other entities adjacent to this entity", this, adjEntities);
@@ -236,7 +236,7 @@ class Entity {
     const currentLevel = gameState.world[this.location.z];
     if (!currentLevel) return;
 
-    const targetCell = this.getCellAtDelta(dx, dy);
+    const targetCell = this.location.getCellAtDelta(dx, dy);
     if (!targetCell) { return 0; }
     if (this.canMoveToCell(targetCell)) {
       return this.confirmMove(targetCell);
@@ -250,7 +250,7 @@ class Entity {
   }
 
   tryMoveToCell(targetCell) {
-    const targetDeltas = this.getCell().getDeltaToOtherCell(targetCell);
+    const targetDeltas = this.location.getCell().getDeltaToOtherCell(targetCell);
     return this.tryMove(targetDeltas.dx, targetDeltas.dy);
   }
 
@@ -270,23 +270,23 @@ class Entity {
     devTrace(7, `checking if entity can move to deltas ${dx},${dy}`, this);
     const currentLevel = gameState.world[this.location.z];
     if (!currentLevel) return false;
-    const targetCell = this.getCellAtDelta(dx, dy);
+    const targetCell = this.location.getCellAtDelta(dx, dy);
     if (!targetCell) { return false; }
     return this.canMoveToCell(targetCell);
   }
 
   confirmMove(newCell) {
     devTrace(6, "confirming move to cell", this, newCell);
-    const oldCell = this.getCell();
+    const oldCell = this.location.getCell();
     oldCell.entity = undefined;
     this.placeAtCell(newCell);
     return this.movement.actionCost;
   }
   confirmMoveDeltas(dx, dy) {
     devTrace(6, `confirming move to deltas ${dx},${dy}`, this);
-    const oldCell = this.getCell();
+    const oldCell = this.location.getCell();
     oldCell.entity = undefined;
-    this.placeAtCell(this.getCellAtDelta(dx, dy));
+    this.placeAtCell(this.location.getCellAtDelta(dx, dy));
     return this.movement.actionCost;
   }
 
@@ -304,13 +304,13 @@ class Entity {
   }
   canRunToDeltas(dx, dy) { // similar to canMoveTo, but more things will stop running
     devTrace(7, `checking run to deltas ${dx},${dy}`, this);
-    const targetCell = this.getCellAtDelta(dx, dy);
+    const targetCell = this.location.getCellAtDelta(dx, dy);
     if (!targetCell) { return false; }
     if (!this.canMoveToCell(targetCell)) { return false; }
 
     // if the destination can be moved to, there are still other conditions that may interrupt running
     // NOTE: taking damage will also stop running, though that's handled in the damage taking method
-    const curCell = this.getCell();
+    const curCell = this.location.getCell();
     const adjCells = curCell.getAdjacentCells();
 
     const hasAdjacentInterrupt = adjCells.some(cell =>
@@ -356,7 +356,7 @@ class Entity {
       devTrace(4, `setting wandering destination`, this.destinationCell);
 
       if (this.destinationCell) {
-        this.movementPath = determineCheapestMovementPath(this.getCell(), this.destinationCell, gameState.world[this.location.z]);
+        this.movementPath = determineCheapestMovementPath(this.location.getCell(), this.destinationCell, gameState.world[this.location.z]);
         if (this.movementPath.length > 0) {
           this.movementPath.shift(); // Remove starting cell to avoid stepping on self
         }
@@ -392,7 +392,7 @@ class Entity {
     if (closestHostile) {
       devTrace(4, `wander aggressive - targeting ${closestHostile.type}`, this, closestHostile);
       this.destinationCell = closestHostile.getCell();
-      this.movementPath = determineCheapestMovementPath(this.getCell(), this.destinationCell, gameState.world[this.location.z]);
+      this.movementPath = determineCheapestMovementPath(this.location.getCell(), this.destinationCell, gameState.world[this.location.z]);
       if (this.movementPath.length > 0) {
         this.movementPath.shift(); // Remove starting cell to avoid stepping on self
       }
