@@ -9,6 +9,7 @@ import { addMessage } from "./uiUtil.js";
 import { EntityHealth } from "./entityHealthClass.js";
 import { EntityLocation } from "./entityLocationClass.js";
 import { EntityMovement } from "./entityMovementClass.js";
+import { EntityVision } from "./entityVisionClass.js";
 
 const DEFAULT_ACTION_COST = 100;
 
@@ -20,16 +21,11 @@ class Entity {
     this.displaySymbol = Entity.ENTITIES[type].displaySymbol;
     this.displayColor = Entity.ENTITIES[type].displayColor;
 
-    this.location = new EntityLocation(this, -1, -1, -1); // placeholder values
-
-    this.viewRadius = Entity.ENTITIES[type].viewRadius;
-    this.visibleCells = new Set();
-    this.seenCells = new Set();
-
     this.baseActionCost = Entity.ENTITIES[type].baseActionCost || DEFAULT_ACTION_COST;
 
-    this.meleeAttack = Entity.ENTITIES[type].meleeAttack;
-
+    this.location = new EntityLocation(this, -1, -1, -1); // placeholder values for initial location
+    this.vision = new EntityVision(this, Entity.ENTITIES[type].viewRadius);
+    this.movement =  new EntityMovement(this, Entity.ENTITIES[type].movementSpec);
     this.health = new EntityHealth(
       this,
       rollDice(Entity.ENTITIES[type].initialHealthRoll),
@@ -37,12 +33,15 @@ class Entity {
       Entity.ENTITIES[type].naturalHealingTicks
     );
 
-    this.movement =  new EntityMovement(this, Entity.ENTITIES[type].movementSpec);
+    this.meleeAttack = Entity.ENTITIES[type].meleeAttack;
 
+    // used in movement AI / movement type implementations
     this.destinationCell = null;
     this.movementPath = [];
 
+    // used in combat AI and for relationship stuff
     this.damagedBy = []; // array of {damageSource, damage}
+
     this.baseKillPoints = 10; // worth this many advancement points when killed
     this.currentAdvancementPoints = 0;
 
@@ -75,54 +74,15 @@ class Entity {
   // VISION
 
   isVisibleTo(otherEntity) {
-    devTrace(7, "checking if this is visible to entity", this, otherEntity);
-    return otherEntity.visibleCells.has(gameState.world[this.location.z].grid[this.location.x][this.location.y]);
+    return this.vision.isVisibleToEntity(otherEntity);
+  }
+
+  canSeeEntity(otherEntity) {
+    return this.vision.canSeeEntity(otherEntity);
   }
 
   determineVisibleCells() {
-    devTrace(7, `determine visible cells for ${this.type}`);
-    this.determineVisibleCellsInGrid(this.location.getWorldLevel().grid);
-  }
-
-  /**
-    * Determines visible cells within the grid using line-of-sight and view radius.
-    * Uses Bresenham’s line algorithm for visibility checking.
-    * @param {Array} grid - The grid representing the world level.
-    */
-  determineVisibleCellsInGrid(grid) {
-    devTrace(8, `determine visible cells in grid`, this, grid);
-    this.visibleCells = new Set();
-    const worldWidth = grid.length;
-    const worldHeight = grid[0].length;
-
-    for (let dx = -this.viewRadius; dx <= this.viewRadius; dx++) {
-      for (let dy = -this.viewRadius; dy <= this.viewRadius; dy++) {
-        let targetX = this.location.x + dx;
-        let targetY = this.location.y + dy;
-
-        if (targetX < 0 || targetX >= worldWidth || targetY < 0 || targetY >= worldHeight) {
-          continue; // Skip out-of-bounds cells
-        }
-
-        let distanceSquared = dx * dx + dy * dy;
-        if (distanceSquared > this.viewRadius * this.viewRadius) {
-          continue; // Skip cells outside the circular view radius
-        }
-
-        let linePoints = computeBresenhamLine(this.location.x, this.location.y, targetX, targetY);
-        let obstructed = false;
-
-        for (let [lx, ly] of linePoints) {
-          let cell = grid[lx][ly];
-          this.visibleCells.add(cell);
-          this.seenCells.add(cell);
-          if (cell.isOpaque) {
-            obstructed = true;
-            break; // Stop tracing further along this line
-          }
-        }
-      }
-    }
+    return this.vision.determineVisibleCells();
   }
 
   //======================================================================
@@ -314,7 +274,7 @@ class Entity {
     let closestHostile = null;
     let closestDistance = Infinity;
 
-    this.visibleCells.forEach(cell => {
+    this.vision.visibleCells.forEach(cell => {
       if (cell.entity && cell.entity !== this && ["HOSTILE_TO", "VIOLENT_TO"].includes(this.getRelationshipTo(cell.entity))) {
         let dist = Math.abs(this.location.x - cell.x) + Math.abs(this.location.y - cell.y); // we only need relative distance for this, so manhattan is fine here
         if (dist < closestDistance) {
@@ -418,8 +378,8 @@ class Entity {
     addMessage(`${this.name} dies`);
 
     this.damagedBy = [];
-    this.visibleCells.clear();
-    this.seenCells.clear();
+    this.vision.visibleCells.clear();
+    this.vision.seenCells.clear();
   }
 
   // get proportional responsibility for damage dealt to this entity

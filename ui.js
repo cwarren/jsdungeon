@@ -198,9 +198,9 @@ function drawWorldLevelGrid(worldLevel) {
         for (let row = 0; row < worldLevel.levelHeight; row++) {   
             // console.log(`drawing cell at ${col}, ${row}`, worldLevel.grid[col][row]);
             const cell = worldLevel.grid[col][row];
-            if (gameState.avatar.visibleCells.has(cell)) {
+            if (gameState.avatar.vision.visibleCells.has(cell)) {
                 drawGridCell(cell, offsetX, offsetY, cellSize, gridSpacing);
-            } else if (gameState.avatar.seenCells.has(cell)) {
+            } else if (gameState.avatar.vision.seenCells.has(cell)) {
                 drawGridCellFaint(cell, offsetX, offsetY, cellSize, gridSpacing);
             }
         }
@@ -217,7 +217,7 @@ function drawWorldLevelStructures(worldLevel) {
   // Draw all structures in the level
   worldLevel.levelStructures.forEach(structure => {
     const structureCell = structure.getCell();
-    if (gameState.avatar.visibleCells.has(structureCell) || gameState.avatar.seenCells.has(structureCell)) {
+    if (gameState.avatar.vision.visibleCells.has(structureCell) || gameState.avatar.vision.seenCells.has(structureCell)) {
       drawStructureInWorldLevel(structure, offsetX, offsetY, cellSize, gridSpacing);
     }
   });
