@@ -80,7 +80,7 @@ class Entity {
   }
 
   determineVisibleCells() {
-    devTrace(5, `determine visible cells for ${this.type}`);
+    devTrace(7, `determine visible cells for ${this.type}`);
     this.determineVisibleCellsInGrid(this.location.getWorldLevel().grid);
   }
 
@@ -90,7 +90,7 @@ class Entity {
     * @param {Array} grid - The grid representing the world level.
     */
   determineVisibleCellsInGrid(grid) {
-    devTrace(5, `determine visible cells in grid`, this, grid);
+    devTrace(8, `determine visible cells in grid`, this, grid);
     this.visibleCells = new Set();
     const worldWidth = grid.length;
     const worldHeight = grid[0].length;
@@ -147,7 +147,6 @@ class Entity {
     if (adjacentsCost > 0) { return adjacentsCost; }
 
     if (this.movement.type == 'STATIONARY') { return this.movement.actionCost; }
-
     if (this.movement.type == 'STEP_AIMLESS') { return this.moveStepAimless(); }
     if (this.movement.type == 'WANDER_AIMLESS') { return this.moveWanderAimless(); }
     if (this.movement.type == 'WANDER_AGGRESSIVE') { return this.moveWanderAggressive(); }
@@ -231,24 +230,10 @@ class Entity {
 
   tryMove(dx, dy) {
     return this.movement.tryMove(dx, dy);
-    // devTrace(6, `${this.type} trying to move ${dx},${dy}`, this);
-    // const targetCell = this.location.getCellAtDelta(dx, dy);
-    // if (!targetCell) { return 0; }
-    // if (this.canMoveToCell(targetCell)) {
-    //   return this.confirmMove(targetCell);
-    // }
-    // if (targetCell.entity) {
-    //   return this.handleAttemptedMoveIntoOccupiedCell(targetCell);
-    // } else {
-    //   console.log("move prevented because target cell is not traversable", targetCell);
-    //   return 0;
-    // }
   }
 
   tryMoveToCell(targetCell) {
     return this.movement.tryMoveToCell(targetCell);
-    // const targetDeltas = this.location.getCell().getDeltaToOtherCell(targetCell);
-    // return this.tryMove(targetDeltas.dx, targetDeltas.dy);
   }
 
   placeAt(x, y, z) {
@@ -261,81 +246,30 @@ class Entity {
 
   canMoveToCell(cell) {
     return this.movement.canMoveToCell(cell);
-    // devTrace(7, "checking if entity can move to cell", this, cell);
-    // return cell.isTraversible && !cell.entity;
   }
   canMoveToDeltas(dx, dy) {
     return this.movement.canMoveToDeltas(dx, dy);
-    // devTrace(7, `checking if entity can move to deltas ${dx},${dy}`, this);
-    // const targetCell = this.location.getCellAtDelta(dx, dy);
-    // if (!targetCell) { return false; }
-    // return this.canMoveToCell(targetCell);
   }
 
   confirmMove(newCell) {
     return this.movement.confirmMove(newCell);
-    // devTrace(6, "confirming move to cell", this, newCell);
-    // const oldCell = this.location.getCell();
-    // oldCell.entity = undefined;
-    // this.placeAtCell(newCell);
-    // return this.movement.actionCost;
   }
   confirmMoveDeltas(dx, dy) {
     return this.movement.confirmMoveDeltas(dx, dy);
-    // devTrace(6, `confirming move to deltas ${dx},${dy}`, this);
-    // const oldCell = this.location.getCell();
-    // oldCell.entity = undefined;
-    // this.placeAtCell(this.location.getCellAtDelta(dx, dy));
-    // return this.movement.actionCost;
   }
 
   startRunning(deltas) {
     this.movement.startRunning(deltas);
-    // devTrace(8, "starting running", this);
-    // this.isRunning = true;
-    // this.runDelta = deltas;
   }
  
   stopRunning() {
     this.movement.stopRunning();
-    // devTrace(8, "stopping running", this);
-    // this.isRunning = false;
-    // this.runDelta = null;
   }
   canRunToDeltas(dx, dy) { // similar to canMoveTo, but more things will stop running
     return this.movement.canRunToDeltas(dx, dy);
-    // devTrace(7, `checking run to deltas ${dx},${dy}`, this);
-    // const targetCell = this.location.getCellAtDelta(dx, dy);
-    // if (!targetCell) { return false; }
-    // if (!this.canMoveToCell(targetCell)) { return false; }
-
-    // // if the destination can be moved to, there are still other conditions that may interrupt running
-    // // NOTE: taking damage will also stop running, though that's handled in the damage taking method
-    // const curCell = this.location.getCell();
-    // const adjCells = curCell.getAdjacentCells();
-
-    // const hasAdjacentInterrupt = adjCells.some(cell =>
-    //   !(cell.structure === undefined || cell.structure == null) ||  // stop if adjacent to a structure
-    //   !(cell.entity === undefined || cell.entity == null) // stop if adjacent to a mob
-    // );
-    // if (hasAdjacentInterrupt) { return false; }
-
-    // // TODO: add check to stop running when at a corner
-
-    // // TODO: add check to stop running when a mob is newly visible
-
-    // return true;
   }
-  // ^^^^^^^^^
   continueRunning() {
     return this.movement.continueRunning();
-    // devTrace(7, 'continue running entity', this);
-    // if (!this.isRunning) return 0;
-    // if (!this.canRunToDeltas(this.runDelta.dx, this.runDelta.dy)) {
-    //   this.stopRunning();
-    //   return 0;
-    // }
-    // return this.confirmMoveDeltas(this.runDelta.dx, this.runDelta.dy); // confirmMoveDeltas actually does the move and returns the action cost
   }
 
   // ------------------
@@ -353,7 +287,6 @@ class Entity {
 
     // If no destination, pick one and set the path
     if (!this.destinationCell || this.movementPath.length === 0) {
-      // const grid = gameState.world[this.location.z].grid;
       const grid = this.location.getWorldLevel().grid;
       this.destinationCell = getRandomCellOfTerrainInGrid("FLOOR", grid); // NOTE: explicitly not a random empty cell!
       devTrace(4, `setting wandering destination`, this.destinationCell);
