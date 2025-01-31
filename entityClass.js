@@ -41,6 +41,7 @@ class Entity {
     this.isRunning = false;
     this.runDelta = null;
     this.movement = Entity.ENTITIES[type].movementSpec || DEFAULT_MOVEMENT;
+
     this.destinationCell = null;
     this.movementPath = [];
 
@@ -337,7 +338,7 @@ class Entity {
   moveStepAimless() { // random dir, may bump into walls and such
     devTrace(5, `move aimless for ${this.type}`);
     const randomDir = getRandomListItem(GridCell.ADJACENCY_DIRECTIONS);
-    return this.tryMove(randomDir.dx, randomDir.dy);
+    return this.movement.tryMove(randomDir.dx, randomDir.dy);
   }
 
 
