@@ -54,28 +54,14 @@ class Entity {
   //======================================================================
   // INSPECTION & INFORMATION
 
-  // vvvvvvvvvvvvvvvvv
   getCell() {
-    devTrace(6, "getting cell for entity", this);
-    return gameState.world[this.location.z].grid[this.location.x][this.location.y];
+    return this.location.getCell();
   }
-  // vvvvvvvvvvvvvvvvv
   getCellAtDelta(dx, dy) {
-    devTrace(6, `getting cell at delta ${dx},${dy} for entity`, this);
-    const currentLevel = gameState.world[this.location.z];
-    if (!currentLevel) { return null };
-    const newX = this.location.x + dx;
-    const newY = this.location.y + dy;
-    if (newX >= 0 && newX < currentLevel.levelWidth && newY >= 0 && newY < currentLevel.levelHeight) {
-      return currentLevel.grid[newX][newY];
-    }
-    return null;
+    return this.location.getCellAtDelta(dx, dy);
   }
-
-  // vvvvvvvvvvvvvvvvv
   getAdjacentCells() {
-    devTrace(8, "getting cells adjacent to entity", this);
-    return this.getCell().getAdjacentCells();
+    return this.location.getAdjacentCells();
   }
 
   getAdjacentEntities() {
@@ -268,25 +254,12 @@ class Entity {
     return this.tryMove(targetDeltas.dx, targetDeltas.dy);
   }
 
-  // vvvvvvvvvvvvvvvvv
   placeAt(x, y, z) {
-    devTrace(5, `placing at location ${x} ${y} ${z}`, this);
-    return placeAtCell(gameState.world[z ? z : 0].grid[x][y]);
+    return this.location.placeAt(x, y, z);
   }
 
-  // vvvvvvvvvvvvvvvvv
   placeAtCell(cell) {
-    devTrace(5, `placing at cell ${cell.x} ${cell.y} ${cell.z}`, this, cell);
-    if (cell.entity) {
-      console.log("cannot place entity in occupied cell", this, cell);
-      return false;
-    }
-    this.location.x = cell.x;
-    this.location.y = cell.y;
-    this.location.z = cell.z;
-    cell.entity = this;
-    this.determineVisibleCells();
-    return true;
+    return this.location.placeAtCell(cell);
   }
 
   canMoveToCell(cell) {
