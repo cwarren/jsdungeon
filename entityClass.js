@@ -7,6 +7,7 @@ import { getRandomCellOfTerrainInGrid, determineCheapestMovementPath, computeBre
 import { ENTITIES_DEFINITIONS } from "./entityDefinitions.js";
 import { addMessage } from "./uiUtil.js";
 import { EntityHealth } from "./entityHealthClass.js";
+import { EntityLocation } from "./entityLocationClass.js";
 
 const DEFAULT_ACTION_COST = 100;
 
@@ -19,15 +20,16 @@ class Entity {
     this.name = Entity.ENTITIES[type].name;
     this.displaySymbol = Entity.ENTITIES[type].displaySymbol;
     this.displayColor = Entity.ENTITIES[type].displayColor;
+
+    this.location = new EntityLocation(this, -1, -1, -1); // placeholder values
+
     this.viewRadius = Entity.ENTITIES[type].viewRadius;
     this.visibleCells = new Set();
     this.seenCells = new Set();
 
     this.baseActionCost = Entity.ENTITIES[type].baseActionCost || DEFAULT_ACTION_COST;
-    this.meleeAttack = Entity.ENTITIES[type].meleeAttack;
 
-    this.isRunning = false;
-    this.runDelta = null;
+    this.meleeAttack = Entity.ENTITIES[type].meleeAttack;
 
     this.health = new EntityHealth(
       this,
@@ -36,7 +38,9 @@ class Entity {
       Entity.ENTITIES[type].naturalHealingTicks
     );
 
-    this.movement = Entity.ENTITIES[type].movement || DEFAULT_MOVEMENT;
+    this.isRunning = false;
+    this.runDelta = null;
+    this.movement = Entity.ENTITIES[type].movementSpec || DEFAULT_MOVEMENT;
     this.destinationCell = null;
     this.movementPath = [];
 
@@ -50,22 +54,25 @@ class Entity {
   //======================================================================
   // INSPECTION & INFORMATION
 
+  // vvvvvvvvvvvvvvvvv
   getCell() {
     devTrace(6, "getting cell for entity", this);
-    return gameState.world[this.z].grid[this.x][this.y];
+    return gameState.world[this.location.z].grid[this.location.x][this.location.y];
   }
+  // vvvvvvvvvvvvvvvvv
   getCellAtDelta(dx, dy) {
     devTrace(6, `getting cell at delta ${dx},${dy} for entity`, this);
-    const currentLevel = gameState.world[this.z];
+    const currentLevel = gameState.world[this.location.z];
     if (!currentLevel) { return null };
-    const newX = this.x + dx;
-    const newY = this.y + dy;
+    const newX = this.location.x + dx;
+    const newY = this.location.y + dy;
     if (newX >= 0 && newX < currentLevel.levelWidth && newY >= 0 && newY < currentLevel.levelHeight) {
       return currentLevel.grid[newX][newY];
     }
     return null;
   }
 
+  // vvvvvvvvvvvvvvvvv
   getAdjacentCells() {
     devTrace(8, "getting cells adjacent to entity", this);
     return this.getCell().getAdjacentCells();
@@ -85,12 +92,12 @@ class Entity {
 
   isVisibleTo(otherEntity) {
     devTrace(7, "checking if this is visible to entity", this, otherEntity);
-    return otherEntity.visibleCells.has(gameState.world[this.z].grid[this.x][this.y]);
+    return otherEntity.visibleCells.has(gameState.world[this.location.z].grid[this.location.x][this.location.y]);
   }
 
   determineVisibleCells() {
     devTrace(7, `determine visible cells for ${this.type}`);
-    this.determineVisibleCellsInGrid(gameState.world[this.z].grid);
+    this.determineVisibleCellsInGrid(gameState.world[this.location.z].grid);
   }
 
   /**
@@ -106,8 +113,8 @@ class Entity {
 
     for (let dx = -this.viewRadius; dx <= this.viewRadius; dx++) {
       for (let dy = -this.viewRadius; dy <= this.viewRadius; dy++) {
-        let targetX = this.x + dx;
-        let targetY = this.y + dy;
+        let targetX = this.location.x + dx;
+        let targetY = this.location.y + dy;
 
         if (targetX < 0 || targetX >= worldWidth || targetY < 0 || targetY >= worldHeight) {
           continue; // Skip out-of-bounds cells
@@ -118,7 +125,7 @@ class Entity {
           continue; // Skip cells outside the circular view radius
         }
 
-        let linePoints = computeBresenhamLine(this.x, this.y, targetX, targetY);
+        let linePoints = computeBresenhamLine(this.location.x, this.location.y, targetX, targetY);
         let obstructed = false;
 
         for (let [lx, ly] of linePoints) {
@@ -208,6 +215,24 @@ class Entity {
     return 0;
   }
 
+  handleAttemptedMoveIntoOccupiedCell(targetCell) {
+    devTrace(6, `${this.type} trying to move into occupied cell`, targetCell);
+    const defaultAction = this.getDefaultActionFor(targetCell.entity);
+    if (defaultAction == 'ATTACK') {
+      return this.doMeleeAttackOn(targetCell.entity);
+    }
+    if (defaultAction == 'BUMP') {
+      console.log("move prevented because target cell is already occupied", targetCell);
+      return 0;
+    }
+    if (defaultAction == 'SWAP') {
+      console.log("SWAP ACTION NOT YET IMPLEMENTED", targetCell);
+      return 0;
+    }
+    console.log(`unknown action ${defaultAction}, doing nothing`);
+    return 0;
+  }
+
   //======================================================================
   // ACTIONS
   // IMPORTANT!!!!
@@ -222,7 +247,7 @@ class Entity {
 
   tryMove(dx, dy) {
     devTrace(6, `${this.type} trying to move ${dx},${dy}`, this);
-    const currentLevel = gameState.world[this.z];
+    const currentLevel = gameState.world[this.location.z];
     if (!currentLevel) return;
 
     const targetCell = this.getCellAtDelta(dx, dy);
@@ -231,20 +256,7 @@ class Entity {
       return this.confirmMove(targetCell);
     }
     if (targetCell.entity) {
-      const defaultAction = this.getDefaultActionFor(targetCell.entity);
-      if (defaultAction == 'ATTACK') {
-        return this.doMeleeAttackOn(targetCell.entity);
-      }
-      if (defaultAction == 'BUMP') {
-        console.log("move prevented because target cell is already occupied", targetCell);
-        return 0;
-      }
-      if (defaultAction == 'SWAP') {
-        console.log("SWAP ACTION NOT YET IMPLEMENTED", targetCell);
-        return 0;
-      }
-      console.log(`unknown action ${defaultAction}, doing nothing`);
-      return 0;
+      return this.handleAttemptedMoveIntoOccupiedCell(targetCell);
     } else {
       console.log("move prevented because target cell is not traversable", targetCell);
       return 0;
@@ -256,20 +268,22 @@ class Entity {
     return this.tryMove(targetDeltas.dx, targetDeltas.dy);
   }
 
+  // vvvvvvvvvvvvvvvvv
   placeAt(x, y, z) {
     devTrace(5, `placing at location ${x} ${y} ${z}`, this);
     return placeAtCell(gameState.world[z ? z : 0].grid[x][y]);
   }
 
+  // vvvvvvvvvvvvvvvvv
   placeAtCell(cell) {
     devTrace(5, `placing at cell ${cell.x} ${cell.y} ${cell.z}`, this, cell);
     if (cell.entity) {
       console.log("cannot place entity in occupied cell", this, cell);
       return false;
     }
-    this.x = cell.x;
-    this.y = cell.y;
-    this.z = cell.z;
+    this.location.x = cell.x;
+    this.location.y = cell.y;
+    this.location.z = cell.z;
     cell.entity = this;
     this.determineVisibleCells();
     return true;
@@ -281,7 +295,7 @@ class Entity {
   }
   canMoveToDeltas(dx, dy) {
     devTrace(7, `checking if entity can move to deltas ${dx},${dy}`, this);
-    const currentLevel = gameState.world[this.z];
+    const currentLevel = gameState.world[this.location.z];
     if (!currentLevel) return false;
     const targetCell = this.getCellAtDelta(dx, dy);
     if (!targetCell) { return false; }
@@ -303,11 +317,13 @@ class Entity {
     return this.movement.actionCost;
   }
 
+  // ^^^^^^^^^
   startRunning(deltas) {
     devTrace(8, "starting running", this);
     this.isRunning = true;
     this.runDelta = deltas;
   }
+  // ^^^^^^^^^
   stopRunning() {
     devTrace(8, "stopping running", this);
     this.isRunning = false;
@@ -336,6 +352,7 @@ class Entity {
 
     return true;
   }
+  // ^^^^^^^^^
   continueRunning() {
     devTrace(7, 'continue running entity', this);
     if (!this.isRunning) return 0;
@@ -361,12 +378,12 @@ class Entity {
 
     // If no destination, pick one and set the path
     if (!this.destinationCell || this.movementPath.length === 0) {
-      const grid = gameState.world[this.z].grid;
+      const grid = gameState.world[this.location.z].grid;
       this.destinationCell = getRandomCellOfTerrainInGrid("FLOOR", grid); // NOTE: explicitly not a random empty cell!
       devTrace(4, `setting wandering destination`, this.destinationCell);
 
       if (this.destinationCell) {
-        this.movementPath = determineCheapestMovementPath(this.getCell(), this.destinationCell, gameState.world[this.z]);
+        this.movementPath = determineCheapestMovementPath(this.getCell(), this.destinationCell, gameState.world[this.location.z]);
         if (this.movementPath.length > 0) {
           this.movementPath.shift(); // Remove starting cell to avoid stepping on self
         }
@@ -391,7 +408,7 @@ class Entity {
 
     this.visibleCells.forEach(cell => {
       if (cell.entity && cell.entity !== this && ["HOSTILE_TO", "VIOLENT_TO"].includes(this.getRelationshipTo(cell.entity))) {
-        let dist = Math.abs(this.x - cell.x) + Math.abs(this.y - cell.y);
+        let dist = Math.abs(this.location.x - cell.x) + Math.abs(this.location.y - cell.y);
         if (dist < closestDistance) {
           closestHostile = cell.entity;
           closestDistance = dist;
@@ -402,7 +419,7 @@ class Entity {
     if (closestHostile) {
       devTrace(4, `wander aggressive - targeting ${closestHostile.type}`, this, closestHostile);
       this.destinationCell = closestHostile.getCell();
-      this.movementPath = determineCheapestMovementPath(this.getCell(), this.destinationCell, gameState.world[this.z]);
+      this.movementPath = determineCheapestMovementPath(this.getCell(), this.destinationCell, gameState.world[this.location.z]);
       if (this.movementPath.length > 0) {
         this.movementPath.shift(); // Remove starting cell to avoid stepping on self
       }
@@ -488,7 +505,7 @@ class Entity {
       }
     });
 
-    gameState.world[this.z].removeEntity(this);
+    gameState.world[this.location.z].removeEntity(this);
     addMessage(`${this.name} dies`);
 
     this.damagedBy = [];

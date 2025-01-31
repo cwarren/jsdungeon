@@ -248,8 +248,8 @@ function drawEntityInWorldLevel(entity, offsetX, offsetY, cellSize, gridSpacing)
   ctx.textBaseline = "middle";
   ctx.fillText(
     entity.displaySymbol,
-    offsetX + entity.x * (cellSize + gridSpacing) + cellSize / 2,
-    offsetY + entity.y * (cellSize + gridSpacing) + cellSize / 2
+    offsetX + entity.location.x * (cellSize + gridSpacing) + cellSize / 2,
+    offsetY + entity.location.y * (cellSize + gridSpacing) + cellSize / 2
   );
 }
 
@@ -322,7 +322,7 @@ canvas.addEventListener("click", (event) => {
     
         // Check if the avatar is in the clicked cell
         const avatar = gameState.avatar;
-        if (avatar.x === col && avatar.y === row && avatar.z === currentLevel.levelNumber) {
+        if (avatar.location.x === col && avatar.location.y === row && avatar.location.z === currentLevel.levelNumber) {
             console.log("Avatar is in the clicked cell:", avatar);
             avatarMovementPath = []; // Reset movement path if clicking the avatar's cell
         } else {
