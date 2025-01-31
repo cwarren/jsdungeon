@@ -14,7 +14,7 @@ describe('EntityHealth', () => {
 
   test('should initialize with correct values', () => {
     expect(entityHealth.maxHealth).toBe(100);
-    expect(entityHealth.health).toBe(100);
+    expect(entityHealth.curHealth).toBe(100);
     expect(entityHealth.naturalHealingRate).toBe(0.001);
     expect(entityHealth.naturalHealingTicks).toBe(250);
   });
@@ -25,7 +25,7 @@ describe('EntityHealth', () => {
 
   test('should take damage correctly', () => {
     entityHealth.takeDamage(30);
-    expect(entityHealth.health).toBe(70);
+    expect(entityHealth.curHealth).toBe(70);
   });
 
   test('should throw error for negative damage', () => {
@@ -35,7 +35,7 @@ describe('EntityHealth', () => {
   test('should heal correctly', () => {
     entityHealth.takeDamage(30);
     entityHealth.heal(20);
-    expect(entityHealth.health).toBe(90);
+    expect(entityHealth.curHealth).toBe(90);
   });
 
   test('should throw error for negative heal amount', () => {
@@ -44,25 +44,25 @@ describe('EntityHealth', () => {
 
   test('should not heal beyond max health', () => {
     entityHealth.heal(20);
-    expect(entityHealth.health).toBe(100);
+    expect(entityHealth.curHealth).toBe(100);
   });
 
   test('should heal naturally over time', () => {
     entityHealth.takeDamage(50);
     entityHealth.healNaturally(DEFAULT_NATURAL_HEALING_TICKS);
-    expect(entityHealth.health).toBeCloseTo(50.1, 2); // 100 - 50 + (0.001 * 100 * 1)
+    expect(entityHealth.curHealth).toBeCloseTo(50.1, 2); // 100 - 50 + (0.001 * 100 * 1)
   });
 
   test('should heal naturally over multiple intervals', () => {
     entityHealth.takeDamage(50);
     entityHealth.healNaturally(2 * DEFAULT_NATURAL_HEALING_TICKS);
-    expect(entityHealth.health).toBeCloseTo(50.2, 2); // 100 - 50 + (0.001 * 100 * 2)
+    expect(entityHealth.curHealth).toBeCloseTo(50.2, 2); // 100 - 50 + (0.001 * 100 * 2)
   });
 
   test('should not heal if not enough time has passed', () => {
     entityHealth.takeDamage(50);
     entityHealth.healNaturally(100);
-    expect(entityHealth.health).toBe(50); // No healing should occur
+    expect(entityHealth.curHealth).toBe(50); // No healing should occur
   });
 
   test('should update lastNaturalHealTime correctly', () => {

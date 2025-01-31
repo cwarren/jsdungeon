@@ -17,7 +17,7 @@ class EntityHealth {
     }
     this.ofEntity = ofEntity;
     this.maxHealth = maxHealth;
-    this.health = this.maxHealth;
+    this.curHealth = this.maxHealth;
     this.naturalHealingRate = naturalHealingRate;
     this.naturalHealingTicks = naturalHealingTicks;
     this.lastNaturalHealTime = 0;
@@ -31,7 +31,7 @@ class EntityHealth {
     if (damageAmount < 0) {
       throw new Error("Damage must be a non-negative value");
     }
-    this.health = Math.max(this.health - damageAmount, 0);
+    this.curHealth = Math.max(this.curHealth - damageAmount, 0);
   }
 
   /**
@@ -42,7 +42,7 @@ class EntityHealth {
     if (amount < 0) {
       throw new Error("Heal amount must be a non-negative value");
     }
-    this.health = Math.min(this.health + amount, this.maxHealth);
+    this.curHealth = Math.min(this.curHealth + amount, this.maxHealth);
   }
 
   /**
@@ -52,12 +52,12 @@ class EntityHealth {
   healNaturally(currentTime) {
     devTrace(6, "healNaturally for entity", this.ofEntity);
     const enoughTimePassed = (currentTime - this.lastNaturalHealTime) >= this.naturalHealingTicks;
-    const anythingToHeal = this.health < this.maxHealth;
+    const anythingToHeal = this.curHealth < this.maxHealth;
     const healingCount = Math.floor((currentTime - this.lastNaturalHealTime) / this.naturalHealingTicks);
     if (enoughTimePassed && anythingToHeal) {
       const healAmt = healingCount * (this.naturalHealingRate * this.maxHealth);
       devTrace(5, `natural healing occurs for ${this.ofEntity.type} at ${currentTime} based on last natural healing time ${this.lastNaturalHealTime}, heal count of ${healingCount} restoring ${healAmt}`, this);
-      this.health = constrainValue(this.health + healAmt, 0, this.maxHealth);
+      this.curHealth = constrainValue(this.curHealth + healAmt, 0, this.maxHealth);
       // addMessage(`Natural healing of ${healAmt} for ${this.name}`);
     }
     if (enoughTimePassed) {
@@ -70,7 +70,7 @@ class EntityHealth {
    * @returns {boolean} True if the entity is alive, false otherwise.
    */
   isAlive() {
-    return this.health > 0;
+    return this.curHealth > 0;
   }
 
   /**
@@ -79,7 +79,7 @@ class EntityHealth {
    */
   getHealthStatus() {
     return {
-      currentHealth: this.health,
+      currentHealth: this.curHealth,
       maxHealth: this.maxHealth,
     };
   }

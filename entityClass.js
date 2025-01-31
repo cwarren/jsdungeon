@@ -6,9 +6,9 @@ import { GridCell } from "./gridCellClass.js";
 import { getRandomCellOfTerrainInGrid, determineCheapestMovementPath, computeBresenhamLine } from "./gridUtils.js";
 import { ENTITIES_DEFINITIONS } from "./entityDefinitions.js";
 import { addMessage } from "./uiUtil.js";
+import { EntityHealth } from "./entityHealthClass.js";
 
 const DEFAULT_ACTION_COST = 100;
-const DEFAULT_NATURAL_HEALING_TICKS = 250;
 
 const DEFAULT_MOVEMENT = { movementType: "STATIONARY", actionCost: DEFAULT_ACTION_COST };
 
@@ -29,23 +29,23 @@ class Entity {
     this.isRunning = false;
     this.runDelta = null;
 
-    this.initialHealth = rollDice(Entity.ENTITIES[type].initialHealthRoll);
-    this.health = this.initialHealth;
-    this.naturalHealingRate = Entity.ENTITIES[type].naturalHealingRate;
-    this.naturalHealingTicks = Entity.ENTITIES[type].naturalHealingTicks ? Entity.ENTITIES[type].naturalHealingTicks : DEFAULT_NATURAL_HEALING_TICKS;
-    this.damagedBy = []; // array of {damageSource, damage}
+    this.health = new EntityHealth(
+      this,
+      rollDice(Entity.ENTITIES[type].initialHealthRoll),
+      Entity.ENTITIES[type].naturalHealingRate,
+      Entity.ENTITIES[type].naturalHealingTicks
+    );
 
     this.movement = Entity.ENTITIES[type].movement || DEFAULT_MOVEMENT;
     this.destinationCell = null;
     this.movementPath = [];
 
+    this.damagedBy = []; // array of {damageSource, damage}
     this.baseKillPoints = 10; // worth this many advancement points when killed
     this.currentAdvancementPoints = 0;
 
     this.actionStartingTime = 0;
-    this.lastNaturalHealTime = 0;
   }
-
 
   //======================================================================
   // INSPECTION & INFORMATION
@@ -455,8 +455,8 @@ class Entity {
 
   takeDamageFrom(dam, otherEntity) {
     devTrace(4, "taking attack damage from entity", this, dam, otherEntity);
-    dam.amount = constrainValue(dam.amount, 0, this.health + 1);
-    this.health -= dam.amount;
+    dam.amount = constrainValue(dam.amount, 0, this.health.curHealth + 1);
+    this.health.takeDamage(dam.amount);
 
     let existingEntry = this.damagedBy.find(entry => entry.damageSource === otherEntity);
     if (existingEntry) {
@@ -471,7 +471,7 @@ class Entity {
     this.destinationCell = null;
     this.movementPath = [];
 
-    if (this.health <= 0) {
+    if (! this.health.isAlive()) {
       this.die();
     }
   }
@@ -510,19 +510,7 @@ class Entity {
   }
 
   healNaturally(currentTime) {
-    devTrace(6, "healNaturally for entity", this);
-    const enoughTimePassed = (currentTime - this.lastNaturalHealTime) >= this.naturalHealingTicks;
-    const anythingToHeal = this.health < this.initialHealth;
-    const healingCount = Math.floor((currentTime - this.lastNaturalHealTime) / this.naturalHealingTicks);
-    if (enoughTimePassed && anythingToHeal) {
-      const healAmt = healingCount * (this.naturalHealingRate * this.initialHealth);
-      devTrace(5, `natural healing occurs for ${this.type} at ${currentTime} based on last natural healing time ${this.lastNaturalHealTime}, heal count of ${healingCount} restoring ${healAmt}`, this);
-      this.health = constrainValue(this.health + healAmt, 0, this.initialHealth);
-      // addMessage(`Natural healing of ${healAmt} for ${this.name}`);
-    }
-    if (enoughTimePassed) {
-      this.lastNaturalHealTime += healingCount * this.naturalHealingTicks;
-    }
+    this.health.healNaturally(currentTime);
   }
 
   //================================================
