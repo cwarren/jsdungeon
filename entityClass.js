@@ -395,6 +395,7 @@ class Entity {
     // Reset movement plans on damage
     this.destinationCell = null;
     this.movementPath = [];
+    this.movement.stopRunning();
 
     if (! this.health.isAlive()) {
       this.die();
