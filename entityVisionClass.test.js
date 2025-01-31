@@ -1,101 +1,120 @@
 import { EntityVision } from './entityVisionClass';
 import { gameState } from './gameStateClass';
-import { computeBresenhamLine } from './gridUtils.js';
-
-jest.mock('./util', () => ({
-  devTrace: jest.fn(),
-}));
 
 jest.mock('./gameStateClass', () => ({
-  gameState: {
-    world: [
-      {
-        grid: Array.from({ length: 10 }, (_, x) =>
-          Array.from({ length: 10 }, (_, y) => ({
-            x,
-            y,
-            z: 0,
-            entity: null,
-          }))
-        ),
-      },
-    ],
-  },
+    gameState: {
+        world: [
+            {
+                grid: Array.from({ length: 10 }, (_, x) =>
+                    Array.from({ length: 10 }, (_, y) => ({
+                        x,
+                        y,
+                        z: 0,
+                        entity: null,
+                        isOpaque: false,
+                    }))
+                ),
+            },
+        ],
+    },
 }));
 
-jest.mock('./gridUtils.js', () => ({
-  computeBresenhamLine: jest.fn((x0, y0, x1, y1) => {
-    // Simple mock implementation of Bresenham's line algorithm
-    let points = [];
-    let dx = Math.abs(x1 - x0);
-    let dy = Math.abs(y1 - y0);
-    let sx = (x0 < x1) ? 1 : -1;
-    let sy = (y0 < y1) ? 1 : -1;
-    let err = dx - dy;
-
-    while (true) {
-      points.push([x0, y0]);
-      if (x0 === x1 && y0 === y1) break;
-      let e2 = 2 * err;
-      if (e2 > -dy) { err -= dy; x0 += sx; }
-      if (e2 < dx) { err += dx; y0 += sy; }
-    }
-    return points;
-  }),
-}));
+const ENITY_VISION_RANGE = 5;
 
 describe('EntityVision', () => {
-  let entity;
-  let entityVision;
-  let otherEntity;
+    let entity;
+    let entityVision;
+    let otherEntity;
+    let otherEntityOutOfSight;
+    let otherEntityHidden;
 
-  beforeEach(() => {
-    entity = {
-      type: 'testEntity',
-      location: {
-        x: 5,
-        y: 5,
-        z: 0,
-        getWorldLevel: jest.fn(() => gameState.world[0]),
-      },
-      getCell: jest.fn(() => gameState.world[0].grid[5][5]),
-    };
-    otherEntity = {
-      type: 'otherEntity',
-      getCell: jest.fn(() => gameState.world[0].grid[6][6]),
-      canSeeEntity: jest.fn(() => true),
-    };
-    entityVision = new EntityVision(entity, 3);
-  });
+    beforeEach(() => {
+        entity = {
+            type: 'testEntity',
+            location: {
+                x: 2,
+                y: 2,
+                z: 0,
+                getWorldLevel: jest.fn(() => gameState.world[0]),
+            },
+            getCell: jest.fn(() => gameState.world[0].grid[2][2]),
+        };
 
-  test('should initialize with correct values', () => {
-    expect(entityVision.ofEntity).toBe(entity);
-    expect(entityVision.viewRadius).toBe(3);
-    expect(entityVision.visibleCells).toEqual(new Set());
-    expect(entityVision.seenCells).toEqual(new Set());
-  });
+        otherEntity = {
+            type: 'otherEntity',
+            location: {
+                x: 3,
+                y: 3,
+                z: 0,
+                getWorldLevel: jest.fn(() => gameState.world[0]),
+            },
+            getCell: jest.fn(() => gameState.world[0].grid[3][3]),
+        };
 
-  test('should check if entity is visible to another entity', () => {
-    const result = entityVision.isVisibleToEntity(otherEntity);
-    expect(result).toBe(true);
-    expect(otherEntity.canSeeEntity).toHaveBeenCalledWith(entity);
-  });
+        otherEntityOutOfSight = {
+            type: 'otherEntityOutOfSight',
+            location: {
+                x: 9,
+                y: 9,
+                z: 0,
+                getWorldLevel: jest.fn(() => gameState.world[0]),
+            },
+            getCell: jest.fn(() => gameState.world[0].grid[9][9]),
+        };
 
-  test('should check if entity can see another entity', () => {
-    entityVision.visibleCells.add(otherEntity.getCell());
-    const result = entityVision.canSeeEntity(otherEntity);
-    expect(result).toBe(true);
-  });
+        otherEntityHidden = {
+            type: 'otherEntityHidden',
+            location: {
+                x: 4,
+                y: 2,
+                z: 0,
+                getWorldLevel: jest.fn(() => gameState.world[0]),
+            },
+            getCell: jest.fn(() => gameState.world[0].grid[4][2]),
+        };
+        gameState.world[0].grid[3][2].isOpaque = true;
 
-  test('should determine visible cells', () => {
-    entityVision.determineVisibleCells();
-    expect(entity.location.getWorldLevel).toHaveBeenCalled();
-    expect(computeBresenhamLine).toHaveBeenCalled();
-  });
+        entityVision = new EntityVision(entity, ENITY_VISION_RANGE);
+    });
 
-  test('should determine visible cells in grid', () => {
-    entityVision.determineVisibleCellsInGrid(gameState.world[0].grid);
-    expect(entityVision.visibleCells.size).toBeGreaterThan(0);
-    expect(computeBresenhamLine).toHaveBeenCalled();
-  });
+    test('should initialize with correct values', () => {
+        expect(entityVision.ofEntity).toBe(entity);
+        expect(entityVision.viewRadius).toBe(ENITY_VISION_RANGE);
+        expect(entityVision.visibleCells).toEqual(new Set());
+        expect(entityVision.seenCells).toEqual(new Set());
+    });
+
+    test('entity can see otherEntity', () => {
+        entityVision.determineVisibleCells();
+        expect(entityVision.canSeeEntity(otherEntity)).toBe(true);
+    });
+
+    test('entity can be seen by otherEntity', () => {
+        const otherEntityVision = new EntityVision(otherEntity, 4);
+        otherEntityVision.determineVisibleCells();
+        expect(otherEntityVision.canSeeEntity(entity)).toBe(true);
+    });
+
+    test('entity cannot see otherEntityOutOfSight', () => {
+        entityVision.determineVisibleCells();
+        expect(entityVision.canSeeEntity(otherEntityOutOfSight)).toBe(false);
+    });
+
+    test('entity cannot see otherEntityHidden', () => {
+        entityVision.determineVisibleCells();
+        expect(entityVision.canSeeEntity(otherEntityHidden)).toBe(false);
+    });
+
+    test('entity should correctly determine visible cells', () => {
+        const vision = new EntityVision(otherEntityHidden, 3);
+        vision.determineVisibleCells();
+        expect(vision.visibleCells.size).toBe(24); // 25 in a 5x5 square minus one hidden on the other side of an opaque cell
+        expect(vision.visibleCells).toEqual(vision.seenCells);
+        expect(vision.visibleCells.has(gameState.world[0].grid[2][2])).toBe(false); // can't see the hidden cell
+        expect(vision.visibleCells.has(gameState.world[0].grid[2][4])).toBe(true); // can see non-hidden cell in range
+        expect(vision.visibleCells.has(gameState.world[0].grid[1][7])).toBe(false); // cannot see cell out of range
+    });
+
+    // NOTE: determineVisibleCellsInGrid is tested via determineVisibleCells, in entity should correctly determine visible cells
+
 });
