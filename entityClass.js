@@ -233,7 +233,7 @@ class Entity {
   }
 
   // ------------------
-  // ACTIONS - MOVEMENT TYPE IMPLEMENTATIONS
+  // ACTIONS - MOVEMENT TYPE IMPLEMENTATIONS / AI
 
   moveStepAimless() { // random dir, may bump into walls and such
     devTrace(5, `move aimless for ${this.type}`);

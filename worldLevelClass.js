@@ -70,8 +70,6 @@ class WorldLevel {
         this.grid = gridGenFunction(this.levelWidth, this.levelHeight);
         setWorldLevelForGridCells(this, this.grid);
         determineCellViewability(this.grid);
-
-        this.populate();
     }
     isGenerated() {
         return this.grid != null;

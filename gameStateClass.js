@@ -49,6 +49,7 @@ class GameState {
         avatar.determineVisibleCells();
     }
 
+    // TODO: move this to world level class
     populateLevelWithEntities(worldLevel) {
         devTrace(4, "populating world level with entities", worldLevel);
         for (let i = 0; i < 4; i++) {
