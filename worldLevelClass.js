@@ -1,4 +1,3 @@
-import { GridCell } from "./gridCellClass.js";
 import { Structure } from "./structureClass.js";
 import { constrainValue, devTrace } from "./util.js";
 import {
