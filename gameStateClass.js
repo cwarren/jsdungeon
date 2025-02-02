@@ -134,7 +134,25 @@ class GameState {
 
 }
 
+// each level is specified as [level width, level height, level gen type]
+const WORLD_LEVEL_SPECS_FOR_DEV= [
+    [15, 10, "EMPTY"], 
+    [30, 20, "TOWN"], 
+    [30, 20, "ROOMS_SUBDIVIDE"], 
+    [30, 20, "ROOMS_RANDOM"], 
+    [30, 20, "PUDDLES"], 
+    [30, 20, "BURROW"], 
+    [30, 20, "NEST"], 
+    [30, 20, "CAVES_SHATTERED"], 
+    [30, 20, "CAVES"], 
+    [30, 20, "CAVES_LARGE"], 
+    [30, 20, "CAVES_HUGE"], 
+    [30, 20, "EMPTY"], 
+    [30, 20, "RANDOM"], 
+  ];
+
+
 // Create a single instance to maintain the game's state globally
 const gameState = new GameState();
 
-export { GameState, gameState };
+export { GameState, gameState, WORLD_LEVEL_SPECS_FOR_DEV };

@@ -11,6 +11,15 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * avatar has a getMiniCharBlock function, which generates text to display depending on avatar status
 * * NOTE: may have to set mini char font to fixed width
 
+* make world level specs richer
+* * object instead of array, so fields can be usefully named and more easily extended
+* * dimensions spec style - FIXED vs BOUNDED
+* * * FIXED - look for specific width and height
+* * * BOUNDED - look for max and min for width and height
+* * update world level generator to take a level spec object instead of particular fields
+* * * update constructor implementation to account for dimensions spec style
+* * * FUTURE: consider a richer LevelSpec class
+
 * revisit entity relationships
 * * maybe default entity relation, then relation type lists for exceptions?
 * * maybe a super default for the avatar - all entities hostile to avatar unless there's an explicit exception?

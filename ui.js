@@ -1,42 +1,17 @@
-import { gameState } from "./gameStateClass.js";
+import { gameState, WORLD_LEVEL_SPECS_FOR_DEV } from "./gameStateClass.js";
 import { executeGameCommand, keyBinding, actionMaps } from "./gameCommands.js";
 import { uiActionsMap } from "./uiActions.js";
-// import {advanceGameTime} from "./gameTime.js";
 import { TextBlock } from "./textBlockClass.js";
 import { createHelpText, devTrace } from "./util.js";
 
 // On page load, initialize the game state, then draw it, then start game turns
 
-// level width, level height, level gen type
-// TODO: this kind of thing should be moved to gameState, and be incorporated into "new game" code
-const worldLevelSpecifications = [
-  [15, 10, "EMPTY"], 
-  [30, 20, "TOWN"], 
-  [30, 20, "ROOMS_SUBDIVIDE"], 
-  [30, 20, "ROOMS_RANDOM"], 
-  [30, 20, "PUDDLES"], 
-  [30, 20, "BURROW"], 
-  [30, 20, "NEST"], 
-  [30, 20, "CAVES_SHATTERED"], 
-  [30, 20, "CAVES"], 
-  [30, 20, "CAVES_LARGE"], 
-  [30, 20, "CAVES_HUGE"], 
-  [30, 20, "EMPTY"], 
-  [30, 20, "RANDOM"], 
-];
-
 
 function initializeGameWorld() { // this is a hack until I pull this stuff out to a better location
-  gameState.initialize(worldLevelSpecifications);
+  gameState.initialize(WORLD_LEVEL_SPECS_FOR_DEV);
 }
 initializeGameWorld();
 
-// UI Elements
-// const charMiniElement = document.getElementById("charmini");
-// const mainElement = document.getElementById("main");
-// const listDisplayElement = document.getElementById("listdisplay");
-// const messagesElement = document.getElementById("messages");
-// const infoElement = document.getElementById("info");
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -60,7 +35,7 @@ function initializeHelpTextBlocks(keyBindings, actionMaps) {
     }
 }
 initializeHelpTextBlocks(keyBinding, actionMaps);
-console.log("helpTextBlocks", helpTextBlocks);
+// console.log("helpTextBlocks", helpTextBlocks);
 
 let uiStateStack = ["GAME_META","GAMEPLAY"];  // Stack starts with gameplay as the default state
 
