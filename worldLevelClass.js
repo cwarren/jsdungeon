@@ -1,4 +1,5 @@
 import { Structure } from "./structureClass.js";
+import { Stairs } from "./stairsClass.js";
 import { constrainValue, devTrace } from "./util.js";
 import {
     setWorldLevelForGridCells,
@@ -64,15 +65,18 @@ class WorldLevel {
         devTrace(1, "generating world level");
         this.generateGrid();
         this.populate();
-        // TODO - activate this code and remove the stair stuff from the ascend and descend actions (and the game state initialization)
-        // if (this.gameState.world.length > 1 && this.levelNumber < this.gameState.world.length - 1) {
-        //     if (this.levelNumber === 0) {
-        //         this.addStairsDown();
-        //     } else {
-        //         const stairsDown = this.gameState.world[this.levelNumber - 1].stairsDown;
-        //         this.addStairsUpTo(stairsDown);
-        //     }
-        // }
+        // NOTE: this stair-adding logic assumes that the world is generated in order and that each level
+        //  has exactly one connection up and down (except for the first and last, which have only down
+        //  and up respectively)
+        if (this.gameState.world.length > 1) {
+            if (this.levelNumber < this.gameState.world.length - 1) {
+                this.addStairsDown();
+            }
+            if (this.levelNumber > 0) {
+                const stairsDown = this.gameState.world[this.levelNumber - 1].stairsDown;
+                this.addStairsUpTo(stairsDown);
+            }
+        }
     }
 
     generateGrid() {
@@ -90,7 +94,7 @@ class WorldLevel {
     }
     populate() {
         devTrace(2, "populating level");
-        console.log("world level population (TO BE IMPLEMENTED (1 insidious rat for now))");
+        //console.log("world level population (TO BE IMPLEMENTED (1 insidious rat for now))");
         for (let i = 0; i < 1; i++) {
             const ent = new Entity("RAT_INSIDIOUS");
             this.placeEntityRandomly(ent);
@@ -156,7 +160,7 @@ class WorldLevel {
     addStairsDown() {
         devTrace(4, "adding stairs down for level", this);
         const stairsDownCell = getRandomEmptyCellOfTerrainInGrid("FLOOR", this.grid);
-        const stairsDown = new Structure(stairsDownCell.x, stairsDownCell.y, this.levelNumber, 'STAIRS_DOWN', '>');
+        const stairsDown = new Stairs(stairsDownCell.x, stairsDownCell.y, this.levelNumber, 'STAIRS_DOWN', '>');
         this.stairsDown = stairsDown;
         stairsDownCell.structure = stairsDown;
         this.levelStructures.push(stairsDown);
@@ -165,7 +169,7 @@ class WorldLevel {
     addStairsUpTo(stairsDown) {
         devTrace(4, "adding stairs up for level", this);
         const stairsUpCell = getRandomEmptyCellOfTerrainInGrid("FLOOR", this.grid);
-        const stairsUp = new Structure(stairsUpCell.x, stairsUpCell.y, this.levelNumber, 'STAIRS_UP', '<');
+        const stairsUp = new Stairs(stairsUpCell.x, stairsUpCell.y, this.levelNumber, 'STAIRS_UP', '<');
         this.stairsUp = stairsUp;
         stairsUpCell.structure = stairsUp;
         stairsDown.connectsTo = stairsUp;

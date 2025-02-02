@@ -28,9 +28,6 @@ class GameState {
         this.world[0].generate();
 
         const firstLevel = this.world[0];
-        if (this.world.length > 1) {
-            firstLevel.addStairsDown();
-        }
 
         this.setUpAvatar(firstLevel);
         // this.populateLevelWithEntities(firstLevel); // DEV FUNCTION

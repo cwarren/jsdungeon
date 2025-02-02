@@ -35,18 +35,20 @@ describe('WorldLevel Integration Tests', () => {
 
   beforeEach(() => {
     gameState.reset();
-    gameState.initialize([[10, 10, 'EMPTY']]);
+    gameState.initialize([[10, 10, 'EMPTY'], [15, 15, 'EMPTY']]);
     worldLevel = gameState.world[0];
   });
 
-  test('should generate and populate level', () => {
-    worldLevel.generateGrid();
+  test('on generation should generate grid and populate level', () => {
+    // worldLevel.generateGrid();
+    worldLevel.generate();
     expect(worldLevel.grid).not.toBeNull();
     expect(worldLevel.grid.length).toBe(10);
     expect(worldLevel.grid[0].length).toBe(10);
-
-    worldLevel.populate();
     expect(worldLevel.levelEntities.length).toBeGreaterThan(0);
+    expect(worldLevel.levelStructures.length).toBeGreaterThan(0);
+    expect(worldLevel.stairsDown).not.toBeNull();
+    expect(worldLevel.stairsUp).toBeNull();
   });
 
   test('should add and remove entities correctly', () => {
@@ -59,22 +61,19 @@ describe('WorldLevel Integration Tests', () => {
     expect(worldLevel.levelEntities).not.toContain(entity);
   });
 
-  test('should handle stairs correctly', () => {
-    worldLevel.generateGrid(); // Ensure grid is generated before adding stairs
-    expect(worldLevel.stairsDown).toBeNull(); // NOTE: this is only true because the world has a single level - otherwise, stairs would be added during gameState initialization
+  test('should handle stairs correctly on level generation', () => {
+    const lowerWorldLevel = gameState.world[1];
+
+    worldLevel.generate();
     expect(worldLevel.stairsUp).toBeNull();
+    expect(worldLevel.stairsDown).not.toBeNull();
+    expect(worldLevel.stairsDown.connectsTo).toBeNull();
 
-    worldLevel.addStairsDown();
-    expect(worldLevel.stairsDown).toBeInstanceOf(Structure);
-    expect(worldLevel.levelStructures).toContain(worldLevel.stairsDown);
-
-    // weird self-looping stairs are sufficient for testing
-    const stairsDown = worldLevel.stairsDown;
-    worldLevel.addStairsUpTo(stairsDown);
-    expect(worldLevel.stairsUp).toBeInstanceOf(Structure);
-    expect(worldLevel.levelStructures).toContain(worldLevel.stairsUp);
-    expect(stairsDown.connectsTo).toBe(worldLevel.stairsUp);
-    expect(worldLevel.stairsUp.connectsTo).toBe(stairsDown);
+    lowerWorldLevel.generate();
+    expect(worldLevel.stairsDown.connectsTo).toBe(lowerWorldLevel.stairsUp);
+    expect(lowerWorldLevel.stairsUp).not.toBeNull();
+    expect(lowerWorldLevel.stairsUp.connectsTo).toBe(worldLevel.stairsDown);
+    expect(lowerWorldLevel.stairsDown).toBeNull();
   });
 
   test('should track avatar departure and handle avatar entering level', () => {

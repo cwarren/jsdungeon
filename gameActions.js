@@ -111,13 +111,7 @@ function descendStairs() {
         gameState.currentLevel++;
         const lowerWorldLevel = gameState.world[gameState.currentLevel]
         if (! lowerWorldLevel.isGridGenerated()) {
-            lowerWorldLevel.generateGrid();
-        }
-        if (! stairsDown.connectsTo) {
-            lowerWorldLevel.addStairsUpTo(stairsDown);
-            if (gameState.currentLevel < gameState.world.length -1) {
-                lowerWorldLevel.addStairsDown();
-            }
+            lowerWorldLevel.generate();
         }
         const newCell = stairsDown.connectsTo.getCell();
         newCell.worldLevel.handleAvatarEnteringLevel(newCell);
