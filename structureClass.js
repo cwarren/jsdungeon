@@ -1,7 +1,8 @@
-import { gameState } from "./gameStateClass.js";
+// import { gameState } from "./gameStateClass.js";
 
 class Structure {
-    constructor(x, y, z, type, displaySymbol = '?', displayColor = '#fff') {
+    constructor(worldLevel, x, y, z, type, displaySymbol = '?', displayColor = '#fff') {
+      this.worldLevel = worldLevel;
       this.x = x;
       this.y = y;
       this.z = z;
@@ -11,7 +12,7 @@ class Structure {
     }
 
     getCell() {
-      return gameState.world[this.z].grid[this.x][this.y];
+      return this.worldLevel.grid[this.x][this.y];
     }
   }
   

@@ -3,12 +3,14 @@ import { Structure } from './structureClass.js';
 
 describe('Stairs', () => {
   let stairs;
+  const worldLevel = {gs: 'test'};
 
   beforeEach(() => {
-    stairs = new Stairs(1, 2, 3, 'STAIRS_DOWN', '>', '#fff', null);
+    stairs = new Stairs(worldLevel, 1, 2, 3, 'STAIRS_DOWN', '>', '#fff', null);
   });
 
   test('should initialize with correct values', () => {
+    expect(stairs.worldLevel).toBe(worldLevel);
     expect(stairs.x).toBe(1);
     expect(stairs.y).toBe(2);
     expect(stairs.z).toBe(3);

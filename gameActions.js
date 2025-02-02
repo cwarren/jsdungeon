@@ -98,9 +98,6 @@ function ascendStairs() {
     return gameState.avatar.baseActionCost;
 }
 
-// if needed, dynamically adds connecting stairs back up on the lower level, and
-// another stairs down on that lower level if it's not the deepest
-
 function descendStairs() {
     devTrace(3,'action - descend stairs');
     const curCell = gameState.getAvatarCell();

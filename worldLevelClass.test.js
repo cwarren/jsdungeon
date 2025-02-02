@@ -1,5 +1,6 @@
 import { WorldLevel } from './worldLevelClass.js';
 import { Structure } from './structureClass.js';
+import { Stairs } from './stairsClass.js';
 import { devTrace, constrainValue } from './util.js';
 import { TurnQueue } from './gameTime.js';
 import { Entity, DEFAULT_ACTION_COST } from './entityClass.js';
@@ -169,7 +170,7 @@ describe('WorldLevel', () => {
   });
 
   test('should add stairs up and connect to stairs down', () => {
-    const stairsDown = new Structure(0, 0, 1, 'STAIRS_DOWN', '>');
+    const stairsDown = new Stairs(worldLevel, 0, 0, 1, 'STAIRS_DOWN', '>');
     worldLevel.addStairsUpTo(stairsDown);
     expect(getRandomEmptyCellOfTerrainInGrid).toHaveBeenCalledWith('FLOOR', worldLevel.grid);
     expect(worldLevel.stairsUp).toBeInstanceOf(Structure);

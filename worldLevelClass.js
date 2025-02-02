@@ -161,7 +161,7 @@ class WorldLevel {
     addStairsDown() {
         devTrace(4, "adding stairs down for level", this);
         const stairsDownCell = getRandomEmptyCellOfTerrainInGrid("FLOOR", this.grid);
-        const stairsDown = new Stairs(stairsDownCell.x, stairsDownCell.y, this.levelNumber, 'STAIRS_DOWN', '>');
+        const stairsDown = new Stairs(this, stairsDownCell.x, stairsDownCell.y, this.levelNumber, 'STAIRS_DOWN', '>');
         this.stairsDown = stairsDown;
         stairsDownCell.structure = stairsDown;
         this.levelStructures.push(stairsDown);
@@ -170,7 +170,7 @@ class WorldLevel {
     addStairsUpTo(stairsDown) {
         devTrace(4, "adding stairs up for level", this);
         const stairsUpCell = getRandomEmptyCellOfTerrainInGrid("FLOOR", this.grid);
-        const stairsUp = new Stairs(stairsUpCell.x, stairsUpCell.y, this.levelNumber, 'STAIRS_UP', '<');
+        const stairsUp = new Stairs(this, stairsUpCell.x, stairsUpCell.y, this.levelNumber, 'STAIRS_UP', '<');
         this.stairsUp = stairsUp;
         stairsUpCell.structure = stairsUp;
         stairsDown.connectsTo = stairsUp;
