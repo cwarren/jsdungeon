@@ -1,4 +1,4 @@
-import { devTrace, constrainValue } from "./util.js";
+import { devTrace, constrainValue, formatNumberForMessage } from "./util.js";
 
 const DEFAULT_NATURAL_HEALING_TICKS = 250; // how often natural healing occurs in game time ticks
 const DEFAULT_NATURAL_HEALING_RATE = 0.001; // what portion of maximum health is healed per natural healing tick 
@@ -58,7 +58,7 @@ class EntityHealth {
       const healAmt = healingCount * (this.naturalHealingRate * this.maxHealth);
       devTrace(5, `natural healing occurs for ${this.ofEntity.type} at ${currentTime} based on last natural healing time ${this.lastNaturalHealTime}, heal count of ${healingCount} restoring ${healAmt}`, this);
       this.curHealth = constrainValue(this.curHealth + healAmt, 0, this.maxHealth);
-      // addMessage(`Natural healing of ${healAmt} for ${this.name}`);
+      this.ofEntity.showNaturalHealingMessage(`Natural healing of ${formatNumberForMessage(healAmt)} for ${this.ofEntity.name}`);
     }
     if (enoughTimePassed) {
       this.lastNaturalHealTime += healingCount * this.naturalHealingTicks;

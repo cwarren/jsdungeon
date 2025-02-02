@@ -1,13 +1,10 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* add tests to many things
-
-* truncate or round numbers in message strings to integers
-* * maybe get fancy and add "a bit more than" and "a bit less than" prefixes
-
 * add messages
 * * ascent & descent (with hooks for avatar knowldedge of level)
+
+* create a class (or classes) for the ui stuff instead of just a jumbled library
 
 * add info text for current level (change when level changes)(with hooks for avatar knowldedge of level)
 

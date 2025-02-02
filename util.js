@@ -98,7 +98,15 @@ function formatNumberForMessage(num) {
     if (Number.isInteger(num)) {
         return num.toString();
     } else {
-        return `about ${Math.round(num)}`;
+        const displayNum = Math.round(num);
+        if (Math.abs(num - displayNum) < 0.001) {
+            return displayNum.toString();
+        }
+        if (num < displayNum) {
+            return `a bit less than ${displayNum}`;
+        } else {
+            return `a bit more than ${displayNum}`;
+        }
     }
 }
 

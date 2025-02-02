@@ -1,15 +1,22 @@
 import { EntityHealth, DEFAULT_NATURAL_HEALING_TICKS, DEFAULT_NATURAL_HEALING_RATE } from './entityHealthClass';
 
-jest.mock('./util', () => ({
+jest.mock('./util.js', () => ({
   devTrace: jest.fn(),
   constrainValue: jest.fn((value, min, max) => Math.min(Math.max(value, min), max)),
+  formatNumberForMessage: jest.fn((num) => num.toString()),
 }));
 
 describe('EntityHealth', () => {
   let entityHealth;
+  let mockEntity;
 
   beforeEach(() => {
-    entityHealth = new EntityHealth({}, 100);
+    mockEntity = {
+      showNaturalHealingMessage: jest.fn(),
+      type: 'TestEntity',
+      name: 'Test Entity',
+    };
+    entityHealth = new EntityHealth(mockEntity, 100);
   });
 
   test('should initialize with correct values', () => {

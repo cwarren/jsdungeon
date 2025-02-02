@@ -2,7 +2,7 @@ import { Damager } from "./damagerClass.js";
 
 const ENTITIES_DEFINITIONS = [
     {
-      type: "AVATAR", name: "Player", displaySymbol: "@", displayColor: "#fff",
+      type: "AVATAR", name: "Avatar", displaySymbol: "@", displayColor: "#fff",
       viewRadius: 8, initialHealthRoll: "150", baseActionCost: 100, naturalHealingRate: .001
     },
     {

@@ -87,7 +87,6 @@ describe('Entity', () => {
     test('should get cell', () => {
         const targetCell = gameState.world[0].grid[5][6];
         entity.placeAtCell(targetCell);
-        console.log("gameState after entity.placeAtCell", gameState);
         expect(entity.getCell()).toBe(targetCell);
     });
 

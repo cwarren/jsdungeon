@@ -24,9 +24,16 @@ describe('formatNumberForMessage', () => {
     test('should return number as string if it is an integer', () => {
         expect(formatNumberForMessage(5)).toBe('5');
     });
+    test('should return number as string if it is very close to an integer', () => {
+        expect(formatNumberForMessage(5.0000001)).toBe('5');
+    });
 
-    test('should return rounded number with "about" if it is not an integer', () => {
-        expect(formatNumberForMessage(5.7)).toBe('about 6');
+    test('should return rounded number with "a bit more than" if it is not an integer and is more than the rounded value', () => {
+        expect(formatNumberForMessage(6.2)).toBe('a bit more than 6');
+    });
+
+    test('should return rounded number with "a bit less than" if it is not an integer and is less than the rounded value', () => {
+        expect(formatNumberForMessage(5.7)).toBe('a bit less than 6');
     });
 });
 

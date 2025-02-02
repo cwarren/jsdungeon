@@ -324,6 +324,12 @@ class Entity {
     this.health.healNaturally(currentTime);
   }
 
+  // ------------------
+  // PLAYER COMMUNICATION
+  showNaturalHealingMessage(message) {
+    // by default, entities don't show messages for natural healing, though some may (such as the avatar)
+  }
+
   //================================================
   //================================================
   //================================================

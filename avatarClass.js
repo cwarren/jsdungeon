@@ -2,6 +2,7 @@ import { Entity, DEFAULT_ACTION_COST } from "./entityClass.js";
 import { gameState } from "./gameStateClass.js";
 import { devTrace, rollDice } from "./util.js";
 import { Damage } from "./damageClass.js";
+import { addMessage } from "./uiUtil.js";
 
 
 class Avatar extends Entity {
@@ -43,6 +44,11 @@ class Avatar extends Entity {
     if (this.baseActionCost) return this.baseActionCost;
     return DEFAULT_ACTION_COST;
   }
+
+  showNaturalHealingMessage(message) {
+    addMessage(message);
+  }
+
 }
 
 export { Avatar };
