@@ -151,13 +151,15 @@ class EntityMovement {
     }
 
     // MOVEMENT AI / TYPE IMPLEMENTATIONS
+    // IMPORTANT!!!!
+    // action functions should return the time cost of the action!
 
     moveStepAimless() { // random dir, may bump into walls and such... though a bump results in a 0 action cost, so will try again
         devTrace(5, `move aimless for ${this.type}`);
         const randomDir = getRandomListItem(GridCell.ADJACENCY_DIRECTIONS);
         return this.tryMove(randomDir.dx, randomDir.dy);
     }
-    
+
 
     moveWanderAimless() {
         devTrace(5, `moveWanderAimless for ${this.ofEntity.type}`, this.ofEntity);
@@ -167,7 +169,7 @@ class EntityMovement {
         }
         return this.moveAlongPath();
     }
-    
+
     moveWanderAggressive() { // if any hostiles are view and reachable, head towards the closest, otherwise wanderAimless
         devTrace(5, `wander aggressive for ${this.type}`);
 
@@ -176,7 +178,7 @@ class EntityMovement {
         const visibleHostilesInfo = this.ofEntity.vision.getVisibleEntityInfo().filter(
             entInfo => ["HOSTILE_TO", "VIOLENT_TO"].includes(entInfo.relation)
         ).sort((a, b) => a.manhattenDistance - b.manhattenDistance);
-        
+
         for (const entInfo of visibleHostilesInfo) {
             this.destinationCell = entInfo.entity.getCell();
             this.setPathToDestination();
