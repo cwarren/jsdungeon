@@ -110,8 +110,8 @@ function descendStairs() {
         curCell.worldLevel.removeEntity(gameState.avatar);
         gameState.currentLevel++;
         const lowerWorldLevel = gameState.world[gameState.currentLevel]
-        if (! lowerWorldLevel.isGenerated()) {
-            lowerWorldLevel.generate();
+        if (! lowerWorldLevel.isGridGenerated()) {
+            lowerWorldLevel.generateGrid();
         }
         if (! stairsDown.connectsTo) {
             lowerWorldLevel.addStairsUpTo(stairsDown);

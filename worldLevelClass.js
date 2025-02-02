@@ -62,6 +62,21 @@ class WorldLevel {
 
     generate() {
         devTrace(1, "generating world level");
+        this.generateGrid();
+        this.populate();
+        // TODO - activate this code and remove the stair stuff from the ascend and descend actions (and the game state initialization)
+        // if (this.gameState.world.length > 1 && this.levelNumber < this.gameState.world.length - 1) {
+        //     if (this.levelNumber === 0) {
+        //         this.addStairsDown();
+        //     } else {
+        //         const stairsDown = this.gameState.world[this.levelNumber - 1].stairsDown;
+        //         this.addStairsUpTo(stairsDown);
+        //     }
+        // }
+    }
+
+    generateGrid() {
+        devTrace(1, "generating world level");
         let gridGenFunction = WorldLevel.levelTypeToGenFunction[this.levelType];
         if (!gridGenFunction) {
             gridGenFunction = WorldLevel.levelTypeToGenFunction["DEFAULT"];
@@ -70,7 +85,7 @@ class WorldLevel {
         setWorldLevelForGridCells(this, this.grid);
         determineCellViewability(this.grid);
     }
-    isGenerated() {
+    isGridGenerated() {
         return this.grid != null;
     }
     populate() {

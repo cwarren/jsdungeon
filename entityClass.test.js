@@ -53,7 +53,7 @@ describe('Entity', () => {
     beforeEach(() => {
         entity = new Entity('testEntity');
         const testWorldLevel = new WorldLevel(gameState, 0, 10, 10);
-        testWorldLevel.generate();
+        testWorldLevel.generateGrid();
         gameState.world = [testWorldLevel];
     });
 

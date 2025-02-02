@@ -33,7 +33,7 @@ class GameState {
         }
 
         this.setUpAvatar(firstLevel);
-        this.populateLevelWithEntities(firstLevel);
+        // this.populateLevelWithEntities(firstLevel); // DEV FUNCTION
 
         this.status="ACTIVE";
         this.isPlaying = true;
@@ -49,7 +49,8 @@ class GameState {
         avatar.determineVisibleCells();
     }
 
-    // TODO: move this to world level class
+    // NOTE: this is a dev function to populate the level with entities for testing
+    // In a real game, entities would be placed by the level population function
     populateLevelWithEntities(worldLevel) {
         devTrace(4, "populating world level with entities", worldLevel);
         for (let i = 0; i < 4; i++) {

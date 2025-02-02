@@ -1,0 +1,92 @@
+import { WorldLevel } from './worldLevelClass.js';
+import { Structure } from './structureClass.js';
+import { TurnQueue } from './gameTime.js';
+import { Entity, DEFAULT_ACTION_COST } from './entityClass.js';
+import {
+  setWorldLevelForGridCells,
+  generateGrid_empty,
+  generateGrid_random,
+  generateGrid_caves,
+  generateGrid_caves_shattered,
+  generateGrid_caves_large,
+  generateGrid_caves_huge,
+  generateGrid_burrow,
+  generateGrid_nest,
+  generateGrid_roomsAndCorridors_random,
+  generateGrid_roomsAndCorridors_subdivide,
+  generateGrid_town,
+  generateGrid_puddles,
+} from './gridGeneration.js';
+import {
+  getRandomEmptyCellOfTerrainInGrid,
+  determineCellViewability,
+} from './gridUtils.js';
+import { devTrace, constrainValue, rollDice } from './util.js';
+import { gameState } from './gameStateClass.js';
+
+jest.mock('./util.js', () => ({
+  devTrace: jest.fn(),
+  constrainValue: jest.fn((value, min, max) => Math.max(min, Math.min(max, value))),
+  rollDice: jest.requireActual('./util.js').rollDice,
+}));
+
+describe('WorldLevel Integration Tests', () => {
+  let worldLevel;
+
+  beforeEach(() => {
+    gameState.reset();
+    gameState.initialize([[10, 10, 'EMPTY']]);
+    worldLevel = gameState.world[0];
+  });
+
+  test('should generate and populate level', () => {
+    worldLevel.generateGrid();
+    expect(worldLevel.grid).not.toBeNull();
+    expect(worldLevel.grid.length).toBe(10);
+    expect(worldLevel.grid[0].length).toBe(10);
+
+    worldLevel.populate();
+    expect(worldLevel.levelEntities.length).toBeGreaterThan(0);
+  });
+
+  test('should add and remove entities correctly', () => {
+    const entity = new Entity('RAT_INSIDIOUS');
+    worldLevel.addEntity(entity, worldLevel.grid[0][0]);
+    expect(worldLevel.levelEntities).toContain(entity);
+    expect(worldLevel.grid[0][0].entity).toBe(entity);
+
+    worldLevel.removeEntity(entity);
+    expect(worldLevel.levelEntities).not.toContain(entity);
+  });
+
+  test('should handle stairs correctly', () => {
+    worldLevel.generateGrid(); // Ensure grid is generated before adding stairs
+    expect(worldLevel.stairsDown).toBeNull(); // NOTE: this is only true because the world has a single level - otherwise, stairs would be added during gameState initialization
+    expect(worldLevel.stairsUp).toBeNull();
+
+    worldLevel.addStairsDown();
+    expect(worldLevel.stairsDown).toBeInstanceOf(Structure);
+    expect(worldLevel.levelStructures).toContain(worldLevel.stairsDown);
+
+    // weird self-looping stairs are sufficient for testing
+    const stairsDown = worldLevel.stairsDown;
+    worldLevel.addStairsUpTo(stairsDown);
+    expect(worldLevel.stairsUp).toBeInstanceOf(Structure);
+    expect(worldLevel.levelStructures).toContain(worldLevel.stairsUp);
+    expect(stairsDown.connectsTo).toBe(worldLevel.stairsUp);
+    expect(worldLevel.stairsUp.connectsTo).toBe(stairsDown);
+  });
+
+  test('should track avatar departure and handle avatar entering level', () => {
+    worldLevel.trackAvatarDepartureTime();
+    expect(worldLevel.timeOfAvatarDeparture).toBe(0);
+
+    gameState.avatar.addTimeOnLevel(10);
+    expect(gameState.avatar.timeOnLevel).toBe(10);
+    worldLevel.handleAvatarEnteringLevel(worldLevel.grid[0][0]);
+    expect(worldLevel.levelEntities).toContain(gameState.avatar);
+    expect(worldLevel.grid[0][0].entity).toBe(gameState.avatar);
+    expect(gameState.avatar.timeOnLevel).toBe(0);
+  });
+
+});

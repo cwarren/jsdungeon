@@ -108,7 +108,7 @@ describe('WorldLevel', () => {
   });
 
   test('should generate grid and set world level for grid cells', () => {
-    worldLevel.generate();
+    worldLevel.generateGrid();
     expect(generateGrid_empty).toHaveBeenCalledWith(10, 10);
     expect(setWorldLevelForGridCells).toHaveBeenCalledWith(worldLevel, []);
     expect(determineCellViewability).toHaveBeenCalledWith([]);
