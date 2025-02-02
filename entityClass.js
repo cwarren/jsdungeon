@@ -1,9 +1,9 @@
 import { gameState } from "./gameStateClass.js";
 import { Damage } from "./damageClass.js";
-import { Damager } from "./damagerClass.js";
+// import { Damager } from "./damagerClass.js";
 import { rollDice, getRandomListItem, constrainValue, devTrace, formatNumberForMessage } from "./util.js";
-import { GridCell } from "./gridCellClass.js";
-import { getRandomCellOfTerrainInGrid, determineCheapestMovementPath, computeBresenhamLine } from "./gridUtils.js";
+// import { GridCell } from "./gridCellClass.js";
+// import { getRandomCellOfTerrainInGrid, determineCheapestMovementPath, computeBresenhamLine } from "./gridUtils.js";
 import { ENTITIES_DEFINITIONS } from "./entityDefinitions.js";
 import { addMessage } from "./uiUtil.js";
 import { EntityHealth } from "./entityHealthClass.js";
@@ -35,10 +35,6 @@ class Entity {
 
     this.meleeAttack = Entity.ENTITIES[type].meleeAttack;
 
-    // used in movement AI / movement type implementations
-    this.destinationCell = null;
-    this.movementPath = [];
-
     // used in combat AI and for relationship stuff
     this.damagedBy = []; // array of {damageSource, damage}
 
@@ -66,7 +62,7 @@ class Entity {
     const adjCells = this.location.getAdjacentCells();
     const adjEntities = [];
     adjCells.forEach(cell => { if (cell.entity) { adjEntities.push(cell.entity); } });
-    devTrace(5, "other entities adjacent to this entity", this, adjEntities);
+    devTrace(6, "other entities adjacent to this entity", this, adjEntities);
     return adjEntities;
   }
 
@@ -233,75 +229,6 @@ class Entity {
   }
 
   // ------------------
-  // ACTIONS - MOVEMENT TYPE IMPLEMENTATIONS / AI
-
-  // moveStepAimless() { // random dir, may bump into walls and such
-  //   devTrace(5, `move aimless for ${this.type}`);
-  //   const randomDir = getRandomListItem(GridCell.ADJACENCY_DIRECTIONS);
-  //   return this.movement.tryMove(randomDir.dx, randomDir.dy);
-  // }
-
-
-  // moveWanderAimless() {
-  //   devTrace(5, `moveWanderAimless for ${this.type}`, this);
-
-  //   // If no destination, pick one and set the path
-  //   if (!this.destinationCell || this.movementPath.length === 0) {
-  //     const grid = this.location.getWorldLevel().grid;
-  //     this.destinationCell = getRandomCellOfTerrainInGrid("FLOOR", grid); // NOTE: explicitly not a random empty cell!
-  //     devTrace(4, `setting wandering destination`, this.destinationCell);
-
-  //     if (this.destinationCell) {
-  //       this.movementPath = determineCheapestMovementPath(this.location.getCell(), this.destinationCell, gameState.world[this.location.z]);
-  //       if (this.movementPath.length > 0) {
-  //         this.movementPath.shift(); // Remove starting cell to avoid stepping on self
-  //       }
-  //     }
-  //   }
-    
-  //   if (this.movementPath.length > 0) { // If there's a path, follow it
-  //     devTrace(5, `moving along movement path`, this.movementPath);
-  //     const nextCell = this.movementPath.shift();  // Move to the next step in path
-  //     return this.movement.tryMoveToCell(nextCell);
-  //   }
-
-  //   return this.movement.actionCost;  // Default action cost if no valid move
-  // }
-
-  // moveWanderAggressive() { // if hostile in view, head towards it, otherwise wanderAimless
-  //   devTrace(5, `wander aggressive for ${this.type}`);
-
-  //   let closestHostile = null;
-  //   let closestDistance = Infinity;
-
-  //   this.vision.visibleCells.forEach(cell => {
-  //     if (cell.entity && cell.entity !== this && ["HOSTILE_TO", "VIOLENT_TO"].includes(this.getRelationshipTo(cell.entity))) {
-  //       let dist = Math.abs(this.location.x - cell.x) + Math.abs(this.location.y - cell.y); // we only need relative distance for this, so manhattan is fine here
-  //       if (dist < closestDistance) {
-  //         closestHostile = cell.entity;
-  //         closestDistance = dist;
-  //       }
-  //     }
-  //   });
-
-  //   if (closestHostile) {
-  //     devTrace(4, `wander aggressive - targeting ${closestHostile.type}`, this, closestHostile);
-  //     this.destinationCell = closestHostile.getCell();
-  //     this.movementPath = determineCheapestMovementPath(this.location.getCell(), this.destinationCell, gameState.world[this.location.z]);
-  //     if (this.movementPath.length > 0) {
-  //       this.movementPath.shift(); // Remove starting cell to avoid stepping on self
-  //     }
-  //   }
-
-  //   if (this.movementPath.length > 0) {
-  //     const nextCell = this.movementPath.shift();
-  //     return this.movement.tryMoveToCell(nextCell);
-  //   }
-
-  //   return this.moveWanderAimless();
-  // }
-
-  // ------------------
   // ACTIONS - COMBAT & HEALTH
 
   attack(otherEntity) {
@@ -353,9 +280,7 @@ class Entity {
     addMessage(`${this.name} takes ${formatNumberForMessage(dam.amount)} damage from ${otherEntity.name}`);
 
     // Reset movement plans on damage
-    this.destinationCell = null;
-    this.movementPath = [];
-    this.movement.stopRunning();
+    this.movement.interruptOngoingMovement();
 
     if (! this.health.isAlive()) {
       this.die();

@@ -68,8 +68,6 @@ describe('Entity', () => {
         expect(entity.movement).toBeInstanceOf(EntityMovement);
         expect(entity.health).toBeInstanceOf(EntityHealth);
         expect(entity.meleeAttack).toEqual(TEST_DAMAGE_SPEC);
-        expect(entity.destinationCell).toBeNull();
-        expect(entity.movementPath).toEqual([]);
         expect(entity.damagedBy).toEqual([]);
         expect(entity.baseKillPoints).toBe(10);
         expect(entity.currentAdvancementPoints).toBe(0);

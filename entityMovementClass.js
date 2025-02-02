@@ -110,6 +110,12 @@ class EntityMovement {
         this.runDelta = null;
     }
 
+    interruptOngoingMovement() {
+        this.destinationCell = null;
+        this.movementPath = [];
+        this.stopRunning();
+    }
+
     // INSPECTION
 
     getMovementStatus() {
