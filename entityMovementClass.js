@@ -1,4 +1,6 @@
-import { devTrace } from "./util.js";
+import { devTrace, getRandomListItem } from "./util.js";
+import { GridCell } from "./gridCellClass.js";
+import { getRandomCellOfTerrainInGrid, determineCheapestMovementPath, computeBresenhamLine } from "./gridUtils.js";
 
 const DEFAULT_MOVEMENT_ACTION_COST = 100;
 const DEFAULT_MOVEMENT_SPEC = { movementType: "STATIONARY", actionCost: DEFAULT_MOVEMENT_ACTION_COST };
@@ -11,6 +13,8 @@ class EntityMovement {
         this.runDelta = null;
         this.type = movementSpec.movementType;
         this.actionCost = movementSpec.actionCost;
+        this.destinationCell = null;
+        this.movementPath = [];
     }
 
     // MOVEMENT METHODS
@@ -115,6 +119,87 @@ class EntityMovement {
             movementSpec: this.movementSpec,
         };
     }
+
+    // MOVEMENT AI SUPPORT
+
+    setPathToDestination() {
+        if (!this.destinationCell) {
+            this.movementPath = [];
+            return;
+        }
+        this.movementPath = determineCheapestMovementPath(
+            this.location.getCell(),
+            this.destinationCell,
+            this.location.getWorldLevel());
+        if (this.movementPath.length > 0) {
+            this.movementPath.shift(); // Remove starting cell to avoid stepping on self
+        }
+    }
+
+    setRandomDestination() {
+        this.destinationCell = getRandomCellOfTerrainInGrid("FLOOR", this.location.getWorldLevel().grid);
+        devTrace(4, `setting random destination for ${this.ofEntity.type}`, this.destinationCell);
+    }
+
+    moveAlongPath() {
+        if (this.movementPath.length > 0) {
+            devTrace(5, `moving along movement path`, this.movementPath);
+            const nextCell = this.movementPath.shift();
+            return this.tryMoveToCell(nextCell);
+        }
+        return this.actionCost;
+    }
+
+    // MOVEMENT AI / TYPE IMPLEMENTATIONS
+
+    moveStepAimless() { // random dir, may bump into walls and such... though a bump results in a 0 action cost, so will try again
+        devTrace(5, `move aimless for ${this.type}`);
+        const randomDir = getRandomListItem(GridCell.ADJACENCY_DIRECTIONS);
+        return this.tryMove(randomDir.dx, randomDir.dy);
+    }
+    
+
+    moveWanderAimless() {
+        devTrace(5, `moveWanderAimless for ${this.ofEntity.type}`, this.ofEntity);
+        if (!this.destinationCell || this.movementPath.length === 0) {
+            this.setRandomDestination();
+            this.setPathToDestination();
+        }
+        return this.moveAlongPath();
+    }
+    
+    //   moveWanderAggressive() { // if hostile in view, head towards it, otherwise wanderAimless
+    //     devTrace(5, `wander aggressive for ${this.type}`);
+    
+    //     let closestHostile = null;
+    //     let closestDistance = Infinity;
+    
+    //     this.vision.visibleCells.forEach(cell => {
+    //       if (cell.entity && cell.entity !== this && ["HOSTILE_TO", "VIOLENT_TO"].includes(this.getRelationshipTo(cell.entity))) {
+    //         let dist = Math.abs(this.location.x - cell.x) + Math.abs(this.location.y - cell.y); // we only need relative distance for this, so manhattan is fine here
+    //         if (dist < closestDistance) {
+    //           closestHostile = cell.entity;
+    //           closestDistance = dist;
+    //         }
+    //       }
+    //     });
+    
+    //     if (closestHostile) {
+    //       devTrace(4, `wander aggressive - targeting ${closestHostile.type}`, this, closestHostile);
+    //       this.destinationCell = closestHostile.getCell();
+    //       this.movementPath = determineCheapestMovementPath(this.location.getCell(), this.destinationCell, gameState.world[this.location.z]);
+    //       if (this.movementPath.length > 0) {
+    //         this.movementPath.shift(); // Remove starting cell to avoid stepping on self
+    //       }
+    //     }
+    
+    //     if (this.movementPath.length > 0) {
+    //       const nextCell = this.movementPath.shift();
+    //       return this.movement.tryMoveToCell(nextCell);
+    //     }
+    
+    //     return this.moveWanderAimless();
+    //   }
 }
 
 export { EntityMovement, DEFAULT_MOVEMENT_ACTION_COST, DEFAULT_MOVEMENT_SPEC };

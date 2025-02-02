@@ -1,7 +1,16 @@
-import { EntityMovement, DEFAULT_MOVEMENT_SPEC } from './entityMovementClass';
+import { EntityMovement, DEFAULT_MOVEMENT_SPEC } from './entityMovementClass.js';
+import { GridCell } from './gridCellClass.js';
+import { devTrace, getRandomListItem } from './util.js';
+import { determineCheapestMovementPath, getRandomCellOfTerrainInGrid } from './gridUtils.js';
 
-jest.mock('./util', () => ({
+jest.mock('./util.js', () => ({
   devTrace: jest.fn(),
+  getRandomListItem: jest.fn(),
+}));
+
+jest.mock('./gridUtils.js', () => ({
+  determineCheapestMovementPath: jest.fn(),
+  getRandomCellOfTerrainInGrid: jest.fn(),
 }));
 
 describe('EntityMovement', () => {
@@ -21,6 +30,7 @@ describe('EntityMovement', () => {
         entity.determineVisibleCells();
         return true;
       }),
+      getWorldLevel: jest.fn(() => ({ grid: [] })),
     };
     entity = {
       type: 'testEntity',
@@ -127,4 +137,67 @@ describe('EntityMovement', () => {
     expect(entityLocation.placeAtCell).toHaveBeenCalledWith(newCell);
     expect(entity.determineVisibleCells).toHaveBeenCalled();
   });
+
+  // MOVEMENT AI SUPPORT
+
+  test('should set empty path when destination is not set', () => {
+    entityMovement.destinationCell = undefined;
+    entityMovement.setPathToDestination();
+    expect(entityMovement.movementPath).toEqual([]);
+  });
+  
+  test('should set path to destination', () => {
+    const destinationCell = { x: 7, y: 7, z: 0, entity: null, isTraversible: true };
+    const path = [{ x: 6, y: 6, z: 0 }, { x: 7, y: 7, z: 0 }];
+    entityMovement.destinationCell = destinationCell;
+    entityLocation.getCell = jest.fn(() => ({ x: 5, y: 5, z: 0 }));
+    determineCheapestMovementPath.mockReturnValue(path);
+
+    entityMovement.setPathToDestination();
+    expect(determineCheapestMovementPath).toHaveBeenCalledWith(
+      entityLocation.getCell(),
+      destinationCell,
+      entityLocation.getWorldLevel()
+    );
+    expect(entityMovement.movementPath).toEqual([{ x: 7, y: 7, z: 0 }]); // starting cell removed
+  });
+
+  test('should set random destination', () => {
+    const randomCell = { x: 8, y: 8, z: 0, entity: null, isTraversible: true };
+    getRandomCellOfTerrainInGrid.mockReturnValue(randomCell);
+
+    entityMovement.setRandomDestination();
+    expect(getRandomCellOfTerrainInGrid).toHaveBeenCalledWith("FLOOR", entityLocation.getWorldLevel().grid);
+    expect(entityMovement.destinationCell).toBe(randomCell);
+  });
+
+  test('should move along path', () => {
+    const nextCell = { x: 6, y: 6, z: 0, entity: null, isTraversible: true };
+    entityMovement.movementPath = [nextCell];
+    entityMovement.tryMoveToCell = jest.fn(() => 100);
+
+    const result = entityMovement.moveAlongPath();
+    expect(result).toBe(100);
+    expect(entityMovement.tryMoveToCell).toHaveBeenCalledWith(nextCell);
+    expect(entityMovement.movementPath).toEqual([]);
+  });
+
+  test('should return action cost if no path to move along', () => {
+    entityMovement.movementPath = [];
+    const result = entityMovement.moveAlongPath();
+    expect(result).toBe(entityMovement.actionCost);
+  });
+
+  // MOVEMENT AI METHODS
+  test('movement type implementation - should move aimlessly', () => {
+    const randomDir = { dx: 1, dy: 0 };
+    getRandomListItem.mockReturnValue(randomDir);
+    entityMovement.tryMove = jest.fn(() => 100);
+
+    const result = entityMovement.moveStepAimless();
+    expect(result).toBe(100);
+    expect(getRandomListItem).toHaveBeenCalledWith(GridCell.ADJACENCY_DIRECTIONS);
+    expect(entityMovement.tryMove).toHaveBeenCalledWith(randomDir.dx, randomDir.dy);
+  });
+  
 });
