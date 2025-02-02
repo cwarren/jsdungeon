@@ -1,8 +1,7 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* add messages
-* * ascent & descent (with hooks for avatar knowldedge of level)
+* extract game state import from structure
 
 * create a class (or classes) for the ui stuff instead of just a jumbled library
 

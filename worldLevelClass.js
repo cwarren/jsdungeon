@@ -23,6 +23,7 @@ import {
 } from "./gridUtils.js";
 import { TurnQueue } from "./gameTime.js";
 import { Entity, DEFAULT_ACTION_COST } from "./entityClass.js";
+import { addMessage } from "./uiUtil.js"; 
 
 const MAX_ENTITY_PLACEMENT_ATTEMPTS = 20;
 const MAX_TIME_AWAY_TO_CARE_ABOUT = DEFAULT_ACTION_COST * 100;
@@ -201,6 +202,9 @@ class WorldLevel {
         } else {
             this.gameState.avatar.actionStartingTime = this.turnQueue.elapsedTime;
         }
+
+        // TODO: add message about entering level
+        addMessage(`You enter level ${this.levelNumber + 1}`);
     }
 }
 
