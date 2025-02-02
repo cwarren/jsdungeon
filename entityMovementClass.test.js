@@ -37,6 +37,9 @@ describe('EntityMovement', () => {
       location: entityLocation,
       handleAttemptedMoveIntoOccupiedCell: jest.fn(() => 0),
       determineVisibleCells: jest.fn(() => 0),
+      vision: {
+        getVisibleEntityInfo: jest.fn(),
+      },
     };
     entityMovement = new EntityMovement(entity);
   });
@@ -202,11 +205,11 @@ describe('EntityMovement', () => {
 
   test('movement type implementation - should move wander aimlessly', () => {
     const randomCell = { x: 8, y: 8, z: 0, entity: null, isTraversible: true };
-    const mockEntStart = { x: 6, y: 6, z: 0 };
+    const mockEntBegin = { x: 6, y: 6, z: 0 };
     const mockEntMid = { x: 7, y: 7, z: 0 };
     const mockEntEnd = { x: 8, y: 8, z: 0 };
     getRandomCellOfTerrainInGrid.mockReturnValue(randomCell);
-    determineCheapestMovementPath.mockReturnValue([mockEntStart, mockEntMid, mockEntEnd]);
+    determineCheapestMovementPath.mockReturnValue([mockEntBegin, mockEntMid, mockEntEnd]);
     entityMovement.tryMoveToCell = jest.fn((arg) => { console.log(arg); return DEFAULT_MOVEMENT_ACTION_COST; });
 
     const result = entityMovement.moveWanderAimless();
@@ -214,6 +217,49 @@ describe('EntityMovement', () => {
     // then try to move to the middle cell
     // and leave the last cell as the next destination
 
+    expect(result).toBe(DEFAULT_MOVEMENT_ACTION_COST);
+    expect(getRandomCellOfTerrainInGrid).toHaveBeenCalledWith("FLOOR", entityLocation.getWorldLevel().grid);
+    expect(determineCheapestMovementPath).toHaveBeenCalledWith(
+      entityLocation.getCell(),
+      randomCell,
+      entityLocation.getWorldLevel()
+    );
+    expect(entityMovement.tryMoveToCell).toHaveBeenCalledWith(mockEntMid);
+    expect(entityMovement.movementPath).toEqual([mockEntEnd]);
+  });
+
+  test('movement type implementation - should move wander aggressive', () => {
+    const hostileEntity = {
+      type: 'hostileEntity',
+      getCell: jest.fn(() => ({ x: 7, y: 7, z: 0, entity: null, isTraversible: true })),
+    };
+    const visibleHostilesInfo = [
+      { entity: hostileEntity, relation: 'HOSTILE_TO', manhattenDistance: 2 },
+    ];
+    const mockEntBegin = { x: 5, y: 5, z: 0 };
+    const mockEntMid = { x: 6, y: 6, z: 0 };
+    const mockEntEnd = { x: 7, y: 7, z: 0 };
+    entity.vision.getVisibleEntityInfo.mockReturnValue(visibleHostilesInfo);
+    determineCheapestMovementPath.mockReturnValue([mockEntBegin, mockEntMid, mockEntEnd]);
+    entityMovement.tryMoveToCell = jest.fn(() => DEFAULT_MOVEMENT_ACTION_COST);
+
+    const result = entityMovement.moveWanderAggressive();
+    expect(result).toBe(DEFAULT_MOVEMENT_ACTION_COST);
+    expect(entityMovement.tryMoveToCell).toHaveBeenCalledWith(mockEntMid);
+    expect(entityMovement.movementPath).toEqual([mockEntEnd]);
+  });
+
+  test('movement type implementation - should move wander aggressive with no hostiles', () => {
+    const randomCell = { x: 7, y: 7, z: 0, entity: null, isTraversible: true };
+    const mockEntBegin = { x: 5, y: 5, z: 0 };
+    const mockEntMid = { x: 6, y: 6, z: 0 };
+    const mockEntEnd = { x: 7, y: 7, z: 0 };
+    entity.vision.getVisibleEntityInfo.mockReturnValue([]);
+    getRandomCellOfTerrainInGrid.mockReturnValue(randomCell);
+    determineCheapestMovementPath.mockReturnValue([mockEntBegin, mockEntMid, mockEntEnd]);
+    entityMovement.tryMoveToCell = jest.fn(() => DEFAULT_MOVEMENT_ACTION_COST);
+
+    const result = entityMovement.moveWanderAggressive();
     expect(result).toBe(DEFAULT_MOVEMENT_ACTION_COST);
     expect(getRandomCellOfTerrainInGrid).toHaveBeenCalledWith("FLOOR", entityLocation.getWorldLevel().grid);
     expect(determineCheapestMovementPath).toHaveBeenCalledWith(
