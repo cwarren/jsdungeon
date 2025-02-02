@@ -57,6 +57,10 @@ class EntityLocation {
     };
     return currentLevel;
   }
+
+  getManhattenDistanceToEntity(otherEntity) {
+    return Math.abs(this.x - otherEntity.location.x) + Math.abs(this.y - otherEntity.location.y);
+  }
 }
 
 export { EntityLocation };

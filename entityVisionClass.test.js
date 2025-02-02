@@ -36,9 +36,12 @@ describe('EntityVision', () => {
                 y: 2,
                 z: 0,
                 getWorldLevel: jest.fn(() => gameState.world[0]),
+                getManhattenDistanceToEntity: jest.fn(() => 2),
             },
             getCell: jest.fn(() => gameState.world[0].grid[2][2]),
+            getRelationshipTo: jest.fn(() => 'HOSTILE_TO'),
         };
+        gameState.world[0].grid[2][2].entity = entity;
 
         otherEntity = {
             type: 'otherEntity',
@@ -50,6 +53,7 @@ describe('EntityVision', () => {
             },
             getCell: jest.fn(() => gameState.world[0].grid[3][3]),
         };
+        gameState.world[0].grid[3][3].entity = otherEntity;
 
         otherEntityOutOfSight = {
             type: 'otherEntityOutOfSight',
@@ -61,6 +65,7 @@ describe('EntityVision', () => {
             },
             getCell: jest.fn(() => gameState.world[0].grid[9][9]),
         };
+        gameState.world[0].grid[9][9].entity = otherEntityOutOfSight;
 
         otherEntityHidden = {
             type: 'otherEntityHidden',
@@ -73,6 +78,7 @@ describe('EntityVision', () => {
             getCell: jest.fn(() => gameState.world[0].grid[4][2]),
         };
         gameState.world[0].grid[3][2].isOpaque = true;
+        gameState.world[0].grid[4][2].entity = otherEntityHidden;
 
         entityVision = new EntityVision(entity, ENITY_VISION_RANGE);
     });
@@ -117,4 +123,12 @@ describe('EntityVision', () => {
 
     // NOTE: determineVisibleCellsInGrid is tested via determineVisibleCells, in entity should correctly determine visible cells
 
+    test('should get visible entity info', () => {
+        entityVision.determineVisibleCells();
+        const visibleEntities = entityVision.getVisibleEntityInfo();
+        expect(visibleEntities.length).toBe(1);
+        expect(visibleEntities[0].entity).toBe(otherEntity);
+        expect(visibleEntities[0].relation).toBe('HOSTILE_TO');
+        expect(visibleEntities[0].manhattenDistance).toBe(2);
+    });
 });

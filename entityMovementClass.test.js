@@ -1,4 +1,4 @@
-import { EntityMovement, DEFAULT_MOVEMENT_SPEC } from './entityMovementClass.js';
+import { EntityMovement, DEFAULT_MOVEMENT_SPEC, DEFAULT_MOVEMENT_ACTION_COST } from './entityMovementClass.js';
 import { GridCell } from './gridCellClass.js';
 import { devTrace, getRandomListItem } from './util.js';
 import { determineCheapestMovementPath, getRandomCellOfTerrainInGrid } from './gridUtils.js';
@@ -131,7 +131,7 @@ describe('EntityMovement', () => {
     entityLocation.getCellAtDelta = jest.fn((dx, dy) => newCell);
 
     const resultMovementCost = entityMovement.confirmMoveDeltas(1, 1);
-    expect(resultMovementCost).toBe(100);
+    expect(resultMovementCost).toBe(DEFAULT_MOVEMENT_ACTION_COST);
     expect(oldCell.entity).toBeUndefined();
     expect(newCell.entity).toBe(entity);
     expect(entityLocation.placeAtCell).toHaveBeenCalledWith(newCell);
@@ -174,10 +174,10 @@ describe('EntityMovement', () => {
   test('should move along path', () => {
     const nextCell = { x: 6, y: 6, z: 0, entity: null, isTraversible: true };
     entityMovement.movementPath = [nextCell];
-    entityMovement.tryMoveToCell = jest.fn(() => 100);
+    entityMovement.tryMoveToCell = jest.fn(() => DEFAULT_MOVEMENT_ACTION_COST);
 
     const result = entityMovement.moveAlongPath();
-    expect(result).toBe(100);
+    expect(result).toBe(DEFAULT_MOVEMENT_ACTION_COST);
     expect(entityMovement.tryMoveToCell).toHaveBeenCalledWith(nextCell);
     expect(entityMovement.movementPath).toEqual([]);
   });
@@ -192,12 +192,36 @@ describe('EntityMovement', () => {
   test('movement type implementation - should move aimlessly', () => {
     const randomDir = { dx: 1, dy: 0 };
     getRandomListItem.mockReturnValue(randomDir);
-    entityMovement.tryMove = jest.fn(() => 100);
+    entityMovement.tryMove = jest.fn(() => DEFAULT_MOVEMENT_ACTION_COST);
 
     const result = entityMovement.moveStepAimless();
-    expect(result).toBe(100);
+    expect(result).toBe(DEFAULT_MOVEMENT_ACTION_COST);
     expect(getRandomListItem).toHaveBeenCalledWith(GridCell.ADJACENCY_DIRECTIONS);
     expect(entityMovement.tryMove).toHaveBeenCalledWith(randomDir.dx, randomDir.dy);
   });
-  
+
+  test('movement type implementation - should move wander aimlessly', () => {
+    const randomCell = { x: 8, y: 8, z: 0, entity: null, isTraversible: true };
+    const mockEntStart = { x: 6, y: 6, z: 0 };
+    const mockEntMid = { x: 7, y: 7, z: 0 };
+    const mockEntEnd = { x: 8, y: 8, z: 0 };
+    getRandomCellOfTerrainInGrid.mockReturnValue(randomCell);
+    determineCheapestMovementPath.mockReturnValue([mockEntStart, mockEntMid, mockEntEnd]);
+    entityMovement.tryMoveToCell = jest.fn((arg) => { console.log(arg); return DEFAULT_MOVEMENT_ACTION_COST; });
+
+    const result = entityMovement.moveWanderAimless();
+    // that should ditch the first cell, as it's the entity starting position and it's already there
+    // then try to move to the middle cell
+    // and leave the last cell as the next destination
+
+    expect(result).toBe(DEFAULT_MOVEMENT_ACTION_COST);
+    expect(getRandomCellOfTerrainInGrid).toHaveBeenCalledWith("FLOOR", entityLocation.getWorldLevel().grid);
+    expect(determineCheapestMovementPath).toHaveBeenCalledWith(
+      entityLocation.getCell(),
+      randomCell,
+      entityLocation.getWorldLevel()
+    );
+    expect(entityMovement.tryMoveToCell).toHaveBeenCalledWith(mockEntMid);
+    expect(entityMovement.movementPath).toEqual([mockEntEnd]);
+  });
 });

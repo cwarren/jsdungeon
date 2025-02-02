@@ -95,6 +95,8 @@ function determineCellViewability(grid) {
 }
 
 // uses A-star algorithm
+// NOTE: this has global knowledge! It should be used sparingly.
+// TODO: create a version of this that uses a local knowledge map - this will be used for AI pathfinding and should take into account the entity's vision radius the entity's visible and seen cells
 function determineCheapestMovementPath(startCell, endCell, worldLevel) {
     if (!endCell.isTraversible) {
         return [];  // No path to an untraversable location

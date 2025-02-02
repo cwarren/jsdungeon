@@ -111,4 +111,10 @@ describe('EntityLocation', () => {
     entityLocation.z = 1; // Invalid level
     expect(() => entityLocation.getWorldLevel()).toThrow(`Entity ${entity.type} is not on a valid level`);
   });
+
+  test('should get the correct manhatten distance to another entity', () => {
+    const otherEntity = { location: { x: 7, y: 7 } };
+    const distance = entityLocation.getManhattenDistanceToEntity(otherEntity);
+    expect(distance).toBe(4);
+  });
 });

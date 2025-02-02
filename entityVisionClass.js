@@ -27,6 +27,20 @@ class EntityVision {
     this.determineVisibleCellsInGrid(this.location.getWorldLevel().grid);
   }
 
+  getVisibleEntityInfo() {
+    const visibleEntities = Array.from(this.visibleCells)
+      .map((cell) => cell.entity)
+      .filter((entity) => entity !== null && entity !== undefined && entity !== this.ofEntity);
+
+    return visibleEntities.map((entity) => {
+      return {
+        entity,
+        relation: this.ofEntity.getRelationshipTo(entity),
+        manhattenDistance: this.location.getManhattenDistanceToEntity(entity)
+      };
+    });
+  }
+
   /**
     * Determines visible cells within the grid using line-of-sight and view radius.
     * Uses Bresenham’s line algorithm for visibility checking.

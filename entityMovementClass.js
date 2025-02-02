@@ -168,38 +168,28 @@ class EntityMovement {
         return this.moveAlongPath();
     }
     
-    //   moveWanderAggressive() { // if hostile in view, head towards it, otherwise wanderAimless
-    //     devTrace(5, `wander aggressive for ${this.type}`);
-    
-    //     let closestHostile = null;
-    //     let closestDistance = Infinity;
-    
-    //     this.vision.visibleCells.forEach(cell => {
-    //       if (cell.entity && cell.entity !== this && ["HOSTILE_TO", "VIOLENT_TO"].includes(this.getRelationshipTo(cell.entity))) {
-    //         let dist = Math.abs(this.location.x - cell.x) + Math.abs(this.location.y - cell.y); // we only need relative distance for this, so manhattan is fine here
-    //         if (dist < closestDistance) {
-    //           closestHostile = cell.entity;
-    //           closestDistance = dist;
-    //         }
-    //       }
-    //     });
-    
-    //     if (closestHostile) {
-    //       devTrace(4, `wander aggressive - targeting ${closestHostile.type}`, this, closestHostile);
-    //       this.destinationCell = closestHostile.getCell();
-    //       this.movementPath = determineCheapestMovementPath(this.location.getCell(), this.destinationCell, gameState.world[this.location.z]);
-    //       if (this.movementPath.length > 0) {
-    //         this.movementPath.shift(); // Remove starting cell to avoid stepping on self
-    //       }
-    //     }
-    
-    //     if (this.movementPath.length > 0) {
-    //       const nextCell = this.movementPath.shift();
-    //       return this.movement.tryMoveToCell(nextCell);
-    //     }
-    
-    //     return this.moveWanderAimless();
-    //   }
+    moveWanderAggressive() { // if any hostiles are view and reachable, head towards the closest, otherwise wanderAimless
+        devTrace(5, `wander aggressive for ${this.type}`);
+
+        const origDestination = this.destinationCell;
+
+        const visibleHostilesInfo = this.ofEntity.vision.getVisibleEntityInfo().filter(
+            entInfo => ["HOSTILE_TO", "VIOLENT_TO"].includes(entInfo.relation)
+        ).sort((a, b) => a.manhattenDistance - b.manhattenDistance);
+        
+        for (const entInfo of visibleHostilesInfo) {
+            this.destinationCell = entInfo.entity.getCell();
+            this.setPathToDestination();
+            if (this.movementPath.length > 0) {
+                devTrace(4, `wander aggressive - targeting ${entInfo.entity.type}`, this.ofEntity, entInfo.entity);
+                return this.moveAlongPath();
+            }
+        }
+
+        this.destinationCell = origDestination;
+        this.setPathToDestination();
+        return this.moveWanderAimless();
+    }
 }
 
 export { EntityMovement, DEFAULT_MOVEMENT_ACTION_COST, DEFAULT_MOVEMENT_SPEC };
