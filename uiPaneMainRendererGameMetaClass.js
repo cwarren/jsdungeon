@@ -7,21 +7,20 @@ class UIPaneMainRendererGameMeta extends UIPaneMainRenderer {
 
     //=====================
 
-    // draw() {
-    //     console.log('################ drawing game meta');
-    //     console.log('canvas', this.canvas);
-    //     console.log('context', this.ctx);
-    //     // TODO: implement draw method for UIPaneMainRendererGameMeta
-    //     this.ctx.fillStyle = "white";
-    //     this.ctx.font = "20px Arial";
-    //     this.ctx.fillText("ui state: GAME_META", 50, 50);
-    // }
-
     draw() {
         super.draw();
         this.ctx.fillStyle = "white";
         this.ctx.font = "20px Arial";
-        this.ctx.fillText("ui state: GAME_META", 10, 50);
+
+        this.ctx.fillText(`Current Game: ${this.ui.gameState.status}`, 10, 80);
+       
+        if (this.ui.gameState.status == 'ACTIVE') {
+            this.ctx.fillText(`A: Abandon the current game`, 10, 110);
+        } else {
+            this.ctx.fillText(`N: Start a new game`, 10, 110);
+        }
+
+        this.ctx.fillText(`Escape: return to previous screen`, 10, 140);
     }
 
     //=====================

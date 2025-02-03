@@ -3,8 +3,6 @@ PS E:\code\jsdungeon> docker-compose up --build
 
 * add info text for current level (change when level changes)(with hooks for avatar knowldedge of level)
 
-* add some useful content to the game meta screen
-
 * update minichar display...
 * * when things start
 * * when avatar status changes (override status-changing methods - call parent, then update minichar)
