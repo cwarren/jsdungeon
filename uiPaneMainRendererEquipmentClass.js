@@ -8,6 +8,7 @@ class UIPaneMainRendererEquipment extends UIPaneMainRenderer {
     //=====================
 
     draw() {
+        super.draw();
         // TODO: implement draw method for UIPaneMainRendererEquipment
         this.ctx.fillStyle = "white";
         this.ctx.font = "20px Arial";

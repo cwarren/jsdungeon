@@ -27,8 +27,10 @@ class UIPaneMainRenderer {
     }
 
     draw() {
-        // Override in subclass
-        console.log("UIRenderer draw method called - should be overridden in subclass");
+        const mainElement = document.getElementById("main");
+        this.canvas.width = mainElement.clientWidth;
+        this.canvas.height = mainElement.clientHeight;
+        // sub-class overrides, leading with super();
     }
 
 }

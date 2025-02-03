@@ -8,6 +8,7 @@ class UIPaneMainRendererGameOver extends UIPaneMainRenderer {
     //=====================
 
     draw() {
+        super.draw();
         // TODO: implement draw method for UIPaneMainRendererGameOver
         this.ctx.fillStyle = "white";
         this.ctx.font = "20px Arial";

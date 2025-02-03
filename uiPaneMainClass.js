@@ -51,6 +51,10 @@ class UIPaneMain {
         this.resizeCanvas(); // Redraw to reflect new state
     }
 
+    getCurrentHelpTextBlock() {
+        return this.renderers['HELP'].currentHelpTextBlock;
+    }
+
     resizeCanvas() {
         this.canvas.width = window.innerWidth * 0.9;
         this.canvas.height = window.innerHeight * 0.9;

@@ -59,7 +59,7 @@
             padding: 10px;
         }
 
-        canvas {
+        #gameCanvas {
             display: block;
         }
     </style>
@@ -77,10 +77,6 @@
     <script type="module">
         import { gameState } from "./gameStateClass.js";
         import { uiPaneMain } from "./ui.js";
-
-        // function updateGameUI() {
-        //     uiPaneMain.drawUI();
-        // }
 
         uiPaneMain.resizeCanvas();
         window.addEventListener("resize", () => { uiPaneMain.resizeCanvas(); });

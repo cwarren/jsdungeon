@@ -7,11 +7,21 @@ class UIPaneMainRendererGameMeta extends UIPaneMainRenderer {
 
     //=====================
 
+    // draw() {
+    //     console.log('################ drawing game meta');
+    //     console.log('canvas', this.canvas);
+    //     console.log('context', this.ctx);
+    //     // TODO: implement draw method for UIPaneMainRendererGameMeta
+    //     this.ctx.fillStyle = "white";
+    //     this.ctx.font = "20px Arial";
+    //     this.ctx.fillText("ui state: GAME_META", 50, 50);
+    // }
+
     draw() {
-        // TODO: implement draw method for UIPaneMainRendererGameMeta
+        super.draw();
         this.ctx.fillStyle = "white";
         this.ctx.font = "20px Arial";
-        this.ctx.fillText("ui state: GAME_META", 50, 50);
+        this.ctx.fillText("ui state: GAME_META", 10, 50);
     }
 
     //=====================

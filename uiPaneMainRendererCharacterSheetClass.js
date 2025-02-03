@@ -8,6 +8,7 @@ class UIPaneMainRendererCharacterSheet extends UIPaneMainRenderer {
     //=====================
 
     draw() {
+        super.draw();
         // TODO: implement draw method for UIPaneMainRendererCharacterSheet
         this.ctx.fillStyle = "white";
         this.ctx.font = "20px Arial";

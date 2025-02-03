@@ -8,6 +8,7 @@ class UIPaneMainRendererGamePlay extends UIPaneMainRenderer {
     //=====================
 
     draw() {
+        super.draw();
         const currentLevel = this.ui.gameState.getCurrentWorldLevel();
         if (!currentLevel) return;
         this.drawWorldLevel(currentLevel);

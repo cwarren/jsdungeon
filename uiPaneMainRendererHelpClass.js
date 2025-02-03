@@ -9,11 +9,14 @@ class UIPaneMainRendererHelp extends UIPaneMainRenderer {
         super(ui, canvas);
         this.helpTextBlocks = {};
         this.initializeHelpTextBlocks(keyBinding, actionMaps);
+        console.log("initialized help text blocks", this.helpTextBlocks);
+        this.currentHelpTextBlock = null;
     }
 
     //=====================
 
     draw() {
+        super.draw();
         this.ctx.fillStyle = "white";
         this.ctx.font = "20px Arial";
         const lineHeight = 24; // Space between lines
@@ -22,6 +25,7 @@ class UIPaneMainRendererHelp extends UIPaneMainRenderer {
 
         const helpFor = this.ui.stateManager.uiStateStack[this.ui.stateManager.uiStateStack.length - 2]; // help is always in the context of the screen in which it was called
         const helpTextBlock = this.helpTextBlocks[helpFor];
+        this.currentHelpTextBlock = helpTextBlock;
 
         if (!helpTextBlock) {
             this.ctx.fillText("No help text available", startX, startY);
@@ -36,6 +40,8 @@ class UIPaneMainRendererHelp extends UIPaneMainRenderer {
             startY += lineHeight;
         }
     }
+
+
 
     //=====================
 

@@ -8,6 +8,7 @@ class UIPaneMainRendererCustomGraphics extends UIPaneMainRenderer {
     //=====================
 
     draw() {
+        super.draw();
         // TODO: implement draw method for UIPaneMainRendererCustomGraphics
         this.ctx.fillStyle = "white";
         this.ctx.font = "20px Arial";
