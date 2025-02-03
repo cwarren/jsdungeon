@@ -68,9 +68,17 @@ class GameState {
         }
     }
 
+    //=====================
+    // INFORMATION
+
     getAvatarCell() {
         devTrace(6,"getting avatar cell via game state");
         return this.avatar ? this.avatar.getCell() : null;
+    }
+
+    getCurrentWorldLevel() {
+        devTrace(6,"getting current world level via game state");
+        return gameState.world[gameState.currentLevel];
     }
 
     //=====================

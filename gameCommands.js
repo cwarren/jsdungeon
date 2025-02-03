@@ -7,7 +7,7 @@ import { pushUIState, popUIState, setUIState, resetUIState, getCurrentUIState } 
 // import { handlePlayerActionTime } from "./gameTime.js";
 
 const keyBinding = {
-    "GAMEPLAY":
+    "GAME_PLAY":
     {
         "7": "MOVE_UL",
         "8": "MOVE_U",
@@ -63,7 +63,7 @@ const keyBinding = {
     "GAME_META": {
         "N": "NEW_GAME",
         "A": "ABANDON_GAME",
-        "Escape": "PUSH_GAMEPLAY",
+        "Escape": "PUSH_GAME_PLAY",
         "?": "PUSH_HELP",
     },
     "GAME_OVER": {
@@ -80,7 +80,7 @@ const keyBinding = {
 };
 
 const actionMaps = {
-    "GAMEPLAY": gameActionsMap,
+    "GAME_PLAY": gameActionsMap,
     "GAME_META": gameMetaActionsMap,
     "HELP": textActionsMap,
 };

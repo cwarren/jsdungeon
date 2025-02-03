@@ -15,7 +15,7 @@ function startNewGame() {
         gameState.reset();
         initializeGameWorld();
         resetUIState();
-        pushUIState("GAMEPLAY");
+        pushUIState("GAME_PLAY");
     } else {
         console.log("Cannot start a new game because there's a game in progress.");
     }

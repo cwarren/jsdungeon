@@ -32,7 +32,7 @@ describe('gameCommands', () => {
 
     describe('getActionKey', () => {
         test('should return action key from keyBinding', () => {
-            expect(getActionKey('GAMEPLAY', '8')).toBe('MOVE_U');
+            expect(getActionKey('GAME_PLAY', '8')).toBe('MOVE_U');
         });
     });
 
@@ -84,8 +84,8 @@ describe('gameCommands', () => {
             const key = 'w';
             const event = { ctrlKey: false };
 
-            getCurrentUIState.mockReturnValue('GAMEPLAY');
-            keyBinding['GAMEPLAY'] = { 'w': 'MOVE_UP' };
+            getCurrentUIState.mockReturnValue('GAME_PLAY');
+            keyBinding['GAME_PLAY'] = { 'w': 'MOVE_UP' };
 
             executeGameCommand(key, event);
 
@@ -98,12 +98,12 @@ describe('gameCommands', () => {
             const key = 'x';
             const event = { ctrlKey: false };
 
-            getCurrentUIState.mockReturnValue('GAMEPLAY');
-            keyBinding['GAMEPLAY'] = {};
+            getCurrentUIState.mockReturnValue('GAME_PLAY');
+            keyBinding['GAME_PLAY'] = {};
 
             executeGameCommand(key, event);
 
-            expect(console.log).toHaveBeenCalledWith('No action bound for key: GAMEPLAY x');
+            expect(console.log).toHaveBeenCalledWith('No action bound for key: GAME_PLAY x');
         });
 
         test('should handle ctrl key combination', () => {

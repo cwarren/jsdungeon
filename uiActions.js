@@ -2,7 +2,7 @@ import { GameState, gameState } from "./gameStateClass.js";
 import { pushUIState, popUIState, setUIState, resetUIState, getCurrentUIState } from "./ui.js";
 
 const uiActionsMap = {
-    "PUSH_GAMEPLAY": { name: "Play game", description: "The main game-play screen", action: uiGamePlay },
+    "PUSH_GAME_PLAY": { name: "Play game", description: "The main game-play screen", action: uiGamePlay },
     "PUSH_CHARACTER_SHEET": { name: "Character Sheet", description: "See detailed information about your character", action: uiCharacterSheet } ,
     "PUSH_INVENTORY_SCREEN": { name: "Inventory", description: "Items that you're carrying", action: uiInventory } ,
     "PUSH_EQUIPMENT_SCREEN": { name: "Equipment", description: "Items that you're using", action: uiEquipment } ,
@@ -14,7 +14,7 @@ const uiActionsMap = {
 function uiGamePlay() { 
     // go to game play if there's an active game, otherwise show the game over screen
     if (gameState.status == 'ACTIVE') {
-        pushUIState("GAMEPLAY");
+        pushUIState("GAME_PLAY");
     } else if (GameState.statusesGameOver.includes(gameState.status)) {
         pushUIState("GAME_OVER");
     } else {
