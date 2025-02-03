@@ -1,5 +1,5 @@
 import { GameState, gameState } from "./gameStateClass.js";
-import { pushUIState, popUIState, setUIState, resetUIState, getCurrentUIState } from "./ui.js";
+import { uiPaneMain } from "./ui.js";
 
 const uiActionsMap = {
     "PUSH_GAME_PLAY": { name: "Play game", description: "The main game-play screen", action: uiGamePlay },
@@ -9,23 +9,23 @@ const uiActionsMap = {
     "PUSH_MAP_SCREEN": { name: "Map", description: "A zoomed out map", action: uiMap } ,
     "PUSH_GAME_META": { name: "Game menu", description: "The main game menu", action: uiGameMeta } ,
     "PUSH_HELP": { name: "Help", description: "Details about the commands available", action: uiHelp } ,
-    "POP_UI_STATE": { name: "Exit", description: "Close this screen", action: popUIState } 
+    "POP_UI_STATE": { name: "Exit", description: "Close this screen", action: uiPaneMain.popUIState } 
 };
 function uiGamePlay() { 
     // go to game play if there's an active game, otherwise show the game over screen
     if (gameState.status == 'ACTIVE') {
-        pushUIState("GAME_PLAY");
+        uiPaneMain.pushUIState("GAME_PLAY");
     } else if (GameState.statusesGameOver.includes(gameState.status)) {
-        pushUIState("GAME_OVER");
+        uiPaneMain.pushUIState("GAME_OVER");
     } else {
-        resetUIState();
+        uiPaneMain.resetUIState();
     }
 }
-function uiCharacterSheet() { pushUIState("CHARACTER_SHEET"); }
-function uiInventory() { pushUIState("INVENTORY"); }
-function uiEquipment() { pushUIState("EQUIPMENT"); }
-function uiMap() { pushUIState("MAP_SCREEN"); }
-function uiGameMeta() { pushUIState("GAME_META"); }
-function uiHelp() { pushUIState("HELP"); }
+function uiCharacterSheet() { uiPaneMain.pushUIState("CHARACTER_SHEET"); }
+function uiInventory() { uiPaneMain.pushUIState("INVENTORY"); }
+function uiEquipment() { uiPaneMain.pushUIState("EQUIPMENT"); }
+function uiMap() { uiPaneMain.pushUIState("MAP_SCREEN"); }
+function uiGameMeta() { uiPaneMain.pushUIState("GAME_META"); }
+function uiHelp() { uiPaneMain.pushUIState("HELP"); }
 
 export { uiActionsMap };

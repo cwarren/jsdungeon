@@ -1,5 +1,5 @@
 import { GameState, gameState } from "./gameStateClass.js";
-import { initializeGameWorld, pushUIState, resetUIState } from "./ui.js";
+import { uiPaneMain, initializeGameWorld } from "./ui.js";
 
 
 //=====================
@@ -14,8 +14,8 @@ function startNewGame() {
     if (GameState.statusesGameOver.includes(gameState.status)) {
         gameState.reset();
         initializeGameWorld();
-        resetUIState();
-        pushUIState("GAME_PLAY");
+        uiPaneMain.resetUIState();
+        uiPaneMain.pushUIState("GAME_PLAY");
     } else {
         console.log("Cannot start a new game because there's a game in progress.");
     }
@@ -26,8 +26,8 @@ function abandonCurrentGame() {
     console.log("abandonCurrentGame", gameState);
     if (gameState.status == 'ACTIVE') {
         gameState.abandonGame();
-        resetUIState();
-        pushUIState("GAME_OVER");
+        uiPaneMain.resetUIState();
+        uiPaneMain.pushUIState("GAME_OVER");
     } else {
         console.log("Cannot abandon a game that's already over")
     }

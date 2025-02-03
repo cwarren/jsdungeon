@@ -1,7 +1,6 @@
 import { gameState } from "./gameStateClass.js";
 import { DEFAULT_ACTION_COST } from "./entityClass.js";
-// import {initializeTurnSystem_mobsOnly} from "./gameTime.js";
-import { pushUIState, resetUIState } from "./ui.js";
+import { uiPaneMain } from "./ui.js";
 import { devTrace } from "./util.js";
 
 
@@ -55,14 +54,14 @@ const DIRECTION_DELTAS = {
 
 function DEV_winGame()  { 
     gameState.winGame();
-    resetUIState();
-    pushUIState("GAME_OVER");
+    uiPaneMain.resetUIState();
+    uiPaneMain.pushUIState("GAME_OVER");
     return 0;
 }
 function DEV_loseGame() {
     gameState.loseGame();
-    resetUIState();
-    pushUIState("GAME_OVER");
+    uiPaneMain.resetUIState();
+    uiPaneMain.pushUIState("GAME_OVER");
     return 0;
 }
 function DEV_dumpGameState() {

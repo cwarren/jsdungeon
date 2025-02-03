@@ -1,8 +1,3 @@
-// import { GameState, gameState } from "./gameStateClass.js";
-// import { initializeGameWorld, pushUIState, resetUIState } from "./ui.js";
-
-
-//=====================
 
 const textActionsMap = {
     LINE_UP: { name: "Line up", description: "Move one line towards the beginning of the text", action: lineUp },

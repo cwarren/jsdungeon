@@ -76,18 +76,18 @@
 
     <script type="module">
         import { gameState } from "./gameStateClass.js";
-        import { resizeCanvas, drawGame } from "./ui.js";
+        import { uiPaneMain } from "./ui.js";
 
         function updateGameUI() {
-            drawGame(gameState);
+            uiPaneMain.drawUI();
         }
 
         // Initialize the game
-        resizeCanvas();
-        updateGameUI();
+        uiPaneMain.resizeCanvas();
+        // updateGameUI();
 
         // Handle resizing
-        window.addEventListener("resize", resizeCanvas);
+        window.addEventListener("resize", uiPaneMain.resizeCanvas);
     </script>
 </body>
 

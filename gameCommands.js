@@ -3,7 +3,7 @@ import { gameActionsMap } from "./gameActions.js";
 import { gameMetaActionsMap } from "./gameMetaActions.js";
 import { textActionsMap } from "./textActions.js";
 import { uiActionsMap } from "./uiActions.js";
-import { pushUIState, popUIState, setUIState, resetUIState, getCurrentUIState } from "./ui.js";
+import { uiPaneMain } from "./ui.js";
 // import { handlePlayerActionTime } from "./gameTime.js";
 
 const keyBinding = {
@@ -112,7 +112,7 @@ function executeGameAction(actionDef, key, event) {
 
 function executeGameCommand(key, event) {
     const lookupKey = getLookupKey(key, event);
-    const uiState = getCurrentUIState();
+    const uiState = uiPaneMain.getCurrentUIState();
     const actionKey = getActionKey(uiState, lookupKey);
 
     if (!actionKey) {

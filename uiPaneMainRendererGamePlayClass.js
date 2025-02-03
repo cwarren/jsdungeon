@@ -1,6 +1,6 @@
 import { UIPaneMainRenderer } from "./uiPaneMainRendererClass.js";
 
-class UIPaneMainRendererGamePlay extends UIRenderer {
+class UIPaneMainRendererGamePlay extends UIPaneMainRenderer {
     constructor(ui, canvas) {
         super(ui, canvas);
     }

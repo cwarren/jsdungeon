@@ -1,8 +1,16 @@
 
+import { UIPaneMainRendererCharacterSheet } from './uiPaneMainRendererCharacterSheetClass.js';
+import { UIPaneMainRendererCustomGraphics } from './uiPaneMainRendererCustomGraphicsClass.js';
+import { UIPaneMainRendererEquipment } from './uiPaneMainRendererEquipmentClass.js';
+import { UIPaneMainRendererGameMeta } from './uiPaneMainRendererGameMetaClass.js';
+import { UIPaneMainRendererGameOver } from './uiPaneMainRendererGameOverClass.js';
 import { UIPaneMainRendererGamePlay } from './uiPaneMainRendererGamePlayClass.js';
+import { UIPaneMainRendererHelp } from './uiPaneMainRendererHelpClass.js';
+import { UIPaneMainRendererInventory } from './uiPaneMainRendererInventoryClass.js';
+import { UIPaneMainRendererMapScreen } from './uiPaneMainRendererMapScreenClass.js';
+import { UIPaneMainRendererProseSection } from './uiPaneMainRendererProseSectionClass.js';
 import { UIPaneMainStateManager } from './uiPaneMainStateManagerClass.js';
 import { UIPaneMainEventHandler } from './uiPaneMainEventHandlerClass.js';
-import { keyBinding, actionMaps } from "./gameCommands.js";
 
 class UIPaneMain {
     constructor(gameState) {
@@ -11,29 +19,17 @@ class UIPaneMain {
         this.stateManager = new UIPaneMainStateManager(this);
         this.eventHandler = new UIPaneMainEventHandler(this, this.canvas);
         this.renderers = {
+            "CHARACTER_SHEET": new UIPaneMainRendererCharacterSheet(this, this.canvas),
+            "CUSTOM_GRAPHICS": new UIPaneMainRendererCustomGraphics(this, this.canvas),
+            "EQUIPMENT": new UIPaneMainRendererEquipment(this, this.canvas),
+            "GAME_META": new UIPaneMainRendererGameMeta(this, this.canvas),
+            "GAME_OVER": new UIPaneMainRendererGameOver(this, this.canvas),
             "GAME_PLAY": new UIPaneMainRendererGamePlay(this, this.canvas),
-            "CHARACTER_SHEET": null,
-            "INVENTORY": null,
-            "EQUIPMENT": null,
-            "MAP_SCREEN": null,
-            "GAME_META": null,
-            "GAME_OVER": null,
-            "PROSE_SECTION": null,
-            "CUSTOM_GRAPHICS": null,
+            "HELP": new UIPaneMainRendererHelp(this, this.canvas),
+            "INVENTORY": new UIPaneMainRendererInventory(this, this.canvas),
+            "MAP_SCREEN": new UIPaneMainRendererMapScreen(this, this.canvas),
+            "PROSE_SECTION": new UIPaneMainRendererProseSection(this, this.canvas),
         };
-
-        this.helpTextBlocks = {};
-        this.initializeHelpTextBlocks(keyBinding, actionMaps);
-    }
-
-    initializeHelpTextBlocks(keyBindings, actionMaps) {
-        for (const commandSet in keyBindings) {
-            if (actionMaps[commandSet]) {
-                this.helpTextBlocks[commandSet] = new TextBlock(
-                    createHelpText(keyBindings[commandSet], actionMaps[commandSet], uiActionsMap)
-                );
-            }
-        }
     }
 
     getCurrentUIState() {
@@ -62,40 +58,7 @@ class UIPaneMain {
             return;
         }
         renderer.clear();
-
-        switch (getCurrentUIState()) {
-            case "GAME_PLAY":
-                this.rendererGamePlay.draw();
-                break;
-            case "CHARACTER_SHEET":
-                drawCharacterSheet(gameState);
-                break;
-            case "INVENTORY":
-                drawInventory(gameState);
-                break;
-            case "EQUIPMENT":
-                drawEquipment(gameState);
-                break;
-            case "GAME_META":
-                drawGameMeta();
-                break;
-            case "GAME_OVER":
-                drawGameOver();
-                break;
-            case "PROSE_SECTION":
-                drawProseSection(gameState);
-                break;
-            case "HELP":
-                console.log("uiStateStack", uiStateStack);
-                drawHelp();
-                break;
-            case "MAP_SCREEN":
-                drawMapScreen(gameState);
-                break;
-            case "CUSTOM_GRAPHICS":
-                drawCustomGraphics(gameState);
-                break;
-        }
+        renderer.draw();
     }
 }
 
