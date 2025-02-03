@@ -204,8 +204,7 @@ class WorldLevel {
             this.gameState.avatar.actionStartingTime = this.turnQueue.elapsedTime;
         }
 
-        // TODO: add message about entering level
-        addMessage(`You enter level ${this.levelNumber + 1}`);
+        uiPaneMessages.addMessage(`You enter level ${this.levelNumber + 1}`);
     }
 }
 

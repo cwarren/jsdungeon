@@ -235,7 +235,7 @@ class Entity {
   attack(otherEntity) {
     devTrace(3, `${this.type} attacking ${otherEntity.type}`, this, otherEntity);
     otherEntity.takeDamageFrom(this.getAttackDamage(), this);
-    addMessage(`${this.name} attacks ${otherEntity.name}`);
+    uiPaneMessages.addMessage(`${this.name} attacks ${otherEntity.name}`);
     return DEFAULT_ACTION_COST;
   }
 
@@ -278,7 +278,7 @@ class Entity {
       this.damagedBy.push({ "damageSource": otherEntity, "damage": dam });
     }
 
-    addMessage(`${this.name} takes ${formatNumberForMessage(dam.amount)} damage from ${otherEntity.name}`);
+    uiPaneMessages.addMessage(`${this.name} takes ${formatNumberForMessage(dam.amount)} damage from ${otherEntity.name}`);
 
     // Reset movement plans on damage
     this.movement.interruptOngoingMovement();
@@ -301,7 +301,7 @@ class Entity {
     });
 
     gameState.world[this.location.z].removeEntity(this);
-    addMessage(`${this.name} dies`);
+    uiPaneMessages.addMessage(`${this.name} dies`);
 
     this.damagedBy = [];
     this.vision.visibleCells.clear();

@@ -162,11 +162,10 @@ const WORLD_LEVEL_SPECS_FOR_DEV= [
 
 // Create a single instance to maintain the game's state globally
 const gameState = new GameState();
-function initializeGameWorld() { // this is a hack until I pull this stuff out to a better location
+function initializeGameWorld() { // this is a hack until I put this stuff in a better location (probably just embed it in the class)
     gameState.initialize(WORLD_LEVEL_SPECS_FOR_DEV);
     gameState.advanceGameTime();
   }
-// initializeGameWorld();
 
 
 export { GameState, gameState, WORLD_LEVEL_SPECS_FOR_DEV, initializeGameWorld };

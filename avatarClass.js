@@ -47,7 +47,7 @@ class Avatar extends Entity {
   }
 
   showNaturalHealingMessage(message) {
-    addMessage(message);
+    uiPaneMessages.addMessage(message);
   }
 
 }
