@@ -9,7 +9,7 @@ const uiActionsMap = {
     "PUSH_MAP_SCREEN": { name: "Map", description: "A zoomed out map", action: uiMap } ,
     "PUSH_GAME_META": { name: "Game menu", description: "The main game menu", action: uiGameMeta } ,
     "PUSH_HELP": { name: "Help", description: "Details about the commands available", action: uiHelp } ,
-    "POP_UI_STATE": { name: "Exit", description: "Close this screen", action: uiPaneMain.popUIState } 
+    "POP_UI_STATE": { name: "Exit", description: "Close this screen", action: uiPopState } 
 };
 function uiGamePlay() { 
     // go to game play if there's an active game, otherwise show the game over screen
@@ -27,5 +27,7 @@ function uiEquipment() { uiPaneMain.pushUIState("EQUIPMENT"); }
 function uiMap() { uiPaneMain.pushUIState("MAP_SCREEN"); }
 function uiGameMeta() { uiPaneMain.pushUIState("GAME_META"); }
 function uiHelp() { uiPaneMain.pushUIState("HELP"); }
+
+function uiPopState() { uiPaneMain.popUIState(); }
 
 export { uiActionsMap };

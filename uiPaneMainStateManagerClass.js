@@ -1,20 +1,20 @@
 class UIPaneMainStateManager {
 
-    static uiStates = [
-        "GAME_PLAY",
-        "CHARACTER_SHEET",
-        "INVENTORY",
-        "EQUIPMENT",
-        "MAP_SCREEN",
-        "GAME_META",
-        "GAME_OVER",
-        "PROSE_SECTION",
-        "CUSTOM_GRAPHICS",
-      ];
+  static uiStates = [
+    "GAME_PLAY",
+    "CHARACTER_SHEET",
+    "INVENTORY",
+    "EQUIPMENT",
+    "MAP_SCREEN",
+    "GAME_META",
+    "GAME_OVER",
+    "PROSE_SECTION",
+    "CUSTOM_GRAPHICS",
+  ];
 
-    constructor(ui) {
-        this.ui = ui;
-    this.uiStateStack = ["GAME_META"];
+  constructor(ui) {
+    this.ui = ui;
+    this.uiStateStack = ["GAME_META", "GAME_PLAY"];
   }
 
   getCurrentUIState() {
@@ -33,12 +33,12 @@ class UIPaneMainStateManager {
   }
 
   setUIState(newState) {
-        this.uiStateStack = [newState];
-      resizeCanvas();  // Redraw to reflect new state
+    this.uiStateStack = [newState];
+    resizeCanvas();  // Redraw to reflect new state
   }
 
   resetUIState() {
-    uiStateStack = ["GAME_META"];
+    this.uiStateStack = ["GAME_META"];
   }
 }
 

@@ -16,10 +16,10 @@ class UIPaneMainRendererGamePlay extends UIPaneMainRenderer {
     //=====================
 
     drawWorldLevel(worldLevel) {
-        drawWorldLevelGrid(worldLevel);
-        drawWorldLevelStructures(worldLevel);
-        drawWorldLevelItems(worldLevel);
-        drawWorldLevelEntities(worldLevel);
+        this.drawWorldLevelGrid(worldLevel);
+        this.drawWorldLevelStructures(worldLevel);
+        this.drawWorldLevelItems(worldLevel);
+        this.drawWorldLevelEntities(worldLevel);
     }
 
     drawWorldLevelGrid(worldLevel) {
@@ -27,10 +27,10 @@ class UIPaneMainRendererGamePlay extends UIPaneMainRenderer {
         for (let col = 0; col < worldLevel.levelWidth; col++) {
             for (let row = 0; row < worldLevel.levelHeight; row++) {
                 const cell = worldLevel.grid[col][row];
-                if (this.gameState.avatar.vision.visibleCells.has(cell)) {
-                    drawGridCell(cell, offsetX, offsetY, cellSize, gridSpacing);
-                } else if (this.gameState.avatar.vision.seenCells.has(cell)) {
-                    drawGridCellFaint(cell, offsetX, offsetY, cellSize, gridSpacing);
+                if (this.ui.gameState.avatar.vision.visibleCells.has(cell)) {
+                    this.drawGridCell(cell, offsetX, offsetY, cellSize, gridSpacing);
+                } else if (this.ui.gameState.avatar.vision.seenCells.has(cell)) {
+                    this.drawGridCellFaint(cell, offsetX, offsetY, cellSize, gridSpacing);
                 }
             }
         }
@@ -62,7 +62,7 @@ class UIPaneMainRendererGamePlay extends UIPaneMainRenderer {
         const {cellSize, gridSpacing, offsetX, offsetY} = this.getGridRenderSettings(worldLevel);
         worldLevel.levelStructures.forEach(structure => {
             const structureCell = structure.getCell();
-            if (this.gameState.avatar.vision.visibleCells.has(structureCell) || this.gameState.avatar.vision.seenCells.has(structureCell)) {
+            if (this.ui.gameState.avatar.vision.visibleCells.has(structureCell) || this.ui.gameState.avatar.vision.seenCells.has(structureCell)) {
                 this.drawStructure(structure, offsetX, offsetY, cellSize, gridSpacing);
             }
         });
@@ -87,24 +87,24 @@ class UIPaneMainRendererGamePlay extends UIPaneMainRenderer {
     drawWorldLevelEntities(worldLevel) {
         const {cellSize, gridSpacing, offsetX, offsetY} = this.getGridRenderSettings(worldLevel);
         worldLevel.levelEntities.forEach(entity => {
-            if (entity.isVisibleTo(gameState.avatar)) {
+            if (entity.isVisibleTo(this.ui.gameState.avatar)) {
                 this.drawEntity(entity, offsetX, offsetY, cellSize, gridSpacing);
             }
         });
 
         // Draw the avatar if it's in this world level
-        const avatar = this.gameState.avatar;
+        const avatar = this.ui.gameState.avatar;
         if (avatar && avatar.z === worldLevel.levelNumber) {
             this.drawEntity(avatar, offsetX, offsetY, cellSize, gridSpacing);
         }
     }
 
     drawEntity(entity, offsetX, offsetY, cellSize, gridSpacing) {
-        ctx.fillStyle = entity.displayColor;
-        ctx.font = `${cellSize * 0.8}px Arial`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(
+        this.ctx.fillStyle = entity.displayColor;
+        this.ctx.font = `${cellSize * 0.8}px Arial`;
+        this.ctx.textAlign = "center";
+        this.ctx.textBaseline = "middle";
+        this.ctx.fillText(
             entity.displaySymbol,
             offsetX + entity.location.x * (cellSize + gridSpacing) + cellSize / 2,
             offsetY + entity.location.y * (cellSize + gridSpacing) + cellSize / 2
@@ -114,7 +114,7 @@ class UIPaneMainRendererGamePlay extends UIPaneMainRenderer {
     drawPathHighlight(gridCellList, highlightColor = "red") {
         if (gridCellList === 0) return;
 
-        const currentLevel = this.gameState.world[this.gameState.currentLevel];
+        const currentLevel = this.ui.gameState.getCurrentWorldLevel();
         if (!currentLevel) return;
         const {cellSize, gridSpacing, offsetX, offsetY} = this.getGridRenderSettings(currentLevel);
 

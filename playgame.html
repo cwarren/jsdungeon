@@ -78,16 +78,12 @@
         import { gameState } from "./gameStateClass.js";
         import { uiPaneMain } from "./ui.js";
 
-        function updateGameUI() {
-            uiPaneMain.drawUI();
-        }
+        // function updateGameUI() {
+        //     uiPaneMain.drawUI();
+        // }
 
-        // Initialize the game
         uiPaneMain.resizeCanvas();
-        // updateGameUI();
-
-        // Handle resizing
-        window.addEventListener("resize", uiPaneMain.resizeCanvas);
+        window.addEventListener("resize", () => { uiPaneMain.resizeCanvas(); });
     </script>
 </body>
 

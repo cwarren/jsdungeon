@@ -46,8 +46,14 @@ class UIPaneMain {
         this.resizeCanvas(); // Redraw to reflect new state
     }
 
+    resetUIState() {
+        this.stateManager.resetUIState();
+        this.resizeCanvas(); // Redraw to reflect new state
+    }
+
     resizeCanvas() {
-        this.renderer.resizeCanvas(window.innerWidth * 0.9, window.innerHeight * 0.9);
+        this.canvas.width = window.innerWidth * 0.9;
+        this.canvas.height = window.innerHeight * 0.9;
         this.drawUI();
     }
 
