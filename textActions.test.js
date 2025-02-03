@@ -1,5 +1,14 @@
-import { TextBlock } from './textBlockClass';
-import { textActionsMap } from './textActions';
+import { TextBlock } from './textBlockClass.js';
+import { textActionsMap } from './textActions.js';
+import { uiPaneMain } from './ui.js';
+
+jest.mock('./ui.js', () => ({
+    uiPaneMain: {
+        initializeCanvasClickListeners: jest.fn(),
+        initializeEventListeners: jest.fn(),
+        getCurrentHelpTextBlock: jest.fn(),
+    }
+}));
 
 describe('textActions', () => {
     let textBlock;
@@ -7,6 +16,7 @@ describe('textActions', () => {
     beforeEach(() => {
         const baseText = "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10\nLine 11\nLine 12\nLine 13\nLine 14\nLine 15\nLine 16\nLine 17\nLine 18\nLine 19";
         textBlock = new TextBlock(baseText);
+        uiPaneMain.getCurrentHelpTextBlock.mockReturnValue(textBlock);
     });
 
     test('LINE_UP should move one line up', () => {

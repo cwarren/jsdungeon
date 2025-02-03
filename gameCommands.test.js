@@ -1,13 +1,16 @@
 import { executeGameCommand, getLookupKey, getActionKey, executeUIAction, executeGameAction, keyBinding, gameActionsMap } from './gameCommands';
-import { getCurrentUIState } from './ui';
-import { gameState } from './gameStateClass';
-import { uiActionsMap } from './uiActions';
+import { uiPaneMain, getCurrentUIState } from './ui.js';
+import { gameState } from './gameStateClass.js';
+import { uiActionsMap } from './uiActions.js';
 
-jest.mock('./ui', () => ({
+jest.mock('./ui.js', () => ({
     getCurrentUIState: jest.fn(),
+    uiPaneMain: {
+        getCurrentUIState: jest.fn(),
+    }
 }));
 
-jest.mock('./gameStateClass', () => ({
+jest.mock('./gameStateClass.js', () => ({
     gameState: {
         handlePlayerActionTime: jest.fn(),
     },
@@ -16,6 +19,7 @@ jest.mock('./gameStateClass', () => ({
 describe('gameCommands', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        keyBinding['HELP'] = { '?': 'PUSH_HELP' };
     });
 
     describe('getLookupKey', () => {
@@ -70,7 +74,7 @@ describe('gameCommands', () => {
             const key = '?';
             const event = { ctrlKey: false };
 
-            getCurrentUIState.mockReturnValue('HELP');
+            uiPaneMain.getCurrentUIState.mockReturnValue('HELP');
             keyBinding['HELP'] = { '?': 'PUSH_HELP' };
 
             executeGameCommand(key, event);
@@ -84,7 +88,7 @@ describe('gameCommands', () => {
             const key = 'w';
             const event = { ctrlKey: false };
 
-            getCurrentUIState.mockReturnValue('GAME_PLAY');
+            uiPaneMain.getCurrentUIState.mockReturnValue('GAME_PLAY');
             keyBinding['GAME_PLAY'] = { 'w': 'MOVE_UP' };
 
             executeGameCommand(key, event);
@@ -98,7 +102,7 @@ describe('gameCommands', () => {
             const key = 'x';
             const event = { ctrlKey: false };
 
-            getCurrentUIState.mockReturnValue('GAME_PLAY');
+            uiPaneMain.getCurrentUIState.mockReturnValue('GAME_PLAY');
             keyBinding['GAME_PLAY'] = {};
 
             executeGameCommand(key, event);
@@ -112,7 +116,7 @@ describe('gameCommands', () => {
             const key = 'h';
             const event = { ctrlKey: true };
 
-            getCurrentUIState.mockReturnValue('HELP');
+            uiPaneMain.getCurrentUIState.mockReturnValue('HELP');
             keyBinding['HELP'] = { 'CTRL-h': 'PUSH_HELP' };
 
             executeGameCommand(key, event);

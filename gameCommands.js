@@ -93,6 +93,9 @@ function getLookupKey(key, event) {
 }
 
 function getActionKey(uiState, lookupKey) {
+    console.log('keybinding', keyBinding);
+    console.log('uiState', uiState);
+    console.log('lookupKey', lookupKey);
     return keyBinding[uiState][lookupKey];
 }
 
