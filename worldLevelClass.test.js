@@ -24,7 +24,8 @@ import {
   determineCellViewability,
 } from './gridUtils.js';
 import { rollDice } from './util.js';
-import { addMessage } from './uiUtil.js';
+// import { addMessage } from './uiUtil.js';
+import { uiPaneMessages } from "./ui.js";
 
 jest.mock('./util.js', () => ({
   devTrace: jest.fn(),

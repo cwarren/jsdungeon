@@ -1,17 +1,14 @@
-import { gameState, WORLD_LEVEL_SPECS_FOR_DEV } from "./gameStateClass.js";
 import { UIPaneMain } from "./uiPaneMainClass.js";
+import { UIPaneMessages } from "./uiPaneMessagesClass.js";
 
-// On page load, initialize the game state, then draw it, then start game turns
+let uiPaneMain;
+let uiPaneMessages;
 
-function initializeGameWorld() { // this is a hack until I pull this stuff out to a better location
-  gameState.initialize(WORLD_LEVEL_SPECS_FOR_DEV);
+function setupUi(gameState) {
+  uiPaneMain = new UIPaneMain(gameState);
+  uiPaneMessages = new UIPaneMessages();  
 }
-initializeGameWorld();
-
-const uiPaneMain = new UIPaneMain(gameState);
-
-gameState.advanceGameTime();
 
 export {
-  uiPaneMain, initializeGameWorld,
+  uiPaneMain, uiPaneMessages, setupUi,
 };

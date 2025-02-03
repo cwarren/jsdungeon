@@ -5,7 +5,8 @@ import { rollDice, getRandomListItem, constrainValue, devTrace, formatNumberForM
 // import { GridCell } from "./gridCellClass.js";
 // import { getRandomCellOfTerrainInGrid, determineCheapestMovementPath, computeBresenhamLine } from "./gridUtils.js";
 import { ENTITIES_DEFINITIONS } from "./entityDefinitions.js";
-import { addMessage } from "./uiUtil.js";
+// import { addMessage } from "./uiUtil.js";
+import { uiPaneMessages } from "./ui.js";
 import { EntityHealth } from "./entityHealthClass.js";
 import { EntityLocation } from "./entityLocationClass.js";
 import { EntityMovement } from "./entityMovementClass.js";

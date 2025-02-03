@@ -7,7 +7,8 @@ import { EntityMovement } from './entityMovementClass';
 import { EntityVision } from './entityVisionClass';
 import { WorldLevel } from './worldLevelClass';
 import { Damager } from './damagerClass';
-import { addMessage } from './uiUtil';
+// import { addMessage } from './uiUtil';
+import { uiPaneMessages } from "./ui.js";
 
 // NOTE: many of these tests are more integration tests than unit tests
 

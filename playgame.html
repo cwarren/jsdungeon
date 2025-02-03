@@ -75,11 +75,11 @@
     <div id="info"></div>
 
     <script type="module">
-        import { gameState } from "./gameStateClass.js";
-        import { uiPaneMain } from "./ui.js";
+        import { gameState, initializeGameWorld } from "./gameStateClass.js";
+        import { uiPaneMain, setupUi } from "./ui.js";
 
-        uiPaneMain.resizeCanvas();
-        window.addEventListener("resize", () => { uiPaneMain.resizeCanvas(); });
+        initializeGameWorld();
+        setupUi(gameState);
     </script>
 </body>
 

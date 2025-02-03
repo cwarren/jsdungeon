@@ -3,7 +3,8 @@ import { Entity, DEFAULT_ACTION_COST } from './entityClass.js';
 import { gameState } from './gameStateClass.js';
 import { devTrace, rollDice } from './util.js';
 import { Damage } from './damageClass.js';
-import { addMessage } from './uiUtil.js';
+// import { addMessage } from './uiUtil.js';
+import { uiPaneMessages } from "./ui.js";
 
 jest.mock('./util.js', () => ({
   devTrace: jest.fn(),

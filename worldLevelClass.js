@@ -23,7 +23,8 @@ import {
 } from "./gridUtils.js";
 import { TurnQueue } from "./gameTime.js";
 import { Entity, DEFAULT_ACTION_COST } from "./entityClass.js";
-import { addMessage } from "./uiUtil.js"; 
+// import { addMessage } from "./uiUtil.js"; 
+import { uiPaneMessages } from "./ui.js";
 
 const MAX_ENTITY_PLACEMENT_ATTEMPTS = 20;
 const MAX_TIME_AWAY_TO_CARE_ABOUT = DEFAULT_ACTION_COST * 100;
