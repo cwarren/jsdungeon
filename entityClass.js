@@ -1,11 +1,7 @@
 import { gameState } from "./gameStateClass.js";
 import { Damage } from "./damageClass.js";
-// import { Damager } from "./damagerClass.js";
 import { rollDice, getRandomListItem, constrainValue, devTrace, formatNumberForMessage } from "./util.js";
-// import { GridCell } from "./gridCellClass.js";
-// import { getRandomCellOfTerrainInGrid, determineCheapestMovementPath, computeBresenhamLine } from "./gridUtils.js";
 import { ENTITIES_DEFINITIONS } from "./entityDefinitions.js";
-// import { addMessage } from "./uiUtil.js";
 import { uiPaneMessages } from "./ui.js";
 import { EntityHealth } from "./entityHealthClass.js";
 import { EntityLocation } from "./entityLocationClass.js";

@@ -3,7 +3,6 @@ import { Entity, DEFAULT_ACTION_COST } from './entityClass.js';
 import { gameState } from './gameStateClass.js';
 import { devTrace, rollDice } from './util.js';
 import { Damage } from './damageClass.js';
-// import { addMessage } from './uiUtil.js';
 import { uiPaneMessages } from "./ui.js";
 
 jest.mock('./util.js', () => ({
@@ -17,8 +16,8 @@ jest.mock('./util.js', () => ({
 //   },
 // }));
 
-jest.mock('./uiUtil.js', () => ({
-  addMessage: jest.fn(),
+jest.mock('./ui.js', () => ({
+  uiPaneMessages: { addMessage: jest.fn()},
 }));
 
 describe('Avatar', () => {
@@ -76,6 +75,6 @@ describe('Avatar', () => {
 
   test('should show natural healing message', () => {
     avatar.showNaturalHealingMessage('Healing message');
-    expect(addMessage).toHaveBeenCalledWith('Healing message');
+    expect(uiPaneMessages.addMessage).toHaveBeenCalledWith('Healing message');
   });
 });

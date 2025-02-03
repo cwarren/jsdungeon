@@ -1,11 +1,6 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* updates messages display to use a new uiPaneMessages class/object
-* * creation of the class & copy in relevant functions et al from uiUtil
-* * instantiate and export in ui.js
-* * replace current library calls with use of the object
-
 * add info text for current level (change when level changes)(with hooks for avatar knowldedge of level)
 * updates info display to use a new uiPaneInfo class/object
 

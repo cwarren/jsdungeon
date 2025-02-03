@@ -23,7 +23,8 @@ import {
 } from './gridUtils.js';
 import { devTrace, constrainValue, rollDice } from './util.js';
 import { gameState } from './gameStateClass.js';
-import { addMessage } from './uiUtil.js';
+import { uiPaneMessages } from "./ui.js";
+
 
 
 jest.mock('./util.js', () => ({
@@ -32,8 +33,8 @@ jest.mock('./util.js', () => ({
   rollDice: jest.requireActual('./util.js').rollDice,
 }));
 
-jest.mock('./uiUtil.js', () => ({
-  addMessage: jest.fn(),
+jest.mock('./ui.js', () => ({
+  uiPaneMessages: {addMessage: jest.fn()},
 }));
 
 describe('WorldLevel Integration Tests', () => {
@@ -93,7 +94,7 @@ describe('WorldLevel Integration Tests', () => {
     expect(worldLevel.levelEntities).toContain(gameState.avatar);
     expect(worldLevel.grid[0][0].entity).toBe(gameState.avatar);
     expect(gameState.avatar.timeOnLevel).toBe(0);
-    expect(addMessage).toHaveBeenCalledWith(`You enter level ${worldLevel.levelNumber + 1}`);
+    expect(uiPaneMessages.addMessage).toHaveBeenCalledWith(`You enter level ${worldLevel.levelNumber + 1}`);
   });
 
 });

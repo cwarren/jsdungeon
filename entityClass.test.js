@@ -7,7 +7,6 @@ import { EntityMovement } from './entityMovementClass';
 import { EntityVision } from './entityVisionClass';
 import { WorldLevel } from './worldLevelClass';
 import { Damager } from './damagerClass';
-// import { addMessage } from './uiUtil';
 import { uiPaneMessages } from "./ui.js";
 
 // NOTE: many of these tests are more integration tests than unit tests
@@ -17,8 +16,8 @@ jest.mock('./util.js', () => ({
     devTrace: jest.fn(),
 }));
 
-jest.mock('./uiUtil.js', () => ({
-    addMessage: jest.fn(),
+jest.mock('./ui.js', () => ({
+    uiPaneMessages: {addMessage: jest.fn()},
 }));
 
 jest.mock('./gameStateClass.js', () => ({
@@ -97,7 +96,7 @@ describe('Entity', () => {
         gameState.world[0].levelEntities = [entity];
         entity.die();
         expect(gameState.world[0].levelEntities).toEqual([]);
-        expect(addMessage).toHaveBeenCalledWith('Test Entity dies');
+        expect(uiPaneMessages.addMessage).toHaveBeenCalledWith('Test Entity dies');
     });
 
     test('should calculate death credits correctly', () => {
