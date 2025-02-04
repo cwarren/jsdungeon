@@ -34,7 +34,7 @@ class UIPaneMainEventHandler {
     getClickedCell(clickEvent) {
         const currentLevel = this.ui.gameState.getCurrentWorldLevel();
         if (!currentLevel) return;
-        const { cellSize, gridSpacing, offsetX, offsetY } = this.ui.renderer.getGridRenderSettings(currentLevel);
+        const { cellSize, gridSpacing, offsetX, offsetY } = this.ui.getCurrentRenderer().getGridRenderSettings(currentLevel);
 
         const rect = this.canvas.getBoundingClientRect();
         const mouseX = clickEvent.clientX - rect.left;

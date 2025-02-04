@@ -40,7 +40,7 @@ class GameState {
     setUpAvatar(initialFloor) {
         devTrace(3, "setting up avatar in game state on initial floor", initialFloor);
         const avatar = new Avatar();
-        initialFloor.placeEntityRandomly(avatar);
+        initialFloor.placeEntityRandomlyAtBeginningOfTurnQueue(avatar);
 
         this.avatar = avatar;
         avatar.determineVisibleCells();

@@ -9,12 +9,14 @@ class UIPaneMessages {
     addMessage(message) {
         const newMessage = document.createElement("div");
         newMessage.textContent = message;
-        newMessage.classList.add("message-entry");
+        newMessage.classList.add("message-entry", "message-new");
     
         while (messagesElement.children.length >= MAX_MESSAGES_TO_SHOW) {
             messagesElement.removeChild(messagesElement.firstChild);
         }
     
+        Array.from(messagesElement.children).forEach(msg => msg.classList.remove("message-new"));
+
         messagesElement.appendChild(newMessage);
         messagesElement.scrollTop = messagesElement.scrollHeight;
     }
@@ -32,8 +34,9 @@ class UIPaneMessages {
         if (messagesElement.firstChild) {
             if (messagesElement.firstChild.classList.contains('message-aged')) {
                 messagesElement.removeChild(messagesElement.firstChild);
+                Array.from(messagesElement.children).forEach(msg => msg.classList.remove("message-new"));
             } else {
-                messagesElement.firstChild.classList.add('message-aged');
+                Array.from(messagesElement.children).forEach(msg => msg.classList.add("message-aged"));
             }
         }
     }

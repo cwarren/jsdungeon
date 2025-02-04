@@ -1,19 +1,6 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* update minichar display...
-* * when things start
-* * when avatar status changes (override status-changing methods - call parent, then update minichar)
-* * avatar has a getMiniCharBlock function, which generates text to display depending on avatar status
-* * NOTE: may have to set mini char font to fixed width
-
-* improve message display - highlight the newest
-* * remove new-message class from all
-* * do normal stuff
-* * add new-message class to last child / appended element
-
-* fix issue where natural healing doesn't happen while running
-
 * fix bug when clicking on a cell:
 uiPaneMainEventHandlerClass.js:37 Uncaught TypeError: Cannot read properties of undefined (reading 'getGridRenderSettings')
     at UIPaneMainEventHandler.getClickedCell (uiPaneMainEventHandlerClass.js:37:78)

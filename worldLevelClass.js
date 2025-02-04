@@ -136,6 +136,23 @@ class WorldLevel {
         }
     }
 
+    placeEntityRandomlyAtBeginningOfTurnQueue(entity, avoidCellSet) {
+        devTrace(3, `placing entity ${entity.type} randomly in world level`, this, entity, avoidCellSet);
+        let possiblePlacementCell = getRandomEmptyCellOfTerrainInGrid("FLOOR", this.grid);
+        let placementAttempts = 1;
+        if (avoidCellSet) {
+            while (avoidCellSet.has(possiblePlacementCell) && (placementAttempts < MAX_ENTITY_PLACEMENT_ATTEMPTS)) {
+                possiblePlacementCell = getRandomEmptyCellOfTerrainInGrid("FLOOR", this.grid);
+                placementAttempts++;
+            }
+        }
+        if (placementAttempts >= MAX_ENTITY_PLACEMENT_ATTEMPTS) {
+            console.log("could not place entity in world level - placement attempts exceed max placement attempts");
+        } else {
+            this.addEntityAtBeginningOfTurnQueue(entity, possiblePlacementCell);
+        }
+    }
+
     addEntity(ent, atCell = null) {
         devTrace(3, `adding entity ${ent.type} to level`, this);
         this.levelEntities.push(ent);

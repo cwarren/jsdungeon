@@ -61,8 +61,12 @@ class UIPaneMain {
         this.drawUI();
     }
 
+    getCurrentRenderer() {
+        return this.renderers[this.getCurrentUIState()];
+    }
+
     drawUI() {
-        const renderer = this.renderers[this.getCurrentUIState()];
+        const renderer = this.getCurrentRenderer();
         if (!renderer) { 
             console.log("No renderer for current UI state", this.getCurrentUIState());
             return;
