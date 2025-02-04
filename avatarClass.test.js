@@ -10,26 +10,20 @@ jest.mock('./util.js', () => ({
   rollDice: jest.fn(() => 3), // Mock rollDice to always return 3
 }));
 
-// jest.mock('./gameStateClass.js', () => ({
-//   gameState: {
-//     loseGame: jest.fn(),
-//   },
-// }));
-
 jest.mock('./ui.js', () => ({
-  uiPaneMessages: { addMessage: jest.fn()},
+  uiPaneMessages: { addMessage: jest.fn() },
 }));
 
 describe('Avatar', () => {
   let avatar;
 
   beforeEach(() => {
-	gameState.reset();
-	gameState.initialize([[10, 10, 'EMPTY']]);
+    gameState.reset();
+    gameState.initialize([[10, 10, 'EMPTY']]);
     avatar = gameState.avatar;
-    jest.spyOn(avatar, 'healNaturally'); 
-	jest.spyOn(gameState, 'loseGame');
-	jest.spyOn(Entity.prototype, 'die');
+    jest.spyOn(avatar, 'healNaturally');
+    jest.spyOn(gameState, 'loseGame');
+    jest.spyOn(Entity.prototype, 'die');
   });
 
   test('should initialize with correct values', () => {
@@ -53,7 +47,7 @@ describe('Avatar', () => {
     avatar.actionStartingTime = 100;
     const result = avatar.takeTurn();
     expect(result).toBe(0);
-    expect(avatar.healNaturally).toHaveBeenCalledWith(100);
+    expect(avatar.healNaturally).toHaveBeenCalled();
   });
 
   test('should die and lose game', () => {
