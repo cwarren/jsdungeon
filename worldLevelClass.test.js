@@ -24,7 +24,7 @@ import {
   determineCellViewability,
 } from './gridUtils.js';
 import { rollDice } from './util.js';
-import { uiPaneMessages } from "./ui.js";
+import { uiPaneMessages, uiPaneInfo } from "./ui.js";
 
 jest.mock('./util.js', () => ({
   devTrace: jest.fn(),
@@ -74,6 +74,7 @@ jest.mock('./entityClass', () => ({
 
 jest.mock('./ui.js', () => ({
   uiPaneMessages: { addMessage: jest.fn()},
+  uiPaneInfo: { setInfo: jest.fn()},
 }));
 
 describe('WorldLevel', () => {
@@ -198,5 +199,6 @@ describe('WorldLevel', () => {
     expect(gameState.avatar.placeAtCell).toHaveBeenCalledWith(entryCell);
     expect(gameState.avatar.actionStartingTime).toBe(0);
     expect(uiPaneMessages.addMessage).toHaveBeenCalledWith(`You enter level ${worldLevel.levelNumber + 1}`);
+    expect(uiPaneInfo.setInfo).toHaveBeenCalled();
   });
 });

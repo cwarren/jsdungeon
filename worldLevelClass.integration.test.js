@@ -23,7 +23,7 @@ import {
 } from './gridUtils.js';
 import { devTrace, constrainValue, rollDice } from './util.js';
 import { gameState } from './gameStateClass.js';
-import { uiPaneMessages } from "./ui.js";
+import { uiPaneMessages, uiPaneInfo } from "./ui.js";
 
 
 
@@ -35,6 +35,7 @@ jest.mock('./util.js', () => ({
 
 jest.mock('./ui.js', () => ({
   uiPaneMessages: {addMessage: jest.fn()},
+  uiPaneInfo: { setInfo: jest.fn()},
 }));
 
 describe('WorldLevel Integration Tests', () => {
@@ -95,6 +96,7 @@ describe('WorldLevel Integration Tests', () => {
     expect(worldLevel.grid[0][0].entity).toBe(gameState.avatar);
     expect(gameState.avatar.timeOnLevel).toBe(0);
     expect(uiPaneMessages.addMessage).toHaveBeenCalledWith(`You enter level ${worldLevel.levelNumber + 1}`);
+    expect(uiPaneInfo.setInfo).toHaveBeenCalled();
   });
 
 });

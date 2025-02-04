@@ -24,8 +24,8 @@ class UIPaneMessages {
     }
 
     setMessage(message) {
-      clearMessages();
-      addMessage(message);
+      this.clearMessages();
+      this.addMessage(message);
     }
 
     ageMessages() {

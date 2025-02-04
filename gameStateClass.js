@@ -2,7 +2,7 @@ import { Entity } from "./entityClass.js";
 import { WorldLevel } from "./worldLevelClass.js";
 import { Avatar } from "./avatarClass.js";
 import { devTrace } from "./util.js";
-import { uiPaneMessages } from "./ui.js";
+import { uiPaneMessages, uiPaneInfo } from "./ui.js";
 
 class GameState {
     constructor() {

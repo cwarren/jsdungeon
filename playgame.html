@@ -76,10 +76,11 @@
 
     <script type="module">
         import { gameState, initializeGameWorld } from "./gameStateClass.js";
-        import { uiPaneMain, setupUi } from "./ui.js";
+        import { uiPaneMain, uiPaneInfo, setupUi } from "./ui.js";
 
         initializeGameWorld();
         setupUi(gameState);
+        uiPaneInfo.setInfo(gameState.getCurrentWorldLevel().getInfo());
     </script>
 </body>
 

@@ -23,8 +23,7 @@ import {
 } from "./gridUtils.js";
 import { TurnQueue } from "./gameTime.js";
 import { Entity, DEFAULT_ACTION_COST } from "./entityClass.js";
-// import { addMessage } from "./uiUtil.js"; 
-import { uiPaneMessages } from "./ui.js";
+import { uiPaneMessages, uiPaneInfo } from "./ui.js";
 
 const MAX_ENTITY_PLACEMENT_ATTEMPTS = 20;
 const MAX_TIME_AWAY_TO_CARE_ABOUT = DEFAULT_ACTION_COST * 100;
@@ -59,6 +58,23 @@ class WorldLevel {
         "RANDOM": generateGrid_random,
         "ROOMS_RANDOM": generateGrid_roomsAndCorridors_random,
         "ROOMS_SUBDIVIDE": generateGrid_roomsAndCorridors_subdivide,
+
+        "DEFAULT": generateGrid_empty
+    };
+
+    static levelTypeToInfo = {
+        "EMPTY": "This level is full of emptiness",
+        "TOWN": "There are a number of small but well-crafted buildings here.",
+        "BURROW": "Some creature or creatures seem to have dug out a burrow here. It's not clear whether they're still present.",
+        "CAVES": "Twisty passages and irregular open areas make this a great place to lay an ambush.",
+        "CAVES_HUGE": "Huge caverns give plenty of room to maneuver, but few places to hide.",
+        "CAVES_LARGE": "These caves have some wide open area, but some smaller spaces as well tucked here and there.",
+        "CAVES_SHATTERED": "Some old earthquake seems to have collapsed this cavern, leaving sometime of a mess to navigate through.",
+        "NEST": "The pattern of openings suggests ants or something similar, but large enough for a person to walk through.",
+        "PUDDLES": "Water collects on the uneven floor.",
+        "RANDOM": "Pure chaos.",
+        "ROOMS_RANDOM": "Clearly crafted corridors connected to carved out rooms, but the organization is a bit lacking.",
+        "ROOMS_SUBDIVIDE": "Clearly crafted corridors connected to carved out rooms.",
 
         "DEFAULT": generateGrid_empty
     };
@@ -205,6 +221,11 @@ class WorldLevel {
         }
 
         uiPaneMessages.addMessage(`You enter level ${this.levelNumber + 1}`);
+        uiPaneInfo.setInfo(this.getInfo());
+    }
+
+    getInfo() {
+        return WorldLevel.levelTypeToInfo[this.levelType];
     }
 }
 
