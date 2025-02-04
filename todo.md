@@ -1,16 +1,24 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* add info text for current level (change when level changes)(with hooks for avatar knowldedge of level)
-* updates info display to use a new uiPaneInfo class/object
-
-* add some tests for the ui stuff
-
 * update minichar display...
 * * when things start
 * * when avatar status changes (override status-changing methods - call parent, then update minichar)
 * * avatar has a getMiniCharBlock function, which generates text to display depending on avatar status
 * * NOTE: may have to set mini char font to fixed width
+
+* improve message display - highlight the newest
+* * remove new-message class from all
+* * do normal stuff
+* * add new-message class to last child / appended element
+
+* fix issue where natural healing doesn't happen while running
+
+* fix bug when clicking on a cell:
+uiPaneMainEventHandlerClass.js:37 Uncaught TypeError: Cannot read properties of undefined (reading 'getGridRenderSettings')
+    at UIPaneMainEventHandler.getClickedCell (uiPaneMainEventHandlerClass.js:37:78)
+    at UIPaneMainEventHandler.handleCanvasClick (uiPaneMainEventHandlerClass.js:27:34)
+    at HTMLCanvasElement.<anonymous> (uiPaneMainEventHandlerClass.js:22:18)
 
 * make world level specs richer
 * * object instead of array, so fields can be usefully named and more easily extended
@@ -33,7 +41,8 @@ logic:
 
 * shift bulk of determineVisibleCells into grid utils
 
-* move world level specs from ui into game state (new game)
+* implement entity sleeping
+* * very similar to running, but don't actually move (still update time on level, natural healing, etc.)
 
 * more mob stuff
 * * stats for mobs / stat system (what they are and mean; what effect they have)
@@ -67,7 +76,7 @@ logic:
 
 * resolve duped info between direction deltas in gameActions and adjacency directions in GridCell
 
-* ? refactor UI stuff into UI Manager objects (diff for each display area)
+* add some tests for the ui stuff
 
 * grid display enhancements
 * * zoom in / out
@@ -117,4 +126,5 @@ logic:
 
 * CHECK AND FIX
 * * keep an eye on time issues with running - seems OK at the moment, but tricky....
+* * address hack of directly accessing lastNaturalHealingTime when gameTime wraps (in normalizeQueueTimes)
 

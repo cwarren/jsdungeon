@@ -50,12 +50,12 @@ class EntityHealth {
    * @param {number} currentTime - The current game time in ticks.
    */
   healNaturally(currentTime) {
-    devTrace(6, "healNaturally for entity", this.ofEntity);
+    devTrace(5, `healNaturally at ${currentTime} for entity (last natural heal time was ${this.lastNaturalHealTime})`, this.ofEntity);
     const enoughTimePassed = (currentTime - this.lastNaturalHealTime) >= this.naturalHealingTicks;
     const anythingToHeal = this.curHealth < this.maxHealth;
     const healingCount = Math.floor((currentTime - this.lastNaturalHealTime) / this.naturalHealingTicks);
     if (enoughTimePassed && anythingToHeal) {
-      const healAmt = healingCount * (this.naturalHealingRate * this.maxHealth);
+      const healAmt = healingCount * this.getHealAmountPerInterval();
       devTrace(5, `natural healing occurs for ${this.ofEntity.type} at ${currentTime} based on last natural healing time ${this.lastNaturalHealTime}, heal count of ${healingCount} restoring ${healAmt}`, this);
       this.curHealth = constrainValue(this.curHealth + healAmt, 0, this.maxHealth);
       this.ofEntity.showNaturalHealingMessage(`Natural healing of ${formatNumberForMessage(healAmt)} for ${this.ofEntity.name}`);
@@ -63,6 +63,9 @@ class EntityHealth {
     if (enoughTimePassed) {
       this.lastNaturalHealTime += healingCount * this.naturalHealingTicks;
     }
+  }
+  getHealAmountPerInterval() {
+    return this.naturalHealingRate * this.maxHealth;
   }
 
   /**

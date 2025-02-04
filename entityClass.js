@@ -93,7 +93,7 @@ class Entity {
   takeTurn() {
     devTrace(2, `${this.type} acts at ${this.actionStartingTime}`, this);
     let actionTime = this.baseActionCost;
-    this.healNaturally(this.actionStartingTime);
+    this.healNaturally();
 
     // AI logic or automatic actions go here...
     const adjacentsCost = this.dealWithAdjacentEntities();
@@ -317,8 +317,8 @@ class Entity {
     }));
   }
 
-  healNaturally(currentTime) {
-    this.health.healNaturally(currentTime);
+  healNaturally() {
+    this.health.healNaturally(this.actionStartingTime);
   }
 
   // ------------------

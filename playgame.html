@@ -18,11 +18,19 @@
             font-family: Arial, sans-serif;
         }
 
-        #charmini {
+        #minichar {
             grid-column: 1;
             grid-row: 1;
             background-color: #222;
             padding: 10px;
+            font: 18px sans-serif;
+            color: white;
+        }
+        #minichar .charName {
+            font: 22px sans-serif;
+        }
+        #minichar .smallText {
+            font: 14px sans-serif;
         }
 
         #main {
@@ -52,6 +60,13 @@
             overflow-y: hidden;
         }
 
+        #messages .message-aged {
+            color: #999;
+        }
+        #messages .message-new {
+            color: #afa;
+        }
+
         #info {
             grid-column: 3  / span 2;
             grid-row: 2;
@@ -66,7 +81,7 @@
 </head>
 
 <body>
-    <div id="charmini"></div>
+    <div id="minichar"></div>
     <div id="main">
         <canvas id="gameCanvas"></canvas>
     </div>

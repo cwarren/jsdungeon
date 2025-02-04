@@ -97,7 +97,10 @@ class EntityMovement {
             this.stopRunning();
             return 0;
         }
-        return this.confirmMoveDeltas(this.runDelta.dx, this.runDelta.dy); // confirmMoveDeltas actually does the move and returns the action cost
+        this.ofEntity.healNaturally(); // don't forget to check for healing while running! Normally this is called in takeTurn, but when a character is running this method is called in place of takeTurn
+        const runActionCost = this.confirmMoveDeltas(this.runDelta.dx, this.runDelta.dy); // confirmMoveDeltas actually does the move and returns the action cost
+        if (this.ofEntity.addTimeOnLevel) { this.ofEntity.addTimeOnLevel(runActionCost); }
+        return runActionCost;
     }
     startRunning(deltas) {
         devTrace(5, "starting running", this);
