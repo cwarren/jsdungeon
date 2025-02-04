@@ -1,20 +1,13 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* fix bug when clicking on a cell:
-uiPaneMainEventHandlerClass.js:37 Uncaught TypeError: Cannot read properties of undefined (reading 'getGridRenderSettings')
-    at UIPaneMainEventHandler.getClickedCell (uiPaneMainEventHandlerClass.js:37:78)
-    at UIPaneMainEventHandler.handleCanvasClick (uiPaneMainEventHandlerClass.js:27:34)
-    at HTMLCanvasElement.<anonymous> (uiPaneMainEventHandlerClass.js:22:18)
-
-* make world level specs richer
+* make world level specs richer - consider a richer LevelSpec class
 * * object instead of array, so fields can be usefully named and more easily extended
 * * dimensions spec style - FIXED vs BOUNDED
 * * * FIXED - look for specific width and height
 * * * BOUNDED - look for max and min for width and height
 * * update world level generator to take a level spec object instead of particular fields
 * * * update constructor implementation to account for dimensions spec style
-* * * FUTURE: consider a richer LevelSpec class
 
 * revisit entity relationships
 * * maybe default entity relation, then relation type lists for exceptions?
