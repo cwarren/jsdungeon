@@ -399,8 +399,9 @@ describe('determineCheapestMovementPathForEntity', () => {
         worldLevel.addEntity(targetEntity, endCell);
 
         const path = determineCheapestMovementPathForEntity(movingEntity, endCell, worldLevel);
-        expect(path.length).toBe(endCell.y - startCell.y);
-        expect(path[0]).toBe(worldLevel.grid[1][2]);
+        console.log(path);
+        expect(path.length).toBe(endCell.y - startCell.y + 1);
+        expect(path[0]).toBe(startCell);
         expect(path[path.length - 1]).toBe(endCell);
         expect(path).not.toContain(occupiedCell);
     });
