@@ -1,5 +1,40 @@
-import { findCellOfTerrainNearPlace, getRandomCellOfTerrainInGrid, findEmptyCellTerrainNearPlace, getRandomEmptyCellOfTerrainInGrid, determineCellViewability, applyCellularAutomataSmoothing, computeBresenhamLine, determineCheapestMovementPath } from './gridUtils';
+import { WorldLevel } from './worldLevelClass.js';
+import { Entity, DEFAULT_ACTION_COST } from './entityClass.js';
+import { Damager } from './damagerClass.js';
+import { devTrace, constrainValue, rollDice } from './util.js';
+import { gameState } from './gameStateClass.js';
+import { uiPaneMessages, uiPaneInfo } from "./ui.js";
+import { WorldLevelSpecification } from './worldLevelSpecificationClass.js';
+import {
+    findCellOfTerrainNearPlace,
+    getRandomCellOfTerrainInGrid,
+    findEmptyCellTerrainNearPlace,
+    getRandomEmptyCellOfTerrainInGrid,
+    determineCellViewability,
+    applyCellularAutomataSmoothing,
+    computeBresenhamLine,
+    determineCheapestMovementPath,
+    determineCheapestMovementPathForEntity
+} from './gridUtils';
 import { GridCell } from './gridCellClass';
+
+// NOTE: all the gameState and entity stuff and all the mocks are related to determining best path FOR ENTITY
+
+jest.mock('./util.js', () => ({
+    devTrace: jest.fn(),
+    constrainValue: jest.fn((value, min, max) => Math.max(min, Math.min(max, value))),
+    rollDice: jest.requireActual('./util.js').rollDice,
+}));
+
+jest.mock('./ui.js', () => ({
+    uiPaneMessages: { addMessage: jest.fn() },
+    uiPaneInfo: { setInfo: jest.fn() },
+}));
+
+const WORLD_LEVEL_SPECS_FOR_TESTING = [
+    WorldLevelSpecification.generateWorldLevelSpec({ type: 'EMPTY', width: 10, height: 10 }),
+    WorldLevelSpecification.generateWorldLevelSpec({ type: 'EMPTY', width: 15, height: 15 }),
+];
 
 describe('findCellOfTerrainNearPlace', () => {
     let grid;
@@ -294,5 +329,79 @@ describe('determineCheapestMovementPath', () => {
         expect(path[0]).toBe(startCell);
         expect(path[path.length - 1]).toBe(endCell);
         expect(path).not.toContain(worldLevel.grid[5][5]);
+    });
+});
+
+describe('determineCheapestMovementPathForEntity', () => {
+    let worldLevel;
+
+    const TEST_ENTITIES_DEFINITIONS = [
+        {
+            type: "AVATAR", name: "Avatar", displaySymbol: "@", displayColor: "#fff",
+            viewRadius: 8, initialHealthRoll: "150", baseActionCost: 100, naturalHealingRate: .001,
+            relations: { othersFeelAboutMe: "HOSTILE_TO", iFeelAboutOthers: "HOSTILE_TO" },
+        },
+        {
+            type: "MOLD_PALE", name: "Pale Mold", displaySymbol: "m", displayColor: "#ddd",
+            viewRadius: 2, initialHealthRoll: "2d6+4", baseActionCost: 210, naturalHealingRate: .002,
+            meleeAttack: { damager: new Damager("1d4-1", [], 0), actionCost: 80 },
+            movementSpec: { movementType: "STATIONARY", actionCost: 210 },
+            relations: {
+                overrideFeelingsToOthers: {
+                    "WORM_VINE": "FRIENDLY_TO",
+                },
+                othersFeelAboutMe: "NEUTRAL_TO", iFeelAboutOthers: "NEUTRAL_TO",
+            },
+        },
+        {
+            type: "RAT_MALIGN", name: "Malign Rat", displaySymbol: "r", displayColor: "#321",
+            viewRadius: 4, initialHealthRoll: "3d4+6", baseActionCost: 100, naturalHealingRate: .001,
+            meleeAttack: { damager: new Damager("1d5", [], 0), actionCost: 100 },
+            movementSpec: { movementType: "WANDER_AGGRESSIVE", actionCost: 100 },
+            relations: {
+                overrideFeelingsToOthers: {
+                    "RAT_INSIDIOUS": "FRIENDLY_TO",
+                },
+                iFeelAboutOthers: "HOSTILE_TO",
+            },
+        },
+    ];
+
+    TEST_ENTITIES_DEFINITIONS.forEach((ent) => { Entity.ENTITIES[ent.type] = ent; })
+
+    beforeEach(() => {
+        gameState.reset();
+        gameState.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
+        worldLevel = gameState.world[0];
+    });
+
+    test('should find the cheapest path between two cells when grid is empty', () => {
+        const startCell = worldLevel.grid[0][0];
+        const endCell = worldLevel.grid[9][9];
+        const path = determineCheapestMovementPath(startCell, endCell, worldLevel);
+        expect(path.length).toBeGreaterThan(0);
+        expect(path[0]).toBe(startCell);
+        expect(path[path.length - 1]).toBe(endCell);
+    });
+
+
+    test('should find the cheapest path avoiding non-traversible cells and cells with non-hostile, non-violent entities', () => {
+        const startCell = worldLevel.grid[1][1];
+        const occupiedCell = worldLevel.grid[1][5];
+        const endCell = worldLevel.grid[1][8];
+
+        const targetEntity = new Entity('AVATAR');
+        const blockingEntity = new Entity('MOLD_PALE');
+        const movingEntity = new Entity('RAT_MALIGN');
+
+        worldLevel.addEntity(movingEntity, startCell);
+        worldLevel.addEntity(blockingEntity, occupiedCell);
+        worldLevel.addEntity(targetEntity, endCell);
+
+        const path = determineCheapestMovementPathForEntity(movingEntity, endCell, worldLevel);
+        expect(path.length).toBe(endCell.y - startCell.y);
+        expect(path[0]).toBe(worldLevel.grid[1][2]);
+        expect(path[path.length - 1]).toBe(endCell);
+        expect(path).not.toContain(occupiedCell);
     });
 });

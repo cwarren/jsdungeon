@@ -2,6 +2,8 @@ to start server:
 PS E:\code\jsdungeon> docker-compose up --build
 
 * MAJOR BUG: a an entity trying to path towards another to which it's hostile causes an infinite loop if there's a neutral entity on the path!!!!
+* * first, need to expose this issue in a test
+* * * maybe in EntityMovement, but possibly lower level, in the path finder
 * * to fix - when calculating a path, need a way to treat cells occupied by non-hostile, non-violent entities as impassable
 
 * shift bulk of determineVisibleCells into grid utils

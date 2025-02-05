@@ -1,4 +1,4 @@
-import {generateGrid_empty} from "./gridGeneration.js";
+import { generateGrid_empty } from "./gridGeneration.js";
 import { GridCell } from "./gridCellClass.js";
 
 function applyCellularAutomataSmoothing(grid, terrainToSmooth = "WALL") {
@@ -19,7 +19,7 @@ function applyCellularAutomataSmoothing(grid, terrainToSmooth = "WALL") {
                     }
                 }
             }
-            newGrid[x][y] =GridCell.createDetachedAt(x, y, terrainCount >= 5 ? terrainToSmooth : "FLOOR");
+            newGrid[x][y] = GridCell.createDetachedAt(x, y, terrainCount >= 5 ? terrainToSmooth : "FLOOR");
         });
     });
     return newGrid;
@@ -85,11 +85,11 @@ function determineCellViewability(grid) {
             let cell = grid[x][y];
             // console.log(`cell ${x} ${y}`, cell);
             if (!cell.isOpaque) {
-                cell.isViewable = true; 
+                cell.isViewable = true;
             } else {
                 let adjacentCells = cell.getAdjacentCells();
                 cell.isViewable = GridCell.anyCellHasPropertyOfValue(adjacentCells, "isOpaque", false);
-            } 
+            }
         }
     }
 }
@@ -167,15 +167,18 @@ function computeBresenhamLine(x0, y0, x1, y1) {
     let err = dx - dy;
 
     while (true) {
-      points.push([x0, y0]);
-      if (x0 === x1 && y0 === y1) break;
-      let e2 = 2 * err;
-      if (e2 > -dy) { err -= dy; x0 += sx; }
-      if (e2 < dx) { err += dx; y0 += sy; }
+        points.push([x0, y0]);
+        if (x0 === x1 && y0 === y1) break;
+        let e2 = 2 * err;
+        if (e2 > -dy) { err -= dy; x0 += sx; }
+        if (e2 < dx) { err += dx; y0 += sy; }
     }
     return points;
-  }
+}
 
+function determineCheapestMovementPathForEntity(ent, targetCell, worldLevel) {
+    return [];
+}
 
 export {
     applyCellularAutomataSmoothing,
@@ -185,5 +188,6 @@ export {
     getRandomEmptyCellOfTerrainInGrid,
     determineCellViewability,
     determineCheapestMovementPath,
-    computeBresenhamLine
+    computeBresenhamLine,
+    determineCheapestMovementPathForEntity
 };

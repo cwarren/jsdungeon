@@ -1,5 +1,4 @@
 import { Entity } from './entityClass.js';
-import { ENTITIES_DEFINITIONS } from "./entityDefinitions.js";
 import { gameState } from './gameStateClass.js';
 import { rollDice, constrainValue } from './util.js';
 import { EntityHealth } from './entityHealthClass.js';
