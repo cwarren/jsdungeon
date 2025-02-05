@@ -1,19 +1,22 @@
-import { Entity } from './entityClass';
+import { Entity } from './entityClass.js';
 import { ENTITIES_DEFINITIONS } from "./entityDefinitions.js";
-import { gameState } from './gameStateClass';
-import { rollDice } from './util';
-import { EntityHealth } from './entityHealthClass';
-import { EntityLocation } from './entityLocationClass';
-import { EntityMovement } from './entityMovementClass';
-import { EntityVision } from './entityVisionClass';
-import { WorldLevel } from './worldLevelClass';
-import { Damager } from './damagerClass';
+import { gameState } from './gameStateClass.js';
+import { rollDice, constrainValue } from './util.js';
+import { EntityHealth } from './entityHealthClass.js';
+import { EntityLocation } from './entityLocationClass.js';
+import { EntityMovement } from './entityMovementClass.js';
+import { EntityVision } from './entityVisionClass.js';
+import { WorldLevel } from './worldLevelClass.js';
+import { Damager } from './damagerClass.js';
 import { uiPaneMessages } from "./ui.js";
+import { Damage } from './damageClass.js';
 
 // NOTE: many of these tests are more integration tests than unit tests
 
 jest.mock('./util.js', () => ({
     rollDice: jest.fn(() => 10),
+    constrainValue: jest.requireActual('./util.js').constrainValue,
+    formatNumberForMessage: jest.requireActual('./util.js').formatNumberForMessage,
     devTrace: jest.fn(),
 }));
 
@@ -212,8 +215,14 @@ describe('Entity', () => {
         expect(malignRat.getRelationshipTo(paleMold)).toBe("NEUTRAL_TO");
         expect(malignRat.getRelationshipTo(wormVine)).toBe("HOSTILE_TO");
         expect(malignRat.getRelationshipTo(insidiousRat)).toBe("FRIENDLY_TO");
-
-
     });
 
+    test('should have violent relationship to an otherwise neutral entity that has damaged it', () => {
+        const wormVine = new Entity('WORM_VINE');
+        const insidiousRat = new Entity('RAT_INSIDIOUS');
+        expect(wormVine.getRelationshipTo(insidiousRat)).toBe("NEUTRAL_TO");
+
+        wormVine.takeDamageFrom(new Damage(2), insidiousRat);
+        expect(wormVine.getRelationshipTo(insidiousRat)).toBe("VIOLENT_TO");
+    });
 });

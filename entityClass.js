@@ -22,7 +22,7 @@ class Entity {
 
     this.location = new EntityLocation(this, -1, -1, -1); // placeholder values for initial location
     this.vision = new EntityVision(this, Entity.ENTITIES[type].viewRadius);
-    this.movement =  new EntityMovement(this, Entity.ENTITIES[type].movementSpec);
+    this.movement = new EntityMovement(this, Entity.ENTITIES[type].movementSpec);
     this.health = new EntityHealth(
       this,
       rollDice(Entity.ENTITIES[type].initialHealthRoll),
@@ -31,6 +31,8 @@ class Entity {
     );
 
     this.meleeAttack = Entity.ENTITIES[type].meleeAttack;
+
+    this.relations = Entity.ENTITIES[type].relations;
 
     // used in combat AI and for relationship stuff
     this.damagedBy = []; // array of {damageSource, damage}
@@ -108,9 +110,26 @@ class Entity {
   }
 
   static RELATIONSHIPS = ["TAMED_BY", "FRIENDLY_TO", "NEUTRAL_TO", "HOSTILE_TO", "VIOLENT_TO"];
+  // A note on relations:
+  // 0. IMPLICIT: if entity B has damaged entity A, then entity A is VIOLENT_TO entity B regardless of anything in the definitions
+  // 1. overrideFeelingsToOthers otherwise has precedence on how entity A feels about entity B, but has no effect on how B feels about A
+  // 2. othersFeelAboutMe has precedence over another entity's iFeelAboutOthers - if entity X has othersFeelAboutMe HOSTILE_TO and entity Y has iFeelAboutOthers NEUTRAL_TO, Y will be HOSTILE_TO X
+  // 3. iFeelAboutOthers comes into play only if none of the above do
+  // 4. lastly if nothing at all is specified, then the default is NEUTRAL_TO
   getRelationshipTo(otherEntity) {
     devTrace(6, "getting entity relationship", this, otherEntity);
-    return "HOSTILE_TO"; // defaults to "murderhobo" (at least for development)
+    if (this.getEntitiesThatDamagedMe().includes(otherEntity)) { return "VIOLENT_TO"; }
+    if (this.relations.overrideFeelingsToOthers && this.relations.overrideFeelingsToOthers[otherEntity.type]) {
+      return this.relations.overrideFeelingsToOthers[otherEntity.type]
+    }
+    let relation = otherEntity.relations.othersFeelAboutMe;
+    if (!relation) {
+      relation = this.relations.iFeelAboutOthers;
+    }
+    if (!relation) {
+      relation = "NEUTRAL_TO";
+    }
+    return relation;
   }
 
   getDefaultActionFor(otherEntity) {
@@ -214,7 +233,7 @@ class Entity {
   startRunning(deltas) {
     this.movement.startRunning(deltas);
   }
- 
+
   stopRunning() {
     this.movement.stopRunning();
   }
@@ -279,7 +298,7 @@ class Entity {
     // Reset movement plans on damage
     this.movement.interruptOngoingMovement();
 
-    if (! this.health.isAlive()) {
+    if (!this.health.isAlive()) {
       this.die();
     }
   }

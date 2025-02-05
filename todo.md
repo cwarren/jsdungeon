@@ -1,15 +1,8 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* revisit entity relationships
-* * maybe default entity relation, then relation type lists for exceptions?
-* * maybe a super default for the avatar - all entities hostile to avatar unless there's an explicit exception?
-* * * maybe a default on the recipient side instead
-logic:
-1. relation = get default "what others think of me" from target, if it exists
-2. if self has any relation overrides, check those for target and relation = that override
-3. if relation not set, relation = get default "what I think of others" from self if it exists
-4. if still not set, relation is NEUTRAL_TO
+* MAJOR BUG: a an entity trying to path towards another to which it's hostile causes an infinite loop if there's a neutral entity on the path!!!!
+* * to fix - when calculating a path, need a way to treat cells occupied by non-hostile, non-violent entities as impassable
 
 * shift bulk of determineVisibleCells into grid utils
 
