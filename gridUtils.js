@@ -94,6 +94,8 @@ function determineCellViewability(grid) {
     }
 }
 
+
+
 // uses A-star algorithm
 // NOTE: this has global knowledge! It should be used sparingly.
 // TODO: create a version of this that uses a local knowledge map - this will be used for AI pathfinding and should take into account the entity's vision radius the entity's visible and seen cells
@@ -102,6 +104,7 @@ function determineCheapestMovementPath(startCell, endCell, worldLevel) {
         return [];  // No path to an untraversable location
     }
 
+    // internal class, support pathing
     class Node {
         constructor(cell, parent, g, h) {
             this.cell = cell;
@@ -112,6 +115,70 @@ function determineCheapestMovementPath(startCell, endCell, worldLevel) {
         }
     }
 
+    const openSet = new Map();
+    const closedSet = new Set();
+    const startNode = new Node(startCell, null, 0, 0);
+    openSet.set(`${startCell.x},${startCell.y}`, startNode);
+
+    while (openSet.size > 0) {
+        let currentNode = [...openSet.values()].reduce((a, b) => (a.f < b.f ? a : b));
+
+        if (currentNode.cell === endCell) {
+            let path = [];
+            while (currentNode) {
+                path.push(currentNode.cell);
+                currentNode = currentNode.parent;
+            }
+            return path.reverse();
+        }
+
+        openSet.delete(`${currentNode.cell.x},${currentNode.cell.y}`);
+        closedSet.add(`${currentNode.cell.x},${currentNode.cell.y}`);
+
+        for (const { dx, dy } of GridCell.ADJACENCY_DIRECTIONS) {
+            const newX = currentNode.cell.x + dx;
+            const newY = currentNode.cell.y + dy;
+
+            if (newX < 0 || newX >= worldLevel.levelWidth || newY < 0 || newY >= worldLevel.levelHeight) {
+                continue;
+            }
+
+            const neighbor = worldLevel.grid[newX][newY];
+            if (!neighbor.isTraversible || closedSet.has(`${newX},${newY}`)) {
+                continue;
+            }
+
+            const g = currentNode.g + neighbor.entryMovementCost;
+            const h = Math.abs(newX - endCell.x) + Math.abs(newY - endCell.y);
+            const f = g + h;
+
+            if (!openSet.has(`${newX},${newY}`) || openSet.get(`${newX},${newY}`).g > g) {
+                openSet.set(`${newX},${newY}`, new Node(neighbor, currentNode, g, h));
+            }
+        }
+    }
+
+    return [];  // No path found
+}
+
+// very similar to the basic determineCheapestMovementPath, but avoids pathing through non-hostile, non-violent entities
+function determineCheapestMovementPathForEntity(ent, endCell, worldLevel) {
+    let startCell = ent.getCell();
+   if (!endCell.isTraversible) {
+        return [];  // No path to an untraversable location
+    }
+
+    // internal class, support pathing
+    class Node {
+        constructor(cell, parent, g, h) {
+            this.cell = cell;
+            this.parent = parent;
+            this.g = g; // Movement cost from start
+            this.h = Math.abs(cell.x - endCell.x) + Math.abs(cell.y - endCell.y); // Manhattan heuristic
+            this.f = this.g + this.h;
+        }
+    }
+    
     const openSet = new Map();
     const closedSet = new Set();
     const startNode = new Node(startCell, null, 0, 0);
@@ -174,10 +241,6 @@ function computeBresenhamLine(x0, y0, x1, y1) {
         if (e2 < dx) { err += dx; y0 += sy; }
     }
     return points;
-}
-
-function determineCheapestMovementPathForEntity(ent, targetCell, worldLevel) {
-    return [];
 }
 
 export {
