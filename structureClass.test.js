@@ -1,12 +1,17 @@
 import { Structure } from './structureClass';
 import { gameState } from './gameStateClass';
+import { WorldLevelSpecification } from './worldLevelSpecificationClass.js';
 
+const WORLD_LEVEL_SPECS_FOR_TESTING= [
+    WorldLevelSpecification.generateWorldLevelSpec({type: 'EMPTY', width: 10, height: 10}),
+  ];
+  
 describe('Structure', () => {
     let structure;
 
     beforeEach(() => {
         gameState.reset();
-        gameState.initialize([[10, 10, 'EMPTY']]);
+        gameState.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
         structure = new Structure(gameState.world[0], 5, 5, 0, 'wall', '#', '#fff');
     });
 

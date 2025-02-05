@@ -42,8 +42,19 @@ class WorldLevel {
         this.stairsUp = null;
         this.turnQueue = new TurnQueue();
         this.timeOfAvatarDeparture = 0;
+        this.generationParams = null;
         // console.log("new world level", this);
     }
+
+    // ---------------------
+
+    static getFromSpecification(gameState, levelNumber, worldLevelSpecification) {
+        const wl = new WorldLevel(gameState, levelNumber, worldLevelSpecification.width, worldLevelSpecification.height, worldLevelSpecification.type);
+        wl.generationParams = worldLevelSpecification.typeGenerationParams ? worldLevelSpecification.typeGenerationParams : null;
+        return wl;
+    }
+
+    // ---------------------
 
     static levelTypeToGenFunction = {
         "EMPTY": generateGrid_empty,
@@ -79,6 +90,8 @@ class WorldLevel {
         "DEFAULT": generateGrid_empty
     };
 
+    // ---------------------
+
     generate() {
         devTrace(1, "generating world level");
         this.generateGrid();
@@ -103,7 +116,7 @@ class WorldLevel {
         if (!gridGenFunction) {
             gridGenFunction = WorldLevel.levelTypeToGenFunction["DEFAULT"];
         }
-        this.grid = gridGenFunction(this.levelWidth, this.levelHeight);
+        this.grid = gridGenFunction(this.levelWidth, this.levelHeight, this.generationParams);
         setWorldLevelForGridCells(this, this.grid);
         determineCellViewability(this.grid);
     }

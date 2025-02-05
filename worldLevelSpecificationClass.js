@@ -93,7 +93,7 @@ class WorldLevelSpecification {
   }
 
   static levelTypes = [
-    { typeIdentifier: "EMPTY", attributes: ['DEV'] },
+    { typeIdentifier: "EMPTY", attributes: ['ALL', 'DEV'] },
     { typeIdentifier: "TOWN", attributes: ['ALL', 'CIVILIZED'] },
     { typeIdentifier: "ROOMS_SUBDIVIDE", attributes: ['ALL', 'CIVILIZED'] },
     { typeIdentifier: "ROOMS_RANDOM", attributes: ['ALL', 'CIVILIZED'] },
@@ -104,7 +104,7 @@ class WorldLevelSpecification {
     { typeIdentifier: "CAVES", attributes: ['ALL', 'NATURAL'] },
     { typeIdentifier: "CAVES_LARGE", attributes: ['ALL', 'NATURAL'] },
     { typeIdentifier: "CAVES_HUGE", attributes: ['ALL', 'NATURAL'] },
-    { typeIdentifier: "RANDOM", attributes: ['DEV'] },
+    { typeIdentifier: "RANDOM", attributes: ['ALL', 'DEV'] },
   ];
 
 

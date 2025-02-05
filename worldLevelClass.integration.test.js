@@ -24,6 +24,7 @@ import {
 import { devTrace, constrainValue, rollDice } from './util.js';
 import { gameState } from './gameStateClass.js';
 import { uiPaneMessages, uiPaneInfo } from "./ui.js";
+import { WorldLevelSpecification } from './worldLevelSpecificationClass.js';
 
 
 
@@ -38,12 +39,17 @@ jest.mock('./ui.js', () => ({
   uiPaneInfo: { setInfo: jest.fn()},
 }));
 
+const WORLD_LEVEL_SPECS_FOR_TESTING= [
+  WorldLevelSpecification.generateWorldLevelSpec({type: 'EMPTY', width: 10, height: 10}),
+  WorldLevelSpecification.generateWorldLevelSpec({type: 'EMPTY', width: 15, height: 15}),
+];
+
 describe('WorldLevel Integration Tests', () => {
   let worldLevel;
 
   beforeEach(() => {
     gameState.reset();
-    gameState.initialize([[10, 10, 'EMPTY'], [15, 15, 'EMPTY']]);
+    gameState.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
     worldLevel = gameState.world[0];
   });
 

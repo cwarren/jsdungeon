@@ -20,7 +20,7 @@ function setWorldLevelForGridCells(worldLevel, grid) {
 }
 
 function generateGrid_empty(width, height, generationParams = {}) {
-    const startingTerrain = generationParams.startingTerrain ? generationParams.startingTerrain : "FLOOR";
+    const startingTerrain = generationParams && generationParams.startingTerrain ? generationParams.startingTerrain : "FLOOR";
     const newGrid = Array.from({ length: width }, (_, col) =>
         Array.from({ length: height }, (_, row) => GridCell.createDetachedAt(col, row, startingTerrain))
     );

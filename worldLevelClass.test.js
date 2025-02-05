@@ -25,6 +25,7 @@ import {
 } from './gridUtils.js';
 import { rollDice } from './util.js';
 import { uiPaneMessages, uiPaneInfo } from "./ui.js";
+import { WorldLevelSpecification } from './worldLevelSpecificationClass.js';
 
 jest.mock('./util.js', () => ({
   devTrace: jest.fn(),
@@ -117,9 +118,19 @@ describe('WorldLevel', () => {
     expect(worldLevel.timeOfAvatarDeparture).toBe(0);
   });
 
+  test('should get a valid world level from a WorldLevelSpecification', () => {
+    const levelFromSpec = WorldLevel.getFromSpecification(gameState, 5, WorldLevelSpecification.generateWorldLevelSpec({width: 18, height: 12, type: "RANDOM"}));
+    expect(levelFromSpec.gameState).toBe(gameState);
+    expect(levelFromSpec.levelNumber).toBe(5);
+    expect(levelFromSpec.levelWidth).toBe(18);
+    expect(levelFromSpec.levelHeight).toBe(12);
+    expect(levelFromSpec.grid).toBeNull();
+    expect(levelFromSpec.levelType).toBe('RANDOM');
+  });
+
   test('should generate grid and set world level for grid cells', () => {
     worldLevel.generateGrid();
-    expect(generateGrid_empty).toHaveBeenCalledWith(10, 10);
+    expect(generateGrid_empty).toHaveBeenCalledWith(10, 10, null);
     expect(setWorldLevelForGridCells).toHaveBeenCalledWith(worldLevel, []);
     expect(determineCellViewability).toHaveBeenCalledWith([]);
     expect(worldLevel.grid).toEqual([]);

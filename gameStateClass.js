@@ -3,6 +3,7 @@ import { WorldLevel } from "./worldLevelClass.js";
 import { Avatar } from "./avatarClass.js";
 import { devTrace } from "./util.js";
 import { uiPaneMessages, uiPaneInfo } from "./ui.js";
+import { WorldLevelSpecification } from "./worldLevelSpecificationClass.js";
 
 class GameState {
     constructor() {
@@ -24,7 +25,8 @@ class GameState {
 
     initialize(levelSpecifications) {
         devTrace(4,"initializing game state from level specs", levelSpecifications);
-        this.world = levelSpecifications.map(([width, height, genOption], index) => new WorldLevel(this, index, width, height, genOption));
+        // this.world = levelSpecifications.map(([width, height, genOption], index) => new WorldLevel(this, index, width, height, genOption));
+        this.world = levelSpecifications.map((spec, index) => WorldLevel.getFromSpecification(this, index, spec));
         this.world[0].generate();
 
         const firstLevel = this.world[0];
@@ -143,20 +145,35 @@ class GameState {
 }
 
 // each level is specified as [level width, level height, level gen type]
-const WORLD_LEVEL_SPECS_FOR_DEV= [
-    [15, 10, "EMPTY"], 
-    [30, 20, "TOWN"], 
-    [30, 20, "ROOMS_SUBDIVIDE"], 
-    [30, 20, "ROOMS_RANDOM"], 
-    [30, 20, "PUDDLES"], 
-    [30, 20, "BURROW"], 
-    [30, 20, "NEST"], 
-    [30, 20, "CAVES_SHATTERED"], 
-    [30, 20, "CAVES"], 
-    [30, 20, "CAVES_LARGE"], 
-    [30, 20, "CAVES_HUGE"], 
-    [30, 20, "EMPTY"], 
-    [30, 20, "RANDOM"], 
+// const WORLD_LEVEL_SPECS_FOR_DEV= [
+//     [15, 10, "EMPTY"], 
+//     [30, 20, "TOWN"], 
+//     [30, 20, "ROOMS_SUBDIVIDE"], 
+//     [30, 20, "ROOMS_RANDOM"], 
+//     [30, 20, "PUDDLES"], 
+//     [30, 20, "BURROW"], 
+//     [30, 20, "NEST"], 
+//     [30, 20, "CAVES_SHATTERED"], 
+//     [30, 20, "CAVES"], 
+//     [30, 20, "CAVES_LARGE"], 
+//     [30, 20, "CAVES_HUGE"], 
+//     [30, 20, "EMPTY"], 
+//     [30, 20, "RANDOM"], 
+//   ];
+  const WORLD_LEVEL_SPECS_FOR_DEV= [
+    WorldLevelSpecification.generateWorldLevelSpec({type: 'EMPTY', width: 15, height: 10}),
+    WorldLevelSpecification.generateWorldLevelSpec({type: 'TOWN', width: 30, height: 20}),
+    WorldLevelSpecification.generateWorldLevelSpec({type: 'ROOMS_SUBDIVIDE', width: 30, height: 20}),
+    WorldLevelSpecification.generateWorldLevelSpec({type: 'ROOMS_RANDOM', width: 30, height: 20}),
+    WorldLevelSpecification.generateWorldLevelSpec({type: 'PUDDLES', width: 30, height: 20}),
+    WorldLevelSpecification.generateWorldLevelSpec({type: 'BURROW', width: 30, height: 20}),
+    WorldLevelSpecification.generateWorldLevelSpec({type: 'NEST', width: 30, height: 20}),
+    WorldLevelSpecification.generateWorldLevelSpec({type: 'CAVES_SHATTERED', width: 30, height: 20}),
+    WorldLevelSpecification.generateWorldLevelSpec({type: 'CAVES', width: 30, height: 20}),
+    WorldLevelSpecification.generateWorldLevelSpec({type: 'CAVES_LARGE', width: 30, height: 20}),
+    WorldLevelSpecification.generateWorldLevelSpec({type: 'CAVES_HUGE', width: 30, height: 20}),
+    WorldLevelSpecification.generateWorldLevelSpec({type: 'EMPTY', width: 30, height: 20}),
+    WorldLevelSpecification.generateWorldLevelSpec({type: 'RANDOM', width: 30, height: 20}),
   ];
 
 

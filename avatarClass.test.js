@@ -4,6 +4,11 @@ import { gameState } from './gameStateClass.js';
 import { devTrace, rollDice } from './util.js';
 import { Damage } from './damageClass.js';
 import { uiPaneMessages } from "./ui.js";
+import { WorldLevelSpecification } from './worldLevelSpecificationClass.js';
+
+const WORLD_LEVEL_SPECS_FOR_TESTING= [
+    WorldLevelSpecification.generateWorldLevelSpec({type: 'EMPTY', width: 10, height: 10}),
+  ];
 
 jest.mock('./util.js', () => ({
   devTrace: jest.fn(),
@@ -19,7 +24,7 @@ describe('Avatar', () => {
 
   beforeEach(() => {
     gameState.reset();
-    gameState.initialize([[10, 10, 'EMPTY']]);
+    gameState.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
     avatar = gameState.avatar;
     jest.spyOn(avatar, 'healNaturally');
     jest.spyOn(gameState, 'loseGame');
