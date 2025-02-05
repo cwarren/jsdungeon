@@ -208,7 +208,11 @@ function determineCheapestMovementPathForEntity(ent, endCell, worldLevel) {
             }
 
             const neighbor = worldLevel.grid[newX][newY];
-            if (!neighbor.isTraversible || closedSet.has(`${newX},${newY}`)) {
+            let relationToNeighborEntity = '';
+            if (neighbor.entity) {
+                relationToNeighborEntity = ent.getRelationshipTo(neighbor.entity);
+            }
+            if (!neighbor.isTraversible || ["TAMED_BY", "FRIENDLY_TO", "NEUTRAL_TO"].includes(relationToNeighborEntity) || closedSet.has(`${newX},${newY}`)) {
                 continue;
             }
 

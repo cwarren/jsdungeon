@@ -373,6 +373,10 @@ describe('determineCheapestMovementPathForEntity', () => {
         gameState.reset();
         gameState.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
         worldLevel = gameState.world[0];
+        const entitiesToRemove = [...worldLevel.levelEntities];
+        entitiesToRemove.forEach((ent, idx) => {
+            worldLevel.removeEntity(ent);
+        });
     });
 
     test('should find the cheapest path between two cells when grid is empty', () => {
@@ -390,7 +394,7 @@ describe('determineCheapestMovementPathForEntity', () => {
         const occupiedCell = worldLevel.grid[1][5];
         const endCell = worldLevel.grid[1][8];
 
-        const targetEntity = new Entity('AVATAR');
+        const targetEntity = new Entity('WORM_VINE');
         const blockingEntity = new Entity('MOLD_PALE');
         const movingEntity = new Entity('RAT_MALIGN');
 
@@ -399,7 +403,6 @@ describe('determineCheapestMovementPathForEntity', () => {
         worldLevel.addEntity(targetEntity, endCell);
 
         const path = determineCheapestMovementPathForEntity(movingEntity, endCell, worldLevel);
-        console.log(path);
         expect(path.length).toBe(endCell.y - startCell.y + 1);
         expect(path[0]).toBe(startCell);
         expect(path[path.length - 1]).toBe(endCell);
