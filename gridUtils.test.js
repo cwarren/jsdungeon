@@ -337,9 +337,16 @@ describe('determineCheapestMovementPathForEntity', () => {
 
     const TEST_ENTITIES_DEFINITIONS = [
         {
-            type: "AVATAR", name: "Avatar", displaySymbol: "@", displayColor: "#fff",
-            viewRadius: 8, initialHealthRoll: "150", baseActionCost: 100, naturalHealingRate: .001,
-            relations: { othersFeelAboutMe: "HOSTILE_TO", iFeelAboutOthers: "HOSTILE_TO" },
+            type: "WORM_VINE", name: "Worm Vine", displaySymbol: "w", displayColor: "#6C4",
+            viewRadius: 2, initialHealthRoll: "2d6+4", baseActionCost: 100, naturalHealingRate: .001,
+            meleeAttack: { damager: new Damager("1d3-1", [], 0), actionCost: 100 },
+            movementSpec: { movementType: "STEP_AIMLESS", actionCost: 100 },
+            relations: {
+                overrideFeelingsToOthers: {
+                    "AVATAR": "NEUTRAL_TO",
+                },
+                iFeelAboutOthers: "NEUTRAL_TO"
+            },
         },
         {
             type: "MOLD_PALE", name: "Pale Mold", displaySymbol: "m", displayColor: "#ddd",

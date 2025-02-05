@@ -135,6 +135,7 @@ class Entity {
   getDefaultActionFor(otherEntity) {
     devTrace(5, "getting default action", this, otherEntity);
     const relationship = this.getRelationshipTo(otherEntity);
+    console.log(`${this.name} is ${relationship} ${otherEntity.name}`);
     if (["HOSTILE_TO", "VIOLENT_TO"].includes(relationship)) {
       return "ATTACK"
     }

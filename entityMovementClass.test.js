@@ -1,47 +1,139 @@
 import { EntityMovement, DEFAULT_MOVEMENT_SPEC, DEFAULT_MOVEMENT_ACTION_COST } from './entityMovementClass.js';
-import { GridCell } from './gridCellClass.js';
-import { devTrace, getRandomListItem } from './util.js';
-import { determineCheapestMovementPath, getRandomCellOfTerrainInGrid } from './gridUtils.js';
+import { WorldLevel } from './worldLevelClass.js';
+import { Entity, DEFAULT_ACTION_COST } from './entityClass.js';
+import { Damager } from './damagerClass.js';
+import { devTrace, constrainValue, rollDice, getRandomListItem } from './util.js';
+import { gameState } from './gameStateClass.js';
+import { uiPaneMessages, uiPaneInfo } from "./ui.js";
+import { WorldLevelSpecification } from './worldLevelSpecificationClass.js';
+import {
+  findCellOfTerrainNearPlace,
+  getRandomCellOfTerrainInGrid,
+  findEmptyCellTerrainNearPlace,
+  getRandomEmptyCellOfTerrainInGrid,
+  determineCellViewability,
+  applyCellularAutomataSmoothing,
+  computeBresenhamLine,
+  determineCheapestMovementPath,
+  determineCheapestMovementPathForEntity
+} from './gridUtils';
+import { GridCell } from './gridCellClass';
+
+
+
 
 jest.mock('./util.js', () => ({
   devTrace: jest.fn(),
+  constrainValue: jest.requireActual('./util.js').constrainValue,
+  rollDice: jest.requireActual('./util.js').rollDice,
   getRandomListItem: jest.fn(),
 }));
 
+jest.mock('./ui.js', () => ({
+  uiPaneMessages: { addMessage: jest.fn() },
+  uiPaneInfo: { setInfo: jest.fn() },
+}));
+
 jest.mock('./gridUtils.js', () => ({
-  determineCheapestMovementPath: jest.fn(),
+  determineCheapestMovementPathForEntity: jest.requireActual('./gridUtils.js').determineCheapestMovementPathForEntity,
+  determineCellViewability: jest.requireActual('./gridUtils.js').determineCellViewability,
+  getRandomEmptyCellOfTerrainInGrid: jest.requireActual('./gridUtils.js').getRandomEmptyCellOfTerrainInGrid,
+  computeBresenhamLine: jest.requireActual('./gridUtils.js').computeBresenhamLine,
   getRandomCellOfTerrainInGrid: jest.fn(),
 }));
+
+const WORLD_LEVEL_SPECS_FOR_TESTING = [
+  WorldLevelSpecification.generateWorldLevelSpec({ type: 'EMPTY', width: 10, height: 10 }),
+  WorldLevelSpecification.generateWorldLevelSpec({ type: 'EMPTY', width: 15, height: 15 }),
+];
+
 
 describe('EntityMovement', () => {
   let entity;
   let entityLocation;
   let entityMovement;
 
-  beforeEach(() => {
-    entityLocation = {
-      getCell: jest.fn(() => ({ x: 5, y: 5, z: 0, entity: null, isTraversible: true })),
-      getCellAtDelta: jest.fn((dx, dy) => ({ x: 5 + dx, y: 5 + dy, z: 0, entity: null, isTraversible: true })),
-      placeAtCell: jest.fn((targetCell) => {
-        if (targetCell.entity) {
-          return false;
-        }
-        targetCell.entity = entity;
-        entity.determineVisibleCells();
-        return true;
-      }),
-      getWorldLevel: jest.fn(() => ({ grid: [] })),
-    };
-    entity = {
-      type: 'testEntity',
-      location: entityLocation,
-      handleAttemptedMoveIntoOccupiedCell: jest.fn(() => 0),
-      determineVisibleCells: jest.fn(() => 0),
-      vision: {
-        getVisibleEntityInfo: jest.fn(),
+  let worldLevel;
+
+  const TEST_ENTITIES_DEFINITIONS = [
+    {
+      type: "WORM_VINE", name: "Worm Vine", displaySymbol: "w", displayColor: "#6C4",
+      viewRadius: 2, initialHealthRoll: "2d6+4", baseActionCost: 100, naturalHealingRate: .001,
+      meleeAttack: { damager: new Damager("1d3-1", [], 0), actionCost: 100 },
+      movementSpec: { movementType: "STEP_AIMLESS", actionCost: 100 },
+      relations: {
+        overrideFeelingsToOthers: {
+          "AVATAR": "NEUTRAL_TO",
+        },
+        iFeelAboutOthers: "NEUTRAL_TO"
       },
-    };
-    entityMovement = new EntityMovement(entity);
+    },
+    {
+      type: "MOLD_PALE", name: "Pale Mold", displaySymbol: "m", displayColor: "#ddd",
+      viewRadius: 2, initialHealthRoll: "2d6+4", baseActionCost: 210, naturalHealingRate: .002,
+      meleeAttack: { damager: new Damager("1d4-1", [], 0), actionCost: 80 },
+      movementSpec: { movementType: "STATIONARY", actionCost: 210 },
+      relations: {
+        overrideFeelingsToOthers: {
+          "WORM_VINE": "FRIENDLY_TO",
+        },
+        othersFeelAboutMe: "NEUTRAL_TO", iFeelAboutOthers: "NEUTRAL_TO",
+      },
+    },
+    {
+      type: "RAT_MALIGN", name: "Malign Rat", displaySymbol: "r", displayColor: "#321",
+      viewRadius: 4, initialHealthRoll: "3d4+6", baseActionCost: 100, naturalHealingRate: .001,
+      meleeAttack: { damager: new Damager("1d5", [], 0), actionCost: 100 },
+      movementSpec: { movementType: "WANDER_AGGRESSIVE", actionCost: 100 },
+      relations: {
+        overrideFeelingsToOthers: {
+          "RAT_INSIDIOUS": "FRIENDLY_TO",
+        },
+        iFeelAboutOthers: "HOSTILE_TO",
+      },
+    },
+  ];
+
+  TEST_ENTITIES_DEFINITIONS.forEach((ent) => { Entity.ENTITIES[ent.type] = ent; })
+  const TEST_MOVEMENT_SPEC = Entity.ENTITIES["RAT_MALIGN"].movementSpec;
+
+  beforeEach(() => {
+    gameState.reset();
+    gameState.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
+    worldLevel = gameState.world[0];
+    const entitiesToRemove = [...worldLevel.levelEntities];
+    entitiesToRemove.forEach((ent, idx) => {
+        worldLevel.removeEntity(ent);
+    });
+
+    entity = new Entity("RAT_MALIGN");
+    worldLevel.addEntity(entity, worldLevel.grid[0][0]);
+    entityLocation = entity.location;
+    entityMovement = entity.movement;
+
+    // entityLocation = {
+    //   getCell: jest.fn(() => ({ x: 5, y: 5, z: 0, entity: null, isTraversible: true })),
+    //   getCellAtDelta: jest.fn((dx, dy) => ({ x: 5 + dx, y: 5 + dy, z: 0, entity: null, isTraversible: true })),
+    //   placeAtCell: jest.fn((targetCell) => {
+    //     if (targetCell.entity) {
+    //       return false;
+    //     }
+    //     targetCell.entity = entity;
+    //     entity.determineVisibleCells();
+    //     return true;
+    //   }),
+    //   getWorldLevel: jest.fn(() => ({ grid: [] })),
+    // };
+    // entity = {
+    //   type: 'testEntity',
+    //   location: entityLocation,
+    //   handleAttemptedMoveIntoOccupiedCell: jest.fn(() => 0),
+    //   determineVisibleCells: jest.fn(() => 0),
+    //   vision: {
+    //     getVisibleEntityInfo: jest.fn(),
+    //   },
+    // };
+    // entityMovement = new EntityMovement(entity);
   });
 
   test('should initialize with correct values', () => {
@@ -49,18 +141,22 @@ describe('EntityMovement', () => {
     expect(entityMovement.location).toBe(entityLocation);
     expect(entityMovement.isRunning).toBe(false);
     expect(entityMovement.runDelta).toBeNull();
-    expect(entityMovement.type).toBe(DEFAULT_MOVEMENT_SPEC.movementType);
-    expect(entityMovement.actionCost).toBe(DEFAULT_MOVEMENT_SPEC.actionCost);
+    expect(entityMovement.type).toBe(TEST_MOVEMENT_SPEC.movementType);
+    expect(entityMovement.actionCost).toBe(TEST_MOVEMENT_SPEC.actionCost);
   });
 
   test('should try to move to a cell and succeed', () => {
+    jest.spyOn(entityLocation, 'getCellAtDelta');
+    jest.spyOn(entity, 'determineVisibleCells');
     const resultMovementCost = entityMovement.tryMove(1, 1);
-    expect(resultMovementCost).toBe(DEFAULT_MOVEMENT_SPEC.actionCost);
+    expect(resultMovementCost).toBe(TEST_MOVEMENT_SPEC.actionCost);
     expect(entityLocation.getCellAtDelta).toHaveBeenCalledWith(1, 1);
     expect(entity.determineVisibleCells).toHaveBeenCalled();
   });
 
   test('should try to move slowly to a cell and succeed', () => {
+    jest.spyOn(entityLocation, 'getCellAtDelta');
+    jest.spyOn(entity, 'determineVisibleCells');
     entityMovement = new EntityMovement(entity, { movementType: "STATIONARY", actionCost: 325 });
     const resultMovementCost = entityMovement.tryMove(1, 1);
     expect(resultMovementCost).toBe(325);
@@ -69,6 +165,7 @@ describe('EntityMovement', () => {
   });
 
   test('should try to move to a cell and fail due to non-traversible cell', () => {
+    jest.spyOn(entityLocation, 'getCellAtDelta');
     entityLocation.getCellAtDelta = jest.fn((dx, dy) => ({ x: 5 + dx, y: 5 + dy, z: 0, entity: null, isTraversible: false }));
     const resultMovementCost = entityMovement.tryMove(1, 1);
     expect(resultMovementCost).toBe(0);
@@ -76,17 +173,23 @@ describe('EntityMovement', () => {
   });
 
   test('should try to move to a cell and handle occupied cell', () => {
-    entityLocation.getCellAtDelta = jest.fn((dx, dy) => ({ x: 5 + dx, y: 5 + dy, z: 0, entity: { type: 'otherEntity' }, isTraversible: true }));
+    jest.spyOn(entity, 'handleAttemptedMoveIntoOccupiedCell');
+
+    // entityLocation.getCellAtDelta = jest.fn((dx, dy) => ({ x: 5 + dx, y: 5 + dy, z: 0, entity: { type: 'otherEntity' }, isTraversible: true }));
+    const entityInTargetCell = new Entity("MOLD_PALE");
+    worldLevel.addEntity(entityInTargetCell, worldLevel.grid[1][1]);
     const resultMovementCost = entityMovement.tryMove(1, 1);
     expect(resultMovementCost).toBe(0);
     expect(entity.handleAttemptedMoveIntoOccupiedCell).toHaveBeenCalled();
   });
 
   test('should try to move to a specific cell and succeed', () => {
+    jest.spyOn(entityLocation, 'getCell');
+    jest.spyOn(entity, 'determineVisibleCells');
     const targetCell = { x: 6, y: 6, z: 0, entity: null, isTraversible: true };
     entityLocation.getCell = jest.fn(() => ({ x: 5, y: 5, z: 0, entity: null, getDeltaToOtherCell: jest.fn(() => ({ dx: 1, dy: 1 })) }));
     const resultMovementCost = entityMovement.tryMoveToCell(targetCell);
-    expect(resultMovementCost).toBe(DEFAULT_MOVEMENT_SPEC.actionCost);
+    expect(resultMovementCost).toBe(TEST_MOVEMENT_SPEC.actionCost);
     expect(entityLocation.getCell).toHaveBeenCalled();
     expect(entity.determineVisibleCells).toHaveBeenCalled();
   });
@@ -104,12 +207,14 @@ describe('EntityMovement', () => {
   });
 
   test('should check if can move to deltas and return true', () => {
+    jest.spyOn(entityLocation, 'getCellAtDelta');
     const resultCanMove = entityMovement.canMoveToDeltas(1, 1);
     expect(resultCanMove).toBe(true);
     expect(entityLocation.getCellAtDelta).toHaveBeenCalledWith(1, 1);
   });
 
   test('should check if can move to deltas and return false due to non-traversible cell', () => {
+    jest.spyOn(entityLocation, 'getCellAtDelta');
     entityLocation.getCellAtDelta = jest.fn((dx, dy) => ({ x: 5 + dx, y: 5 + dy, z: 0, entity: null, isTraversible: false }));
     const resultCanMove = entityMovement.canMoveToDeltas(1, 1);
     expect(resultCanMove).toBe(false);
@@ -117,17 +222,20 @@ describe('EntityMovement', () => {
   });
 
   test('should confirm move to a new cell', () => {
+    jest.spyOn(entity, 'determineVisibleCells');
     const newCell = { x: 6, y: 6, z: 0, entity: null, isTraversible: true };
     const oldCell = { x: 5, y: 5, z: 0, entity: entity };
     entityLocation.getCell = jest.fn(() => oldCell);
     const resultMovementCost = entityMovement.confirmMove(newCell);
-    expect(resultMovementCost).toBe(DEFAULT_MOVEMENT_SPEC.actionCost);
+    expect(resultMovementCost).toBe(TEST_MOVEMENT_SPEC.actionCost);
     expect(oldCell.entity).toBeUndefined();
     expect(newCell.entity).toBe(entity);
     expect(entity.determineVisibleCells).toHaveBeenCalled();
   });
 
   test('should confirm move to deltas', () => {
+    jest.spyOn(entityLocation, 'placeAtCell');
+    jest.spyOn(entity, 'determineVisibleCells');
     const oldCell = { x: 5, y: 5, z: 0, entity: entity };
     const newCell = { x: 6, y: 6, z: 0, entity: null, isTraversible: true };
     entityLocation.getCell = jest.fn(() => oldCell);
@@ -148,16 +256,16 @@ describe('EntityMovement', () => {
     entityMovement.setPathToDestination();
     expect(entityMovement.movementPath).toEqual([]);
   });
-  
+
   test('should set path to destination', () => {
     const destinationCell = { x: 7, y: 7, z: 0, entity: null, isTraversible: true };
     const path = [{ x: 6, y: 6, z: 0 }, { x: 7, y: 7, z: 0 }];
     entityMovement.destinationCell = destinationCell;
     entityLocation.getCell = jest.fn(() => ({ x: 5, y: 5, z: 0 }));
-    determineCheapestMovementPath.mockReturnValue(path);
+    determineCheapestMovementPathForEntity.mockReturnValue(path);
 
     entityMovement.setPathToDestination();
-    expect(determineCheapestMovementPath).toHaveBeenCalledWith(
+    expect(determineCheapestMovementPathForEntity).toHaveBeenCalledWith(
       entityLocation.getCell(),
       destinationCell,
       entityLocation.getWorldLevel()
@@ -209,7 +317,7 @@ describe('EntityMovement', () => {
     const mockEntMid = { x: 7, y: 7, z: 0 };
     const mockEntEnd = { x: 8, y: 8, z: 0 };
     getRandomCellOfTerrainInGrid.mockReturnValue(randomCell);
-    determineCheapestMovementPath.mockReturnValue([mockEntBegin, mockEntMid, mockEntEnd]);
+    determineCheapestMovementPathForEntity.mockReturnValue([mockEntBegin, mockEntMid, mockEntEnd]);
     entityMovement.tryMoveToCell = jest.fn((arg) => { console.log(arg); return DEFAULT_MOVEMENT_ACTION_COST; });
 
     const result = entityMovement.moveWanderAimless();
@@ -219,7 +327,7 @@ describe('EntityMovement', () => {
 
     expect(result).toBe(DEFAULT_MOVEMENT_ACTION_COST);
     expect(getRandomCellOfTerrainInGrid).toHaveBeenCalledWith("FLOOR", entityLocation.getWorldLevel().grid);
-    expect(determineCheapestMovementPath).toHaveBeenCalledWith(
+    expect(determineCheapestMovementPathForEntity).toHaveBeenCalledWith(
       entityLocation.getCell(),
       randomCell,
       entityLocation.getWorldLevel()
@@ -240,7 +348,7 @@ describe('EntityMovement', () => {
     const mockEntMid = { x: 6, y: 6, z: 0 };
     const mockEntEnd = { x: 7, y: 7, z: 0 };
     entity.vision.getVisibleEntityInfo.mockReturnValue(visibleHostilesInfo);
-    determineCheapestMovementPath.mockReturnValue([mockEntBegin, mockEntMid, mockEntEnd]);
+    determineCheapestMovementPathForEntity.mockReturnValue([mockEntBegin, mockEntMid, mockEntEnd]);
     entityMovement.tryMoveToCell = jest.fn(() => DEFAULT_MOVEMENT_ACTION_COST);
 
     const result = entityMovement.moveWanderAggressive();
@@ -256,13 +364,13 @@ describe('EntityMovement', () => {
     const mockEntEnd = { x: 7, y: 7, z: 0 };
     entity.vision.getVisibleEntityInfo.mockReturnValue([]);
     getRandomCellOfTerrainInGrid.mockReturnValue(randomCell);
-    determineCheapestMovementPath.mockReturnValue([mockEntBegin, mockEntMid, mockEntEnd]);
+    determineCheapestMovementPathForEntity.mockReturnValue([mockEntBegin, mockEntMid, mockEntEnd]);
     entityMovement.tryMoveToCell = jest.fn(() => DEFAULT_MOVEMENT_ACTION_COST);
 
     const result = entityMovement.moveWanderAggressive();
     expect(result).toBe(DEFAULT_MOVEMENT_ACTION_COST);
     expect(getRandomCellOfTerrainInGrid).toHaveBeenCalledWith("FLOOR", entityLocation.getWorldLevel().grid);
-    expect(determineCheapestMovementPath).toHaveBeenCalledWith(
+    expect(determineCheapestMovementPathForEntity).toHaveBeenCalledWith(
       entityLocation.getCell(),
       randomCell,
       entityLocation.getWorldLevel()

@@ -1,6 +1,6 @@
 import { devTrace, getRandomListItem } from "./util.js";
 import { GridCell } from "./gridCellClass.js";
-import { getRandomCellOfTerrainInGrid, determineCheapestMovementPath, computeBresenhamLine } from "./gridUtils.js";
+import { getRandomCellOfTerrainInGrid, determineCheapestMovementPathForEntity, computeBresenhamLine } from "./gridUtils.js";
 
 const DEFAULT_MOVEMENT_ACTION_COST = 100;
 const DEFAULT_MOVEMENT_SPEC = { movementType: "STATIONARY", actionCost: DEFAULT_MOVEMENT_ACTION_COST };
@@ -136,8 +136,8 @@ class EntityMovement {
             this.movementPath = [];
             return;
         }
-        this.movementPath = determineCheapestMovementPath(
-            this.location.getCell(),
+        this.movementPath = determineCheapestMovementPathForEntity(
+            this.ofEntity,
             this.destinationCell,
             this.location.getWorldLevel());
         if (this.movementPath.length > 0) {
