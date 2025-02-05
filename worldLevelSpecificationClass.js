@@ -8,28 +8,28 @@ const LEVEL_HEIGHT_BOUND_LOWER = 20;
 const LEVEL_HEIGHT_BOUND_UPPER = 240;
 const DEFAULT_LEVEL_TYPE = 'EMPTY';
 
-class WorldLevelSpecifciation {
+class WorldLevelSpecification {
   constructor(type, width, height) {
-    if (WorldLevelSpecifciation.getLevelTypesByAttribute('ALL').includes(type)) {
+    if (WorldLevelSpecification.getLevelTypesByAttribute('ALL').includes(type)) {
       this.type = type;
     } else {
-      console.log(`unknown type for WorldLevelSpecifciation: ${type} - using EMPTY instead`);
+      console.log(`unknown type for WorldLevelSpecification: ${type} - using EMPTY instead`);
       this.type = DEFAULT_LEVEL_TYPE;
     }
     this.width = width;
     this.height = height;
-    this.typeSpecificParams = null;
+    this.typeGenerationParams = null;
   }
 
   // -----------------------------------
 
   static generateWorldLevelSpec(specGenerationParams) {
-    let genType = WorldLevelSpecifciation.getGenTypeFromSpecGenParams(specGenerationParams);
-    let genWidth = WorldLevelSpecifciation.getGenWidthFromSpecGenParams(specGenerationParams);
-    let genHeight = WorldLevelSpecifciation.getGenHeightFromSpecGenParams(specGenerationParams);
-    const spec = new WorldLevelSpecifciation(genType, genWidth, genHeight);
-    if (specGenerationParams.typeSpecificParams) {
-      spec.typeSpecificParams = specGenerationParams.typeSpecificParams;
+    let genType = WorldLevelSpecification.getGenTypeFromSpecGenParams(specGenerationParams);
+    let genWidth = WorldLevelSpecification.getGenWidthFromSpecGenParams(specGenerationParams);
+    let genHeight = WorldLevelSpecification.getGenHeightFromSpecGenParams(specGenerationParams);
+    const spec = new WorldLevelSpecification(genType, genWidth, genHeight);
+    if (specGenerationParams.typeGenerationParams) {
+      spec.typeGenerationParams = specGenerationParams.typeGenerationParams;
     }
     return spec;
   }
@@ -37,12 +37,12 @@ class WorldLevelSpecifciation {
   // -----------------------------------
 
   static getGenTypeFromSpecGenParams(specGenerationParams) {
-    if (specGenerationParams.type && WorldLevelSpecifciation.getLevelTypesByAttribute('ALL').includes(specGenerationParams.type)) {
+    if (specGenerationParams.type && WorldLevelSpecification.getLevelTypesByAttribute('ALL').includes(specGenerationParams.type)) {
       return specGenerationParams.type;
     }
 
     if (specGenerationParams.typeAttribute) {
-      const typesHavingAttribute = WorldLevelSpecifciation.getLevelTypesByAttribute(specGenerationParams.typeAttribute);
+      const typesHavingAttribute = WorldLevelSpecification.getLevelTypesByAttribute(specGenerationParams.typeAttribute);
       if (typesHavingAttribute.length > 0) {
         return getRandomListItem(typesHavingAttribute);
       }
@@ -111,4 +111,4 @@ class WorldLevelSpecifciation {
 
 }
 
-export { WorldLevelSpecifciation };
+export { WorldLevelSpecification };
