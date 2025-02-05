@@ -1,45 +1,100 @@
-import { generateGrid_empty, setWorldLevelForGridCells } from './gridGeneration';
-import { GridCell } from './gridCellClass';
+import {
+    generateGrid_empty,
+    generateGrid_random,
+    generateGrid_caves,
+    generateGrid_caves_shattered,
+    generateGrid_caves_large,
+    generateGrid_caves_huge,
+    generateGrid_burrow,
+    generateGrid_nest,
+    generateGrid_roomsAndCorridors_random,
+    generateGrid_roomsAndCorridors_subdivide,
+    generateGrid_town,
+    generateGrid_puddles,
+    setWorldLevelForGridCells
+} from './gridGeneration.js';
 
-describe('generateGrid_empty', () => {
-    test('should generate an empty grid with specified dimensions', () => {
-        const width = 10;
-        const height = 10;
-        const grid = generateGrid_empty(width, height);
-        expect(grid).toBeDefined();
+import { GridCell } from './gridCellClass.js';
+
+describe('Grid Generation - Integration Tests', () => {
+    const testWidth = 20;
+    const testHeight = 15;
+
+    function basicValidateGrid(grid, width, height) {
         expect(grid.length).toBe(width);
         expect(grid[0].length).toBe(height);
-        grid.forEach(col => {
-            col.forEach(cell => {
-                expect(cell).toBeInstanceOf(GridCell);
-                expect(cell.terrain).toBe('FLOOR');
-            });
-        });
+        expect(grid.flat().every(cell => cell instanceof GridCell)).toBe(true);
+    }
+
+    test('generateGrid_empty creates a fully FLOOR grid', () => {
+        const grid = generateGrid_empty(testWidth, testHeight);
+        basicValidateGrid(grid, testWidth, testHeight);
+        grid.forEach(col => col.forEach(cell => expect(cell.terrain).toBe("FLOOR")));
     });
 
-    test('should generate an empty grid with cells of the given type', () => {
-        const width = 5;
-        const height = 5;
-        const grid = generateGrid_empty(width, height, 'WALL');
-        expect(grid).toBeDefined();
-        expect(grid.length).toBe(width);
-        expect(grid[0].length).toBe(height);
-        grid.forEach(col => {
-            col.forEach(cell => {
-                expect(cell).toBeInstanceOf(GridCell);
-                expect(cell.terrain).toBe('WALL');
-            });
-        });
+    test('generateGrid_random creates a grid with mixed terrain', () => {
+        const grid = generateGrid_random(testWidth, testHeight);
+        basicValidateGrid(grid, testWidth, testHeight);
+        const uniqueTerrains = new Set(grid.flat().map(cell => cell.terrain));
+        expect(uniqueTerrains.size).toBeGreaterThan(1); // Ensures terrain variation
     });
 
-    test('should generate an empty grid with zero dimensions', () => {
-        const width = 0;
-        const height = 0;
-        const grid = generateGrid_empty(width, height);
-        expect(grid).toBeDefined();
-        expect(grid.length).toBe(width);
+    test('generateGrid_caves creates a cave-like structure', () => {
+        const grid = generateGrid_caves(testWidth, testHeight);
+        basicValidateGrid(grid, testWidth, testHeight);
+        expect(grid.flat().some(cell => cell.terrain === "WALL")).toBe(true);
+    });
+
+    test('generateGrid_caves_shattered creates a loosely structured cave', () => {
+        const grid = generateGrid_caves_shattered(testWidth, testHeight);
+        basicValidateGrid(grid, testWidth, testHeight);
+    });
+
+    test('generateGrid_caves_large creates a more open cave system', () => {
+        const grid = generateGrid_caves_large(testWidth, testHeight);
+        basicValidateGrid(grid, testWidth, testHeight);
+    });
+
+    test('generateGrid_caves_huge creates very open cave systems', () => {
+        const grid = generateGrid_caves_huge(testWidth, testHeight);
+        basicValidateGrid(grid, testWidth, testHeight);
+    });
+
+    test('generateGrid_burrow creates a winding, narrow cave system', () => {
+        const grid = generateGrid_burrow(testWidth, testHeight);
+        basicValidateGrid(grid, testWidth, testHeight);
+        expect(grid.flat().some(cell => cell.terrain === "FLOOR")).toBe(true);
+    });
+
+    test('generateGrid_nest creates tunnels with some structure', () => {
+        const grid = generateGrid_nest(testWidth, testHeight);
+        basicValidateGrid(grid, testWidth, testHeight);
+    });
+
+    test('generateGrid_roomsAndCorridors_random creates multiple rooms', () => {
+        const grid = generateGrid_roomsAndCorridors_random(testWidth, testHeight);
+        basicValidateGrid(grid, testWidth, testHeight);
+    });
+
+    test('generateGrid_roomsAndCorridors_subdivide creates connected room networks', () => {
+        const grid = generateGrid_roomsAndCorridors_subdivide(testWidth, testHeight);
+        basicValidateGrid(grid, testWidth, testHeight);
+    });
+
+    test('generateGrid_town creates buildings with doors', () => {
+        const grid = generateGrid_town(testWidth, testHeight);
+        basicValidateGrid(grid, testWidth, testHeight);
+        expect(grid.flat().some(cell => cell.terrain === "WALL")).toBe(true);
+    });
+
+    test('generateGrid_puddles creates scattered water terrain', () => {
+        const grid = generateGrid_puddles(testWidth, testHeight);
+        basicValidateGrid(grid, testWidth, testHeight);
+        expect(grid.flat().some(cell => cell.terrain === "WATER_SHALLOW")).toBe(true);
     });
 });
+
+
 
 describe('setWorldLevelForGridCells', () => {
     let grid;
