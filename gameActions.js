@@ -36,6 +36,11 @@ const gameActionsMap = {
     RUN_DR: { name: "Run DR", description: "Move repeatedly, starting in the given direction", action: runAvatar_DR },
 
     SLEEP: { name: "Sleep", description: "Stay in the same space doing nothing until something happens or enough time has passed", action: sleepAvatar },
+
+    ZOOM_IN: { name: "Zoom In", description: "Zoom in", action: zoomIn },
+    ZOOM_OUT: { name: "Zoom Out", description: "Zoom out", action: zoomOut },
+    ZOOM_RESET: { name: "Zoom Reset", description: "Reset the zoom level to the initial value", action: zoomReset },
+
 };
 
 const DIRECTION_DELTAS = {
@@ -139,5 +144,9 @@ function runAvatar_DR()   { return runAvatar(DIRECTION_DELTAS["DR"]) }
 function sleepAvatar(key, event) {
     devTrace(3,`${key} - sleep avatar (not yet implemented)`, event);
 }
+
+function zoomIn()  { uiPaneMain.zoomIn(); return 0; }
+function zoomOut()  { uiPaneMain.zoomOut(); return 0; }
+function zoomReset()  { uiPaneMain.zoomReset(); return 0;  }
 
 export { gameActionsMap };

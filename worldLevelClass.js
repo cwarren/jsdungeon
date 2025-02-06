@@ -80,7 +80,7 @@ class WorldLevel {
         "CAVES": "Twisty passages and irregular open areas make this a great place to lay an ambush.",
         "CAVES_HUGE": "Huge caverns give plenty of room to maneuver, but few places to hide.",
         "CAVES_LARGE": "These caves have some wide open area, but some smaller spaces as well tucked here and there.",
-        "CAVES_SHATTERED": "Some old earthquake seems to have collapsed this cavern, leaving sometime of a mess to navigate through.",
+        "CAVES_SHATTERED": "Some old earthquake seems to have collapsed this cavern, leaving something of a mess to navigate through.",
         "NEST": "The pattern of openings suggests ants or something similar, but large enough for a person to walk through.",
         "PUDDLES": "Water collects on the uneven floor.",
         "RANDOM": "Pure chaos.",

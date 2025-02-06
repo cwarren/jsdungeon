@@ -1,3 +1,7 @@
+import { constrainValue } from "./util.js";
+
+const INITIAL_ZOOM_FACTOR = .6;
+
 class UIPaneMainRenderer {
     constructor(ui, canvas) {
         this.ui = ui;
@@ -11,6 +15,21 @@ class UIPaneMainRenderer {
             baseCellSize: 30,
             gridCellSpacing: 1,
         };
+    }
+
+    // NOTE: zoom alteration is implemented here... but not every game mode rendering pays attention to it
+    zoomIn(factor = 1.1) {
+        this.zoomAlter(factor);
+    }
+    zoomOut(factor = 0.9) {
+        this.zoomAlter(factor);
+    }
+    zoomAlter(factor = 1) {
+        this.uiRenderSettings.zoomFactor = 
+        constrainValue(this.uiRenderSettings.zoomFactor * factor, this.uiRenderSettings.zoomFactorMin, this.uiRenderSettings.zoomFactorMax);
+    }
+    zoomReset() {
+        this.uiRenderSettings.zoomFactor = INITIAL_ZOOM_FACTOR;
     }
 
     getGridRenderSettings(worldLevel) {

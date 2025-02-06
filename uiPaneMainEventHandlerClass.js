@@ -34,6 +34,10 @@ class UIPaneMainEventHandler {
     getClickedCell(clickEvent) {
         const currentLevel = this.ui.gameState.getCurrentWorldLevel();
         if (!currentLevel) return;
+
+        // no cells to click on if not showing game play nor map
+        if (this.ui.getCurrentUIState() != "GAME_PLAY" && this.ui.getCurrentUIState() != "MAP_SCREEN") { return; }
+
         const { cellSize, gridSpacing, offsetX, offsetY } = this.ui.getCurrentRenderer().getGridRenderSettings(currentLevel);
 
         const rect = this.canvas.getBoundingClientRect();

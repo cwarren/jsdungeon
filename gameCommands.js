@@ -36,6 +36,10 @@ const keyBinding = {
         "w": "DEV_WIN_GAME",
         "%": "DEV_DUMP_GAME_STATE",
 
+        "+": "ZOOM_IN",
+        "-": "ZOOM_OUT",
+        "=": "ZOOM_RESET",
+
         "C": "PUSH_CHARACTER_SHEET",
         "I": "PUSH_INVENTORY_SCREEN",
         "E": "PUSH_EQUIPMENT_SCREEN",

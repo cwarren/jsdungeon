@@ -1,10 +1,7 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* grid display enhancements
-* * zoom in / out
-* * map view - very zoomed out, to fit screen; centered on level center, not avatar, structures and avatar drawn larger than cells; avatar highlighted
-* * * maybe base size and center on seen cells, not whole level (track up-est, down-est, left-est, and right-est seen cells to aid in these calcs)
+* currently on avatar death the UI is left in gameplay mode - should probably switch it to lost mode (and similar for game won (don't need to worry about abandon, since that only happens from meta screen and is already covered))
 
 * ISSUE! running tests with "this.populateLevelWithEntities(firstLevel); // DEV FUNCTION" active in gameStateClass drops things into an infinite loop
 * * figure out which test surfaces this
@@ -30,9 +27,11 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * more mob types spec-ed
 * * more detailed info in mob type specs
 
-* healing currently is checked when an entity takes it's turn, which could lead to some weird healing bursts for slow-acting entities. Consider moving it to a global check (anchored at world level, triggered by game time?)
+* implement map screen
+* * map view - very zoomed out, to fit screen; centered on level center, not avatar, structures and avatar drawn larger than cells; avatar highlighted
+* * * maybe base size and center on seen cells, not whole level (track up-est, down-est, left-est, and right-est seen cells to aid in these calcs)
 
-* currently on avatar death the UI is left in gameplay mode - should probably switch it to lost mode (and similar for game won (don't need to worry about abandon, since that only happens from meta screen and is already covered))
+* healing currently is checked when an entity takes it's turn, which could lead to some weird healing bursts for slow-acting entities. Consider moving it to a global check (anchored at world level, triggered by game time?)
 
 * when an entity dies, remove it from the damagedBy lists of other entities
 * * maybe have to add to entities a list of thing's they've damaged... though that could get messy, especially for the avatar

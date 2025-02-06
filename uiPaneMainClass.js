@@ -74,6 +74,19 @@ class UIPaneMain {
         renderer.clear();
         renderer.draw();
     }
+
+    zoomIn(factor = 1.1) {
+        this.getCurrentRenderer().zoomIn(factor);
+        this.resizeCanvas(); // Redraw to reflect new state
+    }
+    zoomOut(factor = 0.9) {
+        this.getCurrentRenderer().zoomOut(factor);
+        this.resizeCanvas(); // Redraw to reflect new state
+    }
+    zoomReset() {
+        this.getCurrentRenderer().zoomReset();
+        this.resizeCanvas(); // Redraw to reflect new state
+    }
 }
 
 export { UIPaneMain };
