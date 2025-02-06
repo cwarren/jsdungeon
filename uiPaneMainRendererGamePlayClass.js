@@ -5,35 +5,54 @@ class UIPaneMainRendererGamePlay extends UIPaneMainRenderer {
         super(ui, canvas);
     }
 
-    //=====================
+    //===================== 
 
     draw() {
         super.draw();
         const currentLevel = this.ui.gameState.getCurrentWorldLevel();
         if (!currentLevel) return;
-        this.drawWorldLevel(currentLevel);
+
+        const avatar = this.ui.gameState.avatar;
+        if (avatar) {
+            const centerCell = avatar.getCell();
+            this.drawWorldLevel(currentLevel, centerCell);
+        } else {
+            this.drawWorldLevel(currentLevel);
+        }
     }
 
     //=====================
 
-    drawWorldLevel(worldLevel) {
-        this.drawWorldLevelGrid(worldLevel);
-        this.drawWorldLevelStructures(worldLevel);
-        this.drawWorldLevelItems(worldLevel);
-        this.drawWorldLevelEntities(worldLevel);
+    drawWorldLevel(worldLevel, centerCell = null) {
+        this.drawWorldLevelGrid(worldLevel, centerCell);
+        this.drawWorldLevelStructures(worldLevel, centerCell);
+        this.drawWorldLevelItems(worldLevel, centerCell);
+        this.drawWorldLevelEntities(worldLevel, centerCell);
     }
+
 
     // override to handle centering
-    getGridRenderSettings(worldLevel) {
+    getGridRenderSettings(worldLevel, centerCell = null) {
         const cellSize = this.uiRenderSettings.baseCellSize * this.uiRenderSettings.zoomFactor;
         const gridSpacing = this.uiRenderSettings.gridCellSpacing;
+
+        if (centerCell) {
+            const canvasCenterX = this.canvas.width / 2;
+            const canvasCenterY = this.canvas.height / 2;
+            const offsetX = canvasCenterX - centerCell.x * (cellSize + gridSpacing);
+            const offsetY = canvasCenterY - centerCell.y * (cellSize + gridSpacing);
+            return { cellSize, gridSpacing, offsetX, offsetY };
+        }
+
+        // Default centering the entire world level
         const offsetX = (this.canvas.width - (worldLevel.levelWidth * (cellSize + gridSpacing))) / 2;
         const offsetY = (this.canvas.height - (worldLevel.levelHeight * (cellSize + gridSpacing))) / 2;
-        return {cellSize, gridSpacing, offsetX, offsetY,}
+        return { cellSize, gridSpacing, offsetX, offsetY };
     }
 
-    drawWorldLevelGrid(worldLevel) {
-        const {cellSize, gridSpacing, offsetX, offsetY} = this.getGridRenderSettings(worldLevel);
+
+    drawWorldLevelGrid(worldLevel, centerCell = null) {
+        const { cellSize, gridSpacing, offsetX, offsetY } = this.getGridRenderSettings(worldLevel, centerCell);
         for (let col = 0; col < worldLevel.levelWidth; col++) {
             for (let row = 0; row < worldLevel.levelHeight; row++) {
                 const cell = worldLevel.grid[col][row];
@@ -68,11 +87,12 @@ class UIPaneMainRendererGamePlay extends UIPaneMainRenderer {
         this.ctx.globalAlpha = 1;
     }
 
-    drawWorldLevelStructures(worldLevel) {
-        const {cellSize, gridSpacing, offsetX, offsetY} = this.getGridRenderSettings(worldLevel);
+    drawWorldLevelStructures(worldLevel, centerCell = null) {
+        const { cellSize, gridSpacing, offsetX, offsetY } = this.getGridRenderSettings(worldLevel, centerCell);
         worldLevel.levelStructures.forEach(structure => {
             const structureCell = structure.getCell();
-            if (this.ui.gameState.avatar.vision.visibleCells.has(structureCell) || this.ui.gameState.avatar.vision.seenCells.has(structureCell)) {
+            if (this.ui.gameState.avatar.vision.visibleCells.has(structureCell) ||
+                this.ui.gameState.avatar.vision.seenCells.has(structureCell)) {
                 this.drawStructure(structure, offsetX, offsetY, cellSize, gridSpacing);
             }
         });
@@ -94,15 +114,14 @@ class UIPaneMainRendererGamePlay extends UIPaneMainRenderer {
         // Placeholder for drawing items
     }
 
-    drawWorldLevelEntities(worldLevel) {
-        const {cellSize, gridSpacing, offsetX, offsetY} = this.getGridRenderSettings(worldLevel);
+    drawWorldLevelEntities(worldLevel, centerCell = null) {
+        const { cellSize, gridSpacing, offsetX, offsetY } = this.getGridRenderSettings(worldLevel, centerCell);
         worldLevel.levelEntities.forEach(entity => {
             if (entity.isVisibleTo(this.ui.gameState.avatar)) {
                 this.drawEntity(entity, offsetX, offsetY, cellSize, gridSpacing);
             }
         });
 
-        // Draw the avatar if it's in this world level
         const avatar = this.ui.gameState.avatar;
         if (avatar && avatar.z === worldLevel.levelNumber) {
             this.drawEntity(avatar, offsetX, offsetY, cellSize, gridSpacing);
@@ -126,7 +145,7 @@ class UIPaneMainRendererGamePlay extends UIPaneMainRenderer {
 
         const currentLevel = this.ui.gameState.getCurrentWorldLevel();
         if (!currentLevel) return;
-        const {cellSize, gridSpacing, offsetX, offsetY} = this.getGridRenderSettings(currentLevel);
+        const { cellSize, gridSpacing, offsetX, offsetY } = this.getGridRenderSettings(currentLevel);
 
         this.ctx.fillStyle = highlightColor;
         gridCellList.forEach(cell => {
