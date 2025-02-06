@@ -1,7 +1,9 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* currently on avatar death the UI is left in gameplay mode - should probably switch it to lost mode (and similar for game won (don't need to worry about abandon, since that only happens from meta screen and is already covered))
+* BUG: on new game, the mini-char display is still tied to the avatar from the old game
+* * when a game ends, clear out that connection
+* * when a new game starts, set up a connection for the new avatar
 
 * ISSUE! running tests with "this.populateLevelWithEntities(firstLevel); // DEV FUNCTION" active in gameStateClass drops things into an infinite loop
 * * figure out which test surfaces this

@@ -59,14 +59,10 @@ const DIRECTION_DELTAS = {
 
 function DEV_winGame()  { 
     gameState.winGame();
-    uiPaneMain.resetUIState();
-    uiPaneMain.pushUIState("GAME_OVER");
     return 0;
 }
 function DEV_loseGame() {
     gameState.loseGame();
-    uiPaneMain.resetUIState();
-    uiPaneMain.pushUIState("GAME_OVER");
     return 0;
 }
 function DEV_dumpGameState() {

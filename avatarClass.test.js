@@ -3,7 +3,7 @@ import { Entity, DEFAULT_ACTION_COST } from './entityClass.js';
 import { gameState } from './gameStateClass.js';
 import { devTrace, rollDice } from './util.js';
 import { Damage } from './damageClass.js';
-import { uiPaneMessages } from "./ui.js";
+import { uiPaneMain, uiPaneMessages } from "./ui.js";
 import { WorldLevelSpecification } from './worldLevelSpecificationClass.js';
 
 const WORLD_LEVEL_SPECS_FOR_TESTING= [
@@ -17,6 +17,10 @@ jest.mock('./util.js', () => ({
 
 jest.mock('./ui.js', () => ({
   uiPaneMessages: { addMessage: jest.fn() },
+  uiPaneMain: { 
+    resetUIState: jest.fn(), 
+    pushUIState: jest.fn(),
+  },
 }));
 
 describe('Avatar', () => {
@@ -59,6 +63,7 @@ describe('Avatar', () => {
     avatar.die();
     expect(gameState.loseGame).toHaveBeenCalled();
     expect(Entity.prototype.die).toHaveBeenCalled();
+    expect(uiPaneMain.pushUIState).toHaveBeenCalledWith("GAME_OVER");
   });
 
   test('should get melee attack damage', () => {

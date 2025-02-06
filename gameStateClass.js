@@ -2,7 +2,7 @@ import { Entity } from "./entityClass.js";
 import { WorldLevel } from "./worldLevelClass.js";
 import { Avatar } from "./avatarClass.js";
 import { devTrace } from "./util.js";
-import { uiPaneMessages, uiPaneInfo } from "./ui.js";
+import { uiPaneMain, uiPaneMessages, uiPaneInfo } from "./ui.js";
 import { WorldLevelSpecification } from "./worldLevelSpecificationClass.js";
 
 class GameState {
@@ -90,18 +90,24 @@ class GameState {
         devTrace(1,"winning the game");
         this.status = "WON";
         this.isPlaying = false;
+        uiPaneMain.resetUIState();
+        uiPaneMain.pushUIState("GAME_OVER");
     }
 
     loseGame() {
         devTrace(1,"losing the game");
         this.status = "LOST";
         this.isPlaying = false;
+        uiPaneMain.resetUIState();
+        uiPaneMain.pushUIState("GAME_OVER");
     }
 
     abandonGame() {
         devTrace(1,"abandoning the game");
         this.status = "ABANDONED";
         this.isPlaying = false;
+        uiPaneMain.resetUIState();
+        uiPaneMain.pushUIState("GAME_OVER");
     }
 
     //=====================
