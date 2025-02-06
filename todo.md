@@ -1,7 +1,11 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* shift bulk of determineVisibleCells into grid utils
+* grid display enhancements
+* * zoom in / out
+* * center on avatar
+* * map view - very zoomed out, to fit screen; centered on level center, not avatar, structures and avatar drawn larger than cells; avatar highlighted
+* * * maybe base size and center on seen cells, not whole level (track up-est, down-est, left-est, and right-est seen cells to aid in these calcs)
 
 * implement entity sleeping
 * * very similar to running, but don't actually move (still update time on level, natural healing, etc.)
@@ -37,14 +41,6 @@ PS E:\code\jsdungeon> docker-compose up --build
 * when running, change adjacency interrupts to interrupt on newly adjacent only
 
 * resolve duped info between direction deltas in gameActions and adjacency directions in GridCell
-
-* add some tests for the ui stuff
-
-* grid display enhancements
-* * zoom in / out
-* * center on avatar
-* * map view - very zoomed out, to fit screen; centered on level center, not avatar, structures and avatar drawn larger than cells; avatar highlighted
-* * * maybe base size and center on seen cells, not whole level (track up-est, down-est, left-est, and right-est seen cells to aid in these calcs)
 
 * support for multi-input commands, e.g. first command is "dig" and second input is a direction, or first command is 'sleep' and second input is a duration
 * support for command confirmations, e.g. 'Are you sure you want to attack the town sheriff? (y/n)'

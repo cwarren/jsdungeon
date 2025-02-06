@@ -19,9 +19,6 @@ import {
 } from './gridUtils.js';
 import { GridCell } from './gridCellClass';
 
-
-
-
 jest.mock('./util.js', () => ({
   devTrace: jest.fn(),
   constrainValue: jest.requireActual('./util.js').constrainValue,
@@ -101,10 +98,9 @@ describe('EntityMovement', () => {
     gameState.reset();
     gameState.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
     worldLevel = gameState.world[0];
-    const entitiesToRemove = [...worldLevel.levelEntities];
-    entitiesToRemove.forEach((ent, idx) => {
-      worldLevel.removeEntity(ent);
-    });
+    while (worldLevel.levelEntities.length > 0) {
+      worldLevel.removeEntity(worldLevel.levelEntities[0]);
+    }
 
     entity = new Entity("RAT_MALIGN");
     worldLevel.addEntity(entity, worldLevel.grid[0][0]);

@@ -380,10 +380,9 @@ describe('determineCheapestMovementPathForEntity', () => {
         gameState.reset();
         gameState.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
         worldLevel = gameState.world[0];
-        const entitiesToRemove = [...worldLevel.levelEntities];
-        entitiesToRemove.forEach((ent, idx) => {
-            worldLevel.removeEntity(ent);
-        });
+        while (worldLevel.levelEntities.length > 0) {
+            worldLevel.removeEntity(worldLevel.levelEntities[0]);
+        }
     });
 
     test('should find the cheapest path between two cells when grid is empty', () => {

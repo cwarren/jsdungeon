@@ -23,6 +23,15 @@ class UIPaneMainRendererGamePlay extends UIPaneMainRenderer {
         this.drawWorldLevelEntities(worldLevel);
     }
 
+    // override to handle centering
+    getGridRenderSettings(worldLevel) {
+        const cellSize = this.uiRenderSettings.baseCellSize * this.uiRenderSettings.zoomFactor;
+        const gridSpacing = this.uiRenderSettings.gridCellSpacing;
+        const offsetX = (this.canvas.width - (worldLevel.levelWidth * (cellSize + gridSpacing))) / 2;
+        const offsetY = (this.canvas.height - (worldLevel.levelHeight * (cellSize + gridSpacing))) / 2;
+        return {cellSize, gridSpacing, offsetX, offsetY,}
+    }
+
     drawWorldLevelGrid(worldLevel) {
         const {cellSize, gridSpacing, offsetX, offsetY} = this.getGridRenderSettings(worldLevel);
         for (let col = 0; col < worldLevel.levelWidth; col++) {
