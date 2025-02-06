@@ -32,7 +32,7 @@ class GameState {
         const firstLevel = this.world[0];
 
         this.setUpAvatar(firstLevel);
-        // this.populateLevelWithEntities(firstLevel); // DEV FUNCTION
+        this.populateLevelWithEntities(firstLevel); // DEV FUNCTION
 
         this.status="ACTIVE";
         this.isPlaying = true;
