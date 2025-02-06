@@ -1,6 +1,6 @@
 import { applyCellularAutomataSmoothing } from "./gridUtils.js";
 import { GridCell } from "./gridCellClass.js";
-import { constrainValue } from "./util.js";
+import { constrainValue, devTrace } from "./util.js";
 
 const SUBDIVIDE_MIN_WIDTH = 6;
 const SUBDIVIDE_MIN_HEIGHT = 6;
@@ -11,7 +11,7 @@ const MIN_ROOM_HEIGHT = 3;
 const MAX_TOWN_BUILDING_ATTEMPTS = 200;
 
 function setWorldLevelForGridCells(worldLevel, grid) {
-    // console.log("setWorldLevelForGridCells",worldLevel, grid);
+    devTrace(5,`setWorldLevelForGridCells`);
     grid.forEach(gridCol => {
         gridCol.forEach(gridCell => {
             gridCell.setWorldLevel(worldLevel);
@@ -20,6 +20,7 @@ function setWorldLevelForGridCells(worldLevel, grid) {
 }
 
 function generateGrid_empty(width, height, generationParams = {}) {
+    devTrace(5,`generateGrid_empty ${width} ${height}`, generationParams);
     const startingTerrain = generationParams && generationParams.startingTerrain ? generationParams.startingTerrain : "FLOOR";
     const newGrid = Array.from({ length: width }, (_, col) =>
         Array.from({ length: height }, (_, row) => GridCell.createDetachedAt(col, row, startingTerrain))
@@ -30,6 +31,7 @@ function generateGrid_empty(width, height, generationParams = {}) {
 
 
 function generateGrid_random(width, height, generationParams = {}) {
+    devTrace(5,`generateGrid_random ${width} ${height}`, generationParams);
     const terrainTypes = Object.keys(GridCell.TYPES);
     const newGrid = Array.from({ length: width }, (_, col) =>
         Array.from({ length: height }, (_, row) => {
@@ -42,6 +44,7 @@ function generateGrid_random(width, height, generationParams = {}) {
 }
 
 function generateGrid_variable_caves(width, height, smoothness = 2) {
+    devTrace(5,`generateGrid_variable_caves ${width} ${height} ${smoothness}`, );
     let grid = generateGrid_empty(width, height);
 
     // Initialize all border cells as WALL, fill the interior with simple noise
@@ -142,23 +145,28 @@ function generateGrid_variable_caves(width, height, smoothness = 2) {
 }
 
 function generateGrid_caves(width, height, generationParams = {}) {
+    devTrace(5,`generateGrid_caves ${width} ${height}`, generationParams);
     return generateGrid_variable_caves(width, height, 3);
 }
 
 function generateGrid_caves_shattered(width, height, generationParams = {}) {
+    devTrace(5,`generateGrid_caves_shattered ${width} ${height}`, generationParams);
     return generateGrid_variable_caves(width, height, 1);
 }
 
 function generateGrid_caves_large(width, height, generationParams = {}) {
+    devTrace(5,`generateGrid_caves_large ${width} ${height}`, generationParams);
     return generateGrid_variable_caves(width, height, 5);
 }
 
 function generateGrid_caves_huge(width, height, generationParams = {}) {
+    devTrace(5,`generateGrid_caves_huge ${width} ${height}`, generationParams);
     return generateGrid_variable_caves(width, height, 11);
 }
 
 function generateGrid_burrow(width, height, generationParams = {}) {
-    let grid = generateGrid_empty(width, height, "WALL");
+    devTrace(5,`generateGrid_burrow ${width} ${height}`, generationParams);
+    let grid = generateGrid_empty(width, height, {startingTerrain: "WALL"});
 
     // Determine starting location within the central 75% of the grid
     let startX = Math.floor(width * 0.125) + Math.floor(Math.random() * (width * 0.75));
@@ -181,7 +189,8 @@ function generateGrid_burrow(width, height, generationParams = {}) {
 
 // similar to burrow, but preferentially follow previous direction, and re-set to start when hitting an edge
 function generateGrid_nest(width, height, generationParams = {}) {
-    let grid = generateGrid_empty(width, height, "WALL");
+    devTrace(5,`generateGrid_nest ${width} ${height}`, generationParams);
+    let grid = generateGrid_empty(width, height, {startingTerrain: "WALL"});
 
     // Determine starting location within the central 75% of the grid
     let startX = Math.floor(width * 0.125) + Math.floor(Math.random() * (width * 0.75));
@@ -221,7 +230,8 @@ function generateGrid_nest(width, height, generationParams = {}) {
 
 const MAX_ATTEMPTS_TO_START_ROOM = 20;
 function generateGrid_roomsAndCorridors_random(width, height, generationParams = {}) {
-    let grid = generateGrid_empty(width, height, "WALL");
+    devTrace(5,`generateGrid_roomsAndCorridors_random ${width} ${height}`, generationParams);
+    let grid = generateGrid_empty(width, height, {startingTerrain: "WALL"});
 
     // // Define number of rooms
     const numRooms = Math.random() * Math.floor(width * height * 0.01) + 4;
@@ -278,7 +288,8 @@ function generateGrid_roomsAndCorridors_random(width, height, generationParams =
 
 
 function generateGrid_roomsAndCorridors_subdivide(width, height, generationParams = {}) {
-    let grid = generateGrid_empty(width, height, "WALL");
+    devTrace(5,`generateGrid_roomsAndCorridors_subdivide ${width} ${height}`, generationParams);
+    let grid = generateGrid_empty(width, height, {startingTerrain: "WALL"});
 
     let rooms = [];
     const subdivideDepth = Math.floor(Math.random() * (SUBDIVIDE_MAX_DEPTH - SUBDIVIDE_MIN_DEPTH + 1)) + SUBDIVIDE_MIN_DEPTH;
@@ -346,6 +357,7 @@ function generateGrid_roomsAndCorridors_subdivide(width, height, generationParam
 }
 
 function generateGrid_town(width, height, generationParams = {}, numBuildings = 5, minSize = 4, maxSize = 8) {
+    devTrace(5,`generateGrid_town ${width} ${height}`, generationParams);
     let grid = generateGrid_empty(width, height);
 
     // Function to create a building
@@ -403,6 +415,7 @@ function generateGrid_town(width, height, generationParams = {}, numBuildings = 
 
 
 function generateGrid_puddles(width, height, generationParams = {}, puddleDensity = 0.12, puddleMaxSize = 3) {
+    devTrace(5,`generateGrid_puddles ${width} ${height}`, generationParams);
     let grid = generateGrid_empty(width, height);
 
     const numPuddles = Math.floor(width * height * puddleDensity);

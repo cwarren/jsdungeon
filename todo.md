@@ -3,9 +3,13 @@ PS E:\code\jsdungeon> docker-compose up --build
 
 * grid display enhancements
 * * zoom in / out
-* * center on avatar
 * * map view - very zoomed out, to fit screen; centered on level center, not avatar, structures and avatar drawn larger than cells; avatar highlighted
 * * * maybe base size and center on seen cells, not whole level (track up-est, down-est, left-est, and right-est seen cells to aid in these calcs)
+
+* ISSUE! running tests with "this.populateLevelWithEntities(firstLevel); // DEV FUNCTION" active in gameStateClass drops things into an infinite loop
+* * figure out which test surfaces this
+* * figure out why the infinite processing happens
+* * fix it
 
 * implement entity sleeping
 * * very similar to running, but don't actually move (still update time on level, natural healing, etc.)

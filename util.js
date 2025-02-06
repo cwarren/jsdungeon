@@ -87,7 +87,7 @@ function createHelpText(keyBindings, actionMap, secondaryActionMap) {
     return helpText;
 }
 
-const DEV_TRACE_LEVEL = 5;
+const DEV_TRACE_LEVEL = 4;
 function devTrace(level, msg, ...objects) {
     if (level <= DEV_TRACE_LEVEL) {
         console.log(msg, ...objects);

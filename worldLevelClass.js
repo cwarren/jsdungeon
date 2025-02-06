@@ -87,7 +87,7 @@ class WorldLevel {
         "ROOMS_RANDOM": "Clearly crafted corridors connected to carved out rooms, but the organization is a bit lacking.",
         "ROOMS_SUBDIVIDE": "Clearly crafted corridors connected to carved out rooms.",
 
-        "DEFAULT": generateGrid_empty
+        "DEFAULT": "This default level is full of emptiness",
     };
 
     // ---------------------
@@ -111,9 +111,10 @@ class WorldLevel {
     }
 
     generateGrid() {
-        devTrace(1, "generating world level");
+        devTrace(1, `generating world level grid ${this.levelType}`);
         let gridGenFunction = WorldLevel.levelTypeToGenFunction[this.levelType];
         if (!gridGenFunction) {
+            devTrace(1, `!! no grid gen function found for ${this.levelType}, using DEFAULT one instead`);
             gridGenFunction = WorldLevel.levelTypeToGenFunction["DEFAULT"];
         }
         this.grid = gridGenFunction(this.levelWidth, this.levelHeight, this.generationParams);
