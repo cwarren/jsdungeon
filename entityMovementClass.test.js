@@ -159,7 +159,7 @@ describe('EntityMovement', () => {
     jest.spyOn(entity, 'determineVisibleCells');
     const targetCell = { x: 6, y: 6, z: 0, entity: null, isTraversible: true };
     entityLocation.getCell = jest.fn(() => ({ x: 5, y: 5, z: 0, entity: null, getDeltaToOtherCell: jest.fn(() => ({ dx: 1, dy: 1 })) }));
-    
+
     const resultMovementCost = entityMovement.tryMoveToCell(targetCell);
     expect(resultMovementCost).toBe(TEST_MOVEMENT_SPEC.actionCost);
     expect(entityLocation.getCell).toHaveBeenCalled();
@@ -188,7 +188,7 @@ describe('EntityMovement', () => {
   test('should check if can move to deltas and return false due to non-traversible cell', () => {
     jest.spyOn(entityLocation, 'getCellAtDelta');
     entityLocation.getCellAtDelta = jest.fn((dx, dy) => ({ x: 5 + dx, y: 5 + dy, z: 0, entity: null, isTraversible: false }));
-    
+
     const resultCanMove = entityMovement.canMoveToDeltas(1, 1);
     expect(resultCanMove).toBe(false);
     expect(entityLocation.getCellAtDelta).toHaveBeenCalledWith(1, 1);
@@ -199,7 +199,7 @@ describe('EntityMovement', () => {
     const newCell = { x: 6, y: 6, z: 0, entity: null, isTraversible: true };
     const oldCell = { x: 5, y: 5, z: 0, entity: entity };
     entityLocation.getCell = jest.fn(() => oldCell);
-    
+
     const resultMovementCost = entityMovement.confirmMove(newCell);
     expect(resultMovementCost).toBe(TEST_MOVEMENT_SPEC.actionCost);
     expect(oldCell.entity).toBeUndefined();
@@ -223,93 +223,178 @@ describe('EntityMovement', () => {
     expect(entity.determineVisibleCells).toHaveBeenCalled();
   });
 
+  // RUNNING
+  describe('EntityMovement - Running Methods', () => {
+    test('should start running with given deltas', () => {
+      const deltas = { dx: 1, dy: 0 };
+      entityMovement.startRunning(deltas);
+      expect(entityMovement.isRunning).toBe(true);
+      expect(entityMovement.runDelta).toEqual(deltas);
+    });
+
+    test('should stop running', () => {
+      entityMovement.startRunning({ dx: 1, dy: 0 });
+      entityMovement.stopRunning();
+      expect(entityMovement.isRunning).toBe(false);
+      expect(entityMovement.runDelta).toBeNull();
+    });
+
+    test('should check if can run to deltas and return true', () => {
+      jest.spyOn(entityLocation, 'getCellAtDelta');
+      const traversibleCell = { x: 6, y: 6, z: 0, entity: null, isTraversible: true, getAdjacentCells: () => [] };
+      entityLocation.getCellAtDelta.mockReturnValue(traversibleCell);
+
+      const result = entityMovement.canRunToDeltas(1, 1);
+      expect(result).toBe(true);
+      expect(entityLocation.getCellAtDelta).toHaveBeenCalledWith(1, 1);
+    });
+
+    test('should check if can run to deltas and return false due to non-traversible cell', () => {
+      jest.spyOn(entityLocation, 'getCellAtDelta');
+      const nonTraversibleCell = { x: 6, y: 6, z: 0, entity: null, isTraversible: false };
+      entityLocation.getCellAtDelta.mockReturnValue(nonTraversibleCell);
+
+      const result = entityMovement.canRunToDeltas(1, 1);
+      expect(result).toBe(false);
+      expect(entityLocation.getCellAtDelta).toHaveBeenCalledWith(1, 1);
+    });
+
+    test('should check if can run to deltas and return false due to adjacent entity', () => {
+      const traversibleCell = worldLevel.grid[1][1];
+      const entityInTargetCell = new Entity("MOLD_PALE");
+      worldLevel.addEntity(entityInTargetCell, traversibleCell);
+
+      const result = entityMovement.canRunToDeltas(1, 1);
+      expect(result).toBe(false);
+    });
+
+    test('should continue running if conditions allow', () => {
+      entityMovement.startRunning({ dx: 1, dy: 0 });
+
+      jest.spyOn(entityMovement, 'canRunToDeltas').mockReturnValue(true);
+      jest.spyOn(entityMovement, 'confirmMoveDeltas').mockReturnValue(DEFAULT_MOVEMENT_ACTION_COST);
+      jest.spyOn(entity, 'healNaturally');
+
+      const result = entityMovement.continueRunning();
+      expect(result).toBe(DEFAULT_MOVEMENT_ACTION_COST);
+      expect(entityMovement.confirmMoveDeltas).toHaveBeenCalledWith(1, 0);
+      expect(entity.healNaturally).toHaveBeenCalled();
+    });
+
+    test('should stop running if conditions prevent it', () => {
+      entityMovement.startRunning({ dx: 1, dy: 0 });
+
+      jest.spyOn(entityMovement, 'canRunToDeltas').mockReturnValue(false);
+      jest.spyOn(entityMovement, 'stopRunning');
+
+      const result = entityMovement.continueRunning();
+      expect(result).toBe(0);
+      expect(entityMovement.stopRunning).toHaveBeenCalled();
+    });
+
+    test('should interrupt ongoing movement', () => {
+      entityMovement.destinationCell = worldLevel.grid[5][5];
+      entityMovement.movementPath = [worldLevel.grid[6][6], worldLevel.grid[7][7]];
+      entityMovement.startRunning({ dx: 1, dy: 0 });
+
+      entityMovement.interruptOngoingMovement();
+      expect(entityMovement.destinationCell).toBeNull();
+      expect(entityMovement.movementPath).toEqual([]);
+      expect(entityMovement.isRunning).toBe(false);
+      expect(entityMovement.runDelta).toBeNull();
+    });
+  });
+
   // MOVEMENT AI SUPPORT
+  describe('EntityMovement - Movement AI Support Methods', () => {
+    test('should set empty path when destination is not set', () => {
+      entityMovement.destinationCell = undefined;
+      entityMovement.setPathToDestination();
+      expect(entityMovement.movementPath).toEqual([]);
+    });
 
-  test('should set empty path when destination is not set', () => {
-    entityMovement.destinationCell = undefined;
-    entityMovement.setPathToDestination();
-    expect(entityMovement.movementPath).toEqual([]);
-  });
+    test('should set path to destination', () => {
+      const destinationCell = worldLevel.grid[4][4];
+      const path = [worldLevel.grid[1][1], worldLevel.grid[2][2], worldLevel.grid[3][3], worldLevel.grid[4][4]];
+      entityMovement.destinationCell = destinationCell;
 
-  test('should set path to destination', () => {
-    const destinationCell = worldLevel.grid[4][4];
-    const path = [worldLevel.grid[1][1], worldLevel.grid[2][2], worldLevel.grid[3][3], worldLevel.grid[4][4]];
-    entityMovement.destinationCell = destinationCell;
-    
-    entityMovement.setPathToDestination();
-    expect(entityMovement.movementPath).toEqual(path); // starting cell removed
-  });
+      entityMovement.setPathToDestination();
+      expect(entityMovement.movementPath).toEqual(path); // starting cell removed
+    });
 
-  test('should set random destination', () => {
-    const randomCell = { x: 8, y: 8, z: 0, entity: null, isTraversible: true };
-    getRandomCellOfTerrainInGrid.mockReturnValue(randomCell);
+    test('should set random destination', () => {
+      const randomCell = { x: 8, y: 8, z: 0, entity: null, isTraversible: true };
+      getRandomCellOfTerrainInGrid.mockReturnValue(randomCell);
 
-    entityMovement.setRandomDestination();
-    expect(getRandomCellOfTerrainInGrid).toHaveBeenCalledWith("FLOOR", entityLocation.getWorldLevel().grid);
-    expect(entityMovement.destinationCell).toBe(randomCell);
-  });
+      entityMovement.setRandomDestination();
+      expect(getRandomCellOfTerrainInGrid).toHaveBeenCalledWith("FLOOR", entityLocation.getWorldLevel().grid);
+      expect(entityMovement.destinationCell).toBe(randomCell);
+    });
 
-  test('should move along path', () => {
-    const nextCell = { x: 6, y: 6, z: 0, entity: null, isTraversible: true };
-    entityMovement.movementPath = [nextCell];
-    entityMovement.tryMoveToCell = jest.fn(() => DEFAULT_MOVEMENT_ACTION_COST);
+    test('should move along path', () => {
+      const nextCell = { x: 6, y: 6, z: 0, entity: null, isTraversible: true };
+      entityMovement.movementPath = [nextCell];
+      entityMovement.tryMoveToCell = jest.fn(() => DEFAULT_MOVEMENT_ACTION_COST);
 
-    const result = entityMovement.moveAlongPath();
-    expect(result).toBe(DEFAULT_MOVEMENT_ACTION_COST);
-    expect(entityMovement.tryMoveToCell).toHaveBeenCalledWith(nextCell);
-    expect(entityMovement.movementPath).toEqual([]);
-  });
+      const result = entityMovement.moveAlongPath();
+      expect(result).toBe(DEFAULT_MOVEMENT_ACTION_COST);
+      expect(entityMovement.tryMoveToCell).toHaveBeenCalledWith(nextCell);
+      expect(entityMovement.movementPath).toEqual([]);
+    });
 
-  test('should return action cost if no path to move along', () => {
-    entityMovement.movementPath = [];
-    const result = entityMovement.moveAlongPath();
-    expect(result).toBe(entityMovement.actionCost);
+    test('should return action cost if no path to move along', () => {
+      entityMovement.movementPath = [];
+      const result = entityMovement.moveAlongPath();
+      expect(result).toBe(entityMovement.actionCost);
+    });
   });
 
   // MOVEMENT AI METHODS
-  test('movement type implementation - should move aimlessly', () => {
-    const randomDir = { dx: 1, dy: 0 };
-    getRandomListItem.mockReturnValue(randomDir);
-    entityMovement.tryMove = jest.fn(() => DEFAULT_MOVEMENT_ACTION_COST);
+  describe('EntityMovement - Movement AI Methods', () => {
+    test('movement type implementation - should move aimlessly', () => {
+      const randomDir = { dx: 1, dy: 0 };
+      getRandomListItem.mockReturnValue(randomDir);
+      entityMovement.tryMove = jest.fn(() => DEFAULT_MOVEMENT_ACTION_COST);
 
-    const result = entityMovement.moveStepAimless();
-    expect(result).toBe(DEFAULT_MOVEMENT_ACTION_COST);
-    expect(getRandomListItem).toHaveBeenCalledWith(GridCell.ADJACENCY_DIRECTIONS);
-    expect(entityMovement.tryMove).toHaveBeenCalledWith(randomDir.dx, randomDir.dy);
-  });
+      const result = entityMovement.moveStepAimless();
+      expect(result).toBe(DEFAULT_MOVEMENT_ACTION_COST);
+      expect(getRandomListItem).toHaveBeenCalledWith(GridCell.ADJACENCY_DIRECTIONS);
+      expect(entityMovement.tryMove).toHaveBeenCalledWith(randomDir.dx, randomDir.dy);
+    });
 
-  test('movement type implementation - should move wander aimlessly', () => {
-    jest.spyOn(entityMovement, 'tryMoveToCell');
-    const randomCell = worldLevel.grid[0][4];
-    getRandomCellOfTerrainInGrid.mockReturnValue(randomCell);
-    
-    const result = entityMovement.moveWanderAimless();
-    expect(result).toBe(DEFAULT_MOVEMENT_ACTION_COST);
-    expect(getRandomCellOfTerrainInGrid).toHaveBeenCalledWith("FLOOR", entityLocation.getWorldLevel().grid);
-    expect(entityMovement.tryMoveToCell).toHaveBeenCalledWith(worldLevel.grid[0][1]);
-    expect(entityMovement.movementPath).toEqual([worldLevel.grid[0][2],worldLevel.grid[0][3],worldLevel.grid[0][4]]);
-  });
+    test('movement type implementation - should move wander aimlessly', () => {
+      jest.spyOn(entityMovement, 'tryMoveToCell');
+      const randomCell = worldLevel.grid[0][4];
+      getRandomCellOfTerrainInGrid.mockReturnValue(randomCell);
 
-  test('movement type implementation - should move wander aggressive pure', () => {
-    jest.spyOn(entityMovement, 'tryMoveToCell');
-    const hostileToEntity = new Entity("WORM_VINE");
-    worldLevel.addEntity(hostileToEntity, worldLevel.grid[2][2]); // NOTE: this is within the vision range of the default entity
-    
-    const result = entityMovement.moveWanderAggressive();
-    expect(result).toBe(DEFAULT_MOVEMENT_ACTION_COST);
-    expect(entityMovement.tryMoveToCell).toHaveBeenCalledWith(worldLevel.grid[1][1]);
-    expect(entityMovement.movementPath).toEqual([worldLevel.grid[2][2]]);
-  });
+      const result = entityMovement.moveWanderAimless();
+      expect(result).toBe(DEFAULT_MOVEMENT_ACTION_COST);
+      expect(getRandomCellOfTerrainInGrid).toHaveBeenCalledWith("FLOOR", entityLocation.getWorldLevel().grid);
+      expect(entityMovement.tryMoveToCell).toHaveBeenCalledWith(worldLevel.grid[0][1]);
+      expect(entityMovement.movementPath).toEqual([worldLevel.grid[0][2], worldLevel.grid[0][3], worldLevel.grid[0][4]]);
+    });
 
-  test('movement type implementation - should move wander aggressive with no hostiles', () => {
-    jest.spyOn(entityMovement, 'tryMoveToCell');
-    const randomCell = worldLevel.grid[4][0];
-    getRandomCellOfTerrainInGrid.mockReturnValue(randomCell);
+    test('movement type implementation - should move wander aggressive pure', () => {
+      jest.spyOn(entityMovement, 'tryMoveToCell');
+      const hostileToEntity = new Entity("WORM_VINE");
+      worldLevel.addEntity(hostileToEntity, worldLevel.grid[2][2]); // NOTE: this is within the vision range of the default entity
 
-    const result = entityMovement.moveWanderAggressive();
-    expect(result).toBe(DEFAULT_MOVEMENT_ACTION_COST);
-    expect(getRandomCellOfTerrainInGrid).toHaveBeenCalledWith("FLOOR", entityLocation.getWorldLevel().grid);
-    expect(entityMovement.tryMoveToCell).toHaveBeenCalledWith(worldLevel.grid[1][0]);
-    expect(entityMovement.movementPath).toEqual([worldLevel.grid[2][0],worldLevel.grid[3][0],worldLevel.grid[4][0]]);
+      const result = entityMovement.moveWanderAggressive();
+      expect(result).toBe(DEFAULT_MOVEMENT_ACTION_COST);
+      expect(entityMovement.tryMoveToCell).toHaveBeenCalledWith(worldLevel.grid[1][1]);
+      expect(entityMovement.movementPath).toEqual([worldLevel.grid[2][2]]);
+    });
+
+    test('movement type implementation - should move wander aggressive with no hostiles', () => {
+      jest.spyOn(entityMovement, 'tryMoveToCell');
+      const randomCell = worldLevel.grid[4][0];
+      getRandomCellOfTerrainInGrid.mockReturnValue(randomCell);
+
+      const result = entityMovement.moveWanderAggressive();
+      expect(result).toBe(DEFAULT_MOVEMENT_ACTION_COST);
+      expect(getRandomCellOfTerrainInGrid).toHaveBeenCalledWith("FLOOR", entityLocation.getWorldLevel().grid);
+      expect(entityMovement.tryMoveToCell).toHaveBeenCalledWith(worldLevel.grid[1][0]);
+      expect(entityMovement.movementPath).toEqual([worldLevel.grid[2][0], worldLevel.grid[3][0], worldLevel.grid[4][0]]);
+    });
   });
 });
