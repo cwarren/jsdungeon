@@ -183,6 +183,7 @@ class EntityMovement {
     getMovementStatus() {
         return {
             isRunning: this.isRunning,
+            isSleeping: this.isSleeping,
             runDelta: this.runDelta,
             movementSpec: this.movementSpec,
         };

@@ -132,7 +132,7 @@ class GameState {
             let activeEntity = this.currentTurnQueue.nextTurn();
             if (!activeEntity) break; // No more entities to process
     
-            if (activeEntity === this.avatar && !activeEntity.movement.isRunning) {
+            if (activeEntity === this.avatar && !activeEntity.movement.isRunning  && !activeEntity.movement.isSleeping) {
                 break; // Stop when it's the avatar's turn and the avatar is not running
             }
         }
@@ -145,7 +145,7 @@ class GameState {
         uiPaneMessages.ageMessages();
     
         // If the avatar is running, immediately continue running
-        if (this.avatar.movement.isRunning) {
+        if (this.avatar.movement.isRunning || this.avatar.isSleeping) {
             this.currentTurnQueue.addEntity(this.avatar, this.avatar.actionStartingTime + actionCost);
             this.advanceGameTime();  // Keep the turns flowing for running
             return;
