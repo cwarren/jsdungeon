@@ -2,7 +2,13 @@ to start server:
 PS E:\code\jsdungeon> docker-compose up --build
 
 * implement entity sleeping
-* * very similar to running, but don't actually move (still update time on level, natural healing, etc.)
+* * hook up sleeping stuff in turn taking (same place(s) as running)
+
+* add some kind of delay in the continuous action loops (sleeping and running, for now) so that players can see the world update during the continuous action
+
+* add to entity a general interruptContinuousActivity, which stops running, sleeping, and any future continuous activity
+
+* make any game play command interrupt all continuous activities
 
 * stats for entities / stat system (what they are and mean; what effect they have)
 * * begin richer combat stuff in general

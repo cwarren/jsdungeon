@@ -138,7 +138,9 @@ function runAvatar_D()    { return runAvatar(DIRECTION_DELTAS["D"]) }
 function runAvatar_DR()   { return runAvatar(DIRECTION_DELTAS["DR"]) }
 
 function sleepAvatar(key, event) {
-    devTrace(3,`${key} - sleep avatar (not yet implemented)`, event);
+    // devTrace(3,`${key} - sleep avatar (not yet implemented)`, event);
+    gameState.avatar.startSleeping();
+    return gameState.avatar.continueSleeping();
 }
 
 function zoomIn()  { uiPaneMain.zoomIn(); return 0; }

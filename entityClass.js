@@ -245,6 +245,16 @@ class Entity {
     return this.movement.continueRunning();
   }
 
+  startSleeping() {
+    this.movement.startSleeping();
+  }
+  stopSleeping() {
+    this.movement.stopSleeping();
+  }
+  continueSleeping() {
+    return this.movement.continueSleeping();
+  }
+
   // ------------------
   // ACTIONS - COMBAT & HEALTH
 

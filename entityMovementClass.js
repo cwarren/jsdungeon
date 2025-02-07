@@ -75,6 +75,7 @@ class EntityMovement {
         // cannot sleep if already at max health
         if (this.ofEntity.health.curHealth >= this.ofEntity.health.maxHealth) {
             devTrace(6, `${this.ofEntity.type} is already at max health and does not need to sleep`, this.ofEntity);
+            // TODO: add message to message pane about not sleeping when already at full health
             return false;
         }
 
@@ -85,6 +86,7 @@ class EntityMovement {
                 const relation = this.ofEntity.getRelationshipTo(cell.entity);
                 if (relation === "HOSTILE_TO" || relation === "VIOLENT_TO") {
                     devTrace(6, `${this.ofEntity.type} cannot sleep due to ${cell.entity.type} ${relation} it`, this.ofEntity, cell.entity);
+                    // TODO: add message to message pane about not sleeping when dangerous entity is close by
                     return false;
                 }
             }
