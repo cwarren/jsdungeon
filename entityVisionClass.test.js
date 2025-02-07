@@ -1,5 +1,9 @@
 import { EntityVision } from './entityVisionClass';
 import { gameState } from './gameStateClass';
+import { devTrace } from './util.js';
+jest.mock('./util.js', () => ({
+    devTrace: jest.fn(),
+}));
 
 jest.mock('./gameStateClass', () => ({
     gameState: {

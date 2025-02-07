@@ -1,6 +1,11 @@
 import { TextBlock } from './textBlockClass.js';
 import { textActionsMap } from './textActions.js';
 import { uiPaneMain } from './ui.js';
+import { devTrace } from './util.js';
+jest.mock('./util.js', () => ({
+    devTrace: jest.fn(),
+    constrainValue: jest.requireActual('./util.js').constrainValue,
+}));
 
 jest.mock('./ui.js', () => ({
     uiPaneMain: {

@@ -178,14 +178,14 @@ class Entity {
       return this.doMeleeAttackOn(targetCell.entity);
     }
     if (defaultAction == 'BUMP') {
-      console.log("move prevented because target cell is already occupied", targetCell);
+      console.log(`move prevented because target cell is already occupied: ${targetCell.entity.name} at ${targetCell.x} ${targetCell.y} ${targetCell.z}`);
       return 0;
     }
     if (defaultAction == 'SWAP') {
-      console.log("SWAP ACTION NOT YET IMPLEMENTED", targetCell);
+      console.log(`SWAP ACTION NOT YET IMPLEMENTED: ${targetCell.entity.name} at ${targetCell.x} ${targetCell.y} ${targetCell.z}`);
       return 0;
     }
-    console.log(`unknown action ${defaultAction}, doing nothing`);
+    console.log(`handleAttemptedMoveIntoOccupiedCell results in unknown action ${defaultAction}, doing nothing at ${targetCell.x} ${targetCell.y} ${targetCell.z}`);
     return 0;
   }
 

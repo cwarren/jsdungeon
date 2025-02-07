@@ -15,7 +15,6 @@ class UIPaneMiniChar {
     }
 
     clearMiniChar() {
-        console.log('FFFFFFFFFFFFFFFFFFFFFFF clearMiniChar');
         this.getPageElement().innerHTML = "";
     }
 

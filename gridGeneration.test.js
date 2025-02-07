@@ -16,6 +16,12 @@ import {
 
 import { GridCell } from './gridCellClass.js';
 
+import { constrainValue, devTrace } from './util.js';
+jest.mock('./util.js', () => ({
+    devTrace: jest.fn(),
+    constrainValue: jest.requireActual('./util.js').constrainValue,
+}));
+
 describe('Grid Generation - Integration Tests', () => {
     const testWidth = 20;
     const testHeight = 15;

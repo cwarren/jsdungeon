@@ -1,6 +1,11 @@
 import { Structure } from './structureClass';
 import { gameState } from './gameStateClass';
 import { WorldLevelSpecification } from './worldLevelSpecificationClass.js';
+import { devTrace } from './util.js';
+jest.mock('./util.js', () => ({
+    devTrace: jest.fn(),
+    rollDice: jest.requireActual('./util.js').rollDice,
+}));
 
 const WORLD_LEVEL_SPECS_FOR_TESTING= [
     WorldLevelSpecification.generateWorldLevelSpec({type: 'EMPTY', width: 10, height: 10}),

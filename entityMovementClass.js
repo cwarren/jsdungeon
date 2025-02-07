@@ -29,7 +29,7 @@ class EntityMovement {
         if (targetCell.entity) {
             return this.ofEntity.handleAttemptedMoveIntoOccupiedCell(targetCell);
         } else {
-            console.log("move prevented because target cell is not traversable", targetCell);
+            console.log(`move prevented because target cell is not traversable: ${targetCell.terrain} at ${targetCell.x} ${targetCell.y} ${targetCell.z}`);
             return 0;
         }
     }
@@ -52,7 +52,6 @@ class EntityMovement {
     }
 
     confirmMove(targetCell) {
-        // console.log("confirmMove", targetCell);
         devTrace(6, "confirming move to cell", this.ofEntity, targetCell);
         const oldCell = this.location.getCell();
         oldCell.entity = undefined;

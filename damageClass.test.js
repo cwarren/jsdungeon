@@ -1,4 +1,8 @@
 import { Damage } from './damageClass';
+import { devTrace } from './util.js';
+jest.mock('./util.js', () => ({
+    devTrace: jest.fn(),
+}));
 
 describe('Damage', () => {
     test('should initialize with correct properties', () => {

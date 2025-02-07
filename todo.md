@@ -1,12 +1,6 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* ISSUE! running tests with "this.populateLevelWithEntities(firstLevel); // DEV FUNCTION" active in gameStateClass drops things into an infinite loop
-* * figure out which test surfaces this
-* * figure out why the infinite processing happens
-* * fix it
-* * * test to expose? depends on the particular issue/reason....
-
 * implement entity sleeping
 * * very similar to running, but don't actually move (still update time on level, natural healing, etc.)
 
@@ -93,4 +87,9 @@ PS E:\code\jsdungeon> docker-compose up --build
 * CHECK AND FIX
 * * keep an eye on time issues with running - seems OK at the moment, but tricky....
 * * address hack of directly accessing lastNaturalHealingTime when gameTime wraps (in normalizeQueueTimes)
-
+* ISSUE! running tests with "this.populateLevelWithEntities(firstLevel); // DEV FUNCTION" active in gameStateClass drops things into an infinite loop
+* * figure out which test surfaces this
+* * * this seems to happen for worldLevelClass.integration.test.js, but only when running the full test suite (npx jest) and only some of the time
+* * figure out why the infinite processing happens
+* * fix it
+* * * test to expose? depends on the particular issue/reason....

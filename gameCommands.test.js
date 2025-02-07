@@ -2,6 +2,10 @@ import { executeGameCommand, getLookupKey, getActionKey, executeUIAction, execut
 import { uiPaneMain, getCurrentUIState } from './ui.js';
 import { gameState } from './gameStateClass.js';
 import { uiActionsMap } from './uiActions.js';
+import { devTrace } from './util.js';
+jest.mock('./util.js', () => ({
+    devTrace: jest.fn(),
+}));
 
 jest.mock('./ui.js', () => ({
     getCurrentUIState: jest.fn(),

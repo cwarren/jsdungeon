@@ -1,5 +1,9 @@
 import { Stairs } from './stairsClass.js';
 import { Structure } from './structureClass.js';
+import { devTrace } from './util.js';
+jest.mock('./util.js', () => ({
+    devTrace: jest.fn(),
+}));
 
 describe('Stairs', () => {
   let stairs;

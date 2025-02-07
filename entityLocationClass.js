@@ -39,7 +39,7 @@ class EntityLocation {
   placeAtCell(targetCell) {
     devTrace(5, `placing at cell ${targetCell.x} ${targetCell.y} ${targetCell.z}`, this.ofEntity, targetCell);
     if (targetCell.entity) {
-      console.log("cannot place entity in occupied cell", this.ofEntity, targetCell);
+      console.log(`cannot place entity ${this.ofEntity.name} in occupied cell ${targetCell.x} ${targetCell.y} ${targetCell.z}`);
       return false;
     }
     this.x = targetCell.x;

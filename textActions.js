@@ -10,25 +10,21 @@ const textActionsMap = {
 // TODO: figure out how to get the relevant textBlock (instance of TextBlock) passed to these functions... or some other approach such as getting it from ui function
 
 function lineUp() {
-    console.log("lineUp");
     uiPaneMain.getCurrentHelpTextBlock().scrollUp();
     return 0;
 }
 
 function lineDown() {
-    console.log("lineDown");
     uiPaneMain.getCurrentHelpTextBlock().scrollDown();
     return 0;
 }
 
 function scrollUp() {
-    console.log("scrollUp");
     uiPaneMain.getCurrentHelpTextBlock().scrollUp(12);
     return 0;
 }
 
 function scrollDown() {
-    console.log("scrollDown");
     uiPaneMain.getCurrentHelpTextBlock().scrollDown(12);
     return 0;
 }

@@ -3,6 +3,7 @@ import { getRandomListItem, constrainValue } from './util.js';
 
 // Mock utility functions
 jest.mock('./util.js', () => ({
+  devTrace: jest.fn(),
   getRandomListItem: jest.fn((list) => list[0]), // Always return the first available item for predictable tests
   constrainValue: jest.fn((val, min, max) => Math.min(Math.max(val, min), max)), // Simulated bound check
 }));

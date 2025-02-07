@@ -4,6 +4,8 @@ import { gameMetaActionsMap } from "./gameMetaActions.js";
 import { textActionsMap } from "./textActions.js";
 import { uiActionsMap } from "./uiActions.js";
 import { uiPaneMain } from "./ui.js";
+import { devTrace } from "./util.js";
+
 // import { handlePlayerActionTime } from "./gameTime.js";
 
 const keyBinding = {
@@ -97,9 +99,7 @@ function getLookupKey(key, event) {
 }
 
 function getActionKey(uiState, lookupKey) {
-    console.log('keybinding', keyBinding);
-    console.log('uiState', uiState);
-    console.log('lookupKey', lookupKey);
+    devTrace(3, 'getActionKey: keybinding, uiState, lookupKey', keyBinding, uiState, lookupKey);
     return keyBinding[uiState][lookupKey];
 }
 
@@ -112,7 +112,7 @@ function executeUIAction(actionKey) {
 }
 
 function executeGameAction(actionDef, key, event) {
-    console.log(`Executing action: ${actionDef.name}`);
+    devTrace(3, `Executing action: ${actionDef.name}`);
     const actionTimeCost = actionDef.action(key, event);
     gameState.handlePlayerActionTime(actionTimeCost);
 }
