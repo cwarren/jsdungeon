@@ -2,7 +2,7 @@ import { Entity } from "./entityClass.js";
 import { WorldLevel } from "./worldLevelClass.js";
 import { Avatar } from "./avatarClass.js";
 import { devTrace } from "./util.js";
-import { uiPaneMain, uiPaneMessages, uiPaneInfo } from "./ui.js";
+import { uiPaneMain, uiPaneMessages, uiPaneInfo, uiPaneMiniChar } from "./ui.js";
 import { WorldLevelSpecification } from "./worldLevelSpecificationClass.js";
 
 class GameState {
@@ -46,6 +46,10 @@ class GameState {
 
         this.avatar = avatar;
         avatar.determineVisibleCells();
+
+        if (uiPaneMiniChar && uiPaneMiniChar.avatar == null) {
+            this.avatar.registerPaneMiniChar(uiPaneMiniChar);
+        }
     }
 
     // NOTE: this is a dev function to populate the level with entities for testing
@@ -88,6 +92,7 @@ class GameState {
 
     winGame() {
         devTrace(1,"winning the game");
+        this.avatar.unregisterPaneMiniChar();
         this.status = "WON";
         this.isPlaying = false;
         uiPaneMain.resetUIState();
@@ -96,14 +101,17 @@ class GameState {
 
     loseGame() {
         devTrace(1,"losing the game");
+        this.avatar.unregisterPaneMiniChar();
         this.status = "LOST";
         this.isPlaying = false;
         uiPaneMain.resetUIState();
         uiPaneMain.pushUIState("GAME_OVER");
+
     }
 
     abandonGame() {
         devTrace(1,"abandoning the game");
+        this.avatar.unregisterPaneMiniChar();
         this.status = "ABANDONED";
         this.isPlaying = false;
         uiPaneMain.resetUIState();

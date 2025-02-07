@@ -29,7 +29,13 @@ class Avatar extends Entity {
 
   registerPaneMiniChar(paneMiniChar) {
     this.paneMiniChar = paneMiniChar;
+    this.paneMiniChar.avatar = this;
     this.updateMiniChar();
+  }
+  unregisterPaneMiniChar() {
+    this.paneMiniChar.clearMiniChar();
+    this.paneMiniChar.avatar = null;
+    this.paneMiniChar = null;
   }
 
   updateMiniChar() {

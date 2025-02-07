@@ -16,5 +16,5 @@ function setupUi(gameState) {
 }
 
 export {
-  uiPaneMain, uiPaneMessages, uiPaneInfo, UIPaneMiniChar, setupUi,
+  uiPaneMain, uiPaneMessages, uiPaneInfo, uiPaneMiniChar, setupUi,
 };

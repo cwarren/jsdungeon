@@ -1,9 +1,10 @@
 import { Avatar } from './avatarClass.js';
 import { Entity, DEFAULT_ACTION_COST } from './entityClass.js';
 import { gameState } from './gameStateClass.js';
-import { devTrace, rollDice } from './util.js';
+import { devTrace, rollDice, formatNumberForMessage } from './util.js';
 import { Damage } from './damageClass.js';
 import { uiPaneMain, uiPaneMessages } from "./ui.js";
+import { UIPaneMiniChar, miniCharElement } from './uiPaneMiniCharClass.js';
 import { WorldLevelSpecification } from './worldLevelSpecificationClass.js';
 
 const WORLD_LEVEL_SPECS_FOR_TESTING= [
@@ -13,6 +14,7 @@ const WORLD_LEVEL_SPECS_FOR_TESTING= [
 jest.mock('./util.js', () => ({
   devTrace: jest.fn(),
   rollDice: jest.fn(() => 3), // Mock rollDice to always return 3
+  formatNumberForMessage: jest.fn(() => '10'),
 }));
 
 jest.mock('./ui.js', () => ({
@@ -22,6 +24,12 @@ jest.mock('./ui.js', () => ({
     pushUIState: jest.fn(),
   },
 }));
+
+jest.mock('./uiPaneMiniCharClass.js', () => ({
+  // UIPaneMiniChar.getPageElement: jest.fn(() => {return {innerHTML: ''};}),
+  UIPaneMiniChar: jest.requireActual('./uiPaneMiniCharClass.js').UIPaneMiniChar
+}));
+
 
 describe('Avatar', () => {
   let avatar;
@@ -59,11 +67,43 @@ describe('Avatar', () => {
     expect(avatar.healNaturally).toHaveBeenCalled();
   });
 
+
+  test('should register minichar pane', () =>{
+    const uiPaneMiniChar = new UIPaneMiniChar(null);
+    uiPaneMiniChar.getPageElement = jest.fn(() => {return {innerHTML: ''}; });
+    
+    expect(avatar.paneMiniChar).toBeNull();
+    expect(uiPaneMiniChar.avatar).toBeNull();
+
+    avatar.registerPaneMiniChar(uiPaneMiniChar);
+    expect(avatar.paneMiniChar).toBe(uiPaneMiniChar);
+    expect(uiPaneMiniChar.avatar).toBe(avatar);
+  });
+  test('should unregister minichar pane', () =>{
+    const uiPaneMiniChar = new UIPaneMiniChar(null);
+    uiPaneMiniChar.getPageElement = jest.fn(() => {return {innerHTML: ''}; });
+    avatar.registerPaneMiniChar(uiPaneMiniChar);
+    expect(avatar.paneMiniChar).toBe(uiPaneMiniChar);
+    expect(uiPaneMiniChar.avatar).toBe(avatar);
+
+    avatar.unregisterPaneMiniChar();
+    expect(avatar.paneMiniChar).toBeNull();
+    expect(uiPaneMiniChar.avatar).toBeNull();
+  });
+
   test('should die and lose game', () => {
+    const uiPaneMiniChar = new UIPaneMiniChar(null);
+    uiPaneMiniChar.getPageElement = jest.fn(() => {return {innerHTML: ''}; });
+    jest.spyOn(uiPaneMiniChar, 'clearMiniChar');
+    avatar.registerPaneMiniChar(uiPaneMiniChar);
+
     avatar.die();
     expect(gameState.loseGame).toHaveBeenCalled();
     expect(Entity.prototype.die).toHaveBeenCalled();
     expect(uiPaneMain.pushUIState).toHaveBeenCalledWith("GAME_OVER");
+    expect(uiPaneMiniChar.clearMiniChar).toHaveBeenCalled();
+    expect(avatar.paneMiniChar).toBeNull();
+    expect(uiPaneMiniChar.avatar).toBeNull();
   });
 
   test('should get melee attack damage', () => {

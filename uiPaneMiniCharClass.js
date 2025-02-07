@@ -1,20 +1,28 @@
 import { formatNumberForMessage } from './util.js';
+
 const miniCharElement = document.getElementById("minichar");
 
 class UIPaneMiniChar {
     constructor(avatar) {
         this.avatar = avatar;
-        this.avatar.registerPaneMiniChar(this);
+        if (avatar) {
+            this.avatar.registerPaneMiniChar(this);
+        }
+    }
+
+    getPageElement() {
+        return miniCharElement;
     }
 
     clearMiniChar() {
-        miniCharElement.innerHTML = "";
+        console.log('FFFFFFFFFFFFFFFFFFFFFFF clearMiniChar');
+        this.getPageElement().innerHTML = "";
     }
 
     refreshMiniChar(charInfo) {
         this.clearMiniChar();
         // console.log(charInfo);
-        miniCharElement.innerHTML = this.getDisplayTextFromInfo(charInfo);
+        this.getPageElement().innerHTML = this.getDisplayTextFromInfo(charInfo);
     }
 
     getDisplayTextFromInfo(charInfo) {
@@ -35,4 +43,4 @@ class UIPaneMiniChar {
     }
 }
 
-export { UIPaneMiniChar };
+export { UIPaneMiniChar, miniCharElement };

@@ -42,4 +42,4 @@ class UIPaneMessages {
     }
 }
 
-export { UIPaneMessages };
+export { UIPaneMessages, messagesElement };

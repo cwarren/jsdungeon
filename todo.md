@@ -1,21 +1,20 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* BUG: on new game, the mini-char display is still tied to the avatar from the old game
-* * when a game ends, clear out that connection
-* * when a new game starts, set up a connection for the new avatar
-
 * ISSUE! running tests with "this.populateLevelWithEntities(firstLevel); // DEV FUNCTION" active in gameStateClass drops things into an infinite loop
 * * figure out which test surfaces this
 * * figure out why the infinite processing happens
 * * fix it
+* * * test to expose? depends on the particular issue/reason....
 
 * implement entity sleeping
 * * very similar to running, but don't actually move (still update time on level, natural healing, etc.)
 
+* stats for entities / stat system (what they are and mean; what effect they have)
+* * begin richer combat stuff in general
+
 * more mob stuff
-* * stats for mobs / stat system (what they are and mean; what effect they have)
-* * simple status sheets for mobs (for display in info block)
+* * simple status sheets for mobs (for display in info block when attacking or otherwise interacting with that mob)
 
 * more more mob stuff
 * * mobs on other levels
@@ -78,6 +77,10 @@ PS E:\code\jsdungeon> docker-compose up --build
 * richer combat
 
 * ranged combat
+
+* current minichar display is unregisters when game becomes over. while this is OK, it hides the final char info from the player. consider shifting the de-registration to a different point so that the player can see info about there character and the point the game ended
+* * maybe when GAME_OVER ui state is popped? feels a bit messy....
+
 
 * when entering a level for the first time then time runs based on time on previous level - this should not happen when entering a level for the first time
 * * though, it doesn't really break things... just means some mobs may fight if they're hostile to each other... which shouldn't be much of a problem outside development, since eventually most mobs will not be hostile to each other...

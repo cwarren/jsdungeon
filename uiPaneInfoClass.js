@@ -14,4 +14,4 @@ class UIPaneInfo {
     }
 }
 
-export { UIPaneInfo };
+export { UIPaneInfo, infoElement };
