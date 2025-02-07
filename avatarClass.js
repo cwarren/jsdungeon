@@ -51,7 +51,7 @@ class Avatar extends Entity {
   }
 
   addTimeOnLevel(someTime) {
-    devTrace(6, `adding ${someTime} to avatar time on level`);
+    devTrace(5, `adding ${someTime} to avatar time on level`);
     this.timeOnLevel += someTime;
     this.updateMiniChar();
   }

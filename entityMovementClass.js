@@ -15,6 +15,7 @@ class EntityMovement {
         this.actionCost = movementSpec.actionCost;
         this.destinationCell = null;
         this.movementPath = [];
+        this.isSleeping = false;
     }
 
     // MOVEMENT METHODS
@@ -65,6 +66,63 @@ class EntityMovement {
         this.location.placeAtCell(this.location.getCellAtDelta(dx, dy));
         return this.actionCost;
     }
+
+    // SLEEPING METHODS
+
+    canSleep() {
+        devTrace(5, `checking if ${this.ofEntity.type} can sleep`, this.ofEntity);
+
+        // cannot sleep if already at max health
+        if (this.ofEntity.health.curHealth >= this.ofEntity.health.maxHealth) {
+            devTrace(6, `${this.ofEntity.type} is already at max health and does not need to sleep`, this.ofEntity);
+            return false;
+        }
+
+        // cannot sleep if there's a hostile or violent entity adjacent
+        const adjacentCells = this.location.getCell().getAdjacentCells();
+        for (const cell of adjacentCells) {
+            if (cell.entity) {
+                const relation = this.ofEntity.getRelationshipTo(cell.entity);
+                if (relation === "HOSTILE_TO" || relation === "VIOLENT_TO") {
+                    devTrace(6, `${this.ofEntity.type} cannot sleep due to ${cell.entity.type} ${relation} it`, this.ofEntity, cell.entity);
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    continueSleeping() {
+        devTrace(5, `continuing sleep for ${this.ofEntity.type}`, this.ofEntity);
+
+        if (!this.isSleeping) {
+            devTrace(5, `${this.ofEntity.type} is not sleeping, returning 0`, this.ofEntity);
+            return 0;
+        }
+
+        if (!this.canSleep()) {
+            devTrace(5, `${this.ofEntity.type} was interrupted and stopped sleeping`, this.ofEntity);
+            this.stopSleeping();
+            return 0;
+        }
+
+        devTrace(4, `${this.ofEntity.type} continues sleeping and heals naturally`, this.ofEntity);
+        this.ofEntity.healNaturally();
+        if (this.ofEntity.addTimeOnLevel) { this.ofEntity.addTimeOnLevel(DEFAULT_MOVEMENT_ACTION_COST); }
+        return DEFAULT_MOVEMENT_ACTION_COST;
+    }
+
+    startSleeping() {
+        devTrace(5, `${this.ofEntity.type} is starting to sleep`, this.ofEntity);
+        this.isSleeping = true;
+    }
+
+    stopSleeping() {
+        devTrace(5, `${this.ofEntity.type} stopped sleeping`, this.ofEntity);
+        this.isSleeping = false;
+    }
+
 
     // RUNNING METHODS
 

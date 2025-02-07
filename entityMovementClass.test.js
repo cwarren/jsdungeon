@@ -223,6 +223,101 @@ describe('EntityMovement', () => {
     expect(entity.determineVisibleCells).toHaveBeenCalled();
   });
 
+  // SLEEPING (technically "movement" even if the entity isn't moving per se)
+  describe('EntityMovement - Sleeping Methods', () => {
+    test('should start sleeping', () => {
+      entityMovement.isSleeping = false;
+      entityMovement.startSleeping();
+      expect(entityMovement.isSleeping).toBe(true);
+    });
+
+    test('should stop sleeping', () => {
+      entityMovement.isSleeping = true;
+      entityMovement.stopSleeping();
+      expect(entityMovement.isSleeping).toBe(false);
+    });
+
+    describe('EntityMovement - Sleeping Methods - canSleep', () => {
+      test('should return true for canSleep when no threats and not at max health', () => {
+        entity.health.curHealth = 50;
+        entity.health.maxHealth = 100;
+        expect(entityMovement.canSleep()).toBe(true);
+      });
+
+      test('should return false for canSleep if entity is at max health', () => {
+        entity.health.curHealth = 100;
+        entity.health.maxHealth = 100;
+
+        expect(entityMovement.canSleep()).toBe(false);
+      });
+
+      test('should return true for canSleep when adjacent entity is not hostile or violent AND at less than max health', () => {
+        // Add a neutral entity nearby
+        const occupiedCell = worldLevel.grid[1][0]; // Adjacent to (0,0)
+        const entityInOccupiedCell = new Entity("MOLD_PALE");
+        worldLevel.addEntity(entityInOccupiedCell, occupiedCell);
+        entity.health.curHealth = 50; // Not at max health
+        entity.health.maxHealth = 100;
+
+        expect(entityMovement.canSleep()).toBe(true);
+      });
+
+      test('should return false for canSleep when a hostile entity is adjacent', () => {
+        // Add a hostile entity nearby
+        const occupiedCell = worldLevel.grid[1][0]; // Adjacent to (0,0)
+        const hostileEntity = new Entity("RAT_MALIGN");
+
+        worldLevel.addEntity(hostileEntity, occupiedCell);
+
+        expect(entityMovement.canSleep()).toBe(false);
+      });
+
+      test('should return false for canSleep when a violent entity is adjacent', () => {
+        // Add a violent entity nearby
+        const occupiedCell = worldLevel.grid[0][1]; // Adjacent to (0,0)
+        const violentEntity = new Entity("WORM_VINE");
+        worldLevel.addEntity(violentEntity, occupiedCell);
+        // Ensure violent relationship
+        jest.spyOn(entity, 'getRelationshipTo').mockReturnValue("VIOLENT_TO");
+
+        expect(entityMovement.canSleep()).toBe(false);
+      });
+
+    });
+
+    test('should return 0 for continueSleeping if not already sleeping', () => {
+      entityMovement.isSleeping = false;
+      expect(entityMovement.continueSleeping()).toBe(0);
+    });
+
+    test('should stop sleeping and return 0 for continueSleeping if canSleep is false', () => {
+      entityMovement.isSleeping = true;
+
+      // Add a hostile entity to ensure canSleep() returns false
+      const occupiedCell = worldLevel.grid[1][1];
+      const hostileEntity = new Entity("RAT_MALIGN");
+      worldLevel.addEntity(hostileEntity, occupiedCell);
+      jest.spyOn(entityMovement, 'canSleep').mockReturnValue(false);
+
+      jest.spyOn(entityMovement, 'stopSleeping');
+
+      expect(entityMovement.continueSleeping()).toBe(0);
+      expect(entityMovement.stopSleeping).toHaveBeenCalled();
+    });
+
+    test('should heal naturally and return action cost for continueSleeping if conditions allow', () => {
+      entityMovement.isSleeping = true;
+
+      // No hostile entities added, so canSleep() should return true
+      jest.spyOn(entityMovement, 'canSleep').mockReturnValue(true);
+      jest.spyOn(entity, 'healNaturally');
+
+      expect(entityMovement.continueSleeping()).toBe(DEFAULT_MOVEMENT_ACTION_COST);
+      expect(entity.healNaturally).toHaveBeenCalled();
+    });
+  });
+
+
   // RUNNING
   describe('EntityMovement - Running Methods', () => {
     test('should start running with given deltas', () => {
