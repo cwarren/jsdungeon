@@ -1,10 +1,12 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* organize code
-
 * stats for entities / stat system (what they are and mean; what effect they have)
 * * begin richer combat stuff in general
+
+* skills for entities / skill system
+* * what they are
+* * how they work in general
 
 * more mob stuff
 * * simple status sheets for mobs (for display in info block when attacking or otherwise interacting with that mob)
