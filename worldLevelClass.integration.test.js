@@ -1,5 +1,5 @@
 import { WorldLevel } from './worldLevelClass.js';
-import { Structure } from './structureClass.js';
+import { Structure } from './structure/structureClass.js';
 import { TurnQueue } from './gameTime.js';
 import { Entity, DEFAULT_ACTION_COST } from './entity/entityClass.js';
 import {

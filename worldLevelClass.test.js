@@ -1,6 +1,6 @@
 import { WorldLevel } from './worldLevelClass.js';
-import { Structure } from './structureClass.js';
-import { Stairs } from './stairsClass.js';
+import { Structure } from './structure/structureClass.js';
+import { Stairs } from './structure/stairsClass.js';
 import { devTrace, constrainValue } from './util.js';
 import { TurnQueue } from './gameTime.js';
 import { Entity, DEFAULT_ACTION_COST } from './entity/entityClass.js';

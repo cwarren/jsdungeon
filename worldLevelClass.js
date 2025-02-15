@@ -1,5 +1,5 @@
-import { Structure } from "./structureClass.js";
-import { Stairs } from "./stairsClass.js";
+import { Structure } from "./structure/structureClass.js";
+import { Stairs } from "./structure/stairsClass.js";
 import { constrainValue, devTrace } from "./util.js";
 import {
     setWorldLevelForGridCells,
