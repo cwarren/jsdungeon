@@ -198,6 +198,10 @@ class Entity {
     this.actionStartingTime = actionStartingTime;
   }
 
+  interruptOngoingActions() {
+    this.movement.interruptOngoingMovement();
+  }
+
   // ------------------
   // ACTIONS - MOVEMENT & LOCATION
 

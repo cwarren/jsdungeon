@@ -1,14 +1,7 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* implement entity sleeping
-* * hook up sleeping stuff in turn taking (same place(s) as running)
-
-* add some kind of delay in the continuous action loops (sleeping and running, for now) so that players can see the world update during the continuous action
-
-* add to entity a general interruptContinuousActivity, which stops running, sleeping, and any future continuous activity
-
-* make any game play command interrupt all continuous activities
+* organize code
 
 * stats for entities / stat system (what they are and mean; what effect they have)
 * * begin richer combat stuff in general
@@ -54,6 +47,7 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * chance for a level to have puddles (overlay)
 * * chance for a level to have a river through it (carve)
 
+* add sleeping-related and running-related tests to gameTime.test.js
 
 * create a basic item class
 
@@ -78,9 +72,13 @@ PS E:\code\jsdungeon> docker-compose up --build
 
 * ranged combat
 
-* current minichar display is unregisters when game becomes over. while this is OK, it hides the final char info from the player. consider shifting the de-registration to a different point so that the player can see info about there character and the point the game ended
+* current minichar display is unregistered when game becomes over. while this is OK, it hides the final char info from the player. consider shifting the de-registration to a different point so that the player can see info about there character and the point the game ended
 * * maybe when GAME_OVER ui state is popped? feels a bit messy....
 
+* add some kind of delay in the continuous action loops (sleeping and running, for now) so that players can see the world update during the continuous action
+* * NOTE: this seems like it should be pretty straight forward... but it's definitely not. Javascript is doesn't have a 'sleep' command, which make adding this kind of behavior actually a significant challenge. I spent a couple of hours poking at this already, and while I can get the delay thing to work somewhat doing so introduces a completely blocking bug where when a entity enters a level they end up removed from the turn queue (while still being on the level) and other entities act until the avatar dies.
+* * ideas
+* * * .... I got nothing at the moment; it's too late at night
 
 * when entering a level for the first time then time runs based on time on previous level - this should not happen when entering a level for the first time
 * * though, it doesn't really break things... just means some mobs may fight if they're hostile to each other... which shouldn't be much of a problem outside development, since eventually most mobs will not be hostile to each other...

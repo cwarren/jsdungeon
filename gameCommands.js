@@ -118,6 +118,7 @@ function executeGameAction(actionDef, key, event) {
 }
 
 function executeGameCommand(key, event) {
+    gameState.avatar.interruptOngoingActions();
     const lookupKey = getLookupKey(key, event);
     const uiState = uiPaneMain.getCurrentUIState();
     const actionKey = getActionKey(uiState, lookupKey);

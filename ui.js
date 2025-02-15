@@ -12,7 +12,9 @@ function setupUi(gameState) {
   uiPaneMain = new UIPaneMain(gameState);
   uiPaneMessages = new UIPaneMessages();  
   uiPaneInfo = new UIPaneInfo();  
-  uiPaneMiniChar = new UIPaneMiniChar(gameState.avatar);  
+  uiPaneMiniChar = new UIPaneMiniChar(gameState.avatar);
+  uiPaneMain.resetUIState();
+  uiPaneMain.drawUI();
 }
 
 export {

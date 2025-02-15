@@ -176,6 +176,7 @@ class EntityMovement {
         this.destinationCell = null;
         this.movementPath = [];
         this.stopRunning();
+        this.stopSleeping();
     }
 
     // INSPECTION
