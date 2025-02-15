@@ -1,6 +1,6 @@
 import { EntityHealth, DEFAULT_NATURAL_HEALING_TICKS, DEFAULT_NATURAL_HEALING_RATE } from './entityHealthClass';
 
-jest.mock('./util.js', () => ({
+jest.mock('../util.js', () => ({
   devTrace: jest.fn(),
   constrainValue: jest.fn((value, min, max) => Math.min(Math.max(value, min), max)),
   formatNumberForMessage: jest.fn((num) => num.toString()),

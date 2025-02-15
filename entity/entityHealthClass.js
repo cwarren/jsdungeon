@@ -1,4 +1,4 @@
-import { devTrace, constrainValue, formatNumberForMessage } from "./util.js";
+import { devTrace, constrainValue, formatNumberForMessage } from "../util.js";
 
 const DEFAULT_NATURAL_HEALING_TICKS = 250; // how often natural healing occurs in game time ticks
 const DEFAULT_NATURAL_HEALING_RATE = 0.001; // what portion of maximum health is healed per natural healing tick 

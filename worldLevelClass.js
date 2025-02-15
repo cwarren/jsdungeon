@@ -22,7 +22,7 @@ import {
     determineCellViewability
 } from "./gridUtils.js";
 import { TurnQueue } from "./gameTime.js";
-import { Entity, DEFAULT_ACTION_COST } from "./entityClass.js";
+import { Entity, DEFAULT_ACTION_COST } from "./entity/entityClass.js";
 import { uiPaneMessages, uiPaneInfo } from "./ui.js";
 
 const MAX_ENTITY_PLACEMENT_ATTEMPTS = 20;

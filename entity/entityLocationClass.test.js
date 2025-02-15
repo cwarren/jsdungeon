@@ -1,12 +1,12 @@
 import { EntityLocation } from './entityLocationClass';
-import { gameState } from './gameStateClass';
-import { devTrace } from './util';
+import { gameState } from '../gameStateClass';
+import { devTrace } from '../util';
 
-jest.mock('./util', () => ({
+jest.mock('../util', () => ({
   devTrace: jest.fn(),
 }));
 
-jest.mock('./gameStateClass', () => ({
+jest.mock('../gameStateClass', () => ({
   gameState: {
     world: [
       {

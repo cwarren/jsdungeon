@@ -1,23 +1,23 @@
 import { Avatar } from './avatarClass.js';
 import { Entity, DEFAULT_ACTION_COST } from './entityClass.js';
-import { gameState } from './gameStateClass.js';
-import { devTrace, rollDice, formatNumberForMessage } from './util.js';
-import { Damage } from './damageClass.js';
-import { uiPaneMain, uiPaneMessages } from "./ui.js";
-import { UIPaneMiniChar, miniCharElement } from './uiPaneMiniCharClass.js';
-import { WorldLevelSpecification } from './worldLevelSpecificationClass.js';
+import { gameState } from '../gameStateClass.js';
+import { devTrace, rollDice, formatNumberForMessage } from '../util.js';
+import { Damage } from '../damageClass.js';
+import { uiPaneMain, uiPaneMessages } from "../ui.js";
+import { UIPaneMiniChar, miniCharElement } from '../uiPaneMiniCharClass.js';
+import { WorldLevelSpecification } from '../worldLevelSpecificationClass.js';
 
 const WORLD_LEVEL_SPECS_FOR_TESTING= [
     WorldLevelSpecification.generateWorldLevelSpec({type: 'EMPTY', width: 10, height: 10}),
   ];
 
-jest.mock('./util.js', () => ({
+jest.mock('../util.js', () => ({
   devTrace: jest.fn(),
   rollDice: jest.fn(() => 3), // Mock rollDice to always return 3
   formatNumberForMessage: jest.fn(() => '10'),
 }));
 
-jest.mock('./ui.js', () => ({
+jest.mock('../ui.js', () => ({
   uiPaneMessages: { addMessage: jest.fn() },
   uiPaneMain: { 
     resetUIState: jest.fn(), 
@@ -25,9 +25,9 @@ jest.mock('./ui.js', () => ({
   },
 }));
 
-jest.mock('./uiPaneMiniCharClass.js', () => ({
+jest.mock('../uiPaneMiniCharClass.js', () => ({
   // UIPaneMiniChar.getPageElement: jest.fn(() => {return {innerHTML: ''};}),
-  UIPaneMiniChar: jest.requireActual('./uiPaneMiniCharClass.js').UIPaneMiniChar
+  UIPaneMiniChar: jest.requireActual('../uiPaneMiniCharClass.js').UIPaneMiniChar
 }));
 
 

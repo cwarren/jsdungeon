@@ -1,6 +1,6 @@
-import { devTrace, getRandomListItem } from "./util.js";
-import { GridCell } from "./gridCellClass.js";
-import { getRandomCellOfTerrainInGrid, determineCheapestMovementPathForEntity, computeBresenhamLine } from "./gridUtils.js";
+import { devTrace, getRandomListItem } from "../util.js";
+import { GridCell } from "../gridCellClass.js";
+import { getRandomCellOfTerrainInGrid, determineCheapestMovementPathForEntity, computeBresenhamLine } from "../gridUtils.js";
 
 const DEFAULT_MOVEMENT_ACTION_COST = 100;
 const DEFAULT_MOVEMENT_SPEC = { movementType: "STATIONARY", actionCost: DEFAULT_MOVEMENT_ACTION_COST };

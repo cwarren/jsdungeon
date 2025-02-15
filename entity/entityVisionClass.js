@@ -1,5 +1,5 @@
-import { devTrace } from "./util.js";
-import { computeBresenhamLine } from './gridUtils.js';
+import { devTrace } from "../util.js";
+import { computeBresenhamLine } from '../gridUtils.js';
 
 const DEFAULT_VIEW_RADIUS = 1;
 

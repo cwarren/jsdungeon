@@ -1,5 +1,5 @@
 import { WorldLevel } from './worldLevelClass.js';
-import { Entity, DEFAULT_ACTION_COST } from './entityClass.js';
+import { Entity, DEFAULT_ACTION_COST } from './entity/entityClass.js';
 import { Damager } from './damagerClass.js';
 import { devTrace, constrainValue, rollDice } from './util.js';
 import { gameState } from './gameStateClass.js';

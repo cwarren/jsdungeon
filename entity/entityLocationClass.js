@@ -1,5 +1,5 @@
-import { devTrace } from "./util.js";
-import { gameState } from "./gameStateClass.js";
+import { devTrace } from "../util.js";
+import { gameState } from "../gameStateClass.js";
 
 
 class EntityLocation {

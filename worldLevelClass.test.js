@@ -3,7 +3,7 @@ import { Structure } from './structureClass.js';
 import { Stairs } from './stairsClass.js';
 import { devTrace, constrainValue } from './util.js';
 import { TurnQueue } from './gameTime.js';
-import { Entity, DEFAULT_ACTION_COST } from './entityClass.js';
+import { Entity, DEFAULT_ACTION_COST } from './entity/entityClass.js';
 import {
   setWorldLevelForGridCells,
   generateGrid_empty,
@@ -64,7 +64,7 @@ jest.mock('./gameTime', () => ({
   })),
 }));
 
-jest.mock('./entityClass', () => ({
+jest.mock('./entity/entityClass', () => ({
   Entity: jest.fn().mockImplementation(() => ({
     type: 'RAT_INSIDIOUS',
     placeAtCell: jest.fn(),

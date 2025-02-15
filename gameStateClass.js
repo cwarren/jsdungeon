@@ -1,6 +1,6 @@
-import { Entity } from "./entityClass.js";
+import { Entity } from "./entity/entityClass.js";
 import { WorldLevel } from "./worldLevelClass.js";
-import { Avatar } from "./avatarClass.js";
+import { Avatar } from "./entity/avatarClass.js";
 import { devTrace } from "./util.js";
 import { uiPaneMain, uiPaneMessages, uiPaneInfo, uiPaneMiniChar } from "./ui.js";
 import { WorldLevelSpecification } from "./worldLevelSpecificationClass.js";

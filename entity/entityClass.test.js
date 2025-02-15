@@ -1,29 +1,29 @@
 import { Entity } from './entityClass.js';
-import { gameState } from './gameStateClass.js';
-import { rollDice, constrainValue } from './util.js';
+import { gameState } from '../gameStateClass.js';
+import { rollDice, constrainValue } from '../util.js';
 import { EntityHealth } from './entityHealthClass.js';
 import { EntityLocation } from './entityLocationClass.js';
 import { EntityMovement } from './entityMovementClass.js';
 import { EntityVision } from './entityVisionClass.js';
-import { WorldLevel } from './worldLevelClass.js';
-import { Damager } from './damagerClass.js';
-import { uiPaneMessages } from "./ui.js";
-import { Damage } from './damageClass.js';
+import { WorldLevel } from '../worldLevelClass.js';
+import { Damager } from '../damagerClass.js';
+import { uiPaneMessages } from "../ui.js";
+import { Damage } from '../damageClass.js';
 
 // NOTE: many of these tests are more integration tests than unit tests
 
-jest.mock('./util.js', () => ({
+jest.mock('../util.js', () => ({
     rollDice: jest.fn(() => 10),
-    constrainValue: jest.requireActual('./util.js').constrainValue,
-    formatNumberForMessage: jest.requireActual('./util.js').formatNumberForMessage,
+    constrainValue: jest.requireActual('../util.js').constrainValue,
+    formatNumberForMessage: jest.requireActual('../util.js').formatNumberForMessage,
     devTrace: jest.fn(),
 }));
 
-jest.mock('./ui.js', () => ({
+jest.mock('../ui.js', () => ({
     uiPaneMessages: { addMessage: jest.fn() },
 }));
 
-jest.mock('./gameStateClass.js', () => ({
+jest.mock('../gameStateClass.js', () => ({
     gameState: {
         world: [],
     },

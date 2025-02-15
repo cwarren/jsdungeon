@@ -1,4 +1,4 @@
-import { Damager } from "./damagerClass.js";
+import { Damager } from "../damagerClass.js";
 
 // A note on relations:
 // 0. IMPLICIT: if entity B has damaged entity A, then entity A is VIOLENT_TO entity B regardless of anything in the definitions

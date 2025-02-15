@@ -1,7 +1,7 @@
 import { WorldLevel } from './worldLevelClass.js';
 import { Structure } from './structureClass.js';
 import { TurnQueue } from './gameTime.js';
-import { Entity, DEFAULT_ACTION_COST } from './entityClass.js';
+import { Entity, DEFAULT_ACTION_COST } from './entity/entityClass.js';
 import {
   setWorldLevelForGridCells,
   generateGrid_empty,
