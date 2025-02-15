@@ -1,4 +1,4 @@
-import { constrainValue } from "./util.js";
+import { constrainValue } from "../util.js";
 
 const INITIAL_ZOOM_FACTOR = .6;
 

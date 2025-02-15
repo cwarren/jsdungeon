@@ -1,5 +1,5 @@
 import { GameState, gameState, initializeGameWorld } from "./gameStateClass.js";
-import { uiPaneMain, uiPaneMessages } from "./ui.js";
+import { uiPaneMain, uiPaneMessages } from "./ui/ui.js";
 
 
 //=====================

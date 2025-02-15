@@ -1,5 +1,5 @@
-import { executeGameCommand } from "./gameCommands.js";
-import { devTrace } from "./util.js";
+import { executeGameCommand } from "../gameCommands.js";
+import { devTrace } from "../util.js";
 
 class UIPaneMainEventHandler {
     constructor(ui, canvas) {

@@ -1,8 +1,8 @@
 import { UIPaneMainRenderer } from "./uiPaneMainRendererClass.js";
-import { keyBinding, actionMaps } from "./gameCommands.js";
-import { createHelpText, devTrace } from "./util.js";
-import { TextBlock } from "./textBlockClass.js";
-import { uiActionsMap } from "./uiActions.js";
+import { keyBinding, actionMaps } from "../gameCommands.js";
+import { createHelpText, devTrace } from "../util.js";
+import { TextBlock } from "../textBlockClass.js";
+import { uiActionsMap } from "../uiActions.js";
 
 class UIPaneMainRendererHelp extends UIPaneMainRenderer {
     constructor(ui, canvas) {

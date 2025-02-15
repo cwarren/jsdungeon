@@ -1,4 +1,4 @@
-import { formatNumberForMessage } from './util.js';
+import { formatNumberForMessage } from '../util.js';
 
 const miniCharElement = document.getElementById("minichar");
 

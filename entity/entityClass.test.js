@@ -7,7 +7,7 @@ import { EntityMovement } from './entityMovementClass.js';
 import { EntityVision } from './entityVisionClass.js';
 import { WorldLevel } from '../worldLevelClass.js';
 import { Damager } from '../damagerClass.js';
-import { uiPaneMessages } from "../ui.js";
+import { uiPaneMessages } from "../ui/ui.js";
 import { Damage } from '../damageClass.js';
 
 // NOTE: many of these tests are more integration tests than unit tests
@@ -19,7 +19,7 @@ jest.mock('../util.js', () => ({
     devTrace: jest.fn(),
 }));
 
-jest.mock('../ui.js', () => ({
+jest.mock('../ui/ui.js', () => ({
     uiPaneMessages: { addMessage: jest.fn() },
 }));
 

@@ -3,7 +3,7 @@ import { gameActionsMap } from "./gameActions.js";
 import { gameMetaActionsMap } from "./gameMetaActions.js";
 import { textActionsMap } from "./textActions.js";
 import { uiActionsMap } from "./uiActions.js";
-import { uiPaneMain } from "./ui.js";
+import { uiPaneMain } from "./ui/ui.js";
 import { devTrace } from "./util.js";
 
 // import { handlePlayerActionTime } from "./gameTime.js";

@@ -2,7 +2,7 @@ import { gameState } from "../gameStateClass.js";
 import { Damage } from "../damageClass.js";
 import { rollDice, getRandomListItem, constrainValue, devTrace, formatNumberForMessage } from "../util.js";
 import { ENTITIES_DEFINITIONS } from "./entityDefinitions.js";
-import { uiPaneMessages } from "../ui.js";
+import { uiPaneMessages } from "../ui/ui.js";
 import { EntityHealth } from "./entityHealthClass.js";
 import { EntityLocation } from "./entityLocationClass.js";
 import { EntityMovement } from "./entityMovementClass.js";

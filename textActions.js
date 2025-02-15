@@ -1,4 +1,4 @@
-import { uiPaneMain } from "./ui.js";
+import { uiPaneMain } from "./ui/ui.js";
 
 const textActionsMap = {
     LINE_UP: { name: "Line up", description: "Move one line towards the beginning of the text", action: lineUp },

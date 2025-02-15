@@ -3,8 +3,8 @@ import { Entity, DEFAULT_ACTION_COST } from './entityClass.js';
 import { gameState } from '../gameStateClass.js';
 import { devTrace, rollDice, formatNumberForMessage } from '../util.js';
 import { Damage } from '../damageClass.js';
-import { uiPaneMain, uiPaneMessages } from "../ui.js";
-import { UIPaneMiniChar, miniCharElement } from '../uiPaneMiniCharClass.js';
+import { uiPaneMain, uiPaneMessages } from "../ui/ui.js";
+import { UIPaneMiniChar, miniCharElement } from '../ui/uiPaneMiniCharClass.js';
 import { WorldLevelSpecification } from '../worldLevelSpecificationClass.js';
 
 const WORLD_LEVEL_SPECS_FOR_TESTING= [
@@ -17,7 +17,7 @@ jest.mock('../util.js', () => ({
   formatNumberForMessage: jest.fn(() => '10'),
 }));
 
-jest.mock('../ui.js', () => ({
+jest.mock('../ui/ui.js', () => ({
   uiPaneMessages: { addMessage: jest.fn() },
   uiPaneMain: { 
     resetUIState: jest.fn(), 
@@ -25,9 +25,9 @@ jest.mock('../ui.js', () => ({
   },
 }));
 
-jest.mock('../uiPaneMiniCharClass.js', () => ({
+jest.mock('../ui/uiPaneMiniCharClass.js', () => ({
   // UIPaneMiniChar.getPageElement: jest.fn(() => {return {innerHTML: ''};}),
-  UIPaneMiniChar: jest.requireActual('../uiPaneMiniCharClass.js').UIPaneMiniChar
+  UIPaneMiniChar: jest.requireActual('../ui/uiPaneMiniCharClass.js').UIPaneMiniChar
 }));
 
 

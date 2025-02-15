@@ -1,6 +1,6 @@
 import { gameState } from "./gameStateClass.js";
 import { DEFAULT_ACTION_COST } from "./entity/entityClass.js";
-import { uiPaneMain } from "./ui.js";
+import { uiPaneMain } from "./ui/ui.js";
 import { devTrace } from "./util.js";
 
 

@@ -24,7 +24,7 @@ import {
   determineCellViewability,
 } from './gridUtils.js';
 import { rollDice } from './util.js';
-import { uiPaneMessages, uiPaneInfo } from "./ui.js";
+import { uiPaneMessages, uiPaneInfo } from "./ui/ui.js";
 import { WorldLevelSpecification } from './worldLevelSpecificationClass.js';
 
 jest.mock('./util.js', () => ({
@@ -73,7 +73,7 @@ jest.mock('./entity/entityClass', () => ({
   DEFAULT_ACTION_COST: 100,
 }));
 
-jest.mock('./ui.js', () => ({
+jest.mock('./ui/ui.js', () => ({
   uiPaneMessages: { addMessage: jest.fn()},
   uiPaneInfo: { setInfo: jest.fn()},
 }));

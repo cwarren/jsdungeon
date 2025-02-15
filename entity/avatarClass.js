@@ -2,7 +2,7 @@ import { Entity, DEFAULT_ACTION_COST } from "./entityClass.js";
 import { gameState } from "../gameStateClass.js";
 import { devTrace, rollDice } from "../util.js";
 import { Damage } from "../damageClass.js";
-import { uiPaneMessages } from "../ui.js";
+import { uiPaneMessages } from "../ui/ui.js";
 
 
 class Avatar extends Entity {

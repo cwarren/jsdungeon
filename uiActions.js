@@ -1,5 +1,5 @@
 import { GameState, gameState } from "./gameStateClass.js";
-import { uiPaneMain } from "./ui.js";
+import { uiPaneMain } from "./ui/ui.js";
 
 const uiActionsMap = {
     "PUSH_GAME_PLAY": { name: "Play game", description: "The main game-play screen", action: uiGamePlay },
