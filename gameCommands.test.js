@@ -17,6 +17,9 @@ jest.mock('./ui.js', () => ({
 jest.mock('./gameStateClass.js', () => ({
     gameState: {
         handlePlayerActionTime: jest.fn(),
+        avatar: {
+            interruptOngoingActions: jest.fn(),
+        }
     },
 }));
 
@@ -84,6 +87,7 @@ describe('gameCommands', () => {
             executeGameCommand(key, event);
 
             expect(mockAction).toHaveBeenCalled();
+            expect(gameState.avatar.interruptOngoingActions).toHaveBeenCalled();
         });
 
         test('should execute gameplay action and handle player action time', () => {
