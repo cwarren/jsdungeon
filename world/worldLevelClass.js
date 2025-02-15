@@ -1,6 +1,6 @@
-import { Structure } from "./structure/structureClass.js";
-import { Stairs } from "./structure/stairsClass.js";
-import { constrainValue, devTrace } from "./util.js";
+import { Structure } from "../structure/structureClass.js";
+import { Stairs } from "../structure/stairsClass.js";
+import { constrainValue, devTrace } from "../util.js";
 import {
     setWorldLevelForGridCells,
     generateGrid_empty,
@@ -21,9 +21,9 @@ import {
     getRandomCellOfTerrainInGrid,
     determineCellViewability
 } from "./gridUtils.js";
-import { TurnQueue } from "./gameTime.js";
-import { Entity, DEFAULT_ACTION_COST } from "./entity/entityClass.js";
-import { uiPaneMessages, uiPaneInfo } from "./ui/ui.js";
+import { TurnQueue } from "../gameTime.js";
+import { Entity, DEFAULT_ACTION_COST } from "../entity/entityClass.js";
+import { uiPaneMessages, uiPaneInfo } from "../ui/ui.js";
 
 const MAX_ENTITY_PLACEMENT_ATTEMPTS = 20;
 const MAX_TIME_AWAY_TO_CARE_ABOUT = DEFAULT_ACTION_COST * 100;

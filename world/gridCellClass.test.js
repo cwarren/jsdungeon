@@ -1,6 +1,6 @@
 import { GridCell } from './gridCellClass';
-import { devTrace } from './util.js';
-jest.mock('./util.js', () => ({
+import { devTrace } from '../util.js';
+jest.mock('../util.js', () => ({
     devTrace: jest.fn(),
 }));
 

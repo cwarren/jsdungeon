@@ -1,4 +1,4 @@
-import { getRandomListItem, constrainValue } from './util.js';
+import { getRandomListItem, constrainValue } from '../util.js';
 
 const DEFAULT_LEVEL_WIDTH = 80;
 const LEVEL_WIDTH_BOUND_LOWER = 20;

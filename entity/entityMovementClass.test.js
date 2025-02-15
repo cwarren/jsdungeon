@@ -1,11 +1,11 @@
 import { EntityMovement, DEFAULT_MOVEMENT_SPEC, DEFAULT_MOVEMENT_ACTION_COST } from './entityMovementClass.js';
-import { WorldLevel } from '../worldLevelClass.js';
+import { WorldLevel } from '../world/worldLevelClass.js';
 import { Entity, DEFAULT_ACTION_COST } from './entityClass.js';
 import { Damager } from '../damagerClass.js';
 import { devTrace, constrainValue, rollDice, getRandomListItem } from '../util.js';
 import { gameState } from '../gameStateClass.js';
 import { uiPaneMessages, uiPaneInfo } from "../ui/ui.js";
-import { WorldLevelSpecification } from '../worldLevelSpecificationClass.js';
+import { WorldLevelSpecification } from '../world/worldLevelSpecificationClass.js';
 import {
   findCellOfTerrainNearPlace,
   getRandomCellOfTerrainInGrid,
@@ -16,8 +16,8 @@ import {
   computeBresenhamLine,
   determineCheapestMovementPath,
   determineCheapestMovementPathForEntity
-} from '../gridUtils.js';
-import { GridCell } from '../gridCellClass.js';
+} from '../world/gridUtils.js';
+import { GridCell } from '../world/gridCellClass.js';
 
 jest.mock('../util.js', () => ({
   devTrace: jest.fn(),
@@ -31,11 +31,11 @@ jest.mock('../ui/ui.js', () => ({
   uiPaneInfo: { setInfo: jest.fn() },
 }));
 
-jest.mock('../gridUtils.js', () => ({
-  determineCheapestMovementPathForEntity: jest.requireActual('../gridUtils.js').determineCheapestMovementPathForEntity,
-  determineCellViewability: jest.requireActual('../gridUtils.js').determineCellViewability,
-  getRandomEmptyCellOfTerrainInGrid: jest.requireActual('../gridUtils.js').getRandomEmptyCellOfTerrainInGrid,
-  computeBresenhamLine: jest.requireActual('../gridUtils.js').computeBresenhamLine,
+jest.mock('../world/gridUtils.js', () => ({
+  determineCheapestMovementPathForEntity: jest.requireActual('../world/gridUtils.js').determineCheapestMovementPathForEntity,
+  determineCellViewability: jest.requireActual('../world/gridUtils.js').determineCellViewability,
+  getRandomEmptyCellOfTerrainInGrid: jest.requireActual('../world/gridUtils.js').getRandomEmptyCellOfTerrainInGrid,
+  computeBresenhamLine: jest.requireActual('../world/gridUtils.js').computeBresenhamLine,
   getRandomCellOfTerrainInGrid: jest.fn(),
 }));
 

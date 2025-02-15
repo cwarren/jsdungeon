@@ -1,6 +1,6 @@
 import { applyCellularAutomataSmoothing } from "./gridUtils.js";
 import { GridCell } from "./gridCellClass.js";
-import { constrainValue, devTrace } from "./util.js";
+import { constrainValue, devTrace } from "../util.js";
 
 const SUBDIVIDE_MIN_WIDTH = 6;
 const SUBDIVIDE_MIN_HEIGHT = 6;

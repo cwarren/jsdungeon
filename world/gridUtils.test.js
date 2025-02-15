@@ -1,9 +1,9 @@
 import { WorldLevel } from './worldLevelClass.js';
-import { Entity, DEFAULT_ACTION_COST } from './entity/entityClass.js';
-import { Damager } from './damagerClass.js';
-import { devTrace, constrainValue, rollDice } from './util.js';
-import { gameState } from './gameStateClass.js';
-import { uiPaneMessages, uiPaneInfo } from "./ui/ui.js";
+import { Entity, DEFAULT_ACTION_COST } from '../entity/entityClass.js';
+import { Damager } from '../damagerClass.js';
+import { devTrace, constrainValue, rollDice } from '../util.js';
+import { gameState } from '../gameStateClass.js';
+import { uiPaneMessages, uiPaneInfo } from "../ui/ui.js";
 import { WorldLevelSpecification } from './worldLevelSpecificationClass.js';
 import {
     findCellOfTerrainNearPlace,
@@ -20,13 +20,13 @@ import { GridCell } from './gridCellClass';
 
 // NOTE: all the gameState and entity stuff and all the mocks are related to determining best path FOR ENTITY
 
-jest.mock('./util.js', () => ({
+jest.mock('../util.js', () => ({
     devTrace: jest.fn(),
     constrainValue: jest.fn((value, min, max) => Math.max(min, Math.min(max, value))),
-    rollDice: jest.requireActual('./util.js').rollDice,
+    rollDice: jest.requireActual('../util.js').rollDice,
 }));
 
-jest.mock('./ui/ui.js', () => ({
+jest.mock('../ui/ui.js', () => ({
     uiPaneMessages: { addMessage: jest.fn() },
     uiPaneInfo: { setInfo: jest.fn() },
 }));

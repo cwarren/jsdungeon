@@ -1,6 +1,6 @@
 import { Structure } from './structureClass.js';
 import { gameState } from '../gameStateClass.js';
-import { WorldLevelSpecification } from '../worldLevelSpecificationClass.js';
+import { WorldLevelSpecification } from '../world/worldLevelSpecificationClass.js';
 import { devTrace } from '../util.js';
 jest.mock('../util.js', () => ({
     devTrace: jest.fn(),

@@ -5,7 +5,7 @@ import { devTrace, rollDice, formatNumberForMessage } from '../util.js';
 import { Damage } from '../damageClass.js';
 import { uiPaneMain, uiPaneMessages } from "../ui/ui.js";
 import { UIPaneMiniChar, miniCharElement } from '../ui/uiPaneMiniCharClass.js';
-import { WorldLevelSpecification } from '../worldLevelSpecificationClass.js';
+import { WorldLevelSpecification } from '../world/worldLevelSpecificationClass.js';
 
 const WORLD_LEVEL_SPECS_FOR_TESTING= [
     WorldLevelSpecification.generateWorldLevelSpec({type: 'EMPTY', width: 10, height: 10}),

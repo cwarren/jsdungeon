@@ -5,7 +5,7 @@ import { EntityHealth } from './entityHealthClass.js';
 import { EntityLocation } from './entityLocationClass.js';
 import { EntityMovement } from './entityMovementClass.js';
 import { EntityVision } from './entityVisionClass.js';
-import { WorldLevel } from '../worldLevelClass.js';
+import { WorldLevel } from '../world/worldLevelClass.js';
 import { Damager } from '../damagerClass.js';
 import { uiPaneMessages } from "../ui/ui.js";
 import { Damage } from '../damageClass.js';

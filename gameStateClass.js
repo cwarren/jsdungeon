@@ -1,9 +1,9 @@
 import { Entity } from "./entity/entityClass.js";
-import { WorldLevel } from "./worldLevelClass.js";
+import { WorldLevel } from "./world/worldLevelClass.js";
 import { Avatar } from "./entity/avatarClass.js";
 import { devTrace } from "./util.js";
 import { uiPaneMain, uiPaneMessages, uiPaneInfo, uiPaneMiniChar } from "./ui/ui.js";
-import { WorldLevelSpecification } from "./worldLevelSpecificationClass.js";
+import { WorldLevelSpecification } from "./world/worldLevelSpecificationClass.js";
 
 class GameState {
     constructor() {

@@ -130,7 +130,9 @@ class TurnQueue {
         if (minTime > TIME_WRAP_LIMIT) {
             console.log("Normalizing TurnQueue times to prevent overflow.");
             this.queue.forEach(entry => {
-                entry.entity.health.lastNaturalHealTime -= minTime; // a bit of a hack; this is too deep into entity knowledge, but works for now...
+                if (entry.entity && entry.entity.health) {
+                    entry.entity.health.lastNaturalHealTime -= minTime; // a bit of a hack; this is too deep into entity knowledge, but works for now...
+                }
                 entry.time -= minTime;
             });
         }
