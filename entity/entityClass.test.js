@@ -6,9 +6,9 @@ import { EntityLocation } from './entityLocationClass.js';
 import { EntityMovement } from './entityMovementClass.js';
 import { EntityVision } from './entityVisionClass.js';
 import { WorldLevel } from '../world/worldLevelClass.js';
-import { Damager } from '../damagerClass.js';
+import { Damager } from '../effect/damagerClass.js';
 import { uiPaneMessages } from "../ui/ui.js";
-import { Damage } from '../damageClass.js';
+import { Damage } from '../effect/damageClass.js';
 
 // NOTE: many of these tests are more integration tests than unit tests
 

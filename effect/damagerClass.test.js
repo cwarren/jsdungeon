@@ -1,12 +1,9 @@
 import { Damager } from './damagerClass';
-import { rollDice } from './util.js';
+import { rollDice, devTrace } from '../util.js';
 import { Damage } from './damageClass';
-import { devTrace } from './util.js';
-jest.mock('./util.js', () => ({
-    devTrace: jest.fn(),
-}));
 
-jest.mock('./util.js', () => ({
+jest.mock('../util.js', () => ({
+    devTrace: jest.fn(),
     rollDice: jest.fn(),
 }));
 

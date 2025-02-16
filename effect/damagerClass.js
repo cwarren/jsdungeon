@@ -1,4 +1,4 @@
-import { rollDice } from "./util.js";
+import { rollDice } from "../util.js";
 import { Damage } from "./damageClass.js";
 
 class Damager {

@@ -1,6 +1,6 @@
 import { WorldLevel } from './worldLevelClass.js';
 import { Entity, DEFAULT_ACTION_COST } from '../entity/entityClass.js';
-import { Damager } from '../damagerClass.js';
+import { Damager } from '../effect/damagerClass.js';
 import { devTrace, constrainValue, rollDice } from '../util.js';
 import { gameState } from '../gameStateClass.js';
 import { uiPaneMessages, uiPaneInfo } from "../ui/ui.js";

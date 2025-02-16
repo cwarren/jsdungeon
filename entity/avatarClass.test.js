@@ -2,7 +2,7 @@ import { Avatar } from './avatarClass.js';
 import { Entity, DEFAULT_ACTION_COST } from './entityClass.js';
 import { gameState } from '../gameStateClass.js';
 import { devTrace, rollDice, formatNumberForMessage } from '../util.js';
-import { Damage } from '../damageClass.js';
+import { Damage } from '../effect/damageClass.js';
 import { uiPaneMain, uiPaneMessages } from "../ui/ui.js";
 import { UIPaneMiniChar, miniCharElement } from '../ui/uiPaneMiniCharClass.js';
 import { WorldLevelSpecification } from '../world/worldLevelSpecificationClass.js';

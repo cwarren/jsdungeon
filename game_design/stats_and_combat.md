@@ -113,3 +113,36 @@ Binary conditions aren't true booleans but instead leveled conditions with a max
 NOTE: current levels and level reductions may be fractions! Mechanics should not assume whole numbers nor equal values!
 
 ## implementation
+
+For a given attack the attacker needs a getPrecision and the defender needs a getEvasion. Each needs to accept an Attack object, which has the attacker (entity), defender (entity), and Damager. The Damager already has a types list, which will include things like melee, aoe, ranged, etc. as well as things like fire, mental, chaos, blunt, etc. that are often more associated with the classic "damage type". The type information in the Damager may inform an entity's precision or evasion calculation.
+
+Actually - Damager is really a specific type of a HitEffectGenerator. Generalize that
+
+
+If the attack results in a hit, it is passed to the getHitEffects function, and results in a list of HitEffects (the simplest HitEffect is just some amount of damage, and initially the HitEffect list will contain only a single HitEffect, which is a Damage). The existing takeDamage function is still relevant, but it is superceded by a higher level beHit function which takes the list of hit effects and applies them - the application of a Damage hit effect is passed to takeDamage.
+
+So, primary new and modified objects are
+* Attack
+* * attacker (Entity)
+* * defender (Entity)
+* * defenderHitEffectGenerators (list of EffectGenerator)
+* * attackerHitEffectGenerators (list of EffectGenerator) (NOTE: this is for things like life steal, sacrifices, etc.; for now I'm expecting this will usually be empty, but it migth be a place where things like weapon skill growth is triggered)
+* * possibly, defenderEvadeEffectGenerator and attackerEvadeEffectGenerator
+* EffectGenerator
+* * Damager is a specific type of EffectGenerator
+* Effect
+* * Damage is a specific type of Effect
+
+And the primary functions (methods on Entity intances) are:
+* getPrecision(Attack) - returns a number
+* getEvation(Attack) - returns a number
+* isAttackCritical(Attack) - returns true/false
+* isDefenseCritical(Attack) - returns true/false
+* beHit(Attack) - runs each hitEffectGenerator in the attack and calls applyHitEffect to attacker or defender as appropriate with given HitEffect
+* applyAttackEffect(sourceEntity, Effect)
+* * for Damage type effects, calls takeDamageFrom
+Also static method on the Entity class
+* determnineAttackOutcome - returns HIT, CRITICAL_HIT, EVADE, CRITICAL_EVADE
+
+
+NOTE: 

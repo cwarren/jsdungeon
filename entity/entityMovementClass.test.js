@@ -1,7 +1,7 @@
 import { EntityMovement, DEFAULT_MOVEMENT_SPEC, DEFAULT_MOVEMENT_ACTION_COST } from './entityMovementClass.js';
 import { WorldLevel } from '../world/worldLevelClass.js';
 import { Entity, DEFAULT_ACTION_COST } from './entityClass.js';
-import { Damager } from '../damagerClass.js';
+import { Damager } from '../effect/damagerClass.js';
 import { devTrace, constrainValue, rollDice, getRandomListItem } from '../util.js';
 import { gameState } from '../gameStateClass.js';
 import { uiPaneMessages, uiPaneInfo } from "../ui/ui.js";
