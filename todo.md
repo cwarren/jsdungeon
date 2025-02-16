@@ -1,8 +1,18 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* stats for entities / stat system (what they are and mean; what effect they have)
-* * begin richer combat stuff in general
+implement Entity methods:
+* createAttack(defender) - returns an Attack
+* getPrecision(Attack) - returns a number
+* getEvation(Attack) - returns a number
+* isAttackCritical(Attack) - returns true/false
+* isDefenseCritical(Attack) - returns true/false
+* beHit(Attack) - runs each hitEffectGenerator in the attack and calls applyHitEffect to attacker or defender as appropriate with given HitEffect
+* applyAttackEffect(sourceEntity, Effect)
+* * for Damage type effects, calls takeDamageFrom
+Also static method on the Entity class
+* determnineAttackOutcome - returns HIT, CRITICAL_HIT, EVADE, CRITICAL_EVADE
+
 
 * skills for entities / skill system
 * * what they are
