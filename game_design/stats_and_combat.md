@@ -136,9 +136,9 @@ So, primary new and modified objects are
 And the primary functions (methods on Entity intances) are:
 * createAttack(defender) - returns an Attack
 * getPrecision(Attack) - returns a number
-* getEvation(Attack) - returns a number
-* isAttackCritical(Attack) - returns true/false
-* isDefenseCritical(Attack) - returns true/false
+* getEvasion(Attack) - returns a number
+* isHitCritical(Attack) - returns true/false
+* isEvadeCritical(Attack) - returns true/false
 * beHit(Attack) - runs each hitEffectGenerator in the attack and calls applyHitEffect to attacker or defender as appropriate with given HitEffect
 * applyAttackEffect(sourceEntity, Effect)
 * * for Damage type effects, calls takeDamageFrom

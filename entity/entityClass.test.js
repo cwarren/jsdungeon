@@ -14,7 +14,7 @@ import { Attack } from '../effect/attackClass.js';
 // NOTE: many of these tests are more integration tests than unit tests
 
 jest.mock('../util.js', () => ({
-  rollDice: jest.fn(() => 10),
+  rollDice: jest.fn(),
   constrainValue: jest.requireActual('../util.js').constrainValue,
   formatNumberForMessage: jest.requireActual('../util.js').formatNumberForMessage,
   devTrace: jest.fn(),
@@ -141,10 +141,12 @@ describe('Entity', () => {
 
     let attacker;
     let defender;
+    let attack;
 
     beforeEach(() => {
       attacker = new Entity('RAT_MALIGN');
       defender = new Entity('WORM_VINE');
+      attack = attacker.createAttack(defender);
     });
 
     test('should die and remove entity from world', () => {
@@ -176,8 +178,7 @@ describe('Entity', () => {
 
     // test('', () => {});
 
-    test('should create Attack', () => {
-      const attack = attacker.createAttack(defender);
+    test('should create Attack correctly', () => {
       expect(attack).toBeInstanceOf(Attack);
       expect(attack.attacker).toBe(attacker);
       expect(attack.defender).toBe(defender);
@@ -186,7 +187,39 @@ describe('Entity', () => {
       expect(attack.defenderEvadeEffectGenerators).toEqual([]);
       expect(attack.attackerEvadeEffectGenerators).toEqual([]);
     });
-    // test('', () => { });
+
+    test('should get precision for an attack', () => {
+      const precision = attacker.getPrecision(attack);
+      expect(precision).toBeGreaterThan(0);
+    });
+
+    test('should get evasion for an attack', () => {
+      const evasion = attacker.getPrecision(attack);
+      expect(evasion).toBeGreaterThan(0);
+    });
+
+    test('should determine whether hit was critical', () => {
+      jest.spyOn(attacker, 'getCriticalHitThreshold').mockReturnValue(2);
+
+      rollDice.mockReturnValue(74);
+      expect(attacker.isHitCritical(attack)).toEqual(false);
+      expect(attacker.getCriticalHitThreshold).toHaveBeenCalled();
+
+      rollDice.mockReturnValue(1);
+      expect(attacker.isHitCritical(attack)).toEqual(true);
+    });
+
+    test('should determine whether evade was critical', () => {
+      jest.spyOn(defender, 'getCriticalEvadeThreshold').mockReturnValue(2);
+
+      rollDice.mockReturnValue(74);
+      expect(defender.isEvadeCritical(attack)).toEqual(false);
+      expect(defender.getCriticalEvadeThreshold).toHaveBeenCalled();
+
+      rollDice.mockReturnValue(1);
+      expect(defender.isEvadeCritical(attack)).toEqual(true);
+    });
+
     // test('', () => { });
     // test('', () => { });
     // test('', () => { });
@@ -253,6 +286,8 @@ describe('Entity', () => {
     });
 
     test('should have violent relationship to an otherwise neutral entity that has damaged it', () => {
+      rollDice.mockReturnValue(10); // needed to ensure the worm vine has enough health that it doesn't die when it takes damage
+
       const wormVine = new Entity('WORM_VINE');
       const insidiousRat = new Entity('RAT_INSIDIOUS');
       expect(wormVine.getRelationshipTo(insidiousRat)).toBe("NEUTRAL_TO");

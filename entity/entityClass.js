@@ -272,6 +272,28 @@ class Entity {
     return atk;
   }
 
+  getPrecision(attack) {
+    return 10;
+  }
+
+  getEvasion(attack) {
+    return 5;
+  }
+
+  isHitCritical(attack) {
+    return rollDice("1d100") <= this.getCriticalHitThreshold();
+  }
+  getCriticalHitThreshold() {
+    return 2;
+  }
+
+  isEvadeCritical(attack) {
+    return rollDice("1d100") <= this.getCriticalEvadeThreshold();
+  }
+  getCriticalEvadeThreshold() {
+    return 2;
+  }
+
   ///////// 
   // below are older / original combat and health methods - separated to
   // make implementation of the new combat system a bit simpler to manage; some may
