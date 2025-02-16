@@ -6,9 +6,10 @@ import { EntityLocation } from './entityLocationClass.js';
 import { EntityMovement } from './entityMovementClass.js';
 import { EntityVision } from './entityVisionClass.js';
 import { WorldLevel } from '../world/worldLevelClass.js';
-import { EffGenDamage } from '../effect/effGenDamageClass.js';
 import { uiPaneMessages } from "../ui/ui.js";
+import { EffGenDamage } from '../effect/effGenDamageClass.js';
 import { EffDamage } from '../effect/effDamageClass.js';
+import { Attack } from '../effect/attackClass.js';
 
 // NOTE: many of these tests are more integration tests than unit tests
 
@@ -142,8 +143,8 @@ describe('Entity', () => {
     let defender;
 
     beforeEach(() => {
-      const attacker = new Entity('RAT_MALIGN');
-      const defender = new Entity('WORM_VINE');
+      attacker = new Entity('RAT_MALIGN');
+      defender = new Entity('WORM_VINE');
     });
 
     test('should die and remove entity from world', () => {
@@ -172,6 +173,25 @@ describe('Entity', () => {
       const deathCredits = entity.getDeathCredits();
       expect(deathCredits).toEqual([]);
     });
+
+    // test('', () => {});
+
+    test('should create Attack', () => {
+      const attack = attacker.createAttack(defender);
+      expect(attack).toBeInstanceOf(Attack);
+      expect(attack.attacker).toBe(attacker);
+      expect(attack.defender).toBe(defender);
+      expect(attack.defenderHitEffectGenerators).toEqual([attacker.meleeAttack.damager]);
+      expect(attack.attackerHitEffectGenerators).toEqual([]);
+      expect(attack.defenderEvadeEffectGenerators).toEqual([]);
+      expect(attack.attackerEvadeEffectGenerators).toEqual([]);
+    });
+    // test('', () => { });
+    // test('', () => { });
+    // test('', () => { });
+    // test('', () => { });
+    // test('', () => { });
+
 
   });
 

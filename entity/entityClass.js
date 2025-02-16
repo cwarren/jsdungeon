@@ -7,6 +7,7 @@ import { EntityHealth } from "./entityHealthClass.js";
 import { EntityLocation } from "./entityLocationClass.js";
 import { EntityMovement } from "./entityMovementClass.js";
 import { EntityVision } from "./entityVisionClass.js";
+import { Attack } from "../effect/attackClass.js";
 
 const DEFAULT_ACTION_COST = 100;
 
@@ -261,6 +262,20 @@ class Entity {
 
   // ------------------
   // ACTIONS - COMBAT & HEALTH
+
+  createAttack(defender) {
+    const atk = new Attack(
+      this,
+      defender,
+      [this.meleeAttack.damager],
+    );
+    return atk;
+  }
+
+  ///////// 
+  // below are older / original combat and health methods - separated to
+  // make implementation of the new combat system a bit simpler to manage; some may
+  // end up replaced while others may remain as support methods
 
   attack(otherEntity) {
     devTrace(3, `${this.type} attacking ${otherEntity.type}`, this, otherEntity);

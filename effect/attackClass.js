@@ -5,7 +5,7 @@ class Attack {
       defenderHitEffectGenerators = [],
       attackerHitEffectGenerators = [],
       defenderEvadeEffectGenerators = [],
-      attackerEvadeEffectGenerators = []
+      attackerEvadeEffectGenerators = [],
   ) {
       this.attacker = attacker;
       this.defender = defender;
