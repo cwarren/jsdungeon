@@ -134,6 +134,7 @@ So, primary new and modified objects are
 * * Damage is a specific type of Effect
 
 And the primary functions (methods on Entity intances) are:
+* createAttack(defender) - returns an Attack
 * getPrecision(Attack) - returns a number
 * getEvation(Attack) - returns a number
 * isAttackCritical(Attack) - returns true/false
@@ -145,4 +146,10 @@ Also static method on the Entity class
 * determnineAttackOutcome - returns HIT, CRITICAL_HIT, EVADE, CRITICAL_EVADE
 
 
-NOTE: 
+### flow
+
+1. attacker initiates an attack
+2. create an Attack instance using the entity's createAttack method
+2.1. populate at least the defenderHitEffectGenerators (for now this is enough)
+3. determine the attack outcome
+4. generate an apply each of the effects from the appropriate effectGenerators
