@@ -1,7 +1,7 @@
 import { EntityMovement, DEFAULT_MOVEMENT_SPEC, DEFAULT_MOVEMENT_ACTION_COST } from './entityMovementClass.js';
 import { WorldLevel } from '../world/worldLevelClass.js';
 import { Entity, DEFAULT_ACTION_COST } from './entityClass.js';
-import { Damager } from '../effect/damagerClass.js';
+import { EffGenDamage } from '../effect/effGenDamageClass.js';
 import { devTrace, constrainValue, rollDice, getRandomListItem } from '../util.js';
 import { gameState } from '../gameStateClass.js';
 import { uiPaneMessages, uiPaneInfo } from "../ui/ui.js";
@@ -56,7 +56,7 @@ describe('EntityMovement', () => {
     {
       type: "WORM_VINE", name: "Worm Vine", displaySymbol: "w", displayColor: "#6C4",
       viewRadius: 2, initialHealthRoll: "2d6+4", baseActionCost: 100, naturalHealingRate: .001,
-      meleeAttack: { damager: new Damager("1d3-1", [], 0), actionCost: 100 },
+      meleeAttack: { damager: new EffGenDamage("1d3-1", [], 0), actionCost: 100 },
       movementSpec: { movementType: "STEP_AIMLESS", actionCost: 100 },
       relations: {
         overrideFeelingsToOthers: {
@@ -68,7 +68,7 @@ describe('EntityMovement', () => {
     {
       type: "MOLD_PALE", name: "Pale Mold", displaySymbol: "m", displayColor: "#ddd",
       viewRadius: 2, initialHealthRoll: "2d6+4", baseActionCost: 210, naturalHealingRate: .002,
-      meleeAttack: { damager: new Damager("1d4-1", [], 0), actionCost: 80 },
+      meleeAttack: { damager: new EffGenDamage("1d4-1", [], 0), actionCost: 80 },
       movementSpec: { movementType: "STATIONARY", actionCost: 210 },
       relations: {
         overrideFeelingsToOthers: {
@@ -80,7 +80,7 @@ describe('EntityMovement', () => {
     {
       type: "RAT_MALIGN", name: "Malign Rat", displaySymbol: "r", displayColor: "#321",
       viewRadius: 4, initialHealthRoll: "3d4+6", baseActionCost: 100, naturalHealingRate: .001,
-      meleeAttack: { damager: new Damager("1d5", [], 0), actionCost: 100 },
+      meleeAttack: { damager: new EffGenDamage("1d5", [], 0), actionCost: 100 },
       movementSpec: { movementType: "WANDER_AGGRESSIVE", actionCost: 100 },
       relations: {
         overrideFeelingsToOthers: {

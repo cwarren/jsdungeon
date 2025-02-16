@@ -6,9 +6,9 @@ import { EntityLocation } from './entityLocationClass.js';
 import { EntityMovement } from './entityMovementClass.js';
 import { EntityVision } from './entityVisionClass.js';
 import { WorldLevel } from '../world/worldLevelClass.js';
-import { Damager } from '../effect/damagerClass.js';
+import { EffGenDamage } from '../effect/effGenDamageClass.js';
 import { uiPaneMessages } from "../ui/ui.js";
-import { Damage } from '../effect/damageClass.js';
+import { EffDamage } from '../effect/effDamageClass.js';
 
 // NOTE: many of these tests are more integration tests than unit tests
 
@@ -29,7 +29,7 @@ jest.mock('../gameStateClass.js', () => ({
     },
 }));
 
-const TEST_DAMAGE_SPEC = { damager: new Damager("1d6+4", [], 0), actionCost: 100 };
+const TEST_DAMAGE_SPEC = { damager: new EffGenDamage("1d6+4", [], 0), actionCost: 100 };
 
 const TEST_ENTITIES_DEFINITIONS = [
     {
@@ -40,7 +40,7 @@ const TEST_ENTITIES_DEFINITIONS = [
     {
       type: "MOLD_PALE", name: "Pale Mold", displaySymbol: "m", displayColor: "#ddd",
       viewRadius: 2, initialHealthRoll: "2d6+4", baseActionCost: 210, naturalHealingRate: .002,
-      meleeAttack: { damager: new Damager("1d4-1", [], 0), actionCost: 80 },
+      meleeAttack: { damager: new EffGenDamage("1d4-1", [], 0), actionCost: 80 },
       movementSpec: { movementType: "STATIONARY", actionCost: 210 },
       relations: {
         overrideFeelingsToOthers: {
@@ -52,7 +52,7 @@ const TEST_ENTITIES_DEFINITIONS = [
     {
       type: "WORM_VINE", name: "Worm Vine", displaySymbol: "w", displayColor: "#6C4",
       viewRadius: 2, initialHealthRoll: "2d6+4", baseActionCost: 100, naturalHealingRate: .001,
-      meleeAttack: { damager: new Damager("1d3-1", [], 0), actionCost: 100 },
+      meleeAttack: { damager: new EffGenDamage("1d3-1", [], 0), actionCost: 100 },
       movementSpec: { movementType: "STEP_AIMLESS", actionCost: 100 },
       relations: {
         overrideFeelingsToOthers: {
@@ -64,14 +64,14 @@ const TEST_ENTITIES_DEFINITIONS = [
     {
       type: "RAT_INSIDIOUS", name: "Insidious Rat", displaySymbol: "r", displayColor: "#654",
       viewRadius: 2, initialHealthRoll: "1d6+3", baseActionCost: 100, naturalHealingRate: .001,
-      meleeAttack: { damager: new Damager("1d3-1", [], 0), actionCost: 100 },
+      meleeAttack: { damager: new EffGenDamage("1d3-1", [], 0), actionCost: 100 },
       movementSpec: { movementType: "WANDER_AIMLESS", actionCost: 100 },
       relations: { iFeelAboutOthers: "NEUTRAL_TO" },
     },
     {
       type: "RAT_MALIGN", name: "Malign Rat", displaySymbol: "r", displayColor: "#321",
       viewRadius: 4, initialHealthRoll: "3d4+6", baseActionCost: 100, naturalHealingRate: .001,
-      meleeAttack: { damager: new Damager("1d5", [], 0), actionCost: 100 },
+      meleeAttack: { damager: new EffGenDamage("1d5", [], 0), actionCost: 100 },
       movementSpec: { movementType: "WANDER_AGGRESSIVE", actionCost: 100 },
       relations: {
         overrideFeelingsToOthers: {
@@ -221,7 +221,7 @@ describe('Entity', () => {
         const insidiousRat = new Entity('RAT_INSIDIOUS');
         expect(wormVine.getRelationshipTo(insidiousRat)).toBe("NEUTRAL_TO");
 
-        wormVine.takeDamageFrom(new Damage(2), insidiousRat);
+        wormVine.takeDamageFrom(new EffDamage(2), insidiousRat);
         expect(wormVine.getRelationshipTo(insidiousRat)).toBe("VIOLENT_TO");
     });
 });

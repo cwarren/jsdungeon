@@ -1,7 +1,7 @@
 import { Entity, DEFAULT_ACTION_COST } from "./entityClass.js";
 import { gameState } from "../gameStateClass.js";
 import { devTrace, rollDice } from "../util.js";
-import { Damage } from "../effect/damageClass.js";
+import { EffDamage } from "../effect/effDamageClass.js";
 import { uiPaneMessages } from "../ui/ui.js";
 
 
@@ -71,7 +71,7 @@ class Avatar extends Entity {
 
   getMeleeAttackDamage() {
     devTrace(6, "getting melee attack damage for avatar", this);
-    return new Damage(rollDice("1d4"));
+    return new EffDamage(rollDice("1d4"));
   }
 
   getMeleeAttackActionCost() {

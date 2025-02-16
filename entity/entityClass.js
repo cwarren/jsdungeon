@@ -1,5 +1,5 @@
 import { gameState } from "../gameStateClass.js";
-import { Damage } from "../effect/damageClass.js";
+import { EffDamage } from "../effect/effDamageClass.js";
 import { rollDice, getRandomListItem, constrainValue, devTrace, formatNumberForMessage } from "../util.js";
 import { ENTITIES_DEFINITIONS } from "./entityDefinitions.js";
 import { uiPaneMessages } from "../ui/ui.js";
@@ -271,7 +271,7 @@ class Entity {
 
   getAttackDamage() {
     devTrace(6, "getting attack damage for entity", this);
-    return new Damage(2);
+    return new EffDamage(2);
   }
 
   doMeleeAttackOn(otherEntity) {
@@ -286,8 +286,8 @@ class Entity {
 
   getMeleeAttackDamage() {
     devTrace(6, "getting melee attack damage for entity", this);
-    if (this.meleeAttack) { return this.meleeAttack.damager.getDamage(); }
-    return new Damage(0);
+    if (this.meleeAttack) { return this.meleeAttack.damager.getEffect(); }
+    return new EffDamage(0);
   }
 
   getMeleeAttackActionCost() {
