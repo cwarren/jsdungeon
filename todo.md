@@ -1,14 +1,11 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-implement / stub Entity methods:
-* beHit(Attack) - runs each hitEffectGenerator in the attack and calls applyHitEffect to attacker or defender as appropriate with given HitEffect
-* applyAttackEffect(sourceEntity, Effect)
-* * for Damage type effects, calls takeDamageFrom
-Also static method on the Entity class
-* determnineAttackOutcome - returns HIT, CRITICAL_HIT, EVADE, CRITICAL_EVADE
+* implement real (if basic) version of Entity.applyAttackEffect(sourceEntity, Effect)
 
-
+* update combat interactions to use new combat system
+* * update entity definitions to support new combat paradigm (precision, evasion, effect generators for hit, evade, etc.)
+* * rename supporting methods as needed
 
 
 * skills for entities / skill system

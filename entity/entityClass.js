@@ -272,6 +272,23 @@ class Entity {
     return atk;
   }
 
+  static determnineAttackOutcome(attack) {
+    const atkPrec = attack.attacker.getPrecision(attack);
+    const defEv = attack.defender.getEvasion(attack);
+    const combatRange = atkPrec + defEv;
+    const combatRoll = rollDice("1d"+combatRange);
+    if (combatRoll <= atkPrec) {
+      if (attack.attacker.isHitCritical(attack)) {
+        return "CRITICAL_HIT";
+      }
+      return "HIT";
+    }
+    if (attack.defender.isEvadeCritical(attack)) {
+      return "CRITICAL_EVADE";
+    }
+    return "EVADE";
+  }
+
   getPrecision(attack) {
     return 10;
   }
@@ -292,6 +309,28 @@ class Entity {
   }
   getCriticalEvadeThreshold() {
     return 2;
+  }
+
+  beHit(attack) {
+    attack.defenderHitEffectGenerators.forEach( effGen => {
+      attack.defender.applyAttackEffect(attack.attacker, effGen.getEffect());
+    });
+    attack.attackerHitEffectGenerators.forEach(effGen => {
+      attack.attacker.applyAttackEffect(attack.defender, effGen.getEffect());
+    });
+  }
+
+  evadeHit(attack) {
+    attack.defenderEvadeEffectGenerators.forEach( effGen => {
+      attack.defender.applyAttackEffect(attack.attacker, effGen.getEffect());
+    });
+    attack.attackerEvadeEffectGenerators.forEach(effGen => {
+      attack.attacker.applyAttackEffect(attack.defender, effGen.getEffect());
+    });
+  }
+
+  applyAttackEffect(effectSource, effect) {
+    return null;
   }
 
   ///////// 

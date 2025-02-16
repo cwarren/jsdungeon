@@ -149,79 +149,186 @@ describe('Entity', () => {
       attack = attacker.createAttack(defender);
     });
 
-    test('should die and remove entity from world', () => {
-      entity.getDeathCredits = jest.fn(() => []);
-      entity.placeAtCell(gameState.world[0].grid[5][6]);
-      gameState.world[0].levelEntities = [entity];
-      entity.die();
-      expect(gameState.world[0].levelEntities).toEqual([]);
-      expect(uiPaneMessages.addMessage).toHaveBeenCalledWith('Test Entity 1 dies');
+    describe('Entity - Combat - death', () => {
+      test('should die and remove entity from world', () => {
+        entity.getDeathCredits = jest.fn(() => []);
+        entity.placeAtCell(gameState.world[0].grid[5][6]);
+        gameState.world[0].levelEntities = [entity];
+        entity.die();
+        expect(gameState.world[0].levelEntities).toEqual([]);
+        expect(uiPaneMessages.addMessage).toHaveBeenCalledWith('Test Entity 1 dies');
+      });
+
+      test('should calculate death credits correctly', () => {
+        entity.damagedBy = [
+          { damageSource: 'source1', damage: { amount: 30 } },
+          { damageSource: 'source2', damage: { amount: 70 } },
+        ];
+        const deathCredits = entity.getDeathCredits();
+        expect(deathCredits).toEqual([
+          { damageSource: 'source1', proportionalDamage: 0.3 },
+          { damageSource: 'source2', proportionalDamage: 0.7 },
+        ]);
+      });
+
+      test('death credits should return empty array if no damage dealt', () => {
+        entity.damagedBy = [];
+        const deathCredits = entity.getDeathCredits();
+        expect(deathCredits).toEqual([]);
+      });
     });
 
-    test('should calculate death credits correctly', () => {
-      entity.damagedBy = [
-        { damageSource: 'source1', damage: { amount: 30 } },
-        { damageSource: 'source2', damage: { amount: 70 } },
-      ];
-      const deathCredits = entity.getDeathCredits();
-      expect(deathCredits).toEqual([
-        { damageSource: 'source1', proportionalDamage: 0.3 },
-        { damageSource: 'source2', proportionalDamage: 0.7 },
-      ]);
+    describe('Entity - Combat - support methods', () => {
+
+      test('should create Attack correctly', () => {
+        expect(attack).toBeInstanceOf(Attack);
+        expect(attack.attacker).toBe(attacker);
+        expect(attack.defender).toBe(defender);
+        expect(attack.defenderHitEffectGenerators).toEqual([attacker.meleeAttack.damager]);
+        expect(attack.attackerHitEffectGenerators).toEqual([]);
+        expect(attack.defenderEvadeEffectGenerators).toEqual([]);
+        expect(attack.attackerEvadeEffectGenerators).toEqual([]);
+      });
+
+      test('should get precision for an attack', () => {
+        const precision = attacker.getPrecision(attack);
+        expect(precision).toBeGreaterThan(0);
+      });
+
+      test('should get evasion for an attack', () => {
+        const evasion = attacker.getEvasion(attack);
+        expect(evasion).toBeGreaterThan(0);
+      });
+
+      test('should determine whether hit was critical', () => {
+        jest.spyOn(attacker, 'getCriticalHitThreshold').mockReturnValue(2);
+
+        rollDice.mockReturnValue(74);
+        expect(attacker.isHitCritical(attack)).toEqual(false);
+        expect(attacker.getCriticalHitThreshold).toHaveBeenCalled();
+
+        rollDice.mockReturnValue(1);
+        expect(attacker.isHitCritical(attack)).toEqual(true);
+      });
+
+      test('should determine whether evade was critical', () => {
+        jest.spyOn(defender, 'getCriticalEvadeThreshold').mockReturnValue(2);
+
+        rollDice.mockReturnValue(74);
+        expect(defender.isEvadeCritical(attack)).toEqual(false);
+        expect(defender.getCriticalEvadeThreshold).toHaveBeenCalled();
+
+        rollDice.mockReturnValue(1);
+        expect(defender.isEvadeCritical(attack)).toEqual(true);
+      });
     });
 
-    test('death credits should return empty array if no damage dealt', () => {
-      entity.damagedBy = [];
-      const deathCredits = entity.getDeathCredits();
-      expect(deathCredits).toEqual([]);
+    describe('Entity - Combat - attack outcomes', () => {
+      test('should correctly determine attack outcome - basic hit', () => {
+        jest.spyOn(attacker, 'getPrecision').mockReturnValue(10);
+        jest.spyOn(attacker, 'isHitCritical').mockReturnValue(false);
+        jest.spyOn(defender, 'getEvasion').mockReturnValue(5);
+        jest.spyOn(defender, 'isEvadeCritical').mockReturnValue(false);
+        rollDice.mockReturnValue(7);
+
+        const outcome = Entity.determnineAttackOutcome(attack);
+        expect(outcome).toBe('HIT');
+      });
+
+      test('should correctly determine attack outcome - critical hit', () => {
+        jest.spyOn(attacker, 'getPrecision').mockReturnValue(10);
+        jest.spyOn(attacker, 'isHitCritical').mockReturnValue(true);
+        jest.spyOn(defender, 'getEvasion').mockReturnValue(5);
+        jest.spyOn(defender, 'isEvadeCritical').mockReturnValue(false);
+        rollDice.mockReturnValue(7);
+
+        const outcome = Entity.determnineAttackOutcome(attack);
+        expect(outcome).toBe('CRITICAL_HIT');
+      });
+
+      test('should correctly determine attack outcome - basic evade', () => {
+        jest.spyOn(attacker, 'getPrecision').mockReturnValue(10);
+        jest.spyOn(attacker, 'isHitCritical').mockReturnValue(false);
+        jest.spyOn(defender, 'getEvasion').mockReturnValue(5);
+        jest.spyOn(defender, 'isEvadeCritical').mockReturnValue(false);
+        rollDice.mockReturnValue(12);
+
+        const outcome = Entity.determnineAttackOutcome(attack);
+        expect(outcome).toBe('EVADE');
+      });
+
+      test('should correctly determine attack outcome - critical evade', () => {
+        jest.spyOn(attacker, 'getPrecision').mockReturnValue(10);
+        jest.spyOn(attacker, 'isHitCritical').mockReturnValue(false);
+        jest.spyOn(defender, 'getEvasion').mockReturnValue(5);
+        jest.spyOn(defender, 'isEvadeCritical').mockReturnValue(true);
+        rollDice.mockReturnValue(12);
+
+        const outcome = Entity.determnineAttackOutcome(attack);
+        expect(outcome).toBe('CRITICAL_EVADE');
+      });
     });
 
-    // test('', () => {});
+    describe('Entity - Combat - hitting and evadig', () => {
 
-    test('should create Attack correctly', () => {
-      expect(attack).toBeInstanceOf(Attack);
-      expect(attack.attacker).toBe(attacker);
-      expect(attack.defender).toBe(defender);
-      expect(attack.defenderHitEffectGenerators).toEqual([attacker.meleeAttack.damager]);
-      expect(attack.attackerHitEffectGenerators).toEqual([]);
-      expect(attack.defenderEvadeEffectGenerators).toEqual([]);
-      expect(attack.attackerEvadeEffectGenerators).toEqual([]);
+      let defenderHitEffectGenerator;
+      let attackerHitEffectGenerator;
+      let defenderEvadeEffectGenerator;
+      let attackerEvadeEffectGenerator;
+      let mockEffDam_defHit;
+      let mockEffDam_atkHit;
+      let mockEffDam_defEv;
+      let mockEffDam_atkEv;
+
+      beforeEach(() => {
+        defenderHitEffectGenerator = new EffGenDamage("1d1");
+        attackerHitEffectGenerator = new EffGenDamage("2d1");
+        defenderEvadeEffectGenerator = new EffGenDamage("3d1");
+        attackerEvadeEffectGenerator = new EffGenDamage("4d1");
+        attack.defenderHitEffectGenerators = [defenderHitEffectGenerator];
+        attack.addAttackerHitEffectGenerator(attackerHitEffectGenerator);
+        attack.addDefenderEvadeEffectGenerator(defenderEvadeEffectGenerator);
+        attack.addAttackerEvadeEffectGenerator(attackerEvadeEffectGenerator);
+        mockEffDam_defHit = new EffDamage(1);
+        mockEffDam_atkHit = new EffDamage(2);
+        mockEffDam_defEv = new EffDamage(3);
+        mockEffDam_atkEv = new EffDamage(4);
+        jest.spyOn(defenderHitEffectGenerator, "getEffect").mockReturnValue(mockEffDam_defHit);
+        jest.spyOn(attackerHitEffectGenerator, "getEffect").mockReturnValue(mockEffDam_atkHit);
+        jest.spyOn(defenderEvadeEffectGenerator, "getEffect").mockReturnValue(mockEffDam_defEv);
+        jest.spyOn(attackerEvadeEffectGenerator, "getEffect").mockReturnValue(mockEffDam_atkEv);
+      });
+
+      test('should apply hit effects on hit', () => {
+        jest.spyOn(defender, 'applyAttackEffect');
+        jest.spyOn(attacker, 'applyAttackEffect');
+
+        defender.beHit(attack);
+
+        expect(defenderHitEffectGenerator.getEffect).toHaveBeenCalled();
+        expect(attackerHitEffectGenerator.getEffect).toHaveBeenCalled();
+        expect(defenderEvadeEffectGenerator.getEffect).not.toHaveBeenCalled();
+        expect(attackerEvadeEffectGenerator.getEffect).not.toHaveBeenCalled();
+        expect(defender.applyAttackEffect).toHaveBeenCalledWith(attacker, mockEffDam_defHit);
+        expect(attacker.applyAttackEffect).toHaveBeenCalledWith(defender, mockEffDam_atkHit);
+      });
+
+      test('should apply evade effects on evade', () => {
+        jest.spyOn(defender, 'applyAttackEffect');
+        jest.spyOn(attacker, 'applyAttackEffect');
+
+        defender.evadeHit(attack);
+
+        expect(defenderHitEffectGenerator.getEffect).not.toHaveBeenCalled();
+        expect(attackerHitEffectGenerator.getEffect).not.toHaveBeenCalled();
+        expect(defenderEvadeEffectGenerator.getEffect).toHaveBeenCalled();
+        expect(attackerEvadeEffectGenerator.getEffect).toHaveBeenCalled();
+
+        expect(defender.applyAttackEffect).toHaveBeenCalledWith(attacker, mockEffDam_defEv);
+        expect(attacker.applyAttackEffect).toHaveBeenCalledWith(defender, mockEffDam_atkEv);
+      });
     });
 
-    test('should get precision for an attack', () => {
-      const precision = attacker.getPrecision(attack);
-      expect(precision).toBeGreaterThan(0);
-    });
-
-    test('should get evasion for an attack', () => {
-      const evasion = attacker.getPrecision(attack);
-      expect(evasion).toBeGreaterThan(0);
-    });
-
-    test('should determine whether hit was critical', () => {
-      jest.spyOn(attacker, 'getCriticalHitThreshold').mockReturnValue(2);
-
-      rollDice.mockReturnValue(74);
-      expect(attacker.isHitCritical(attack)).toEqual(false);
-      expect(attacker.getCriticalHitThreshold).toHaveBeenCalled();
-
-      rollDice.mockReturnValue(1);
-      expect(attacker.isHitCritical(attack)).toEqual(true);
-    });
-
-    test('should determine whether evade was critical', () => {
-      jest.spyOn(defender, 'getCriticalEvadeThreshold').mockReturnValue(2);
-
-      rollDice.mockReturnValue(74);
-      expect(defender.isEvadeCritical(attack)).toEqual(false);
-      expect(defender.getCriticalEvadeThreshold).toHaveBeenCalled();
-
-      rollDice.mockReturnValue(1);
-      expect(defender.isEvadeCritical(attack)).toEqual(true);
-    });
-
-    // test('', () => { });
-    // test('', () => { });
     // test('', () => { });
     // test('', () => { });
 
