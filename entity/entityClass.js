@@ -270,30 +270,13 @@ class Entity {
     // NOTE: probably need to pass in some kind of additional attackType param or something to be able
     // to know what dam generators to create and how; maybe 'melee' vs 'ranged' is sufficient for now...?
     // Or maybe pass in the attack weapon? That sounds better off hand...
-    
+
     const atk = new Attack(
       this,
       defender,
       [this.meleeAttack.damager],
     );
     return atk;
-  }
-
-  static determnineAttackOutcome(attack) {
-    const atkPrec = attack.attacker.getPrecision(attack);
-    const defEv = attack.defender.getEvasion(attack);
-    const combatRange = atkPrec + defEv;
-    const combatRoll = rollDice("1d"+combatRange);
-    if (combatRoll <= atkPrec) {
-      if (attack.attacker.isHitCritical(attack)) {
-        return "CRITICAL_HIT";
-      }
-      return "HIT";
-    }
-    if (attack.defender.isEvadeCritical(attack)) {
-      return "CRITICAL_EVADE";
-    }
-    return "EVADE";
   }
 
   getPrecision(attack) {
@@ -319,7 +302,8 @@ class Entity {
   }
 
   beHit(attack) {
-    attack.defenderHitEffectGenerators.forEach( effGen => {
+    console.log('beHit attack', attack);
+    attack.defenderHitEffectGenerators.forEach(effGen => {
       attack.defender.applyAttackEffect(attack.attacker, effGen.getEffect());
     });
     attack.attackerHitEffectGenerators.forEach(effGen => {
@@ -328,7 +312,7 @@ class Entity {
   }
 
   evadeHit(attack) {
-    attack.defenderEvadeEffectGenerators.forEach( effGen => {
+    attack.defenderEvadeEffectGenerators.forEach(effGen => {
       attack.defender.applyAttackEffect(attack.attacker, effGen.getEffect());
     });
     attack.attackerEvadeEffectGenerators.forEach(effGen => {
@@ -374,6 +358,24 @@ class Entity {
     return null;
   }
 
+
+  doMeleeAttackOn(otherEntity) {
+    devTrace(3, `${this.type} doing melee attack on ${otherEntity.type}`, this, otherEntity);
+    if (this.meleeAttack) {
+      otherEntity.takeDamageFrom(this.getMeleeAttackDamage(), this);
+      return this.getMeleeAttackActionCost();
+    }
+    // if (this.meleeAttack) {
+    //   // create attack
+    //   // determine attack outcome
+    //   // - message outcome
+    //   // defender beHit or evadeHit based on outcome
+    //   return this.getMeleeAttackActionCost();
+    // }
+    devTrace(4, `${this.type} has no melee attack`);
+    return 0;
+  }
+
   ///////// 
   // below are older / original combat and health methods - separated to
   // make implementation of the new combat system a bit simpler to manage; some may
@@ -391,15 +393,15 @@ class Entity {
     return new EffDamage(2);
   }
 
-  doMeleeAttackOn(otherEntity) {
-    devTrace(3, `${this.type} doing melee attack on ${otherEntity.type}`, this, otherEntity);
-    if (this.meleeAttack) {
-      otherEntity.takeDamageFrom(this.getMeleeAttackDamage(), this);
-      return this.getMeleeAttackActionCost();
-    }
-    devTrace(4, `${this.type} has no melee attack`);
-    return 0;
-  }
+  // doMeleeAttackOn(otherEntity) {
+  //   devTrace(3, `${this.type} doing melee attack on ${otherEntity.type}`, this, otherEntity);
+  //   if (this.meleeAttack) {
+  //     otherEntity.takeDamageFrom(this.getMeleeAttackDamage(), this);
+  //     return this.getMeleeAttackActionCost();
+  //   }
+  //   devTrace(4, `${this.type} has no melee attack`);
+  //   return 0;
+  // }
 
   getMeleeAttackDamage() {
     devTrace(6, "getting melee attack damage for entity", this);

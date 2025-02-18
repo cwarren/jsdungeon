@@ -150,6 +150,13 @@ describe('Entity', () => {
     });
 
     describe('Entity - Combat - death', () => {
+      
+      beforeEach(() => {
+        attacker = new Entity('RAT_MALIGN');
+        defender = new Entity('WORM_VINE');
+        attack = attacker.createAttack(defender);
+      });
+
       test('should die and remove entity from world', () => {
         entity.getDeathCredits = jest.fn(() => []);
         entity.placeAtCell(gameState.world[0].grid[5][6]);
@@ -179,6 +186,12 @@ describe('Entity', () => {
     });
 
     describe('Entity - Combat - support methods', () => {
+
+      beforeEach(() => {
+        attacker = new Entity('RAT_MALIGN');
+        defender = new Entity('WORM_VINE');
+        attack = attacker.createAttack(defender);
+      });
 
       test('should create Attack correctly', () => {
         expect(attack).toBeInstanceOf(Attack);
@@ -223,52 +236,6 @@ describe('Entity', () => {
       });
     });
 
-    describe('Entity - Combat - attack outcomes', () => {
-      test('should correctly determine attack outcome - basic hit', () => {
-        jest.spyOn(attacker, 'getPrecision').mockReturnValue(10);
-        jest.spyOn(attacker, 'isHitCritical').mockReturnValue(false);
-        jest.spyOn(defender, 'getEvasion').mockReturnValue(5);
-        jest.spyOn(defender, 'isEvadeCritical').mockReturnValue(false);
-        rollDice.mockReturnValue(7);
-
-        const outcome = Entity.determnineAttackOutcome(attack);
-        expect(outcome).toBe('HIT');
-      });
-
-      test('should correctly determine attack outcome - critical hit', () => {
-        jest.spyOn(attacker, 'getPrecision').mockReturnValue(10);
-        jest.spyOn(attacker, 'isHitCritical').mockReturnValue(true);
-        jest.spyOn(defender, 'getEvasion').mockReturnValue(5);
-        jest.spyOn(defender, 'isEvadeCritical').mockReturnValue(false);
-        rollDice.mockReturnValue(7);
-
-        const outcome = Entity.determnineAttackOutcome(attack);
-        expect(outcome).toBe('CRITICAL_HIT');
-      });
-
-      test('should correctly determine attack outcome - basic evade', () => {
-        jest.spyOn(attacker, 'getPrecision').mockReturnValue(10);
-        jest.spyOn(attacker, 'isHitCritical').mockReturnValue(false);
-        jest.spyOn(defender, 'getEvasion').mockReturnValue(5);
-        jest.spyOn(defender, 'isEvadeCritical').mockReturnValue(false);
-        rollDice.mockReturnValue(12);
-
-        const outcome = Entity.determnineAttackOutcome(attack);
-        expect(outcome).toBe('EVADE');
-      });
-
-      test('should correctly determine attack outcome - critical evade', () => {
-        jest.spyOn(attacker, 'getPrecision').mockReturnValue(10);
-        jest.spyOn(attacker, 'isHitCritical').mockReturnValue(false);
-        jest.spyOn(defender, 'getEvasion').mockReturnValue(5);
-        jest.spyOn(defender, 'isEvadeCritical').mockReturnValue(true);
-        rollDice.mockReturnValue(12);
-
-        const outcome = Entity.determnineAttackOutcome(attack);
-        expect(outcome).toBe('CRITICAL_EVADE');
-      });
-    });
-
     describe('Entity - Combat - hitting and evading', () => {
 
       let defenderHitEffectGenerator;
@@ -281,6 +248,11 @@ describe('Entity', () => {
       let mockEffDam_atkEv;
 
       beforeEach(() => {
+        attacker = new Entity('RAT_MALIGN');
+        defender = new Entity('WORM_VINE');
+        attacker.health.curHealth = 10;
+        defender.health.curHealth = 10;
+        attack = attacker.createAttack(defender);
         defenderHitEffectGenerator = new EffGenDamage("1d1");
         attackerHitEffectGenerator = new EffGenDamage("2d1");
         defenderEvadeEffectGenerator = new EffGenDamage("3d1");
@@ -336,6 +308,8 @@ describe('Entity', () => {
       beforeEach(() => {
         attacker = new Entity('RAT_MALIGN');
         defender = new Entity('WORM_VINE');
+        attacker.health.curHealth = 10;
+        defender.health.curHealth = 10;
         mockEffDam_defHit = new EffDamage(5);
         jest.spyOn(defender.health, 'takeDamage'); // Spy on health damage function
         jest.spyOn(defender.movement, 'interruptOngoingMovement'); // Spy on movement interruption
@@ -406,6 +380,10 @@ describe('Entity', () => {
       let mockEffDam_defHit;
 
       beforeEach(() => {
+        attacker = new Entity('RAT_MALIGN');
+        defender = new Entity('WORM_VINE');
+        attacker.health.curHealth = 10;
+        defender.health.curHealth = 10;
         mockEffDam_defHit = new EffDamage(1);
       });
 

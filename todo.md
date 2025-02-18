@@ -2,6 +2,8 @@ to start server:
 PS E:\code\jsdungeon> docker-compose up --build
 
 IMPORTANT! DON'T OVER-COMPLICATE THIS FOR INITIAL IMPLEMENTATION!
+* move determnineAttackOutcome into Attack class
+* * add an outcome field to the class
 * update combat interactions to use new combat system
 * * implement new combat flow (see stats_and_combat notes)
 * * update entity definitions to support new combat paradigm (precision, evasion, effect generators for hit, evade, etc.)
@@ -14,6 +16,19 @@ IMPORTANT! DON'T OVER-COMPLICATE THIS FOR INITIAL IMPLEMENTATION!
 * * getPrecision
 * * getEvasion
 * * damage generation (in createAttack method)
+
+* messages
+* * for gaining advancement points
+* * for blocked actions / commands, with why
+* * * stairs don't exists
+* * * wall in the way
+* * * can't run while adjacent to stairs
+* * * can't run while adjacent to entity
+* * * can't sleep while adjacent to entity
+
+* figure out where and how to handle critical hits and evades
+* * special effect generation?
+* * double normal effects?
 
 * skills for entities / skill system
 * * what they are

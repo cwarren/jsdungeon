@@ -1,4 +1,10 @@
 import { Attack } from './attackClass.js';
+import { rollDice } from '../util.js';
+
+jest.mock('../util.js', () => ({
+    rollDice: jest.fn(),
+    devTrace: jest.fn(),
+  }));
 
 describe('Attack', () => {
     let attacker;
@@ -6,8 +12,8 @@ describe('Attack', () => {
     let attack;
 
     beforeEach(() => {
-        attacker = { name: "Attacker" };
-        defender = { name: "Defender" };
+        attacker = { name: "Attacker", getPrecision: jest.fn(), isHitCritical: jest.fn() };
+        defender = { name: "Defender", getEvasion: jest.fn(), isEvadeCritical: jest.fn() };
         attack = new Attack(attacker, defender);
     });
 
@@ -64,4 +70,50 @@ describe('Attack', () => {
         expect(attackWithEffects.defenderEvadeEffectGenerators).toContain(evadeEffect1);
         expect(attackWithEffects.attackerEvadeEffectGenerators).toContain(evadeEffect2);
     });
+
+    describe('Attack outcomes', () => {
+        test('should correctly determine attack outcome - basic hit', () => {
+          jest.spyOn(attacker, 'getPrecision').mockReturnValue(10);
+          jest.spyOn(attacker, 'isHitCritical').mockReturnValue(false);
+          jest.spyOn(defender, 'getEvasion').mockReturnValue(5);
+          jest.spyOn(defender, 'isEvadeCritical').mockReturnValue(false);
+          rollDice.mockReturnValue(7);
+  
+          attack.determineAttackOutcome();
+          expect(attack.outcome).toBe('HIT');
+        });
+  
+        test('should correctly determine attack outcome - critical hit', () => {
+          jest.spyOn(attacker, 'getPrecision').mockReturnValue(10);
+          jest.spyOn(attacker, 'isHitCritical').mockReturnValue(true);
+          jest.spyOn(defender, 'getEvasion').mockReturnValue(5);
+          jest.spyOn(defender, 'isEvadeCritical').mockReturnValue(false);
+          rollDice.mockReturnValue(7);
+  
+          attack.determineAttackOutcome();
+          expect(attack.outcome).toBe('CRITICAL_HIT');
+        });
+  
+        test('should correctly determine attack outcome - basic evade', () => {
+          jest.spyOn(attacker, 'getPrecision').mockReturnValue(10);
+          jest.spyOn(attacker, 'isHitCritical').mockReturnValue(false);
+          jest.spyOn(defender, 'getEvasion').mockReturnValue(5);
+          jest.spyOn(defender, 'isEvadeCritical').mockReturnValue(false);
+          rollDice.mockReturnValue(12);
+  
+          attack.determineAttackOutcome();
+          expect(attack.outcome).toBe('EVADE');
+        });
+  
+        test('should correctly determine attack outcome - critical evade', () => {
+          jest.spyOn(attacker, 'getPrecision').mockReturnValue(10);
+          jest.spyOn(attacker, 'isHitCritical').mockReturnValue(false);
+          jest.spyOn(defender, 'getEvasion').mockReturnValue(5);
+          jest.spyOn(defender, 'isEvadeCritical').mockReturnValue(true);
+          rollDice.mockReturnValue(12);
+  
+          attack.determineAttackOutcome();
+          expect(attack.outcome).toBe('CRITICAL_EVADE');
+        });
+      });
 });
