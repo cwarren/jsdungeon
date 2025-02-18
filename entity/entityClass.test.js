@@ -269,7 +269,7 @@ describe('Entity', () => {
       });
     });
 
-    describe('Entity - Combat - hitting and evadig', () => {
+    describe('Entity - Combat - hitting and evading', () => {
 
       let defenderHitEffectGenerator;
       let attackerHitEffectGenerator;
@@ -327,6 +327,98 @@ describe('Entity', () => {
         expect(defender.applyAttackEffect).toHaveBeenCalledWith(attacker, mockEffDam_defEv);
         expect(attacker.applyAttackEffect).toHaveBeenCalledWith(defender, mockEffDam_atkEv);
       });
+    });
+
+    describe('Entity - Combat - taking damage', () => {
+
+      let mockEffDam_defHit;
+
+      beforeEach(() => {
+        attacker = new Entity('RAT_MALIGN');
+        defender = new Entity('WORM_VINE');
+        mockEffDam_defHit = new EffDamage(5);
+        jest.spyOn(defender.health, 'takeDamage'); // Spy on health damage function
+        jest.spyOn(defender.movement, 'interruptOngoingMovement'); // Spy on movement interruption
+        jest.spyOn(defender, 'die'); // Spy on death function
+      });
+
+      test('should correctly apply damage', () => {
+        defender.takeDamageFrom(mockEffDam_defHit, attacker);
+        expect(defender.health.takeDamage).toHaveBeenCalledWith(5);
+      });
+
+      test('should add damage source to damagedBy if first attack', () => {
+        defender.takeDamageFrom(mockEffDam_defHit, attacker);
+        expect(defender.damagedBy).toEqual([{ damageSource: attacker, damage: mockEffDam_defHit }]);
+      });
+
+      test('should accumulate damage for repeated attacks', () => {
+        defender.takeDamageFrom(mockEffDam_defHit, attacker);
+        defender.takeDamageFrom(new EffDamage(3), attacker);
+        expect(defender.damagedBy.length).toBe(1);
+        expect(defender.damagedBy[0].damage.amount).toBe(8);
+      });
+
+      test('should add a new entry for a different attacker', () => {
+        const secondAttacker = new Entity('RAT_INSIDIOUS');
+        defender.takeDamageFrom(mockEffDam_defHit, attacker);
+        defender.takeDamageFrom(new EffDamage(4), secondAttacker);
+        expect(defender.damagedBy.length).toBe(2);
+        expect(defender.damagedBy).toEqual([
+          { damageSource: attacker, damage: expect.objectContaining({ amount: 5 }) },
+          { damageSource: secondAttacker, damage: expect.objectContaining({ amount: 4 }) },
+        ]);
+      });
+
+      test('should log damage message to UI', () => {
+        defender.takeDamageFrom(mockEffDam_defHit, attacker);
+        expect(uiPaneMessages.addMessage).toHaveBeenCalledWith('Worm Vine takes 5 damage from Malign Rat');
+      });
+
+      test('should interrupt ongoing movement when taking damage', () => {
+        defender.takeDamageFrom(mockEffDam_defHit, attacker);
+        expect(defender.movement.interruptOngoingMovement).toHaveBeenCalled();
+      });
+
+      test('should not die if health remains above zero', () => {
+        defender.health.curHealth = 10; // Set health above damage amount
+        defender.takeDamageFrom(mockEffDam_defHit, attacker);
+        expect(defender.die).not.toHaveBeenCalled();
+      });
+
+      test('should die if damage exceeds current health', () => {
+        defender.die = jest.fn();
+        defender.health.curHealth = 4; // Less than damage
+        defender.takeDamageFrom(mockEffDam_defHit, attacker);
+        expect(defender.die).toHaveBeenCalled();
+      });
+
+      test('should constrain damage to defender\'s remaining health + 1', () => {
+        defender.die = jest.fn();
+        defender.health.curHealth = 3;
+        defender.takeDamageFrom(mockEffDam_defHit, attacker);
+        expect(defender.health.takeDamage).toHaveBeenCalledWith(4); // Max allowed damage is 3 + 1
+      });
+    });
+
+    describe('Entity - Combat - applying effects', () => {
+
+      let mockEffDam_defHit;
+
+      beforeEach(() => {
+        mockEffDam_defHit = new EffDamage(1);
+      });
+
+      test('applying a damage effect should result in taking damage', () => {
+        jest.spyOn(defender, "takeDamageFrom");
+
+        defender.applyAttackEffect(attacker, mockEffDam_defHit);
+
+        expect(defender.takeDamageFrom).toHaveBeenCalledWith(mockEffDam_defHit, attacker);
+      });
+
+
+
     });
 
     // test('', () => { });

@@ -261,9 +261,16 @@ class Entity {
   }
 
   // ------------------
-  // ACTIONS - COMBAT & HEALTH
+  // COMBAT & HEALTH
 
   createAttack(defender) {
+    // TODO: implement customizations / extensions to effect generators here?
+    // E.g. a melee attack damage effect generator gen's damage based on wielded weapon, stats, temp mods, etc.
+
+    // NOTE: probably need to pass in some kind of additional attackType param or something to be able
+    // to know what dam generators to create and how; maybe 'melee' vs 'ranged' is sufficient for now...?
+    // Or maybe pass in the attack weapon? That sounds better off hand...
+    
     const atk = new Attack(
       this,
       defender,
@@ -330,6 +337,40 @@ class Entity {
   }
 
   applyAttackEffect(effectSource, effect) {
+    if (effect instanceof EffDamage) {
+      return this.takeDamageFrom(effect, effectSource);
+    }
+
+    console.log(`Unknown or unhandled effect type: ${effect.constructor.name}`);
+
+    return null;
+  }
+
+  takeDamageFrom(dam, otherEntity) {
+    devTrace(4, "taking attack damage from entity", this, dam, otherEntity);
+
+    // future: add damage mitigation here...? (base on effect.types?)
+
+    dam.amount = constrainValue(dam.amount, 0, this.health.curHealth + 1);
+
+    this.health.takeDamage(dam.amount);
+
+    let existingEntry = this.damagedBy.find(entry => entry.damageSource === otherEntity);
+    if (existingEntry) {
+      existingEntry.damage.amount += dam.amount;
+    } else {
+      this.damagedBy.push({ "damageSource": otherEntity, "damage": new EffDamage(dam.amount) });
+    }
+
+    uiPaneMessages.addMessage(`${this.name} takes ${formatNumberForMessage(dam.amount)} damage from ${otherEntity.name}`);
+
+    // Reset movement plans on damage
+    this.movement.interruptOngoingMovement();
+
+    if (!this.health.isAlive()) {
+      this.die();
+    }
+
     return null;
   }
 
@@ -370,28 +411,6 @@ class Entity {
     devTrace(6, "getting melee attack action cost for entity", this);
     if (this.meleeAttack) { return this.meleeAttack.actionCost; }
     return DEFAULT_ACTION_COST;
-  }
-
-  takeDamageFrom(dam, otherEntity) {
-    devTrace(4, "taking attack damage from entity", this, dam, otherEntity);
-    dam.amount = constrainValue(dam.amount, 0, this.health.curHealth + 1);
-    this.health.takeDamage(dam.amount);
-
-    let existingEntry = this.damagedBy.find(entry => entry.damageSource === otherEntity);
-    if (existingEntry) {
-      existingEntry.damage.amount += dam.amount;
-    } else {
-      this.damagedBy.push({ "damageSource": otherEntity, "damage": dam });
-    }
-
-    uiPaneMessages.addMessage(`${this.name} takes ${formatNumberForMessage(dam.amount)} damage from ${otherEntity.name}`);
-
-    // Reset movement plans on damage
-    this.movement.interruptOngoingMovement();
-
-    if (!this.health.isAlive()) {
-      this.die();
-    }
   }
 
   // assign death credits, remove this entity from the game

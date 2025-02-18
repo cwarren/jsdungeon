@@ -1,14 +1,6 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* implement real (if basic) version of Entity.applyAttackEffect(sourceEntity, Effect)
-* * if effect is EffDamage, pass on to takeDamageFrom
-* * otherwise, log unknown effect
-* * test / validate that applying EffDamage results in call to takeDamageFrom
-* * * NOTE: entity needs a test specifically for takeDamageFrom! implement that first! Then, can rely on it working correctly when called
-* * * * results in reduced health
-* * * * results in correct blame assignment
-
 IMPORTANT! DON'T OVER-COMPLICATE THIS FOR INITIAL IMPLEMENTATION!
 * update combat interactions to use new combat system
 * * implement new combat flow (see stats_and_combat notes)
@@ -16,6 +8,12 @@ IMPORTANT! DON'T OVER-COMPLICATE THIS FOR INITIAL IMPLEMENTATION!
 * * rename supporting methods as needed
 * * create additional supporting methods as needed
 
+* setup stats for entities
+
+* implement primary combat support Entity methods to use stats
+* * getPrecision
+* * getEvasion
+* * damage generation (in createAttack method)
 
 * skills for entities / skill system
 * * what they are
