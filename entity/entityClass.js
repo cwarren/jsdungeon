@@ -274,7 +274,7 @@ class Entity {
     const atk = new Attack(
       this,
       defender,
-      [this.meleeAttack.damager],
+      [this.meleeAttack.damager], // TODO NEXT: replace this with a call to getMeleeHitEffects(), which Avatar needs to override
     );
     return atk;
   }
@@ -358,55 +358,22 @@ class Entity {
     return null;
   }
 
-
   doMeleeAttackOn(otherEntity) {
     devTrace(3, `${this.type} doing melee attack on ${otherEntity.type}`, this, otherEntity);
     if (this.meleeAttack) {
-      otherEntity.takeDamageFrom(this.getMeleeAttackDamage(), this);
+      const atk = this.createAttack(otherEntity);
+      atk.determineAttackOutcome();
+      atk.sendMessageAboutAttackOutcome(uiPaneMessages); // TODO NEXT: replace this with a showAttackMessages(atk, pane) call, which the avatar overrides (send message only if attacker or defender is visible)
+      if (atk.outcome == 'HIT' || atk.outcome == 'CRITICAL_HIT' ) {
+        otherEntity.beHit(atk);
+      } else {
+        otherEntity.evadeHit(atk);
+      }
+
       return this.getMeleeAttackActionCost();
     }
-    // if (this.meleeAttack) {
-    //   // create attack
-    //   // determine attack outcome
-    //   // - message outcome
-    //   // defender beHit or evadeHit based on outcome
-    //   return this.getMeleeAttackActionCost();
-    // }
     devTrace(4, `${this.type} has no melee attack`);
     return 0;
-  }
-
-  ///////// 
-  // below are older / original combat and health methods - separated to
-  // make implementation of the new combat system a bit simpler to manage; some may
-  // end up replaced while others may remain as support methods
-
-  attack(otherEntity) {
-    devTrace(3, `${this.type} attacking ${otherEntity.type}`, this, otherEntity);
-    otherEntity.takeDamageFrom(this.getAttackDamage(), this);
-    uiPaneMessages.addMessage(`${this.name} attacks ${otherEntity.name}`);
-    return DEFAULT_ACTION_COST;
-  }
-
-  getAttackDamage() {
-    devTrace(6, "getting attack damage for entity", this);
-    return new EffDamage(2);
-  }
-
-  // doMeleeAttackOn(otherEntity) {
-  //   devTrace(3, `${this.type} doing melee attack on ${otherEntity.type}`, this, otherEntity);
-  //   if (this.meleeAttack) {
-  //     otherEntity.takeDamageFrom(this.getMeleeAttackDamage(), this);
-  //     return this.getMeleeAttackActionCost();
-  //   }
-  //   devTrace(4, `${this.type} has no melee attack`);
-  //   return 0;
-  // }
-
-  getMeleeAttackDamage() {
-    devTrace(6, "getting melee attack damage for entity", this);
-    if (this.meleeAttack) { return this.meleeAttack.damager.getEffect(); }
-    return new EffDamage(0);
   }
 
   getMeleeAttackActionCost() {

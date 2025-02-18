@@ -53,6 +53,18 @@ class Attack {
             }
         }
     }
+
+    sendMessageAboutAttackOutcome(messagePane) {
+        if (this.outcome == 'HIT') {
+            messagePane.addMessage(`${this.attacker.name} hits ${this.defender.name}`);
+        } else if (this.outcome == 'CRITICAL_HIT') {
+            messagePane.addMessage(`${this.attacker.name} critically hits ${this.defender.name}`);
+        } else if (this.outcome == 'EVADE') {
+            messagePane.addMessage(`${this.defender.name} evades ${this.attacker.name}`);
+        } else if (this.outcome == 'CRITICAL_EVADE') {
+            messagePane.addMessage(`${this.defender.name} critically evades ${this.attacker.name}`);
+        }
+    }
 }
 
 export { Attack };
