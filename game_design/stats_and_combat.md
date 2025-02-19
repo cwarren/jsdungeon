@@ -1,5 +1,7 @@
 # thoughts on stats for entities
 
+NOTE: shifting terminology from 'stats' to 'attributes' - the former may be used elsewhere with a different meaning (more data / statistics, like "total turns, total kills, etc.")
+
 ## general
 
 Stats are a primary method and signal of progression / advancement in the game - they are expected to change over time.
@@ -15,7 +17,7 @@ Dimensions - body, mind, spirit
 Sub-dimensions - active: power, control; passive: resistance, recovery
 
 body power - strength
-body control - dexteriry
+body control - dexterity
 body resistance - health, toughness, stamina
 body recovery - health regeneration, physical debuff removal, stamina regen
 
@@ -25,8 +27,8 @@ mind resistance - willpower, anti-deception
 mind recovery - mental / sensory debuff removal
 
 spirit power - mojo impact / effectiveness, passive charisma, aura
-spirit control - mojo precision, active charisma
-spirit resistance - mojo pool, mojo cost reduction, anti-deception
+spirit control - mojo precision, mojo cost reduction, active charisma
+spirit resistance - mojo pool, anti-deception
 spirit recovery - mojo pool recovery, spirit debuff removal
 
 appeal - a stand-alone? perhaps derived from the power & control stats across the primary dimensions?
@@ -37,6 +39,22 @@ endurance - a combo of body power, body resistance, mind control, mind resistanc
 Beyond the mechanical effects, the stats convey to the player a sense of what their character is like.
 
 Skills are separate from stats, but impacted by them.
+
+stat names & descriptions:
+body power - strength - the raw force your body can create; impacts speed, damage driven by your muscles, how much you can carry, etc.
+body control - dexterity - precision in using your body, and also your reaction speed; impacts speed, ability to hit things, careful work, etc.
+body resistance - fortitude - your resistance to damage and other bodily degradation; impacts your health, stamina, and resistance to damage and other physical effects
+body recovery - recovery - how well and how quickly you deal with damage to your body and other impairments; impacts how you get back health and stamina
+
+mind power - reasoning - you capabilities with logic, memory, visualization, and imagination; impacts your ability to understand and use complex skills and abilities, and to figure out solutions
+mind control - awareness - noticing and reacting to things externally and internally, directing your attention; impacts how well you notice things, your ability to avoid distractions, your application of the theoretical to the real, etc.
+mind resistance - stability - your resistance to mental effects, magical and mundane; your ability to avoid deception and tricks, deal with challenges and stress, etc.
+mind recovery - will - how quickly and effectively you bounce back from mental and sensory impairment; impacts how much sleep you need, how quickly you recover from mental shocks and sensory overload
+
+spirit power - aura - how strong your spirit is; impacts the magnitude of your mojo effects, and your passive spiritual influence on others
+spirit control - refinement - the degree of control you have over your spirit; impacts your fine control of mojo effects, your efficiency, and your active spiritual influence on others
+spirit resistance - depth - the size and quality of your spirit; impacts your pool of spiritual power, and your resistance to spiritual influence
+spirit recovery - flow - how well your spirit withstands and recovers from change; impacts how quickly you regain energy (MP), and how quickly you deal with lingering spiritual damage or other effects
 
 ## game play
 
