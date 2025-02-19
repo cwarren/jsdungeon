@@ -1,34 +1,13 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-IMPORTANT! DON'T OVER-COMPLICATE THIS FOR INITIAL IMPLEMENTATION!
-* update combat interactions to use new combat system
-* * implement new combat flow (see stats_and_combat notes)
-* * update entity definitions to support new combat paradigm (precision, evasion, effect generators for hit, evade, etc.)
-
-resolve entityClass.js:307 Uncaught TypeError: Cannot read properties of undefined (reading 'getEffect')
-    at entityClass.js:307:65
-    at Array.forEach (<anonymous>)
-    at Entity.beHit (entityClass.js:306:40)
-    at Avatar.doMeleeAttackOn (entityClass.js:369:21)
-    at Avatar.handleAttemptedMoveIntoOccupiedCell (entityClass.js:179:19)
-    at EntityMovement.tryMove (entityMovementClass.js:31:34)
-    at Avatar.tryMove (entityClass.js:210:26)
-    at avatarMove (gameActions.js:73:54)
-    at Object.moveAvatar_UR [as action] (gameActions.js:76:37)
-    at executeGameAction (gameCommands.js:116:38)
-Seems like the attack is missing / has as undefined the damage generator
-SOLVE: this is due to the avatar not having a pre-defined melee attack thing in entity definitions; see "TODO NEXT" in entity class
-
-* * rename supporting methods as needed
-* * create additional supporting methods as needed
-
 * setup stats for entities
 
 * implement primary combat support Entity methods to use stats
-* * getPrecision
-* * getEvasion
-* * damage generation (in createAttack method)
+* * implement getPrecision
+* * implement getEvasion
+* * implement damage generation (in getMeleeHitEffectGenerators method?)
+* * update entity definitions to support new combat paradigm (precision, evasion, effect generators for hit, evade, etc.)
 
 * messages
 * * for gaining advancement points
@@ -42,6 +21,10 @@ SOLVE: this is due to the avatar not having a pre-defined melee attack thing in 
 * figure out where and how to handle critical hits and evades
 * * special effect generation?
 * * double normal effects?
+
+* extended messages
+* * keep a longer message buffer; small number of most recent are shown in message pane, but much larger set is saved and can be separately viewed
+* * add a UI mode to see longer messages
 
 * skills for entities / skill system
 * * what they are

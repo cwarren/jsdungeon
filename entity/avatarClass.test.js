@@ -3,6 +3,7 @@ import { Entity, DEFAULT_ACTION_COST } from './entityClass.js';
 import { gameState } from '../gameStateClass.js';
 import { devTrace, rollDice, formatNumberForMessage } from '../util.js';
 import { EffDamage } from '../effect/effDamageClass.js';
+import { EffectGenerator } from '../effect/effectGeneratorClass.js';
 import { uiPaneMain, uiPaneMessages } from "../ui/ui.js";
 import { UIPaneMiniChar, miniCharElement } from '../ui/uiPaneMiniCharClass.js';
 import { WorldLevelSpecification } from '../world/worldLevelSpecificationClass.js';
@@ -106,10 +107,11 @@ describe('Avatar', () => {
     expect(uiPaneMiniChar.avatar).toBeNull();
   });
 
-  test('should get melee attack damage', () => {
-    const damage = avatar.getMeleeAttackDamage();
-    expect(damage).toBeInstanceOf(EffDamage);
-    expect(damage.amount).toBe(3); // Mocked rollDice returns 3
+  test('should get melee attack effect generators', () => {
+    const effGens = avatar.getMeleeHitEffectGenerators();
+    effGens.forEach( efGe => {
+      expect(efGe).toBeInstanceOf(EffectGenerator);
+    });
   });
 
   test('should get melee attack action cost', () => {
@@ -119,6 +121,7 @@ describe('Avatar', () => {
 
   test('should show natural healing message', () => {
     avatar.showNaturalHealingMessage('Healing message');
-    expect(uiPaneMessages.addMessage).toHaveBeenCalledWith('Healing message');
+    // added .not for healing messages suppressed for now - later this will have a settings flag
+    expect(uiPaneMessages.addMessage).not.toHaveBeenCalledWith('Healing message');
   });
 });

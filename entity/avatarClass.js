@@ -2,6 +2,7 @@ import { Entity, DEFAULT_ACTION_COST } from "./entityClass.js";
 import { gameState } from "../gameStateClass.js";
 import { devTrace, rollDice } from "../util.js";
 import { EffDamage } from "../effect/effDamageClass.js";
+import { EffGenDamage } from "../effect/effGenDamageClass.js";
 import { uiPaneMessages } from "../ui/ui.js";
 
 
@@ -69,9 +70,9 @@ class Avatar extends Entity {
     super.die();
   }
 
-  getMeleeAttackDamage() {
-    devTrace(6, "getting melee attack damage for avatar", this);
-    return new EffDamage(rollDice("1d4"));
+  // NOTE: override this in Avatar
+  getMeleeHitEffectGenerators() {
+    return [new EffGenDamage("1d4")];
   }
 
   getMeleeAttackActionCost() {
@@ -81,7 +82,13 @@ class Avatar extends Entity {
   }
 
   showNaturalHealingMessage(message) {
-    uiPaneMessages.addMessage(message);
+    // suppressing these for now - they're getting a bit annoying - in the future there should be a settings flag to control whether or not these are shown
+    // uiPaneMessages.addMessage(message);
+  }
+
+  showAttackMessages(atk, messagePane) {
+    // TODO: figure out how to get attack messages for all entities that are visible
+    atk.sendMessageAboutAttackOutcome(messagePane);
   }
 
   // -----------

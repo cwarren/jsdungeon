@@ -274,9 +274,14 @@ class Entity {
     const atk = new Attack(
       this,
       defender,
-      [this.meleeAttack.damager], // TODO NEXT: replace this with a call to getMeleeHitEffects(), which Avatar needs to override
+      this.getMeleeHitEffectGenerators(),
     );
     return atk;
+  }
+
+  // NOTE: override this in Avatar
+  getMeleeHitEffectGenerators() {
+    return [this.meleeAttack.damager];
   }
 
   getPrecision(attack) {
@@ -302,7 +307,6 @@ class Entity {
   }
 
   beHit(attack) {
-    console.log('beHit attack', attack);
     attack.defenderHitEffectGenerators.forEach(effGen => {
       attack.defender.applyAttackEffect(attack.attacker, effGen.getEffect());
     });
@@ -363,7 +367,8 @@ class Entity {
     if (this.meleeAttack) {
       const atk = this.createAttack(otherEntity);
       atk.determineAttackOutcome();
-      atk.sendMessageAboutAttackOutcome(uiPaneMessages); // TODO NEXT: replace this with a showAttackMessages(atk, pane) call, which the avatar overrides (send message only if attacker or defender is visible)
+      atk.attacker.showAttackMessages(atk, uiPaneMessages); // show messages for both, so avatar gets hitting and being hit messages
+      atk.defender.showAttackMessages(atk, uiPaneMessages);
       if (atk.outcome == 'HIT' || atk.outcome == 'CRITICAL_HIT' ) {
         otherEntity.beHit(atk);
       } else {
@@ -423,6 +428,12 @@ class Entity {
   // PLAYER COMMUNICATION
   showNaturalHealingMessage(message) {
     // by default, entities don't show messages for natural healing, though some may (such as the avatar)
+  }
+
+  showAttackMessages(atk, messagePane) {
+    // by default, entities don't show messages for attacks, though some may (such as the avatar)
+    // future: this is probably where we check to see if this entity is visible to the avatar and control message display based on that (at which point the doubled call in doMeleeAttackOn should be replaced by a this.showAttackMessages)
+    // atk.sendMessageAboutAttackOutcome(uiPaneMessages); // TODO NEXT: replace this with a showAttackMessages(atk, pane) call, which the avatar overrides (send message only if attacker or defender is visible)
   }
 
   //================================================
