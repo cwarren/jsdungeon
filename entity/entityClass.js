@@ -8,6 +8,7 @@ import { EntityLocation } from "./entityLocationClass.js";
 import { EntityMovement } from "./entityMovementClass.js";
 import { EntityVision } from "./entityVisionClass.js";
 import { Attack } from "../effect/attackClass.js";
+import { EntityAttributes } from "./entityAttributesClass.js";
 
 const DEFAULT_ACTION_COST = 100;
 
@@ -20,6 +21,9 @@ class Entity {
     this.displayColor = Entity.ENTITIES[type].displayColor;
 
     this.baseActionCost = Entity.ENTITIES[type].baseActionCost || DEFAULT_ACTION_COST;
+
+    this.attributes = new EntityAttributes(this);
+    this.attributes.rollAttributes(Entity.ENTITIES[type].attributes);
 
     this.location = new EntityLocation(this, -1, -1, -1); // placeholder values for initial location
     this.vision = new EntityVision(this, Entity.ENTITIES[type].viewRadius);

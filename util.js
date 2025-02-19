@@ -1,5 +1,5 @@
 function rollDice(dString) {
-    const cleanedDString = dString.replace(/\s+/g, ''); // strip whitespace
+    const cleanedDString = (dString+'').replace(/\s+/g, ''); // strip whitespace
     const dicePattern = /([+-]?\d*)d(\d+)|([+-]?\d+)/g;
     let total = 0;
     let matches = [...cleanedDString.matchAll(dicePattern)];

@@ -1,3 +1,5 @@
+import { rollDice } from "../util.js";
+
 class EntityAttributes {
   /**
    * Creates an instance of EntityAttributes - these are the primary numeric descriptors of the entity and drive many game mechanics.
@@ -26,6 +28,14 @@ class EntityAttributes {
     for (const key of EntityAttributes.ATTRIBUTE_ORDERING) {
       if (attrObj[key] !== undefined) {
         this[key] = attrObj[key];
+      }
+    }
+  }
+
+  rollAttributes(attrObj) {
+    for (const key of EntityAttributes.ATTRIBUTE_ORDERING) {
+      if (attrObj[key] !== undefined) {
+        this[key] = rollDice(attrObj[key]);
       }
     }
   }
