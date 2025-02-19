@@ -1,13 +1,19 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* setup stats for entities
-
-* implement primary combat support Entity methods to use stats
+* implement primary combat support Entity methods to use attributes
+* * initialize health (max, and recovery stuff) based on attributes, not (just) fixed values from the entity defs
+* * * still use initialHealthRoll if it exists, but treat it as a base to which attribute-based health is added... or otherwise change the health stuff to be largely driven by attributes
 * * implement getPrecision
 * * implement getEvasion
 * * implement damage generation (in getMeleeHitEffectGenerators method?)
 * * update entity definitions to support new combat paradigm (precision, evasion, effect generators for hit, evade, etc.)
+NOTE: create help docs / design notes for the above calculations!
+
+* implement basic character sheet
+* * attributes
+* * resource pools - current & max
+
 
 * messages
 * * for gaining advancement points
@@ -17,6 +23,14 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * * can't run while adjacent to stairs
 * * * can't run while adjacent to entity
 * * * can't sleep while adjacent to entity
+
+* more robust vision radius
+* * add a getLightRadius to entities
+* * add a hasDarkVision flag to entities
+* * add a getVisionRadius to entities
+* * * baseVisionRadius is some calc driven by stats (mainly awareness)
+* * * if has darkvision, then visionRadius = baseVisionRadius
+* * * otherwise, visionRadius is min of light radius and baseVisionRadius
 
 * figure out where and how to handle critical hits and evades
 * * special effect generation?
