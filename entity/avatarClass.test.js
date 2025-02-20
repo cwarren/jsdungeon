@@ -1,7 +1,7 @@
 import { Avatar } from './avatarClass.js';
 import { Entity, DEFAULT_ACTION_COST } from './entityClass.js';
 import { gameState } from '../gameStateClass.js';
-import { devTrace, rollDice, formatNumberForMessage } from '../util.js';
+import { devTrace, rollDice, formatNumberForMessage, valueCalc } from '../util.js';
 import { EffDamage } from '../effect/effDamageClass.js';
 import { EffectGenerator } from '../effect/effectGeneratorClass.js';
 import { uiPaneMain, uiPaneMessages } from "../ui/ui.js";
@@ -15,6 +15,7 @@ const WORLD_LEVEL_SPECS_FOR_TESTING= [
 jest.mock('../util.js', () => ({
   devTrace: jest.fn(),
   rollDice: jest.fn(() => 3), // Mock rollDice to always return 3
+  valueCalc: jest.requireActual('../util.js').valueCalc,
   formatNumberForMessage: jest.fn(() => '10'),
 }));
 

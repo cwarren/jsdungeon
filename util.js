@@ -110,6 +110,26 @@ function formatNumberForMessage(num) {
     }
 }
 
+function valueCalc(baseVal, modifierLayers) {
+    let curValue = baseVal;
+
+    modifierLayers.forEach(layer => {
+        if (layer.multipliers && Array.isArray(layer.multipliers)) {
+            layer.multipliers.forEach(multiplier => {
+                curValue *= multiplier;
+            });
+        }
+
+        if (layer.flats && Array.isArray(layer.flats)) {
+            layer.flats.forEach(flat => {
+                curValue += flat;
+            });
+        }
+    });
+
+    return curValue;
+}
+
 export {
     rollDice,
     rollDiceGroup,
@@ -119,5 +139,6 @@ export {
     constrainValue,
     createHelpText,
     devTrace,
-    formatNumberForMessage
+    formatNumberForMessage,
+    valueCalc,
 };

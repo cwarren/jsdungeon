@@ -5,6 +5,7 @@ import { devTrace } from '../util.js';
 jest.mock('../util.js', () => ({
     devTrace: jest.fn(),
     rollDice: jest.requireActual('../util.js').rollDice,
+    valueCalc: jest.requireActual('../util.js').valueCalc,
 }));
 
 const WORLD_LEVEL_SPECS_FOR_TESTING= [

@@ -21,7 +21,7 @@ import {
   getRandomEmptyCellOfTerrainInGrid,
   determineCellViewability,
 } from './gridUtils.js';
-import { devTrace, constrainValue, rollDice } from '../util.js';
+import { devTrace, constrainValue, rollDice, valueCalc } from '../util.js';
 import { gameState } from '../gameStateClass.js';
 import { uiPaneMessages, uiPaneInfo } from "../ui/ui.js";
 import { WorldLevelSpecification } from './worldLevelSpecificationClass.js';
@@ -32,6 +32,7 @@ jest.mock('../util.js', () => ({
   devTrace: jest.fn(),
   constrainValue: jest.fn((value, min, max) => Math.max(min, Math.min(max, value))),
   rollDice: jest.requireActual('../util.js').rollDice,
+  valueCalc: jest.requireActual('../util.js').valueCalc,
 }));
 
 jest.mock('../ui/ui.js', () => ({

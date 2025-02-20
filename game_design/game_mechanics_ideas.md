@@ -95,6 +95,8 @@ For initial implementation, need
 * getAttackCostStamina
 * * attributes: strength (moderate), dexterity (major), fortitude (major), awareness (minor), stability (moderate), aura (minor), depth (minor)
 
+NOTE: advancement options include some improvement of base values that drive all the above - so 'real' base value is the base from the entity def, plus any advancement improvement, then that is fed into any calculations as the base
+
 -------------------------
 
 value ranges and calculations

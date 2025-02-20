@@ -48,6 +48,8 @@ class EntityAttributes {
     return summary;
   }
 
+  static BASE_VALUE = 100; // this is the "normal" / "average" value for each attribute - generally, above this gives bonuses, below gives penalties
+
   static ATTRIBUTE_ORDERING = [
     'strength', 'dexterity', 'fortitude', 'recovery',
     'psyche', 'awareness', 'stability', 'will',

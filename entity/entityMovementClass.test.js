@@ -3,7 +3,7 @@ import { WorldLevel } from '../world/worldLevelClass.js';
 import { Entity, DEFAULT_ACTION_COST } from './entityClass.js';
 import { getEntityDef } from "./entityDefinitions.js";
 import { EffGenDamage } from '../effect/effGenDamageClass.js';
-import { devTrace, constrainValue, rollDice, getRandomListItem } from '../util.js';
+import { devTrace, constrainValue, rollDice, getRandomListItem, valueCalc } from '../util.js';
 import { gameState } from '../gameStateClass.js';
 import { uiPaneMessages, uiPaneInfo } from "../ui/ui.js";
 import { WorldLevelSpecification } from '../world/worldLevelSpecificationClass.js';
@@ -24,6 +24,7 @@ jest.mock('../util.js', () => ({
   devTrace: jest.fn(),
   constrainValue: jest.requireActual('../util.js').constrainValue,
   rollDice: jest.requireActual('../util.js').rollDice,
+  valueCalc: jest.requireActual('../util.js').valueCalc,
   getRandomListItem: jest.fn(),
 }));
 
@@ -440,6 +441,7 @@ describe('EntityMovement', () => {
     test('movement type implementation - should move wander aggressive pure', () => {
       jest.spyOn(entityMovement, 'tryMoveToCell');
       const hostileToEntity = new Entity("WORM_VINE");
+      hostileToEntity.vision.viewRadius = 20;
       worldLevel.addEntity(hostileToEntity, worldLevel.grid[2][2]); // NOTE: this is within the vision range of the default entity
 
       const result = entityMovement.moveWanderAggressive();

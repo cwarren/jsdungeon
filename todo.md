@@ -1,6 +1,8 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
+* move getViewRadius from Entity into EntityVision
+
 * implement primary combat support Entity methods to use attributes
 * * initialize health (max, and recovery stuff) based on attributes, not (just) fixed values from the entity defs
 * * * still use initialHealthRoll if it exists, but treat it as a base to which attribute-based health is added... or otherwise change the health stuff to be largely driven by attributes

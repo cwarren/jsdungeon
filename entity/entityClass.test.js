@@ -1,7 +1,7 @@
 import { Entity } from './entityClass.js';
 import { getEntityDef } from "./entityDefinitions.js";
 import { gameState } from '../gameStateClass.js';
-import { rollDice, constrainValue } from '../util.js';
+import { rollDice, constrainValue, valueCalc } from '../util.js';
 import { EntityHealth } from './entityHealthClass.js';
 import { EntityLocation } from './entityLocationClass.js';
 import { EntityMovement } from './entityMovementClass.js';
@@ -17,6 +17,7 @@ import { Attack } from '../effect/attackClass.js';
 jest.mock('../util.js', () => ({
   rollDice: jest.fn(),
   constrainValue: jest.requireActual('../util.js').constrainValue,
+  valueCalc: jest.requireActual('../util.js').valueCalc,
   formatNumberForMessage: jest.requireActual('../util.js').formatNumberForMessage,
   devTrace: jest.fn(),
 }));
@@ -41,7 +42,11 @@ const TEST_ENTITIES_DEFINITIONS = [
   getEntityDef('RAT_MALIGN'),
   {
     type: 'testEntity1', name: 'Test Entity 1', displaySymbol: 'T', displayColor: 'red',
-    attributes: {},
+    attributes: {
+      'strength': 100, 'dexterity': 100, 'fortitude': 100, 'recovery': 100,
+      'psyche': 100, 'awareness': 100, 'stability': 100, 'will': 100,
+      'aura': 100, 'refinement': 100, 'depth': 100, 'flow': 100,
+    },
     viewRadius: 5, initialHealthRoll: '1d10', baseActionCost: 100, naturalHealingRate: 0.01,
     naturalHealingTicks: 100,
     movementSpec: { movementType: 'WALK', actionCost: 100 },
@@ -95,6 +100,11 @@ describe('Entity', () => {
     expect(entity.getCell()).toBe(targetCell);
   });
 
+  test('should calculate vision radius correctly', () => {
+    entity.attributes.setAttributes(Entity.ENTITIES['testEntity1'].attributes);
+    const expectedViewRadius = Math.floor((Entity.ENTITIES['testEntity1'].viewRadius + 0/15 + 0/50 + 0/40) * 1.1 * 1);
+    expect(entity.getViewRadius()).toBe(expectedViewRadius);
+  });
 
   describe('Entity - Combat', () => {
 
@@ -109,7 +119,7 @@ describe('Entity', () => {
     });
 
     describe('Entity - Combat - death', () => {
-      
+
       beforeEach(() => {
         attacker = new Entity('RAT_MALIGN');
         defender = new Entity('WORM_VINE');
