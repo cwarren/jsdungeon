@@ -26,10 +26,7 @@ class Entity {
     this.attributes.rollAttributes(Entity.ENTITIES[type].attributes);
 
     this.location = new EntityLocation(this, -1, -1, -1); // placeholder values for initial location
-    
-    this.vision = new EntityVision(this);
-    this.vision.determineViewRadius();
-
+    this.vision = new EntityVision(this, this.getViewRadius());
     this.movement = new EntityMovement(this, Entity.ENTITIES[type].movementSpec);
     this.health = new EntityHealth(
       this,
@@ -75,6 +72,24 @@ class Entity {
 
   //======================================================================
   // VISION
+
+  // fortitude (minor), awareness (major), psyche (minor)
+  getViewRadius() {
+    let baseViewRadius = Entity.ENTITIES[this.type].viewRadius;
+    let viewRadiusModifiers = [
+      {
+        multipliers: [], flats: [
+          (this.attributes.awareness - EntityAttributes.BASE_VALUE) / 15,
+          (this.attributes.fortitude - EntityAttributes.BASE_VALUE) / 50,
+          (this.attributes.psyche - EntityAttributes.BASE_VALUE) / 40,
+        ]
+      },
+      { multipliers: [
+        this.attributes.awareness / EntityAttributes.BASE_VALUE,
+      ], flats: [] },
+    ];
+    return Math.floor(valueCalc(baseViewRadius, viewRadiusModifiers));
+  }
 
   isVisibleTo(otherEntity) {
     return this.vision.isVisibleToEntity(otherEntity);

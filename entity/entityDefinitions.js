@@ -15,7 +15,7 @@ const ENTITIES_DEFINITIONS = [
       'psyche': 100, 'awareness': 100, 'stability': 100, 'will': 100,
       'aura': 100, 'refinement': 100, 'depth': 100, 'flow': 100,
     },
-    viewRadius: 3, initialHealthRoll: "20", baseActionCost: 100, naturalHealingRate: .001,
+    viewRadius: 3, initialHealthRoll: "150", baseActionCost: 100, naturalHealingRate: .001,
     relations: { othersFeelAboutMe: "HOSTILE_TO", iFeelAboutOthers: "HOSTILE_TO" },
   },
   {

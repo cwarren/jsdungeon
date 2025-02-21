@@ -100,11 +100,11 @@ describe('Entity', () => {
     expect(entity.getCell()).toBe(targetCell);
   });
 
-  // test('should calculate vision radius correctly', () => {
-  //   entity.attributes.setAttributes(Entity.ENTITIES['testEntity1'].attributes);
-  //   const expectedViewRadius = Math.floor((Entity.ENTITIES['testEntity1'].viewRadius + 0/15 + 0/50 + 0/40) * 1.1 * 1);
-  //   expect(entity.getViewRadius()).toBe(expectedViewRadius);
-  // });
+  test('should calculate vision radius correctly', () => {
+    entity.attributes.setAttributes(Entity.ENTITIES['testEntity1'].attributes);
+    const expectedViewRadius = Math.floor((Entity.ENTITIES['testEntity1'].viewRadius + 0/15 + 0/50 + 0/40) * 1.1 * 1);
+    expect(entity.getViewRadius()).toBe(expectedViewRadius);
+  });
 
   describe('Entity - Combat', () => {
 

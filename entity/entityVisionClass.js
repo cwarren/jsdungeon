@@ -1,7 +1,5 @@
-import { devTrace, valueCalc } from "../util.js";
+import { devTrace } from "../util.js";
 import { computeBresenhamLine } from '../world/gridUtils.js';
-import { Entity } from './entityClass.js';
-import { EntityAttributes } from './entityAttributesClass.js';
 
 const DEFAULT_VIEW_RADIUS = 1;
 
@@ -41,27 +39,6 @@ class EntityVision {
         manhattenDistance: this.location.getManhattenDistanceToEntity(entity)
       };
     });
-  }
-
-  getBaseViewRadius() {
-    return Entity.ENTITIES[this.ofEntity.type].viewRadius;
-  }
-
-  determineViewRadius() {
-    let baseViewRadius = this.getBaseViewRadius();
-    let viewRadiusModifiers = [
-      {
-        multipliers: [], flats: [
-          (this.ofEntity.attributes.awareness - EntityAttributes.BASE_VALUE) / 15,
-          (this.ofEntity.attributes.fortitude - EntityAttributes.BASE_VALUE) / 50,
-          (this.ofEntity.attributes.psyche - EntityAttributes.BASE_VALUE) / 40,
-        ]
-      },
-      { multipliers: [
-        this.ofEntity.attributes.awareness / EntityAttributes.BASE_VALUE,
-      ], flats: [] },
-    ];
-    this.viewRadius = Math.floor(valueCalc(baseViewRadius, viewRadiusModifiers));
   }
 
   /**

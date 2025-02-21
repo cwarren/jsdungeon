@@ -1,10 +1,8 @@
 import { EntityVision } from './entityVisionClass';
 import { gameState } from '../gameStateClass.js';
-import { devTrace, valueCalc } from '../util.js';
-import { EntityAttributes } from './entityAttributesClass.js';
+import { devTrace } from '../util.js';
 jest.mock('../util.js', () => ({
     devTrace: jest.fn(),
-    valueCalc: jest.requireActual('../util.js').valueCalc,
 }));
 
 jest.mock('../gameStateClass', () => ({
@@ -94,20 +92,6 @@ describe('EntityVision', () => {
         expect(entityVision.viewRadius).toBe(ENITY_VISION_RANGE);
         expect(entityVision.visibleCells).toEqual(new Set());
         expect(entityVision.seenCells).toEqual(new Set());
-    });
-
-    test('should calculate vision radius correctly', () => {
-        entity.attributes = new EntityAttributes();
-        entity.attributes.setAttributes({
-            'strength': 100, 'dexterity': 100, 'fortitude': 100, 'recovery': 100,
-            'psyche': 100, 'awareness': 100, 'stability': 100, 'will': 100,
-            'aura': 100, 'refinement': 100, 'depth': 100, 'flow': 100,
-        });
-        const mockBaseViewRadius = 4;
-        entityVision.getBaseViewRadius = jest.fn().mockReturnValue(mockBaseViewRadius);
-        const expectedViewRadius = Math.floor((mockBaseViewRadius + 0 / 15 + 0 / 50 + 0 / 40) * 1.1 * 1);
-        entityVision.determineViewRadius();
-        expect(entityVision.viewRadius).toEqual(expectedViewRadius);
     });
 
     test('entity can see otherEntity', () => {
