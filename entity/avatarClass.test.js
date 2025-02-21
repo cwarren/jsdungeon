@@ -14,7 +14,7 @@ const WORLD_LEVEL_SPECS_FOR_TESTING= [
 
 jest.mock('../util.js', () => ({
   devTrace: jest.fn(),
-  rollDice: jest.fn(() => 3), // Mock rollDice to always return 3
+  rollDice: jest.fn(() => 100), // Mock rollDice to always return 3
   valueCalc: jest.requireActual('../util.js').valueCalc,
   formatNumberForMessage: jest.fn(() => '10'),
 }));

@@ -3,7 +3,7 @@ import { EffDamage } from "../effect/effDamageClass.js";
 import { rollDice, getRandomListItem, constrainValue, devTrace, formatNumberForMessage, valueCalc } from "../util.js";
 import { ENTITIES_DEFINITIONS } from "./entityDefinitions.js";
 import { uiPaneMessages } from "../ui/ui.js";
-import { EntityHealth } from "./entityHealthClass.js";
+import { EntityHealth, DEFAULT_NATURAL_HEALING_TICKS } from "./entityHealthClass.js";
 import { EntityLocation } from "./entityLocationClass.js";
 import { EntityMovement } from "./entityMovementClass.js";
 import { EntityVision } from "./entityVisionClass.js";
@@ -22,6 +22,7 @@ class Entity {
 
     this.baseActionCost = Entity.ENTITIES[type].baseActionCost || DEFAULT_ACTION_COST;
 
+    // NOTE: the attributes have to be set very early because many of the subsequent things use attributes in calculations
     this.attributes = new EntityAttributes(this);
     this.attributes.rollAttributes(Entity.ENTITIES[type].attributes);
 
@@ -30,9 +31,9 @@ class Entity {
     this.movement = new EntityMovement(this, Entity.ENTITIES[type].movementSpec);
     this.health = new EntityHealth(
       this,
-      rollDice(Entity.ENTITIES[type].initialHealthRoll),
-      Entity.ENTITIES[type].naturalHealingRate,
-      Entity.ENTITIES[type].naturalHealingTicks
+      this.getMaxHeath(),
+      this.getNaturalHealingAmount(),
+      this.getNaturalHealingTime()
     );
 
     this.meleeAttack = Entity.ENTITIES[type].meleeAttack;
@@ -79,14 +80,16 @@ class Entity {
     let viewRadiusModifiers = [
       {
         multipliers: [], flats: [
-          (this.attributes.awareness - EntityAttributes.BASE_VALUE) / 15,
-          (this.attributes.fortitude - EntityAttributes.BASE_VALUE) / 50,
-          (this.attributes.psyche - EntityAttributes.BASE_VALUE) / 40,
+          (this.attributes.awareness - EntityAttributes.BASE_VALUE) / 14,
+          (this.attributes.fortitude - EntityAttributes.BASE_VALUE) / 51,
+          (this.attributes.psyche - EntityAttributes.BASE_VALUE) / 39,
         ]
       },
-      { multipliers: [
-        this.attributes.awareness / EntityAttributes.BASE_VALUE,
-      ], flats: [] },
+      {
+        multipliers: [
+          this.attributes.awareness / EntityAttributes.BASE_VALUE,
+        ], flats: []
+      },
     ];
     return Math.floor(valueCalc(baseViewRadius, viewRadiusModifiers));
   }
@@ -283,7 +286,7 @@ class Entity {
   }
 
   // ------------------
-  // COMBAT & HEALTH
+  // COMBAT
 
   createAttack(defender) {
     // TODO: implement customizations / extensions to effect generators here?
@@ -356,6 +359,34 @@ class Entity {
     return null;
   }
 
+  doMeleeAttackOn(otherEntity) {
+    devTrace(3, `${this.type} doing melee attack on ${otherEntity.type}`, this, otherEntity);
+    if (this.meleeAttack) {
+      const atk = this.createAttack(otherEntity);
+      atk.determineAttackOutcome();
+      atk.attacker.showAttackMessages(atk, uiPaneMessages); // show messages for both, so avatar gets hitting and being hit messages
+      atk.defender.showAttackMessages(atk, uiPaneMessages);
+      if (atk.outcome == 'HIT' || atk.outcome == 'CRITICAL_HIT') {
+        otherEntity.beHit(atk);
+      } else {
+        otherEntity.evadeHit(atk);
+      }
+
+      return this.getMeleeAttackActionCost();
+    }
+    devTrace(4, `${this.type} has no melee attack`);
+    return 0;
+  }
+
+  getMeleeAttackActionCost() {
+    devTrace(6, "getting melee attack action cost for entity", this);
+    if (this.meleeAttack) { return this.meleeAttack.actionCost; }
+    return DEFAULT_ACTION_COST;
+  }
+
+  // ------------------
+  // HEALTH
+
   takeDamageFrom(dam, otherEntity) {
     devTrace(4, "taking attack damage from entity", this, dam, otherEntity);
 
@@ -382,31 +413,6 @@ class Entity {
     }
 
     return null;
-  }
-
-  doMeleeAttackOn(otherEntity) {
-    devTrace(3, `${this.type} doing melee attack on ${otherEntity.type}`, this, otherEntity);
-    if (this.meleeAttack) {
-      const atk = this.createAttack(otherEntity);
-      atk.determineAttackOutcome();
-      atk.attacker.showAttackMessages(atk, uiPaneMessages); // show messages for both, so avatar gets hitting and being hit messages
-      atk.defender.showAttackMessages(atk, uiPaneMessages);
-      if (atk.outcome == 'HIT' || atk.outcome == 'CRITICAL_HIT') {
-        otherEntity.beHit(atk);
-      } else {
-        otherEntity.evadeHit(atk);
-      }
-
-      return this.getMeleeAttackActionCost();
-    }
-    devTrace(4, `${this.type} has no melee attack`);
-    return 0;
-  }
-
-  getMeleeAttackActionCost() {
-    devTrace(6, "getting melee attack action cost for entity", this);
-    if (this.meleeAttack) { return this.meleeAttack.actionCost; }
-    return DEFAULT_ACTION_COST;
   }
 
   // assign death credits, remove this entity from the game
@@ -446,8 +452,109 @@ class Entity {
     this.health.healNaturally(this.actionStartingTime);
   }
 
+  getMaxHeath() {
+    let maxHealth = rollDice(Entity.ENTITIES[this.type].initialHealthRoll);
+
+    // fortitude (major), strength (minor), stability (minor), aura (minor), depth (moderate)
+    let maxHealthModifiers = [
+      {
+        multipliers: [],
+        flats: [
+          (this.attributes.fortitude - EntityAttributes.BASE_VALUE) / 11,
+          (this.attributes.strength - EntityAttributes.BASE_VALUE) / 34,
+        ]
+      },
+      {
+        multipliers: [
+          this.attributes.fortitude / EntityAttributes.BASE_VALUE,
+          Math.sqrt(this.attributes.depth / EntityAttributes.BASE_VALUE),
+        ], flats: [
+          (this.attributes.stability - EntityAttributes.BASE_VALUE) / 47,
+          (this.attributes.aura - EntityAttributes.BASE_VALUE) / 55,
+          (this.attributes.depth - EntityAttributes.BASE_VALUE) / 26,
+        ]
+      },
+      {
+        multipliers: [
+          Math.sqrt(this.attributes.fortitude / EntityAttributes.BASE_VALUE),
+        ], flats: []
+      },
+    ];
+    return Math.floor(valueCalc(maxHealth, maxHealthModifiers));
+  }
+
+  getNaturalHealingAmount() {
+    let healingAmount = Entity.ENTITIES[this.type].naturalHealingRate;
+
+    // recovery (major), fortitude (minor), flow (minor)
+    let healingAmountModifiers = [
+      {
+        multipliers: [],
+        flats: [
+          (this.attributes.fortitude - EntityAttributes.BASE_VALUE) / 41,
+          (this.attributes.flow - EntityAttributes.BASE_VALUE) / 37,
+        ]
+      },
+      {
+        multipliers: [
+          this.attributes.recovery / EntityAttributes.BASE_VALUE,
+        ], flats: [
+          (this.attributes.recovery - EntityAttributes.BASE_VALUE) / 17,
+          (this.attributes.fortitude - EntityAttributes.BASE_VALUE) / 33,
+          (this.attributes.flow - EntityAttributes.BASE_VALUE) / 37,
+        ]
+      },
+      {
+        multipliers: [
+          Math.sqrt(this.attributes.recovery / EntityAttributes.BASE_VALUE),
+        ], flats: []
+      },
+    ];
+
+    return valueCalc(healingAmount, healingAmountModifiers);
+  }
+
+  getNaturalHealingTime() {
+    // NOTE: for healing time, lower is better!
+    // calc as if higher is better (per normal modifiers stuff), then at the end use that in the denom as a factor
+
+    let healingTime = DEFAULT_NATURAL_HEALING_TICKS;
+
+    // recovery (major), fortitude (moderate), will (minor), refinement (minor), flow (minor)
+    let healingTimeModifiers = [
+      {
+        multipliers: [
+          Math.sqrt(this.attributes.fortitude / EntityAttributes.BASE_VALUE),
+        ],
+        flats: [
+          (this.attributes.recovery - EntityAttributes.BASE_VALUE) / 19,
+          (this.attributes.fortitude - EntityAttributes.BASE_VALUE) / 11,
+          (this.attributes.refinement - EntityAttributes.BASE_VALUE) / 35,
+        ]
+      },
+      {
+        multipliers: [], flats: [
+          (this.attributes.will - EntityAttributes.BASE_VALUE) / 47,
+          (this.attributes.flow - EntityAttributes.BASE_VALUE) / 26,
+        ]
+      },
+      {
+        multipliers: [
+          this.attributes.recovery / EntityAttributes.BASE_VALUE,
+        ], flats: [
+          (this.attributes.recovery - EntityAttributes.BASE_VALUE) / 7,
+        ]
+      },
+    ];
+
+    const adjHealingTime = valueCalc(healingTime, healingTimeModifiers)
+
+    return healingTime * ( healingTime / adjHealingTime);
+  }
+
   // ------------------
   // PLAYER COMMUNICATION
+
   showNaturalHealingMessage(message) {
     // by default, entities don't show messages for natural healing, though some may (such as the avatar)
   }

@@ -1,16 +1,21 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* move getViewRadius from Entity into EntityVision
+* rename entity definition fields
+* * viewRadius -> baseViewRadius
+* * initialHealthRoll -> baseHealthRoll
+* * naturalHealingRate -> baseNaturalHealingAmount
+* * baseActionCost -> baseActionTime
+* * actionCost -> baseActionTime
 
 * implement primary combat support Entity methods to use attributes
-* * initialize health (max, and recovery stuff) based on attributes, not (just) fixed values from the entity defs
-* * * still use initialHealthRoll if it exists, but treat it as a base to which attribute-based health is added... or otherwise change the health stuff to be largely driven by attributes
 * * implement getPrecision
 * * implement getEvasion
 * * implement damage generation (in getMeleeHitEffectGenerators method?)
 * * update entity definitions to support new combat paradigm (precision, evasion, effect generators for hit, evade, etc.)
 NOTE: create help docs / design notes for the above calculations!
+
+* figure out why things break when view radius is a decimal, fix it, then update getViewRadius to remove the Math.floor at the end
 
 * implement basic character sheet
 * * attributes

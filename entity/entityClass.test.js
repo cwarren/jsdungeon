@@ -61,6 +61,7 @@ describe('Entity', () => {
   let entity;
 
   beforeEach(() => {
+    rollDice.mockReturnValue(100);
     entity = new Entity('testEntity1');
     const testWorldLevel = new WorldLevel(gameState, 0, 10, 10);
     testWorldLevel.generateGrid();
@@ -113,6 +114,7 @@ describe('Entity', () => {
     let attack;
 
     beforeEach(() => {
+      rollDice.mockReturnValue(100);
       attacker = new Entity('RAT_MALIGN');
       defender = new Entity('WORM_VINE');
       attack = attacker.createAttack(defender);
@@ -121,6 +123,7 @@ describe('Entity', () => {
     describe('Entity - Combat - death', () => {
 
       beforeEach(() => {
+        rollDice.mockReturnValue(100);
         attacker = new Entity('RAT_MALIGN');
         defender = new Entity('WORM_VINE');
         attack = attacker.createAttack(defender);
@@ -157,6 +160,7 @@ describe('Entity', () => {
     describe('Entity - Combat - support methods', () => {
 
       beforeEach(() => {
+        rollDice.mockReturnValue(100);
         attacker = new Entity('RAT_MALIGN');
         defender = new Entity('WORM_VINE');
         attack = attacker.createAttack(defender);
@@ -217,6 +221,7 @@ describe('Entity', () => {
       let mockEffDam_atkEv;
 
       beforeEach(() => {
+        rollDice.mockReturnValue(100);
         attacker = new Entity('RAT_MALIGN');
         defender = new Entity('WORM_VINE');
         attacker.health.curHealth = 10;
@@ -275,6 +280,7 @@ describe('Entity', () => {
       let mockEffDam_defHit;
 
       beforeEach(() => {
+        rollDice.mockReturnValue(100);
         attacker = new Entity('RAT_MALIGN');
         defender = new Entity('WORM_VINE');
         attacker.health.curHealth = 10;
@@ -349,6 +355,7 @@ describe('Entity', () => {
       let mockEffDam_defHit;
 
       beforeEach(() => {
+        rollDice.mockReturnValue(100);
         attacker = new Entity('RAT_MALIGN');
         defender = new Entity('WORM_VINE');
         attacker.health.curHealth = 10;
@@ -432,7 +439,7 @@ describe('Entity', () => {
     });
 
     test('should have violent relationship to an otherwise neutral entity that has damaged it', () => {
-      rollDice.mockReturnValue(10); // needed to ensure the worm vine has enough health that it doesn't die when it takes damage
+      rollDice.mockReturnValue(100); // needed to ensure the worm vine has enough health that it doesn't die when it takes damage, ALSO ensure that stats are 100
 
       const wormVine = new Entity('WORM_VINE');
       const insidiousRat = new Entity('RAT_INSIDIOUS');
