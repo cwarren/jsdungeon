@@ -441,7 +441,7 @@ describe('EntityMovement', () => {
     test('movement type implementation - should move wander aggressive pure', () => {
       jest.spyOn(entityMovement, 'tryMoveToCell');
       const hostileToEntity = new Entity("WORM_VINE");
-      hostileToEntity.vision.viewRadius = 20;
+      hostileToEntity.vision.baseViewRadius = 20;
       worldLevel.addEntity(hostileToEntity, worldLevel.grid[2][2]); // NOTE: this is within the vision range of the default entity
 
       const result = entityMovement.moveWanderAggressive();

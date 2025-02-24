@@ -76,7 +76,7 @@ class Entity {
 
   // fortitude (minor), awareness (major), psyche (minor)
   getViewRadius() {
-    let baseViewRadius = Entity.ENTITIES[this.type].viewRadius;
+    let baseViewRadius = Entity.ENTITIES[this.type].baseViewRadius;
     let viewRadiusModifiers = [
       {
         multipliers: [], flats: [
