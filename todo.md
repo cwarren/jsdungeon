@@ -1,9 +1,6 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* rename entity definition fields
-* * actionCost -> actionTime
-
 * implement primary combat support Entity methods to use attributes
 * * implement getPrecision
 * * implement getEvasion

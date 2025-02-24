@@ -380,7 +380,7 @@ class Entity {
 
   getMeleeAttackActionCost() {
     devTrace(6, "getting melee attack action cost for entity", this);
-    if (this.meleeAttack) { return this.meleeAttack.baseActionTime; }
+    if (this.meleeAttack) { return this.meleeAttack.baseMeleeAttackTime; }
     return DEFAULT_ACTION_COST;
   }
 

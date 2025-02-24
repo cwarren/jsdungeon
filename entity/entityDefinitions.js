@@ -26,7 +26,7 @@ const ENTITIES_DEFINITIONS = [
       'aura': 100, 'refinement': 100, 'depth': 100, 'flow': 100,
     },
     baseViewRadius: 1, baseHealthRoll: "2d6+4", baseActionTime: 210, baseNaturalHealingAmount: .002,
-    meleeAttack: { damager: new EffGenDamage("1d4-1", [], 0), baseActionTime: 80 },
+    meleeAttack: { damager: new EffGenDamage("1d4-1", [], 0), baseMeleeAttackTime: 80 },
     movementSpec: { movementType: "STATIONARY", baseActionTime: 210 },
     relations: {
       overrideFeelingsToOthers: {
@@ -43,7 +43,7 @@ const ENTITIES_DEFINITIONS = [
       'aura': 100, 'refinement': 100, 'depth': 100, 'flow': 100,
     },
     baseViewRadius: 2, baseHealthRoll: "2d6+4", baseActionTime: 100, baseNaturalHealingAmount: .001,
-    meleeAttack: { damager: new EffGenDamage("1d3-1", [], 0), baseActionTime: 100 },
+    meleeAttack: { damager: new EffGenDamage("1d3-1", [], 0), baseMeleeAttackTime: 100 },
     movementSpec: { movementType: "STEP_AIMLESS", baseActionTime: 100 },
     relations: {
       overrideFeelingsToOthers: {
@@ -60,7 +60,7 @@ const ENTITIES_DEFINITIONS = [
       'aura': 100, 'refinement': 100, 'depth': 100, 'flow': 100,
     },
     baseViewRadius: 2, baseHealthRoll: "1d6+3", baseActionTime: 100, baseNaturalHealingAmount: .001,
-    meleeAttack: { damager: new EffGenDamage("1d3-1", [], 0), baseActionTime: 100 },
+    meleeAttack: { damager: new EffGenDamage("1d3-1", [], 0), baseMeleeAttackTime: 100 },
     movementSpec: { movementType: "WANDER_AIMLESS", baseActionTime: 100 },
     relations: { iFeelAboutOthers: "NEUTRAL_TO" },
   },
@@ -72,7 +72,7 @@ const ENTITIES_DEFINITIONS = [
       'aura': 100, 'refinement': 100, 'depth': 100, 'flow': 100,
     },
     baseViewRadius: 4, baseHealthRoll: "3d4+6", baseActionTime: 100, baseNaturalHealingAmount: .001,
-    meleeAttack: { damager: new EffGenDamage("1d5", [], 0), baseActionTime: 100 },
+    meleeAttack: { damager: new EffGenDamage("1d5", [], 0), baseMeleeAttackTime: 100 },
     movementSpec: { movementType: "WANDER_AGGRESSIVE", baseActionTime: 100 },
     relations: {
       overrideFeelingsToOthers: {
