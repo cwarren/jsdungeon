@@ -451,19 +451,22 @@ class Entity {
     devTrace(4, "taking attack damage from entity", this, dam, otherEntity);
 
     // future: add damage mitigation here...? (base on effect.types?)
+    let damAmount = dam.amount;
 
-    dam.amount = constrainValue(dam.amount, 0, this.health.curHealth + 1);
+    // TODO?: based on dam.types, get value adjustments - first from source (enhancements), then from self (mitigations)
 
-    this.health.takeDamage(dam.amount);
+    damAmount = constrainValue(dam.amount, 0, this.health.curHealth + 1);
+
+    this.health.takeDamage(damAmount);
 
     let existingEntry = this.damagedBy.find(entry => entry.damageSource === otherEntity);
     if (existingEntry) {
-      existingEntry.damage.amount += dam.amount;
+      existingEntry.damage.amount += damAmount;
     } else {
-      this.damagedBy.push({ "damageSource": otherEntity, "damage": new EffDamage(dam.amount) });
+      this.damagedBy.push({ "damageSource": otherEntity, "damage": new EffDamage(damAmount) });
     }
 
-    uiPaneMessages.addMessage(`${this.name} takes ${formatNumberForMessage(dam.amount)} damage from ${otherEntity.name}`);
+    uiPaneMessages.addMessage(`${this.name} takes ${formatNumberForMessage(damAmount)} damage from ${otherEntity.name}`);
 
     // Reset movement plans on damage
     this.movement.interruptOngoingMovement();

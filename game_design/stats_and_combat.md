@@ -171,3 +171,241 @@ Also static method on the Entity class
 2.1. populate at least the defenderHitEffectGenerators (for now this is enough)
 3. determine the attack outcome
 4. generate an apply each of the effects from the appropriate effectGenerators
+
+---------------------
+
+# how (and where) to handle value modifiers for attack effects?
+
+The hit effect generators are determined very early in the process: attacker -> create attack (attacker.createAttack(defender)) -> get hit effect generators -> defender.beHit -> for each effect generator, generate the effect and apply it to the defender (with the attacker as the source)
+
+The effect application happens within the entity to which the effect is being applied (the defender, in the case of a successful attack).
+
+At the time of application, the system knows:
+- the attacker (source)
+- the defender (this)
+- the effect which was generated
+
+The effect has various types, and (for Damage effect) a base value. The types can be examined to determine what kind of value modifiers to apply... however, that has serious limitations. Thinking about two (or more) different weapons that are used, where the type of weapon changes which attributes and to what degree are used to modify the damage amount.
+
+Basically, need a way to define the modifiers to use at the same time the damage source is set....?
+
+Want to be able to say "this creature with these stats is making a melee attack with a long-sword":
+
+precision
+* the creature has some base numbers for melee attacks (precision)
+
+* the creature has some modifers for melee attacks (precision)
+OR
+* the creature has some modifers for long sword attacks (precision)
+
+* there are additioanl precision modifiers based on the defender (if the creature is notably good or bad at hitting this particular defender (by type, or individually))
+* there are additional precision modifiers based on the defender (if the sword is notably good or bad at hitting this particular defender (by type or individually))
+
+damage
+
+* without a sword
+* * the creature has some base damage for melee attacks (damage effect)
+* * the creature has some modifers that are applied to that damage
+* * there are additional modifiers based on the defender (if the creature does notably more or less damage to this particular defender (by type or individually))
+
+* with a sword
+* * the base damage is replaced with the sword's base damage
+* * the modifiers are replaced with the modifiers the sword uses (which still depend on the the creature's attributes)
+* * there are additional modifiers if the creature is notably good or bad with this sword (by type, or individually)
+* * there are additional modifiers based on the defender (if the creature does notably more or less damage to this particular defender (by type or individually))
+* * there are additional modifiers based on the defender (if the sword does notably more or less damage to this particular defender (by type or individually))
+
+generalizing
+
+base precision:
+* creature or item
+
+precision modifiers:
+* base modifiers = creature or item
+* also, creature vs defender
+* if item, also:
+* * creature using item
+* * item vs defender
+
+base damage:
+* creature or item (this is the basic effect generator)
+
+damage modifiers
+* base modifiers = creature or item
+* also, creature vs defender
+* if item, also:
+* * creature using item
+* * item vs defender
+
+NOTE: get rid of the item of 'item-less' attacks - creatures have various 'natural weapon' items that are used for the attacks. SO
+
+base precision:
+* primary item
+
+precision modifiers:
+* base modifiers from the item
+* also, creature vs defender
+* also,
+* * creature using item
+* * item vs defender
+* other precision modifier sources
+* * innate to creature
+* * other items
+* * et al
+
+
+base damage:
+* item (this is the basic effect generator)
+
+damage modifiers
+* base modifiers from the item
+* also, creature vs defender
+* also:
+* * creature using item
+* * item vs defender
+* other damage modifier sources
+* * innate to creature
+* * other items
+* * et al
+
+=============
+
+SO, items (weapons) need to define:
+* characterists / types of the attack when using the weapon
+
+* base precision when used to attack
+* base precision modifiers when used to attack
+* additional precision modifiers vs particular defenders
+
+* effects generator used when the weapon hits
+* * primary damage effect
+* * * base damage when used to attack
+* * * base damage modifiers when used to attack
+* * * additional damage modifiers vs particular defenders
+* * other on-hit effects
+* * * condition under which the effect applies
+
+==========================
+==========================
+
+I'm making this way too complicated up front....
+
+An attack has a source weapon.
+
+* the precision depends on
+* * the weapon base
+* * modifiers for how well the creature can use it
+* * possible modifiers for attacker vs defender (ignore these for now)
+* * possible modifiers for weapon vs defender (ignore these for now)
+* * possible contextual modifiers (ignore these for now)
+
+When it hits, the source weapon deals some damage. (maybe other effects too, but ignore those for now).
+* the damage amount depends on
+* * the weapon base
+* * modifiers for how the creature's attributes impact that
+* * possible modifiers for attacker vs defender (ignore these for now)
+* * possible additional modifiers for weapon vs defender (ignore these for now)
+
+An item (weapon or armor) is defined by:
+* item type / name (e.g. SWORD_LONG)
+* item tags (e.g. SWORD, WEAPON, ARMOR, etc.)
+* item use tags (PRECISION, EVASION, DAMAGE, MELEE, PASSIVE_EQUIPPED, PASSIVE_CARRIED, ACTIVE, etc.)
+* precision
+* * base precision
+* * user modifiers for precision
+* * special target modifiers for precision (ignore these for now)
+* * * attacker vs defender, weapon vs defender, context, etc.
+* hit effects list
+* * damage
+* * * base damage (including types)
+* * * user modifiers for damage
+* * * special target modifiers for damage (ignore these for now)
+* * * * attacker vs defender, weapon vs defender, context, etc.
+* evasion
+* * base evasion
+* * user modifiers for evasion
+* * special target modifiers for evasion (ignore these for now)
+* * * defender vs attacker, defender vs weapon, context, etc.
+
+For melee precision, merge the precision of all the attacker's items involved in the attack
+* items isEquipped & flagged as all of:  MELEE, ATTACK, ACTIVE_PRECISION
+* items isEquipped & flagged as all of:  MELEE, ATTACK, PASSIVE_EQUIPPED_PRECISION
+* items flagged as all of:  MELEE, ATTACK, PASSIVE_CARRIED_PRECISION
+Apply those merged modifers to a base of 0.
+NOTE: modifers start with a tier 1 entry that has no multipliers and at least 1 flat modifer - this is the base (meaning, effectively they're summed when modifier sets are merged and then the merged version is applied to a starting value of 0)
+
+For melee evasion, merge the evasion of all the defenders items involved in the defense
+* items isEquipped & flagged as all of:  MELEE, ATTACK, ACTIVE_EVASION
+* items isEquipped & flagged as all of:  MELEE, ATTACK, PASSIVE_EQUIPPED_EVASION
+* items flagged as all of:  MELEE, ATTACK, PASSIVE_CARRIED_EVASION
+NOTE: modifers start with a tier 1 entry that has no multipliers and at least 1 flat modifer - this is the base  (meaning, effectively they're summed when modifier sets are merged and then the merged version is applied to a starting value of 0)
+
+For melee hit, generate (and accumulate) a hit effect for each item active in the attack
+* items isEquipped & flagged as all of:  MELEE, ATTACK, ACTIVE_HIT_EFFECTS
+* items isEquipped & flagged as all of:  MELEE, ATTACK, PASSIVE_HIT_EFFECTS
+* items flagged as all of:  MELEE, ATTACK, PASSIVE_CARRIED_HIT_EFFECTS
+
+----
+
+For being hit
+* the effect has
+* * source causes (MELEE, ATTACK)
+* * source entity
+* * source item
+* * types
+* mitigate based on
+* * defender items vs source causes (has all)
+* * defender items vs source entity
+* * defender items vs source item
+* * defender items vs source types
+
+Defender doesn't have inherent defences. Similar to attacks, entities have a natural defense item.
+
+When handling a hit effect, apply mitigation modifers from items that are applicable to that hit effect
+if the effect deals damage-
+1. defender has a list/set of items
+2. for each item
+* items isEquipped & flagged as PASSIVE_EQUIPPED_MITIGATION
+* items flagged as PASSIVE_CARRIED_MITIGATION
+2.1. determine whether it can mitigate the hit effect (based on source causes, source entity, source item, and types), if so, accumulate the mitigation modifier
+3. merge all the mitigation modifers
+4. apply the merged modifiers to the effect damage
+
+xxxx
+
+item has
+* precisionFlags: MELEE, ATTACK, ACTIVE, PASSIVE_EQUIPPED, PASSIVE_CARRIED, etc.
+* evasionFlags: MELEE, ATTACK, ACTIVE, PASSIVE_EQUIPPED, PASSIVE_CARRIED, etc.
+* damageFlags: MELEE, ATTACK, ACTIVE, PASSIVE_EQUIPPED, PASSIVE_CARRIED, etc.
+* mitigationFlags: MELEE, ATTACK, ACTIVE, PASSIVE_EQUIPPED, PASSIVE_CARRIED, etc.
+
+zzz
+
+precision item filter:
+* isPrimaryWeapon & precisionFlags include MELEE, ATTACK, and ACTIVE
+* isEquipped & precisionFlags include MELEE, ATTACK, and PASSIVE_EQUIPPED
+* precisionFlags include MELEE, ATTACK, and PASSIVE_CARRIED
+
+evasion item filter:
+* isPrimaryWeapon & evasionFlags include MELEE, ATTACK, and ACTIVE
+* isEquipped & evasionFlags include MELEE, ATTACK, and PASSIVE_EQUIPPED
+* evasionFlags include MELEE, ATTACK, and PASSIVE_CARRIED
+
+damage item filter:
+* isPrimaryWeapon & damageFlags include MELEE, ATTACK, and ACTIVE
+* isEquipped & damageFlags include MELEE, ATTACK, and PASSIVE_EQUIPPED
+* damageFlags include MELEE, ATTACK, and PASSIVE_CARRIED
+
+mitigation item filter:
+* isPrimaryWeapon & mitigationFlags include MELEE, ATTACK, and ACTIVE
+* isEquipped & mitigationFlags include MELEE, ATTACK, and PASSIVE_EQUIPPED
+* mitigationFlags include MELEE, ATTACK, and PASSIVE_CARRIED
+
+
+ITEM groups and categories
+* item key
+* item specs - all the fun mechanical stuff
+* flagSpecial - indicates this isn't a 'real' item but instead something used for internal game mechanics (e.g. a 'buff' item)
+* isPrimaryWeapon - this item comes into play for ACTIVE MELEE ATTACKs
+* isEquipped - has one or more equip slots
+* isCarried - all the 'real' items a character has are carried
