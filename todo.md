@@ -2,7 +2,6 @@ to start server:
 PS E:\code\jsdungeon> docker-compose up --build
 
 * rename entity definition fields
-* * initialHealthRoll -> baseHealthRoll
 * * naturalHealingRate -> baseNaturalHealingAmount
 * * baseActionCost -> baseActionTime
 * * actionCost -> baseActionTime

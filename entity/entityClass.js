@@ -484,7 +484,7 @@ class Entity {
   }
 
   getNaturalHealingAmount() {
-    let healingAmount = Entity.ENTITIES[this.type].naturalHealingRate;
+    let healingAmount = Entity.ENTITIES[this.type].baseNaturalHealingAmount;
 
     // recovery (major), fortitude (minor), flow (minor)
     let healingAmountModifiers = [
