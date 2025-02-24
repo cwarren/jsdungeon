@@ -15,7 +15,7 @@ const ENTITIES_DEFINITIONS = [
       'psyche': 100, 'awareness': 100, 'stability': 100, 'will': 100,
       'aura': 100, 'refinement': 100, 'depth': 100, 'flow': 100,
     },
-    baseViewRadius: 3, baseHealthRoll: "20", baseActionCost: 100, baseNaturalHealingAmount: .001,
+    baseViewRadius: 3, baseHealthRoll: "20", baseActionTime: 100, baseNaturalHealingAmount: .001,
     relations: { othersFeelAboutMe: "HOSTILE_TO", iFeelAboutOthers: "HOSTILE_TO" },
   },
   {
@@ -25,7 +25,7 @@ const ENTITIES_DEFINITIONS = [
       'psyche': 100, 'awareness': 100, 'stability': 100, 'will': 100,
       'aura': 100, 'refinement': 100, 'depth': 100, 'flow': 100,
     },
-    baseViewRadius: 1, baseHealthRoll: "2d6+4", baseActionCost: 210, baseNaturalHealingAmount: .002,
+    baseViewRadius: 1, baseHealthRoll: "2d6+4", baseActionTime: 210, baseNaturalHealingAmount: .002,
     meleeAttack: { damager: new EffGenDamage("1d4-1", [], 0), actionCost: 80 },
     movementSpec: { movementType: "STATIONARY", actionCost: 210 },
     relations: {
@@ -42,7 +42,7 @@ const ENTITIES_DEFINITIONS = [
       'psyche': 100, 'awareness': 100, 'stability': 100, 'will': 100,
       'aura': 100, 'refinement': 100, 'depth': 100, 'flow': 100,
     },
-    baseViewRadius: 2, baseHealthRoll: "2d6+4", baseActionCost: 100, baseNaturalHealingAmount: .001,
+    baseViewRadius: 2, baseHealthRoll: "2d6+4", baseActionTime: 100, baseNaturalHealingAmount: .001,
     meleeAttack: { damager: new EffGenDamage("1d3-1", [], 0), actionCost: 100 },
     movementSpec: { movementType: "STEP_AIMLESS", actionCost: 100 },
     relations: {
@@ -59,7 +59,7 @@ const ENTITIES_DEFINITIONS = [
       'psyche': 100, 'awareness': 100, 'stability': 100, 'will': 100,
       'aura': 100, 'refinement': 100, 'depth': 100, 'flow': 100,
     },
-    baseViewRadius: 2, baseHealthRoll: "1d6+3", baseActionCost: 100, baseNaturalHealingAmount: .001,
+    baseViewRadius: 2, baseHealthRoll: "1d6+3", baseActionTime: 100, baseNaturalHealingAmount: .001,
     meleeAttack: { damager: new EffGenDamage("1d3-1", [], 0), actionCost: 100 },
     movementSpec: { movementType: "WANDER_AIMLESS", actionCost: 100 },
     relations: { iFeelAboutOthers: "NEUTRAL_TO" },
@@ -71,7 +71,7 @@ const ENTITIES_DEFINITIONS = [
       'psyche': 100, 'awareness': 100, 'stability': 100, 'will': 100,
       'aura': 100, 'refinement': 100, 'depth': 100, 'flow': 100,
     },
-    baseViewRadius: 4, baseHealthRoll: "3d4+6", baseActionCost: 100, baseNaturalHealingAmount: .001,
+    baseViewRadius: 4, baseHealthRoll: "3d4+6", baseActionTime: 100, baseNaturalHealingAmount: .001,
     meleeAttack: { damager: new EffGenDamage("1d5", [], 0), actionCost: 100 },
     movementSpec: { movementType: "WANDER_AGGRESSIVE", actionCost: 100 },
     relations: {

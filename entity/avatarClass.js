@@ -77,7 +77,7 @@ class Avatar extends Entity {
 
   getMeleeAttackActionCost() {
     devTrace(6, "getting melee attack action cost for avatar", this);
-    if (this.baseActionCost) return this.baseActionCost;
+    if (this.baseActionTime) return this.baseActionTime;
     return DEFAULT_ACTION_COST;
   }
 

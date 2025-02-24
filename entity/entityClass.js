@@ -20,7 +20,7 @@ class Entity {
     this.displaySymbol = Entity.ENTITIES[type].displaySymbol;
     this.displayColor = Entity.ENTITIES[type].displayColor;
 
-    this.baseActionCost = Entity.ENTITIES[type].baseActionCost || DEFAULT_ACTION_COST;
+    this.baseActionTime = Entity.ENTITIES[type].baseActionTime || DEFAULT_ACTION_COST;
 
     // NOTE: the attributes have to be set very early because many of the subsequent things use attributes in calculations
     this.attributes = new EntityAttributes(this);
@@ -120,7 +120,7 @@ class Entity {
 
   takeTurn() {
     devTrace(2, `${this.type} acts at ${this.actionStartingTime}`, this);
-    let actionTime = this.baseActionCost;
+    let actionTime = this.baseActionTime;
     this.healNaturally();
 
     // AI logic or automatic actions go here...

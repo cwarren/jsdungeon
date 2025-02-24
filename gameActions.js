@@ -95,7 +95,7 @@ function ascendStairs() {
         console.log("cannot ascend - no stairs up");
     }
     console.log("gameState after ascending", gameState);
-    return gameState.avatar.baseActionCost;
+    return gameState.avatar.baseActionTime;
 }
 
 function descendStairs() {
@@ -116,7 +116,7 @@ function descendStairs() {
         console.log("cannot descend - no stairs down");
     }
     console.log("gameState after descending", gameState);
-    return gameState.avatar.baseActionCost;
+    return gameState.avatar.baseActionTime;
 }
 
 function runAvatar(deltas) {
