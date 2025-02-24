@@ -138,20 +138,20 @@ class GameState {
         }
     }
 
-    handlePlayerActionTime(actionCost) {
-        devTrace(4,`handling player action time of ${actionCost} in game state`);
-        if (actionCost <= 0) return;
-        this.avatar.addTimeOnLevel(actionCost);
+    handlePlayerActionTime(actionTime) {
+        devTrace(4,`handling player action time of ${actionTime} in game state`);
+        if (actionTime <= 0) return;
+        this.avatar.addTimeOnLevel(actionTime);
         uiPaneMessages.ageMessages();
     
         // If the avatar is running, immediately continue running
         if (this.avatar.movement.isRunning || this.avatar.isSleeping) {
-            this.currentTurnQueue.addEntity(this.avatar, this.avatar.actionStartingTime + actionCost);
+            this.currentTurnQueue.addEntity(this.avatar, this.avatar.actionStartingTime + actionTime);
             this.advanceGameTime();  // Keep the turns flowing for running
             return;
         }
     
-        this.currentTurnQueue.addEntity(this.avatar, this.avatar.actionStartingTime + actionCost);
+        this.currentTurnQueue.addEntity(this.avatar, this.avatar.actionStartingTime + actionTime);
         this.currentTurnQueue.normalizeQueueTimes();
         this.advanceGameTime();
     }

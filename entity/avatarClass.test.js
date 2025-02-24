@@ -116,8 +116,8 @@ describe('Avatar', () => {
   });
 
   test('should get melee attack action cost', () => {
-    const actionCost = avatar.getMeleeAttackActionCost();
-    expect(actionCost).toBe(DEFAULT_ACTION_COST);
+    const actionTime = avatar.getMeleeAttackActionCost();
+    expect(actionTime).toBe(DEFAULT_ACTION_COST);
   });
 
   test('should show natural healing message', () => {

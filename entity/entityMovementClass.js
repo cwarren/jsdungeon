@@ -3,7 +3,7 @@ import { GridCell } from "../world/gridCellClass.js";
 import { getRandomCellOfTerrainInGrid, determineCheapestMovementPathForEntity, computeBresenhamLine } from "../world/gridUtils.js";
 
 const DEFAULT_MOVEMENT_ACTION_COST = 100;
-const DEFAULT_MOVEMENT_SPEC = { movementType: "STATIONARY", actionCost: DEFAULT_MOVEMENT_ACTION_COST };
+const DEFAULT_MOVEMENT_SPEC = { movementType: "STATIONARY", baseActionTime: DEFAULT_MOVEMENT_ACTION_COST };
 
 class EntityMovement {
     constructor(ofEntity, movementSpec = DEFAULT_MOVEMENT_SPEC) {
@@ -12,7 +12,7 @@ class EntityMovement {
         this.isRunning = false;
         this.runDelta = null;
         this.type = movementSpec.movementType;
-        this.actionCost = movementSpec.actionCost;
+        this.actionTime = movementSpec.baseActionTime;
         this.destinationCell = null;
         this.movementPath = [];
         this.isSleeping = false;
@@ -57,14 +57,14 @@ class EntityMovement {
         const oldCell = this.location.getCell();
         oldCell.entity = undefined;
         this.location.placeAtCell(targetCell);
-        return this.actionCost;
+        return this.actionTime;
     }
     confirmMoveDeltas(dx, dy) {
         devTrace(6, `confirming move to deltas ${dx},${dy}`, this.ofEntity);
         const oldCell = this.location.getCell();
         oldCell.entity = undefined;
         this.location.placeAtCell(this.location.getCellAtDelta(dx, dy));
-        return this.actionCost;
+        return this.actionTime;
     }
 
     // SLEEPING METHODS
@@ -217,7 +217,7 @@ class EntityMovement {
             const nextCell = this.movementPath.shift();
             return this.tryMoveToCell(nextCell);
         }
-        return this.actionCost;
+        return this.actionTime;
     }
 
     // MOVEMENT AI / TYPE IMPLEMENTATIONS

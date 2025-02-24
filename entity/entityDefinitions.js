@@ -26,8 +26,8 @@ const ENTITIES_DEFINITIONS = [
       'aura': 100, 'refinement': 100, 'depth': 100, 'flow': 100,
     },
     baseViewRadius: 1, baseHealthRoll: "2d6+4", baseActionTime: 210, baseNaturalHealingAmount: .002,
-    meleeAttack: { damager: new EffGenDamage("1d4-1", [], 0), actionCost: 80 },
-    movementSpec: { movementType: "STATIONARY", actionCost: 210 },
+    meleeAttack: { damager: new EffGenDamage("1d4-1", [], 0), baseActionTime: 80 },
+    movementSpec: { movementType: "STATIONARY", baseActionTime: 210 },
     relations: {
       overrideFeelingsToOthers: {
         "WORM_VINE": "FRIENDLY_TO",
@@ -43,8 +43,8 @@ const ENTITIES_DEFINITIONS = [
       'aura': 100, 'refinement': 100, 'depth': 100, 'flow': 100,
     },
     baseViewRadius: 2, baseHealthRoll: "2d6+4", baseActionTime: 100, baseNaturalHealingAmount: .001,
-    meleeAttack: { damager: new EffGenDamage("1d3-1", [], 0), actionCost: 100 },
-    movementSpec: { movementType: "STEP_AIMLESS", actionCost: 100 },
+    meleeAttack: { damager: new EffGenDamage("1d3-1", [], 0), baseActionTime: 100 },
+    movementSpec: { movementType: "STEP_AIMLESS", baseActionTime: 100 },
     relations: {
       overrideFeelingsToOthers: {
         "AVATAR": "NEUTRAL_TO",
@@ -60,8 +60,8 @@ const ENTITIES_DEFINITIONS = [
       'aura': 100, 'refinement': 100, 'depth': 100, 'flow': 100,
     },
     baseViewRadius: 2, baseHealthRoll: "1d6+3", baseActionTime: 100, baseNaturalHealingAmount: .001,
-    meleeAttack: { damager: new EffGenDamage("1d3-1", [], 0), actionCost: 100 },
-    movementSpec: { movementType: "WANDER_AIMLESS", actionCost: 100 },
+    meleeAttack: { damager: new EffGenDamage("1d3-1", [], 0), baseActionTime: 100 },
+    movementSpec: { movementType: "WANDER_AIMLESS", baseActionTime: 100 },
     relations: { iFeelAboutOthers: "NEUTRAL_TO" },
   },
   {
@@ -72,8 +72,8 @@ const ENTITIES_DEFINITIONS = [
       'aura': 100, 'refinement': 100, 'depth': 100, 'flow': 100,
     },
     baseViewRadius: 4, baseHealthRoll: "3d4+6", baseActionTime: 100, baseNaturalHealingAmount: .001,
-    meleeAttack: { damager: new EffGenDamage("1d5", [], 0), actionCost: 100 },
-    movementSpec: { movementType: "WANDER_AGGRESSIVE", actionCost: 100 },
+    meleeAttack: { damager: new EffGenDamage("1d5", [], 0), baseActionTime: 100 },
+    movementSpec: { movementType: "WANDER_AGGRESSIVE", baseActionTime: 100 },
     relations: {
       overrideFeelingsToOthers: {
         "RAT_INSIDIOUS": "FRIENDLY_TO",

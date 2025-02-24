@@ -80,19 +80,19 @@ class TurnQueue {
         next.entity.setActionStartingTime(next.time);
 
         // Let the entity act
-        let actionCost;
+        let actionTime;
         if (next.entity.movement.isRunning) {
-            actionCost = next.entity.movement.continueRunning();
+            actionTime = next.entity.movement.continueRunning();
         } else if (next.entity.movement.isSleeping) {
-            actionCost = next.entity.movement.continueSleeping();
+            actionTime = next.entity.movement.continueSleeping();
         } else {
-            actionCost = next.entity.takeTurn(); // Default action
+            actionTime = next.entity.takeTurn(); // Default action
         }
         
         // Reschedule non-avatar entity based on action cost (avatar actions are handled separately, in gameState.handlePlayerActionTime)
         // also, running entities (including avatar) are always rescheduled
         if (next.entity.type != "AVATAR" || next.entity.movement.isRunning || next.entity.movement.isSleeping) {
-            next.time += actionCost;
+            next.time += actionTime;
             this.queue.push(next);
             this.ordering();
             this.normalizeQueueTimes();

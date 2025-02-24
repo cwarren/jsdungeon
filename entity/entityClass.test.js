@@ -32,7 +32,7 @@ jest.mock('../gameStateClass.js', () => ({
   },
 }));
 
-const TEST_DAMAGE_SPEC = { damager: new EffGenDamage("1d6+4", [], 0), actionCost: 100 };
+const TEST_DAMAGE_SPEC = { damager: new EffGenDamage("1d6+4", [], 0), baseActionTime: 100 };
 
 const TEST_ENTITIES_DEFINITIONS = [
   getEntityDef('AVATAR'),
@@ -49,7 +49,7 @@ const TEST_ENTITIES_DEFINITIONS = [
     },
     baseViewRadius: 5, baseHealthRoll: '1d10', baseActionTime: 100, baseNaturalHealingAmount: 0.01,
     naturalHealingTicks: 100,
-    movementSpec: { movementType: 'WALK', actionCost: 100 },
+    movementSpec: { movementType: 'WALK', baseActionTime: 100 },
     meleeAttack: TEST_DAMAGE_SPEC,
     relations: { iFeelAboutOthersP2: "HOSTILE_TO" },
   }
