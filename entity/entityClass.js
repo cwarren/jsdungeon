@@ -310,11 +310,71 @@ class Entity {
   }
 
   getPrecision(attack) {
-    return 10;
+    let attackPrecision = 0;
+    if (Entity.ENTITIES[this.type].basePrecision) { attackPrecision = Entity.ENTITIES[this.type].basePrecision; }
+
+    // dexterity (major), awareness (moderate), refinement (minor), strength (moderate), psyche (minor)
+    let attackPrecisionModifiers = [
+      {
+        multipliers: [],
+        flats: [
+          (this.attributes.dexterity) / 6,
+          (this.attributes.awareness) / 17,
+          (this.attributes.strength - EntityAttributes.BASE_VALUE) / 28,
+        ]
+      },
+      {
+        multipliers: [
+          this.attributes.dexterity / EntityAttributes.BASE_VALUE,
+          Math.sqrt(this.attributes.awareness / EntityAttributes.BASE_VALUE),
+        ], flats: [
+          (this.attributes.refinement - EntityAttributes.BASE_VALUE) / 39,
+          (this.attributes.psyche - EntityAttributes.BASE_VALUE) / 43,
+        ]
+      },
+      {
+        multipliers: [
+          Math.sqrt(this.attributes.dexterity / EntityAttributes.BASE_VALUE),
+        ], flats: []
+      },
+    ];
+    // console.log(`AAAAAAAAAAAAAAA ${this.name} attackPrecisionModifiers`, attackPrecisionModifiers);
+    attackPrecision = valueCalc(attackPrecision, attackPrecisionModifiers);
+    // console.log(`BBBBBBBBBBBBBBB ${this.name} attackPrecision`, attackPrecision);
+    return Math.floor(attackPrecision);
   }
 
   getEvasion(attack) {
-    return 5;
+    let attackEvasion = 0;
+    if (Entity.ENTITIES[this.type].baseEvasion) { attackEvasion = Entity.ENTITIES[this.type].baseEvasion; }
+
+
+    // dexterity (major), awareness (major), refinement (moderate)
+    let attackEvasionModifiers = [
+      {
+        multipliers: [],
+        flats: [
+          (this.attributes.dexterity) / 13,
+          (this.attributes.awareness) / 14,
+        ]
+      },
+      {
+        multipliers: [
+          this.attributes.dexterity / EntityAttributes.BASE_VALUE,
+        ], flats: [
+          (this.attributes.refinement - EntityAttributes.BASE_VALUE) / 26,
+        ]
+      },
+      {
+        multipliers: [
+          Math.sqrt(this.attributes.awareness / EntityAttributes.BASE_VALUE),
+        ], flats: []
+      },
+    ];
+    // console.log(`CCCCCCCCCCCCCCC ${this.name} attackEvasionModifiers`, attackEvasionModifiers);
+    attackEvasion = valueCalc(attackEvasion, attackEvasionModifiers);
+    // console.log(`DDDDDDDDDDDDDDD ${this.name} attackEvasion`, attackEvasion);
+    return Math.floor(attackEvasion);
   }
 
   isHitCritical(attack) {

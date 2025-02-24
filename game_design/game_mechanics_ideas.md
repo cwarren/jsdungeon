@@ -72,7 +72,7 @@ For initial implementation, need
 * getNaturalHealthRecoveryFrequency
 * * attributes: recovery (major), fortitude (moderate), will (minor), refinement (minor), flow (minor)
 * getPrecision
-* * attributes: dexterity (major), awareness (moderate), refinement (minor), strength (minor), psyche (minor)
+* * attributes: dexterity (major), awareness (moderate), refinement (minor), strength (moderate), psyche (minor)
 * getEvasion
 * * attributes: dexterity (major), awareness (major), refinement (moderate)
 * getAttackEffects
