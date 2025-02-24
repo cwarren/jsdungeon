@@ -453,7 +453,7 @@ class Entity {
   }
 
   getMaxHeath() {
-    let maxHealth = rollDice(Entity.ENTITIES[this.type].initialHealthRoll);
+    let maxHealth = rollDice(Entity.ENTITIES[this.type].baseHealthRoll);
 
     // fortitude (major), strength (minor), stability (minor), aura (minor), depth (moderate)
     let maxHealthModifiers = [

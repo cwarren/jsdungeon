@@ -47,7 +47,7 @@ const TEST_ENTITIES_DEFINITIONS = [
       'psyche': 100, 'awareness': 100, 'stability': 100, 'will': 100,
       'aura': 100, 'refinement': 100, 'depth': 100, 'flow': 100,
     },
-    baseViewRadius: 5, initialHealthRoll: '1d10', baseActionCost: 100, naturalHealingRate: 0.01,
+    baseViewRadius: 5, baseHealthRoll: '1d10', baseActionCost: 100, naturalHealingRate: 0.01,
     naturalHealingTicks: 100,
     movementSpec: { movementType: 'WALK', actionCost: 100 },
     meleeAttack: TEST_DAMAGE_SPEC,
