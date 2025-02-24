@@ -27,7 +27,7 @@ const ENTITIES_DEFINITIONS = [
     },
     baseViewRadius: 1, baseHealthRoll: "2d6+4", baseActionTime: 210, baseNaturalHealingAmount: .002,
     meleeAttack: { damager: new EffGenDamage("1d4-1", [], 0), baseMeleeAttackTime: 80 },
-    movementSpec: { movementType: "STATIONARY", baseActionTime: 210 },
+    movementSpec: { movementType: "STATIONARY", baseMovementTime: 210 },
     relations: {
       overrideFeelingsToOthers: {
         "WORM_VINE": "FRIENDLY_TO",
@@ -44,7 +44,7 @@ const ENTITIES_DEFINITIONS = [
     },
     baseViewRadius: 2, baseHealthRoll: "2d6+4", baseActionTime: 100, baseNaturalHealingAmount: .001,
     meleeAttack: { damager: new EffGenDamage("1d3-1", [], 0), baseMeleeAttackTime: 100 },
-    movementSpec: { movementType: "STEP_AIMLESS", baseActionTime: 100 },
+    movementSpec: { movementType: "STEP_AIMLESS", baseMovementTime: 100 },
     relations: {
       overrideFeelingsToOthers: {
         "AVATAR": "NEUTRAL_TO",
@@ -61,7 +61,7 @@ const ENTITIES_DEFINITIONS = [
     },
     baseViewRadius: 2, baseHealthRoll: "1d6+3", baseActionTime: 100, baseNaturalHealingAmount: .001,
     meleeAttack: { damager: new EffGenDamage("1d3-1", [], 0), baseMeleeAttackTime: 100 },
-    movementSpec: { movementType: "WANDER_AIMLESS", baseActionTime: 100 },
+    movementSpec: { movementType: "WANDER_AIMLESS", baseMovementTime: 100 },
     relations: { iFeelAboutOthers: "NEUTRAL_TO" },
   },
   {
@@ -73,7 +73,7 @@ const ENTITIES_DEFINITIONS = [
     },
     baseViewRadius: 4, baseHealthRoll: "3d4+6", baseActionTime: 100, baseNaturalHealingAmount: .001,
     meleeAttack: { damager: new EffGenDamage("1d5", [], 0), baseMeleeAttackTime: 100 },
-    movementSpec: { movementType: "WANDER_AGGRESSIVE", baseActionTime: 100 },
+    movementSpec: { movementType: "WANDER_AGGRESSIVE", baseMovementTime: 100 },
     relations: {
       overrideFeelingsToOthers: {
         "RAT_INSIDIOUS": "FRIENDLY_TO",

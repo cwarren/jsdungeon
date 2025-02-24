@@ -127,7 +127,7 @@ class Entity {
     const adjacentsCost = this.dealWithAdjacentEntities();
     if (adjacentsCost > 0) { return adjacentsCost; }
 
-    if (this.movement.type == 'STATIONARY') { return this.movement.baseActionTime; }
+    if (this.movement.type == 'STATIONARY') { return this.movement.actionTime; }
     if (this.movement.type == 'STEP_AIMLESS') { return this.movement.moveStepAimless(); }
     if (this.movement.type == 'WANDER_AIMLESS') { return this.movement.moveWanderAimless(); }
     if (this.movement.type == 'WANDER_AGGRESSIVE') { return this.movement.moveWanderAggressive(); }

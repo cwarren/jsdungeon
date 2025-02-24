@@ -3,7 +3,7 @@ import { GridCell } from "../world/gridCellClass.js";
 import { getRandomCellOfTerrainInGrid, determineCheapestMovementPathForEntity, computeBresenhamLine } from "../world/gridUtils.js";
 
 const DEFAULT_MOVEMENT_ACTION_COST = 100;
-const DEFAULT_MOVEMENT_SPEC = { movementType: "STATIONARY", baseActionTime: DEFAULT_MOVEMENT_ACTION_COST };
+const DEFAULT_MOVEMENT_SPEC = { movementType: "STATIONARY", baseMovementTime: DEFAULT_MOVEMENT_ACTION_COST };
 
 class EntityMovement {
     constructor(ofEntity, movementSpec = DEFAULT_MOVEMENT_SPEC) {
@@ -12,7 +12,7 @@ class EntityMovement {
         this.isRunning = false;
         this.runDelta = null;
         this.type = movementSpec.movementType;
-        this.actionTime = movementSpec.baseActionTime;
+        this.actionTime = movementSpec.baseMovementTime;
         this.destinationCell = null;
         this.movementPath = [];
         this.isSleeping = false;

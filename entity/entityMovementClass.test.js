@@ -83,14 +83,14 @@ describe('EntityMovement', () => {
     expect(entityMovement.isRunning).toBe(false);
     expect(entityMovement.runDelta).toBeNull();
     expect(entityMovement.type).toBe(TEST_MOVEMENT_SPEC.movementType);
-    expect(entityMovement.actionTime).toBe(TEST_MOVEMENT_SPEC.baseActionTime);
+    expect(entityMovement.actionTime).toBe(TEST_MOVEMENT_SPEC.baseMovementTime);
   });
 
   test('should try to move to a cell and succeed', () => {
     jest.spyOn(entityLocation, 'getCellAtDelta');
     jest.spyOn(entity, 'determineVisibleCells');
     const resultMovementCost = entityMovement.tryMove(1, 1);
-    expect(resultMovementCost).toBe(TEST_MOVEMENT_SPEC.baseActionTime);
+    expect(resultMovementCost).toBe(TEST_MOVEMENT_SPEC.baseMovementTime);
     expect(entityLocation.getCellAtDelta).toHaveBeenCalledWith(1, 1);
     expect(entity.determineVisibleCells).toHaveBeenCalled();
   });
@@ -98,7 +98,7 @@ describe('EntityMovement', () => {
   test('should try to move slowly to a cell and succeed', () => {
     jest.spyOn(entityLocation, 'getCellAtDelta');
     jest.spyOn(entity, 'determineVisibleCells');
-    entityMovement = new EntityMovement(entity, { movementType: "STATIONARY", baseActionTime: 325 });
+    entityMovement = new EntityMovement(entity, { movementType: "STATIONARY", baseMovementTime: 325 });
     const resultMovementCost = entityMovement.tryMove(1, 1);
     expect(resultMovementCost).toBe(325);
     expect(entityLocation.getCellAtDelta).toHaveBeenCalledWith(1, 1);
@@ -130,7 +130,7 @@ describe('EntityMovement', () => {
     entityLocation.getCell = jest.fn(() => ({ x: 5, y: 5, z: 0, entity: null, getDeltaToOtherCell: jest.fn(() => ({ dx: 1, dy: 1 })) }));
 
     const resultMovementCost = entityMovement.tryMoveToCell(targetCell);
-    expect(resultMovementCost).toBe(TEST_MOVEMENT_SPEC.baseActionTime);
+    expect(resultMovementCost).toBe(TEST_MOVEMENT_SPEC.baseMovementTime);
     expect(entityLocation.getCell).toHaveBeenCalled();
     expect(entity.determineVisibleCells).toHaveBeenCalled();
   });
@@ -170,7 +170,7 @@ describe('EntityMovement', () => {
     entityLocation.getCell = jest.fn(() => oldCell);
 
     const resultMovementCost = entityMovement.confirmMove(newCell);
-    expect(resultMovementCost).toBe(TEST_MOVEMENT_SPEC.baseActionTime);
+    expect(resultMovementCost).toBe(TEST_MOVEMENT_SPEC.baseMovementTime);
     expect(oldCell.entity).toBeUndefined();
     expect(newCell.entity).toBe(entity);
     expect(entity.determineVisibleCells).toHaveBeenCalled();

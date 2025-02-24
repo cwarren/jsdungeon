@@ -49,7 +49,7 @@ const TEST_ENTITIES_DEFINITIONS = [
     },
     baseViewRadius: 5, baseHealthRoll: '1d10', baseActionTime: 100, baseNaturalHealingAmount: 0.01,
     naturalHealingTicks: 100,
-    movementSpec: { movementType: 'WALK', baseActionTime: 100 },
+    movementSpec: { movementType: 'WALK', baseMovementTime: 100 },
     meleeAttack: TEST_DAMAGE_SPEC,
     relations: { iFeelAboutOthersP2: "HOSTILE_TO" },
   }
