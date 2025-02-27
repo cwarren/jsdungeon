@@ -12,6 +12,48 @@ could add
 
 Develop this idea further when getting into skills and such....
 
+
+follow-up thoughts:
+* there's already a body-oriented pool with HP - maybe don't need SP? but... stamina might be the blended pool, derived from body, mind, and spirit (I think I like that...)
+* * SP as it's often concieved is essentially just a different kind of mana points for different kinds of things
+* * * if keeping SP, need to make sure it's more mechanically distinct from mana, e.g.
+* * * * goes down when physical things are done, but by a multiplicative %, not a flat cost
+* * * * not "spent" explicitly - just happens
+* * * * current level is used as a factor in certain calculations, and occasionally a threshold limiter (somewhat akin to focus below, but where focus is more threshold-y, stamina is more factor-y)
+* * * * passive restoration is very low
+* * * * active restoration (resting / sleeping) is very high
+
+maybe mind-body-spirit have slightly different mechanics
+* body - health pool / points - other things remove them, if you hit 0 you die, you recover them over time
+* * this is the classic hit points
+
+* mind - focus points - maybe this is not a spend-type resource but instead a threshold-type resource and factor-type resource, focus of 0 doesn't stop you completely, but it stops you from doing anything complicated and generally reduces your capabilities and makes even simple things harder
+* * the things that depend on focus don't generally use up focus, but they require focus to be above a certain level
+* * certain things can reduce focus, but they're more like debuffs than depletions
+* * an entity has a max focus, which (excluding exception mechanics like items and buffs and such) depends on their attributes (mostly the mind ones)
+* * the entity's effective focus is generally lower than their max focus - most people are not at their max focus most of the time
+* * * typically say .6 of max
+* * * may go down based on environment
+* * * accumulates penalties over time - removed by sleeping for a certain amount of time (the details on this TBD, but likely non-linear)
+* * * * NOTE: not calling it a debuff because (to me) that implies a duration-based effect, but in this situation they simply pile up / accumulate and don't go away until specific action it take to deal with them
+* * * active effects may buff it for a while
+* * * * e.g. a Concentrate skill, which temporarily raises focus to 1/2 way (as an example - varies with skill level) between current level and max
+* * * * e.g. a focusing aid may give a flat increase up to (or maybe even above) the max
+* * mechanically, focus comes into play 2 main ways
+* * * as a threshold - certain skills require a focus of a certain level to be able to use the skill - this is more common for active skills
+* * * as a factor - used in the calculation of skill outcomes / evaluations - this is more common for passive skills
+* * specialized things (classes, supporting skills, etc.) may alter / magnify effective focus for certain skills / situations
+* * focus probably has a lot of non-linear stuff going on in terms of recovery targets, increases and decreases, etc.
+* * * also a lot of specific triggered things - e.g.
+* * * * dropping below a certain HP threshold dings your (but won't ding it again until you go above a certain threshold)
+* * * * a structure or location that aligns with the entities interests will increase effective focus when within range of it and for a time after
+* * * * a brief break / rest will increase focus if it's below a certain threshold... or if it's been reduced within a given amount of recent time
+
+* spirit - mojo pool - deliberately spent, and recovered over time, you need to have them to be able to spend them
+* * this is the classic mana points
+
+In general, I like where this is going.... (at least for now - may end up too simulation-y )
+
 -------------------------
 
 core formulas

@@ -1,8 +1,6 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* figure out why things break when view radius is a decimal, fix it, then update getViewRadius to remove the Math.floor at the end
-
 * implement basic character sheet
 * * attributes
 * * resource pools - current & max
