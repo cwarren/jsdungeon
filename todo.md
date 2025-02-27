@@ -1,6 +1,8 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
+* add to utils a valueMod combiner function
+
 * implement primary combat support Entity methods to use attributes
 * * implement damage generation (in getMeleeHitEffectGenerators method?)
 * * update entity definitions to support new combat paradigm (precision, evasion, effect generators for hit, evade, etc.)

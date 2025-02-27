@@ -410,6 +410,7 @@ class Entity {
   }
 
   applyAttackEffect(effectSource, effect) {
+    // effect mitigation in this function, or deeper down? Maybe some of each - probably will make sense to do different things in different places
     if (effect instanceof EffDamage) {
       return this.takeDamageFrom(effect, effectSource);
     }
@@ -447,15 +448,12 @@ class Entity {
   // ------------------
   // HEALTH
 
-  takeDamageFrom(dam, otherEntity) {
-    devTrace(4, "taking attack damage from entity", this, dam, otherEntity);
+  takeDamageFrom(effDam, otherEntity) {
+    devTrace(4, "taking attack damage from entity", this, effDam, otherEntity);
 
-    // future: add damage mitigation here...? (base on effect.types?)
-    let damAmount = dam.amount;
+    let damAmount = this.getMitigatedDamageAmount(effDam, otherEntity);
 
-    // TODO?: based on dam.types, get value adjustments - first from source (enhancements), then from self (mitigations)
-
-    damAmount = constrainValue(dam.amount, 0, this.health.curHealth + 1);
+    damAmount = constrainValue(effDam.amount, 0, this.health.curHealth + 1);
 
     this.health.takeDamage(damAmount);
 
@@ -477,6 +475,37 @@ class Entity {
 
     return null;
   }
+
+  // NOTE: modifers for mitigation are inverted relative to most other cases, as the point is reduction, not increase
+  getMitigatedDamageAmount(effDam, effSource) {
+    let damAmount = effDam.amount;
+    console.log(`initial damage amount: ${damAmount}`);
+
+    if (effDam.types.includes('PHYSICAL')) {
+      // attribute-based: fortitude (moderate), strength (minor), aura (very minor)
+      const physicalMitigtionAttributeModifers = [
+        {
+          multipliers: [
+            Math.sqrt(Math.sqrt(EntityAttributes.BASE_VALUE / this.attributes.strength)),
+            Math.sqrt(Math.sqrt(Math.sqrt(EntityAttributes.BASE_VALUE / this.attributes.aura))),
+          ],
+          flats: [
+            (EntityAttributes.BASE_VALUE - this.attributes.fortitude) / 45,
+          ]
+        },
+        {
+          multipliers: [
+            Math.sqrt(EntityAttributes.BASE_VALUE / this.attributes.fortitude),
+          ], flats: []
+        },
+      ];
+      damAmount = valueCalc(damAmount, physicalMitigtionAttributeModifers);
+    }
+
+    console.log(`    mitigated damage amount: ${damAmount}`);
+    return damAmount;
+  }
+
 
   // assign death credits, remove this entity from the game
   die() {
