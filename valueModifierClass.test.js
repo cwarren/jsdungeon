@@ -97,6 +97,85 @@ describe('ValueModifier', () => {
         // Step 2: (25 * 0.5 * 3) + 2 - 1 = 38.5
         expect(result).toBe(38.5);
     });
+
+    describe('ValueModifier - combine', () => {
+
+        test('should combine multiple ValueModifiers with the same number of layers', () => {
+            const vm1 = new ValueModifier([
+                new ModifierLayer([1.2], [5]),
+                new ModifierLayer([1.1], [3])
+            ]);
+
+            const vm2 = new ValueModifier([
+                new ModifierLayer([0.9], [-2]),
+                new ModifierLayer([1.05], [4])
+            ]);
+
+            const combined = ValueModifier.combine(vm1, vm2);
+
+            expect(combined.modifierLayers.length).toBe(2);
+            expect(combined.modifierLayers[0].multipliers).toEqual([1.2, 0.9]);
+            expect(combined.modifierLayers[0].flats).toEqual([5, -2]);
+            expect(combined.modifierLayers[1].multipliers).toEqual([1.1, 1.05]);
+            expect(combined.modifierLayers[1].flats).toEqual([3, 4]);
+        });
+
+        test('should handle ValueModifiers with different numbers of layers', () => {
+            const vm1 = new ValueModifier([
+                new ModifierLayer([1.2], [5]),
+                new ModifierLayer([1.1], [3])
+            ]);
+
+            const vm2 = new ValueModifier([
+                new ModifierLayer([0.9], [-2])
+            ]);
+
+            const combined = ValueModifier.combine(vm1, vm2);
+
+            expect(combined.modifierLayers.length).toBe(2);
+            expect(combined.modifierLayers[0].multipliers).toEqual([1.2, 0.9]);
+            expect(combined.modifierLayers[0].flats).toEqual([5, -2]);
+            expect(combined.modifierLayers[1].multipliers).toEqual([1.1]);
+            expect(combined.modifierLayers[1].flats).toEqual([3]);
+        });
+
+        test('should return an empty ValueModifier when no arguments are passed', () => {
+            const combined = ValueModifier.combine();
+
+            expect(combined.modifierLayers.length).toBe(0);
+        });
+
+        test('should return an identical ValueModifier when only one is passed', () => {
+            const vm = new ValueModifier([
+                new ModifierLayer([1.3], [7]),
+                new ModifierLayer([1.2], [4])
+            ]);
+
+            const combined = ValueModifier.combine(vm);
+
+            expect(combined.modifierLayers.length).toBe(2);
+            expect(combined.modifierLayers[0].multipliers).toEqual([1.3]);
+            expect(combined.modifierLayers[0].flats).toEqual([7]);
+            expect(combined.modifierLayers[1].multipliers).toEqual([1.2]);
+            expect(combined.modifierLayers[1].flats).toEqual([4]);
+        });
+
+        test('should handle ValueModifiers with empty layers', () => {
+            const vm1 = new ValueModifier([
+                new ModifierLayer([], [5])
+            ]);
+
+            const vm2 = new ValueModifier([
+                new ModifierLayer([0.9], [])
+            ]);
+
+            const combined = ValueModifier.combine(vm1, vm2);
+
+            expect(combined.modifierLayers.length).toBe(1);
+            expect(combined.modifierLayers[0].multipliers).toEqual([0.9]);
+            expect(combined.modifierLayers[0].flats).toEqual([5]);
+        });
+    });
 });
 
 describe('ModifierLayer', () => {
@@ -113,4 +192,69 @@ describe('ModifierLayer', () => {
         expect(modifierLayer.multipliers).toEqual([]);
         expect(modifierLayer.flats).toEqual([]);
     });
+
+    describe('ModifierLayer - combine', () => {
+        // Tests for combine static method
+        test('should combine two ModifierLayers correctly', () => {
+            const layer1 = new ModifierLayer([1.5, 2], [5]);
+            const layer2 = new ModifierLayer([0.8], [-2, 3]);
+
+            const combinedLayer = ModifierLayer.combine(layer1, layer2);
+
+            expect(combinedLayer.multipliers).toEqual([1.5, 2, 0.8]);
+            expect(combinedLayer.flats).toEqual([5, -2, 3]);
+        });
+
+        test('should combine multiple ModifierLayers correctly', () => {
+            const layer1 = new ModifierLayer([1.5], [5]);
+            const layer2 = new ModifierLayer([0.8], [-2]);
+            const layer3 = new ModifierLayer([1.1, 0.9], [4, -1]);
+
+            const combinedLayer = ModifierLayer.combine(layer1, layer2, layer3);
+
+            expect(combinedLayer.multipliers).toEqual([1.5, 0.8, 1.1, 0.9]);
+            expect(combinedLayer.flats).toEqual([5, -2, 4, -1]);
+        });
+
+        test('should handle combining an empty ModifierLayer with a non-empty one', () => {
+            const layer1 = new ModifierLayer();
+            const layer2 = new ModifierLayer([1.2, 0.7], [3, -1]);
+
+            const combinedLayer = ModifierLayer.combine(layer1, layer2);
+
+            expect(combinedLayer.multipliers).toEqual([1.2, 0.7]);
+            expect(combinedLayer.flats).toEqual([3, -1]);
+        });
+
+        test('should handle combining partially full ModifierLayers', () => {
+            const layer1 = new ModifierLayer([1.5], []);
+            const layer2 = new ModifierLayer([], [-2]);
+            const layer3 = new ModifierLayer([1.1], [4]);
+
+            const combinedLayer = ModifierLayer.combine(layer1, layer2, layer3);
+
+            expect(combinedLayer.multipliers).toEqual([1.5, 1.1]);
+            expect(combinedLayer.flats).toEqual([-2, 4]);
+        });
+
+        test('should return an empty ModifierLayer when combining only empty layers', () => {
+            const layer1 = new ModifierLayer();
+            const layer2 = new ModifierLayer();
+
+            const combinedLayer = ModifierLayer.combine(layer1, layer2);
+
+            expect(combinedLayer.multipliers).toEqual([]);
+            expect(combinedLayer.flats).toEqual([]);
+        });
+
+        test('should handle combining a single ModifierLayer (no-op case)', () => {
+            const layer1 = new ModifierLayer([1.3, 0.9], [4, -2]);
+
+            const combinedLayer = ModifierLayer.combine(layer1);
+
+            expect(combinedLayer.multipliers).toEqual([1.3, 0.9]);
+            expect(combinedLayer.flats).toEqual([4, -2]);
+        });
+    });
+
 });

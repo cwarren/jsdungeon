@@ -1,7 +1,6 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* turn value modifer into a real class
 * make a valueMod combiner function
 
 * implement primary combat support Entity methods to use attributes
