@@ -1,7 +1,7 @@
 import { Entity } from './entityClass.js';
 import { getEntityDef } from "./entityDefinitions.js";
 import { gameState } from '../gameStateClass.js';
-import { rollDice, constrainValue, valueCalc } from '../util.js';
+import { rollDice, constrainValue } from '../util.js';
 import { EntityHealth } from './entityHealthClass.js';
 import { EntityLocation } from './entityLocationClass.js';
 import { EntityMovement } from './entityMovementClass.js';
@@ -17,7 +17,6 @@ import { Attack } from '../effect/attackClass.js';
 jest.mock('../util.js', () => ({
   rollDice: jest.fn(),
   constrainValue: jest.requireActual('../util.js').constrainValue,
-  valueCalc: jest.requireActual('../util.js').valueCalc,
   formatNumberForMessage: jest.requireActual('../util.js').formatNumberForMessage,
   devTrace: jest.fn(),
 }));

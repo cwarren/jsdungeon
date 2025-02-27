@@ -1,6 +1,6 @@
 import { gameState } from "../gameStateClass.js";
 import { EffDamage } from "../effect/effDamageClass.js";
-import { rollDice, getRandomListItem, constrainValue, devTrace, formatNumberForMessage, valueCalc } from "../util.js";
+import { rollDice, getRandomListItem, constrainValue, devTrace, formatNumberForMessage } from "../util.js";
 import { ENTITIES_DEFINITIONS } from "./entityDefinitions.js";
 import { uiPaneMessages } from "../ui/ui.js";
 import { EntityHealth, DEFAULT_NATURAL_HEALING_TICKS } from "./entityHealthClass.js";
@@ -9,6 +9,7 @@ import { EntityMovement } from "./entityMovementClass.js";
 import { EntityVision } from "./entityVisionClass.js";
 import { Attack } from "../effect/attackClass.js";
 import { EntityAttributes } from "./entityAttributesClass.js";
+import { ValueModifier, ModifierLayer } from "../valueModifierClass.js";
 
 const DEFAULT_ACTION_COST = 100;
 
@@ -77,21 +78,23 @@ class Entity {
   // fortitude (minor), awareness (major), psyche (minor)
   getViewRadius() {
     let baseViewRadius = Entity.ENTITIES[this.type].baseViewRadius;
-    let viewRadiusModifiers = [
-      {
-        multipliers: [], flats: [
+    let viewRadiusModifier = new ValueModifier([
+      new ModifierLayer(
+        [],
+        [
           (this.attributes.awareness - EntityAttributes.BASE_VALUE) / 14,
           (this.attributes.fortitude - EntityAttributes.BASE_VALUE) / 51,
           (this.attributes.psyche - EntityAttributes.BASE_VALUE) / 39,
         ]
-      },
-      {
-        multipliers: [
+      ),
+      new ModifierLayer(
+        [
           this.attributes.awareness / EntityAttributes.BASE_VALUE,
-        ], flats: []
-      },
-    ];
-    return Math.floor(valueCalc(baseViewRadius, viewRadiusModifiers));
+        ],
+        []
+      ),
+    ]);
+    return Math.floor(viewRadiusModifier.appliedTo(baseViewRadius))
   }
 
   isVisibleTo(otherEntity) {
@@ -314,32 +317,35 @@ class Entity {
     if (Entity.ENTITIES[this.type].basePrecision) { attackPrecision = Entity.ENTITIES[this.type].basePrecision; }
 
     // dexterity (major), awareness (moderate), refinement (minor), strength (moderate), psyche (minor)
-    let attackPrecisionModifiers = [
-      {
-        multipliers: [],
-        flats: [
+    let attackPrecisionModifier = new ValueModifier([
+      new ModifierLayer(
+        [],
+        [
           (this.attributes.dexterity) / 6,
           (this.attributes.awareness) / 17,
           (this.attributes.strength - EntityAttributes.BASE_VALUE) / 28,
         ]
-      },
-      {
-        multipliers: [
+      ),
+      new ModifierLayer(
+        [
           this.attributes.dexterity / EntityAttributes.BASE_VALUE,
           Math.sqrt(this.attributes.awareness / EntityAttributes.BASE_VALUE),
-        ], flats: [
+        ],
+        [
           (this.attributes.refinement - EntityAttributes.BASE_VALUE) / 39,
           (this.attributes.psyche - EntityAttributes.BASE_VALUE) / 43,
         ]
-      },
-      {
-        multipliers: [
+      ),
+      new ModifierLayer(
+        [
           Math.sqrt(this.attributes.dexterity / EntityAttributes.BASE_VALUE),
-        ], flats: []
-      },
-    ];
+        ],
+        []
+      ),
+    ]);
+
     // console.log(`AAAAAAAAAAAAAAA ${this.name} attackPrecisionModifiers`, attackPrecisionModifiers);
-    attackPrecision = valueCalc(attackPrecision, attackPrecisionModifiers);
+    attackPrecision = attackPrecisionModifier.appliedTo(attackPrecision);
     // console.log(`BBBBBBBBBBBBBBB ${this.name} attackPrecision`, attackPrecision);
     return Math.floor(attackPrecision);
   }
@@ -348,31 +354,33 @@ class Entity {
     let attackEvasion = 0;
     if (Entity.ENTITIES[this.type].baseEvasion) { attackEvasion = Entity.ENTITIES[this.type].baseEvasion; }
 
-
     // dexterity (major), awareness (major), refinement (moderate)
-    let attackEvasionModifiers = [
-      {
-        multipliers: [],
-        flats: [
+    let attackEvasionModifier = new ValueModifier([
+      new ModifierLayer(
+        [],
+        [
           (this.attributes.dexterity) / 13,
           (this.attributes.awareness) / 14,
         ]
-      },
-      {
-        multipliers: [
+      ),
+      new ModifierLayer(
+        [
           this.attributes.dexterity / EntityAttributes.BASE_VALUE,
-        ], flats: [
+        ],
+        [
           (this.attributes.refinement - EntityAttributes.BASE_VALUE) / 26,
         ]
-      },
-      {
-        multipliers: [
+      ),
+      new ModifierLayer(
+        [
           Math.sqrt(this.attributes.awareness / EntityAttributes.BASE_VALUE),
-        ], flats: []
-      },
-    ];
+        ],
+        []
+      ),
+    ]);
+
     // console.log(`CCCCCCCCCCCCCCC ${this.name} attackEvasionModifiers`, attackEvasionModifiers);
-    attackEvasion = valueCalc(attackEvasion, attackEvasionModifiers);
+    attackEvasion = attackEvasionModifier.appliedTo(attackEvasion);
     // console.log(`DDDDDDDDDDDDDDD ${this.name} attackEvasion`, attackEvasion);
     return Math.floor(attackEvasion);
   }
@@ -483,23 +491,25 @@ class Entity {
 
     if (effDam.types.includes('PHYSICAL')) {
       // attribute-based: fortitude (moderate), strength (minor), aura (very minor)
-      const physicalMitigtionAttributeModifers = [
-        {
-          multipliers: [
+      const physicalMitigtionAttributeModifer = new ValueModifier([
+        new ModifierLayer(
+          [
             Math.sqrt(Math.sqrt(EntityAttributes.BASE_VALUE / this.attributes.strength)),
             Math.sqrt(Math.sqrt(Math.sqrt(EntityAttributes.BASE_VALUE / this.attributes.aura))),
           ],
-          flats: [
+          [
             (EntityAttributes.BASE_VALUE - this.attributes.fortitude) / 45,
           ]
-        },
-        {
-          multipliers: [
+        ),
+        new ModifierLayer(
+          [
             Math.sqrt(EntityAttributes.BASE_VALUE / this.attributes.fortitude),
-          ], flats: []
-        },
-      ];
-      damAmount = valueCalc(damAmount, physicalMitigtionAttributeModifers);
+          ],
+          []
+        ),
+      ]);
+
+      damAmount = physicalMitigtionAttributeModifer.appliedTo(damAmount);
     }
 
     console.log(`    mitigated damage amount: ${damAmount}`);
@@ -548,62 +558,59 @@ class Entity {
     let maxHealth = rollDice(Entity.ENTITIES[this.type].baseHealthRoll);
 
     // fortitude (major), strength (minor), stability (minor), aura (minor), depth (moderate)
-    let maxHealthModifiers = [
-      {
-        multipliers: [],
-        flats: [
-          (this.attributes.fortitude - EntityAttributes.BASE_VALUE) / 11,
-          (this.attributes.strength - EntityAttributes.BASE_VALUE) / 34,
-        ]
-      },
-      {
-        multipliers: [
-          this.attributes.fortitude / EntityAttributes.BASE_VALUE,
-          Math.sqrt(this.attributes.depth / EntityAttributes.BASE_VALUE),
-        ], flats: [
-          (this.attributes.stability - EntityAttributes.BASE_VALUE) / 47,
+    let maxHealthModifier = new ValueModifier([
+      new ModifierLayer(
+        [],
+        [(this.attributes.fortitude - EntityAttributes.BASE_VALUE) / 11,
+          (this.attributes.strength - EntityAttributes.BASE_VALUE) / 34,]
+      ),
+      new ModifierLayer(
+        [this.attributes.fortitude / EntityAttributes.BASE_VALUE,
+          Math.sqrt(this.attributes.depth / EntityAttributes.BASE_VALUE),],
+        [(this.attributes.stability - EntityAttributes.BASE_VALUE) / 47,
           (this.attributes.aura - EntityAttributes.BASE_VALUE) / 55,
-          (this.attributes.depth - EntityAttributes.BASE_VALUE) / 26,
-        ]
-      },
-      {
-        multipliers: [
-          Math.sqrt(this.attributes.fortitude / EntityAttributes.BASE_VALUE),
-        ], flats: []
-      },
-    ];
-    return Math.floor(valueCalc(maxHealth, maxHealthModifiers));
+          (this.attributes.depth - EntityAttributes.BASE_VALUE) / 26,]
+      ),
+      new ModifierLayer(
+        [Math.sqrt(this.attributes.fortitude / EntityAttributes.BASE_VALUE),],
+        []
+      ),
+    ]);
+
+    return Math.floor(maxHealthModifier.appliedTo(maxHealth));
   }
 
   getNaturalHealingAmount() {
     let healingAmount = Entity.ENTITIES[this.type].baseNaturalHealingAmount;
 
     // recovery (major), fortitude (minor), flow (minor)
-    let healingAmountModifiers = [
-      {
-        multipliers: [],
-        flats: [
+    let healingAmountModifier = new ValueModifier([
+      new ModifierLayer(
+        [],
+        [
           (this.attributes.fortitude - EntityAttributes.BASE_VALUE) / 41,
           (this.attributes.flow - EntityAttributes.BASE_VALUE) / 37,
         ]
-      },
-      {
-        multipliers: [
+      ),
+      new ModifierLayer(
+        [
           this.attributes.recovery / EntityAttributes.BASE_VALUE,
-        ], flats: [
+        ],
+        [
           (this.attributes.recovery - EntityAttributes.BASE_VALUE) / 17,
           (this.attributes.fortitude - EntityAttributes.BASE_VALUE) / 33,
           (this.attributes.flow - EntityAttributes.BASE_VALUE) / 37,
         ]
-      },
-      {
-        multipliers: [
+      ),
+      new ModifierLayer(
+        [
           Math.sqrt(this.attributes.recovery / EntityAttributes.BASE_VALUE),
-        ], flats: []
-      },
-    ];
+        ],
+        []
+      ),
+    ]);
 
-    return valueCalc(healingAmount, healingAmountModifiers);
+    return healingAmountModifier.appliedTo(healingAmount);
   }
 
   getNaturalHealingTime() {
@@ -613,35 +620,37 @@ class Entity {
     let healingTime = DEFAULT_NATURAL_HEALING_TICKS;
 
     // recovery (major), fortitude (moderate), will (minor), refinement (minor), flow (minor)
-    let healingTimeModifiers = [
-      {
-        multipliers: [
+    let healingTimeModifier = new ValueModifier([
+      new ModifierLayer(
+        [
           Math.sqrt(this.attributes.fortitude / EntityAttributes.BASE_VALUE),
         ],
-        flats: [
+        [
           (this.attributes.recovery - EntityAttributes.BASE_VALUE) / 19,
           (this.attributes.fortitude - EntityAttributes.BASE_VALUE) / 11,
           (this.attributes.refinement - EntityAttributes.BASE_VALUE) / 35,
         ]
-      },
-      {
-        multipliers: [], flats: [
+      ),
+      new ModifierLayer(
+        [],
+        [
           (this.attributes.will - EntityAttributes.BASE_VALUE) / 47,
           (this.attributes.flow - EntityAttributes.BASE_VALUE) / 26,
         ]
-      },
-      {
-        multipliers: [
+      ),
+      new ModifierLayer(
+        [
           this.attributes.recovery / EntityAttributes.BASE_VALUE,
-        ], flats: [
+        ],
+        [
           (this.attributes.recovery - EntityAttributes.BASE_VALUE) / 7,
         ]
-      },
-    ];
+      ),
+    ]);
 
-    const adjHealingTime = valueCalc(healingTime, healingTimeModifiers)
+    const adjHealingTime = healingTimeModifier.appliedTo(healingTime);
 
-    return healingTime * ( healingTime / adjHealingTime);
+    return healingTime * (healingTime / adjHealingTime);
   }
 
   // ------------------

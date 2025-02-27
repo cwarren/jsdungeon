@@ -7,7 +7,6 @@ import {
     getListIntersection,
     constrainValue,
     createHelpText,
-    valueCalc
 } from './util';
 
 describe('devTrace', () => {
@@ -166,59 +165,3 @@ describe('createHelpText', () => {
     });
 });
 
-describe('valueCalc', () => {
-    
-    test('should correctly apply multipliers and flats in order', () => {
-        const baseValue = 100;
-        const modifiers = [
-            { multipliers: [1.1, 1.2], flats: [5, 10] }, // (100 * 1.1 * 1.2) + 5 + 10
-            { multipliers: [0.9], flats: [-3] } // * 0.9 - 3
-        ];
-        const expectedValue = ((100 * 1.1 * 1.2) + 5 + 10) * 0.9 - 3;
-        expect(valueCalc(baseValue, modifiers)).toBeCloseTo(expectedValue, 5);
-    });
-
-    test('should return base value when no modifiers are provided', () => {
-        expect(valueCalc(50, [])).toBe(50);
-    });
-
-    test('should handle only multipliers', () => {
-        const baseValue = 20;
-        const modifiers = [{ multipliers: [2, 3], flats: [] }]; // 20 * 2 * 3
-        expect(valueCalc(baseValue, modifiers)).toBe(120);
-    });
-
-    test('should handle only flats', () => {
-        const baseValue = 30;
-        const modifiers = [{ multipliers: [], flats: [5, 10] }]; // 30 + 5 + 10
-        expect(valueCalc(baseValue, modifiers)).toBe(45);
-    });
-
-    test('should handle missing multipliers or flats fields', () => {
-        const baseValue = 10;
-        const modifiers = [{ multipliers: [2] }, { flats: [5] }]; // 10 * 2 + 5
-        expect(valueCalc(baseValue, modifiers)).toBe(25);
-    });
-
-    test('should handle an empty object in modifier layers', () => {
-        const baseValue = 15;
-        const modifiers = [{}]; // No changes applied
-        expect(valueCalc(baseValue, modifiers)).toBe(15);
-    });
-
-    test('should handle multiple empty modifier layers', () => {
-        const baseValue = 25;
-        const modifiers = [{}, {}, {}]; // No changes applied
-        expect(valueCalc(baseValue, modifiers)).toBe(25);
-    });
-
-    test('should handle negative multipliers and flats', () => {
-        const baseValue = 40;
-        const modifiers = [
-            { multipliers: [1.5, -2], flats: [-10, 5] } // (40 * 1.5 * -2) - 10 + 5
-        ];
-        const expectedValue = (40 * 1.5 * -2) - 10 + 5;
-        expect(valueCalc(baseValue, modifiers)).toBe(expectedValue);
-    });
-
-});

@@ -18,7 +18,7 @@ class ValueModifier {
      * @param {number} baseValue - The initial value before modifications.
      * @returns {number} - The modified value after applying all layers.
      */
-    apply(baseValue) {
+    appliedTo(baseValue) {
         let curValue = baseValue;
 
         this.modifierLayers.forEach(modifierLayer => {
@@ -36,14 +36,6 @@ class ValueModifier {
         });
     
         return curValue;
-    }
-
-    /**
-     * Returns a copy of the modifier layers.
-     * @returns {Array<Object>}
-     */
-    getModifiers() {
-        return JSON.parse(JSON.stringify(this.modifiers));
     }
 }
 
