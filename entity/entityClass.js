@@ -94,7 +94,7 @@ class Entity {
         []
       ),
     ]);
-    return Math.floor(viewRadiusModifier.appliedTo(baseViewRadius))
+    return viewRadiusModifier.appliedTo(baseViewRadius);
   }
 
   isVisibleTo(otherEntity) {
@@ -487,7 +487,7 @@ class Entity {
   // NOTE: modifers for mitigation are inverted relative to most other cases, as the point is reduction, not increase
   getMitigatedDamageAmount(effDam, effSource) {
     let damAmount = effDam.amount;
-    console.log(`initial damage amount: ${damAmount}`);
+    // console.log(`initial damage amount: ${damAmount}`);
 
     if (effDam.types.includes('PHYSICAL')) {
       // attribute-based: fortitude (moderate), strength (minor), aura (very minor)
@@ -512,7 +512,7 @@ class Entity {
       damAmount = physicalMitigtionAttributeModifer.appliedTo(damAmount);
     }
 
-    console.log(`    mitigated damage amount: ${damAmount}`);
+    // console.log(`    mitigated damage amount: ${damAmount}`);
     return damAmount;
   }
 

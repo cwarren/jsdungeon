@@ -1,5 +1,6 @@
 import { generateGrid_empty } from "./gridGeneration.js";
 import { GridCell } from "./gridCellClass.js";
+import { devTrace } from "../util.js";
 
 function applyCellularAutomataSmoothing(grid, terrainToSmooth = "WALL") {
     const width = grid.length;
@@ -230,6 +231,7 @@ function determineCheapestMovementPathForEntity(ent, endCell, worldLevel) {
 }
 
 function computeBresenhamLine(x0, y0, x1, y1) {
+    devTrace(9, `computeBresenhamLine (${x0},${y0}) to (${x1},${y1})`);
     let points = [];
     let dx = Math.abs(x1 - x0);
     let dy = Math.abs(y1 - y0);

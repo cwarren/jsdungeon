@@ -1,4 +1,4 @@
-import { devTrace } from "../util.js";
+import { devTrace, constrainValue } from "../util.js";
 import { computeBresenhamLine } from '../world/gridUtils.js';
 
 const DEFAULT_VIEW_RADIUS = 1;
@@ -52,8 +52,8 @@ class EntityVision {
     const worldWidth = grid.length;
     const worldHeight = grid[0].length;
 
-    for (let dx = -this.viewRadius; dx <= this.viewRadius; dx++) {
-      for (let dy = -this.viewRadius; dy <= this.viewRadius; dy++) {
+    for (let dx = Math.floor(-this.viewRadius); dx <= Math.ceil(this.viewRadius); dx++) {
+      for (let dy = Math.floor(-this.viewRadius); dy <= Math.ceil(this.viewRadius); dy++) {
         let targetX = this.location.x + dx;
         let targetY = this.location.y + dy;
 
@@ -66,10 +66,11 @@ class EntityVision {
           continue; // Skip cells outside the circular view radius
         }
 
-        let linePoints = computeBresenhamLine(this.location.x, this.location.y, targetX, targetY);
+        let linePoints = computeBresenhamLine(Math.floor(this.location.x), Math.floor(this.location.y), Math.floor(targetX), Math.floor(targetY));
         let obstructed = false;
 
         for (let [lx, ly] of linePoints) {
+          if (lx < 0 || lx >= grid.length || ly < 0 || ly >= grid[0].length) { continue; } // Skip out-of-bounds cells
           let cell = grid[lx][ly];
           this.visibleCells.add(cell);
           this.seenCells.add(cell);
@@ -81,6 +82,7 @@ class EntityVision {
       }
     }
   }
+
 }
 
 export { EntityVision, DEFAULT_VIEW_RADIUS };
