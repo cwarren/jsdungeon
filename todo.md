@@ -1,11 +1,6 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* implement basic character sheet
-* * attributes
-* * resource pools - current & max
-* * * stub out pools that don't exist yet
-
 * tackle game persistence
 * * serialize & deserialize a bunch of stuff
 * * * game state in general
@@ -19,6 +14,10 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * probably implement an entity repository (and model for other instance repositories)
 * * * update all entity references (other than ofEntity) to use the entity repo key rather than a direct reference
 * * timing queue
+
+* create a help screen for the char sheet
+* * explain / summarize the character screen in general
+* * generate help text for attributes from info in EntityAttributes - add a getHelpText static method to that class
 
 * messages
 * * for gaining advancement points
