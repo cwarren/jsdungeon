@@ -35,9 +35,9 @@ class UIPaneMainRendererCharacterSheet extends UIPaneMainRenderer {
         y += lineHeight * 2;
 
         // Column Headers
-        ctx.fillText("BODY", bodyX, y);
-        ctx.fillText("MIND", mindX, y);
-        ctx.fillText("SPIRIT", spiritX, y);
+        ctx.fillText("  [body]", bodyX, y);
+        ctx.fillText("  [mind]", mindX, y);
+        ctx.fillText("  [spirit]", spiritX, y);
         y += lineHeight;
 
         // Attributes
@@ -59,8 +59,16 @@ class UIPaneMainRendererCharacterSheet extends UIPaneMainRenderer {
 
         // Resource Pools
         ctx.fillText(`HP: ${fnum(avatar.health.curHealth)} / ${fnum(avatar.health.maxHealth)}`, bodyX, y);
-        ctx.fillText(`FP: XX / XX`, mindX, y); // Placeholder until focus pool is implemented
+        ctx.fillText(`Foc: XX / XX`, mindX, y); // Placeholder until focus pool is implemented
         ctx.fillText(`MP: XX / XX`, spiritX, y); // Placeholder until mojo pool is implemented
+
+        // Resource Recovery
+        y += lineHeight * 1;
+        ctx.fillText(`+ ${fnum(avatar.health.getHealAmountPerInterval(),3)} per ${fnum(avatar.health.naturalHealingTicks)}t`, bodyX, y);
+        ctx.fillText(`+ XX`, mindX, y);
+        ctx.fillText(`+ XX`, spiritX, y);
+
+
         y += lineHeight * 2;
 
         // View Distance
