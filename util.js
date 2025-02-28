@@ -110,6 +110,20 @@ function formatNumberForMessage(num) {
     }
 }
 
+function formatNumberForShortDisplay(num, places=0) {
+    let displayNum = (num).toFixed(places);
+    const placeBase = Math.pow(10,places);
+    const diffThreshold = 1/placeBase * .001;
+    if (Math.abs(num - displayNum) < diffThreshold) {
+        return `${displayNum}`;
+    }
+    if (num < displayNum) {
+        return `~ ${displayNum}(-)`;
+    } else {
+        return `~ ${displayNum}(+)`;
+    }
+}
+
 export {
     rollDice,
     rollDiceGroup,
@@ -120,4 +134,5 @@ export {
     createHelpText,
     devTrace,
     formatNumberForMessage,
+    formatNumberForShortDisplay,
 };

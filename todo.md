@@ -4,7 +4,21 @@ PS E:\code\jsdungeon> docker-compose up --build
 * implement basic character sheet
 * * attributes
 * * resource pools - current & max
+* * * stub out pools that don't exist yet
 
+* tackle game persistence
+* * serialize & deserialize a bunch of stuff
+* * * game state in general
+* * * entity
+* * * * avatar
+* * * * all the specials - vision, attributes, health, movement, etc.
+* * * world level
+* * * * grid - NOTE: this would greatly benefit from some compression - most grid cells are the same, so be smart about handling that
+* * * * grid cell
+* * * structure
+* * probably implement an entity repository (and model for other instance repositories)
+* * * update all entity references (other than ofEntity) to use the entity repo key rather than a direct reference
+* * timing queue
 
 * messages
 * * for gaining advancement points
@@ -126,3 +140,9 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * figure out why the infinite processing happens
 * * fix it
 * * * test to expose? depends on the particular issue/reason....
+
+
+LONG TERM
+* split into FE & BE, so the game mechanics are handled server-side
+* deploy to AWS
+* player account system?

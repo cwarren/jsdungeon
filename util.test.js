@@ -1,6 +1,7 @@
 import {
     devTrace,
     formatNumberForMessage,
+    formatNumberForShortDisplay,
     rollDice,
     rollDiceGroup,
     getRandomListItem,
@@ -43,6 +44,54 @@ describe('formatNumberForMessage', () => {
 
     test('should return rounded number with "a bit less than" if it is not an integer and is less than the rounded value', () => {
         expect(formatNumberForMessage(5.7)).toBe('a bit less than 6');
+    });
+});
+
+describe('formatNumberForShortDisplay', () => {
+    test('returns exact number when no rounding needed', () => {
+        expect(formatNumberForShortDisplay(100)).toBe('100');
+        expect(formatNumberForShortDisplay(42.5, 1)).toBe('42.5');
+    });
+
+    test('rounds to the specified decimal places', () => {
+        expect(formatNumberForShortDisplay(3.14159, 2)).toBe('~ 3.14(+)');
+        expect(formatNumberForShortDisplay(2.499, 0)).toBe('~ 2(+)');
+    });
+
+    test('handles negative numbers correctly', () => {
+        expect(formatNumberForShortDisplay(-3.14159, 2)).toBe('~ -3.14(-)');
+        expect(formatNumberForShortDisplay(-2.499, 0)).toBe('~ -2(-)');
+    });
+
+    test('appends minus sign when number is slightly less than rounded value', () => {
+        expect(formatNumberForShortDisplay(1.99, 0)).toBe('~ 2(-)');
+        expect(formatNumberForShortDisplay(-1.99, 0)).toBe('~ -2(+)');
+    });
+
+    test('appends plus sign when number is slightly more than rounded value', () => {
+        expect(formatNumberForShortDisplay(2.01, 0)).toBe('~ 2(+)');
+        expect(formatNumberForShortDisplay(-2.01, 0)).toBe('~ -2(-)');
+    });
+
+    test('handles values close to the difference threshold correct at different places', () => {
+        expect(formatNumberForShortDisplay(0.0004, 3)).toBe('~ 0.000(+)');
+        expect(formatNumberForShortDisplay(-0.0000005, 3)).toBe('-0.000');
+
+        expect(formatNumberForShortDisplay(5.0004, 0)).toBe('5');
+        expect(formatNumberForShortDisplay(-5.0006, 0)).toBe('-5');
+    });
+
+
+    test('handles values close to the difference threshold', () => {
+        expect(formatNumberForShortDisplay(0.0000005, 3)).toBe('0.000');
+        expect(formatNumberForShortDisplay(-0.0000005, 3)).toBe('-0.000');
+
+        expect(formatNumberForShortDisplay(2.0000005, 3)).toBe('2.000');
+        expect(formatNumberForShortDisplay(-2.0000005, 3)).toBe('-2.000');
+
+        expect(formatNumberForShortDisplay(5.0005, 0)).toBe('5');
+        expect(formatNumberForShortDisplay(-5.0005, 0)).toBe('-5');
+
     });
 });
 
