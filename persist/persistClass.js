@@ -31,6 +31,13 @@ class Persist {
     deleteSavedGame(saveSlot) {
         // stub
     }
+
+    //------------------------
+
+    tellUser(msg) {
+        // TODO: replace this with showing the msg in the messages pane
+        console.log(msg);
+    }
 };
 
 export {Persist};

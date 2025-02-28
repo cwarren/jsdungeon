@@ -3,7 +3,7 @@ class SaveSlot {
         this.name = saveName;
         this.gamestate = gamestate;
         this.serializedData = '';
-        this.isLoaded = gamestate != null;
+        this.isLoaded =false;
         this.isSaved = false;
         this.timestampLastSaved = null;
     }
