@@ -8,6 +8,7 @@ import {
     getListIntersection,
     constrainValue,
     createHelpText,
+    generateId,
 } from './util';
 
 describe('devTrace', () => {
@@ -211,6 +212,59 @@ describe('createHelpText', () => {
             `b          - unknownAction        : (No description available)\n`;
 
         expect(createHelpText(keyBindings, actionMap, secondaryActionMap)).toBe(expectedHelpText);
+    });
+});
+
+describe("generateId", () => {
+    beforeEach(() => {
+        // Reset the counter before each test to ensure predictable behavior
+        global.idCounter = 0;
+    });
+
+    test("generates an ID with the default prefix", () => {
+        const id = generateId();
+        expect(id).toMatch(/^id-/); // Ensures it starts with "id-"
+    });
+
+    test("generates an ID with a custom prefix", () => {
+        const id = generateId("user");
+        expect(id).toMatch(/^user-/); // Ensures it starts with "user-"
+    });
+
+    test("ensures the generated ID contains a timestamp", () => {
+        const id = generateId();
+        const parts = id.split("-");
+        const timestamp = parts[1];
+
+        expect(timestamp).toBeDefined();
+        expect(parseInt(timestamp, 36)).toBeGreaterThan(0); // Should be a valid timestamp
+    });
+
+    test("ensures the generated ID contains a random part", () => {
+        const id = generateId();
+        const parts = id.split("-");
+        const randomPart = parts[2];
+
+        expect(randomPart).toBeDefined();
+        expect(randomPart.length).toBe(5); // Ensures the random part is 5 characters long
+    });
+
+    test("ensures the counter increments on successive calls", () => {
+        const id1 = generateId();
+        const id2 = generateId();
+
+        const counter1 = parseInt(id1.split("-")[3], 36);
+        const counter2 = parseInt(id2.split("-")[3], 36);
+
+        expect(counter2).toBe(counter1 + 1);
+    });
+
+    test("checks that generated IDs are unique over multiple calls", () => {
+        const ids = new Set();
+        for (let i = 0; i < 100; i++) {
+            ids.add(generateId());
+        }
+        expect(ids.size).toBe(100); // Ensures all IDs are unique
     });
 });
 

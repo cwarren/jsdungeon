@@ -2,6 +2,8 @@ to start server:
 PS E:\code\jsdungeon> docker-compose up --build
 
 * tackle game persistence
+* * implement an entity repository (and model for other instance repositories)
+* * * update all entity references (other than ofEntity) to use the entity repo key rather than a direct reference
 * * serialize & deserialize a bunch of stuff
 * * * game state in general
 * * * entity
@@ -11,8 +13,6 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * * * grid - NOTE: this would greatly benefit from some compression - most grid cells are the same, so be smart about handling that
 * * * * grid cell
 * * * structure
-* * probably implement an entity repository (and model for other instance repositories)
-* * * update all entity references (other than ofEntity) to use the entity repo key rather than a direct reference
 * * timing queue
 
 * create a help screen for the char sheet

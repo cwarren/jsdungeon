@@ -1,6 +1,6 @@
 import { gameState } from "../gameStateClass.js";
 import { EffDamage } from "../effect/effDamageClass.js";
-import { rollDice, getRandomListItem, constrainValue, devTrace, formatNumberForMessage } from "../util.js";
+import { rollDice, getRandomListItem, constrainValue, devTrace, formatNumberForMessage, generateId } from "../util.js";
 import { ENTITIES_DEFINITIONS } from "./entityDefinitions.js";
 import { uiPaneMessages } from "../ui/ui.js";
 import { EntityHealth, DEFAULT_NATURAL_HEALING_TICKS } from "./entityHealthClass.js";
@@ -15,7 +15,8 @@ const DEFAULT_ACTION_COST = 100;
 
 class Entity {
 
-  constructor(type) {
+  constructor(type, id = null) {
+    this.id = id ? id : generateId();
     this.type = type;
     this.name = Entity.ENTITIES[type].name;
     this.displaySymbol = Entity.ENTITIES[type].displaySymbol;

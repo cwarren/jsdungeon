@@ -1,7 +1,7 @@
 import { Entity } from './entityClass.js';
 import { getEntityDef } from "./entityDefinitions.js";
 import { gameState } from '../gameStateClass.js';
-import { rollDice, constrainValue } from '../util.js';
+import { rollDice, constrainValue, generateId } from '../util.js';
 import { EntityHealth } from './entityHealthClass.js';
 import { EntityLocation } from './entityLocationClass.js';
 import { EntityMovement } from './entityMovementClass.js';
@@ -18,6 +18,7 @@ jest.mock('../util.js', () => ({
   rollDice: jest.fn(),
   constrainValue: jest.requireActual('../util.js').constrainValue,
   formatNumberForMessage: jest.requireActual('../util.js').formatNumberForMessage,
+  generateId: jest.requireActual('../util.js').generateId,
   devTrace: jest.fn(),
 }));
 
@@ -68,6 +69,7 @@ describe('Entity', () => {
   });
 
   test('should initialize with correct values', () => {
+    expect(entity.id.length).toBeGreaterThan(1);
     expect(entity.type).toBe('testEntity1');
     expect(entity.name).toBe('Test Entity 1');
     expect(entity.displaySymbol).toBe('T');
@@ -82,6 +84,11 @@ describe('Entity', () => {
     expect(entity.baseKillPoints).toBe(10);
     expect(entity.currentAdvancementPoints).toBe(0);
     expect(entity.actionStartingTime).toBe(0);
+  });
+
+  test('should initialize with passed in id', () => {
+    const e = new Entity('testEntity1','foo');
+    expect(e.id).toEqual('foo');
   });
 
   test('should place at cell', () => {

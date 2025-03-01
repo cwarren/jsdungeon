@@ -124,6 +124,14 @@ function formatNumberForShortDisplay(num, places=0) {
     }
 }
 
+let idCounter = 0;
+function generateId(prefix = "id") {
+    const timestamp = Date.now().toString(36); // Base-36 timestamp
+    const randomPart = Math.random().toString(36).substr(2, 5); // 5 random chars
+    const counter = (idCounter++).toString(36); // Incremental counter for uniqueness
+    return `${prefix}-${timestamp}-${randomPart}-${counter}`;
+}
+
 export {
     rollDice,
     rollDiceGroup,
@@ -135,4 +143,5 @@ export {
     devTrace,
     formatNumberForMessage,
     formatNumberForShortDisplay,
+    generateId,
 };
