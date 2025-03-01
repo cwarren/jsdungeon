@@ -16,7 +16,7 @@ describe('SaveSlot', () => {
         const slot = new SaveSlot('Slot2', gameState);
         expect(slot.name).toBe('Slot2');
         expect(slot.gamestate).toEqual(gameState);
-        expect(slot.isLoaded).toBe(true);
+        expect(slot.isLoaded).toBe(false);
         expect(slot.serializedData).toBe('');
         expect(slot.isSaved).toBe(false);
         expect(slot.timestampLastSaved).toBeNull();
