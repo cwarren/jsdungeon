@@ -3,6 +3,7 @@ import { Structure } from './structureClass.js';
 import { devTrace } from '../util.js';
 jest.mock('../util.js', () => ({
     devTrace: jest.fn(),
+    generateId: jest.requireActual('../util.js').generateId,
 }));
 
 describe('Stairs', () => {
@@ -14,6 +15,7 @@ describe('Stairs', () => {
   });
 
   test('should initialize with correct values', () => {
+    expect(stairs.id.length).toBeGreaterThan(1);
     expect(stairs.worldLevel).toBe(worldLevel);
     expect(stairs.x).toBe(1);
     expect(stairs.y).toBe(2);

@@ -30,6 +30,7 @@ import { WorldLevelSpecification } from './worldLevelSpecificationClass.js';
 jest.mock('../util.js', () => ({
   devTrace: jest.fn(),
   constrainValue: jest.fn((value, min, max) => Math.max(min, Math.min(max, value))),
+  generateId: jest.requireActual('../util.js').generateId,
 }));
 
 jest.mock('./gridGeneration', () => ({

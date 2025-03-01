@@ -4,6 +4,7 @@ jest.mock('../util.js', () => ({
   devTrace: jest.fn(),
   constrainValue: jest.fn((value, min, max) => Math.min(Math.max(value, min), max)),
   formatNumberForMessage: jest.fn((num) => num.toString()),
+  generateId: jest.requireActual('../util.js').generateId,
 }));
 
 describe('EntityHealth', () => {

@@ -26,6 +26,7 @@ jest.mock('../util.js', () => ({
     constrainValue: jest.fn((value, min, max) => Math.max(min, Math.min(max, value))),
     rollDice: jest.requireActual('../util.js').rollDice,
     valueCalc: jest.requireActual('../util.js').valueCalc,
+    generateId: jest.requireActual('../util.js').generateId,
 }));
 
 jest.mock('../ui/ui.js', () => ({

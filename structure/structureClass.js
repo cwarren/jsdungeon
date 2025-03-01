@@ -1,7 +1,8 @@
-// import { gameState } from "./gameStateClass.js";
+import { generateId } from "../util.js";
 
 class Structure {
-    constructor(worldLevel, x, y, z, type, displaySymbol = '?', displayColor = '#fff') {
+    constructor(worldLevel, x, y, z, type, displaySymbol = '?', displayColor = '#fff', id = null) {
+      this.id = id ? id : generateId();
       this.worldLevel = worldLevel;
       this.x = x;
       this.y = y;

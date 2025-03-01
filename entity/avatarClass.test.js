@@ -17,6 +17,7 @@ jest.mock('../util.js', () => ({
   rollDice: jest.fn(() => 100), // Mock rollDice to always return 3
   valueCalc: jest.requireActual('../util.js').valueCalc,
   formatNumberForMessage: jest.fn(() => '10'),
+  generateId: jest.requireActual('../util.js').generateId,
 }));
 
 jest.mock('../ui/ui.js', () => ({

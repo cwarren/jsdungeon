@@ -3,6 +3,7 @@ import { gameState } from '../gameStateClass.js';
 import { devTrace } from '../util.js';
 jest.mock('../util.js', () => ({
     devTrace: jest.fn(),
+    generateId: jest.requireActual('../util.js').generateId,
 }));
 
 jest.mock('../gameStateClass', () => ({

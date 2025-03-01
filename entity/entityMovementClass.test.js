@@ -26,6 +26,7 @@ jest.mock('../util.js', () => ({
   rollDice: jest.requireActual('../util.js').rollDice,
   valueCalc: jest.requireActual('../util.js').valueCalc,
   getRandomListItem: jest.fn(),
+  generateId: jest.requireActual('../util.js').generateId,
 }));
 
 jest.mock('../ui/ui.js', () => ({

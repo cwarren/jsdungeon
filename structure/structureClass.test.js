@@ -1,11 +1,12 @@
 import { Structure } from './structureClass.js';
 import { gameState } from '../gameStateClass.js';
 import { WorldLevelSpecification } from '../world/worldLevelSpecificationClass.js';
-import { devTrace } from '../util.js';
+import { devTrace, generateId } from '../util.js';
 jest.mock('../util.js', () => ({
     devTrace: jest.fn(),
     rollDice: jest.requireActual('../util.js').rollDice,
     valueCalc: jest.requireActual('../util.js').valueCalc,
+    generateId: jest.requireActual('../util.js').generateId,
 }));
 
 const WORLD_LEVEL_SPECS_FOR_TESTING= [
@@ -22,6 +23,7 @@ describe('Structure', () => {
     });
 
     test('should create a structure with specified properties', () => {
+        expect(structure.id.length).toBeGreaterThan(1);
         expect(structure.worldLevel).toBe(gameState.world[0]);
         expect(structure.x).toBe(5);
         expect(structure.y).toBe(5);
@@ -29,6 +31,11 @@ describe('Structure', () => {
         expect(structure.type).toBe('wall');
         expect(structure.displaySymbol).toBe('#');
         expect(structure.displayColor).toBe('#fff');
+    });
+
+    test('should create a structure with given id', () => {
+        const s = new Structure(gameState.world[0], 5, 5, 0, 'wall', '#', '#fff', 'foo');
+        expect(s.id).toEqual('foo');
     });
 
     test('should return the correct cell from getCell', () => {

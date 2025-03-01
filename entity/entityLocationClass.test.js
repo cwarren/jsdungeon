@@ -4,6 +4,7 @@ import { devTrace } from '../util';
 
 jest.mock('../util', () => ({
   devTrace: jest.fn(),
+  generateId: jest.requireActual('../util.js').generateId,
 }));
 
 jest.mock('../gameStateClass', () => ({
