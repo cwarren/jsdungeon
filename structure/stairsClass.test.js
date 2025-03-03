@@ -1,6 +1,7 @@
 import { Stairs } from './stairsClass.js';
 import { Structure } from './structureClass.js';
 import { devTrace } from '../util.js';
+import { Repository } from '../repositoryClass.js';
 jest.mock('../util.js', () => ({
     devTrace: jest.fn(),
     generateId: jest.requireActual('../util.js').generateId,
@@ -8,7 +9,10 @@ jest.mock('../util.js', () => ({
 
 describe('Stairs', () => {
   let stairs;
-  const worldLevel = {gs: 'test'};
+  const worldLevel = {
+    gs: 'test',
+    gameState: {structureRepo: new Repository('stru')}
+  };
 
   beforeEach(() => {
     stairs = new Stairs(worldLevel, 1, 2, 3, 'STAIRS_DOWN', '>', '#fff', null);

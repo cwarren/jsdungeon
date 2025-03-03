@@ -10,6 +10,8 @@ class Structure {
       this.type = type;
       this.displaySymbol = displaySymbol;
       this.displayColor = displayColor;
+
+      this.worldLevel.gameState.structureRepo.add(this);
     }
 
     getCell() {

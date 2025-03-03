@@ -26,6 +26,7 @@ import {
 import { rollDice } from '../util.js';
 import { uiPaneMessages, uiPaneInfo } from "../ui/ui.js";
 import { WorldLevelSpecification } from './worldLevelSpecificationClass.js';
+import { Repository } from '../repositoryClass.js';
 
 jest.mock('../util.js', () => ({
   devTrace: jest.fn(),
@@ -92,6 +93,7 @@ describe('WorldLevel', () => {
       },
       setTurnQueue: jest.fn(),
       world: [],
+      structureRepo: new Repository('stru'),
     };
     worldLevel = new WorldLevel(gameState, 0, 10, 10, 'EMPTY');
     gameState.world[0] = worldLevel; // Add the world level to the gameState's world array

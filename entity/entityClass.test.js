@@ -11,6 +11,7 @@ import { uiPaneMessages } from "../ui/ui.js";
 import { EffGenDamage } from '../effect/effGenDamageClass.js';
 import { EffDamage } from '../effect/effDamageClass.js';
 import { Attack } from '../effect/attackClass.js';
+import { Repository } from '../repositoryClass.js';
 
 // NOTE: many of these tests are more integration tests than unit tests
 
@@ -62,6 +63,7 @@ describe('Entity', () => {
 
   beforeEach(() => {
     rollDice.mockReturnValue(100);
+    GAME_STATE.entityRepo = new Repository('entities');
     entity = new Entity('testEntity1');
     const testWorldLevel = new WorldLevel(GAME_STATE, 0, 10, 10);
     testWorldLevel.generateGrid();
@@ -84,6 +86,8 @@ describe('Entity', () => {
     expect(entity.baseKillPoints).toBe(10);
     expect(entity.currentAdvancementPoints).toBe(0);
     expect(entity.actionStartingTime).toBe(0);
+
+    expect(GAME_STATE.entityRepo.get(entity.id)).toBe(entity);
   });
 
   test('should initialize with passed in id', () => {

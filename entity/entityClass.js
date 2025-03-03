@@ -49,6 +49,8 @@ class Entity {
     this.currentAdvancementPoints = 0;
 
     this.actionStartingTime = 0;
+
+    GAME_STATE.entityRepo.add(this);
   }
 
   //======================================================================

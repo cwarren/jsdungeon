@@ -31,6 +31,8 @@ describe('Structure', () => {
         expect(structure.type).toBe('wall');
         expect(structure.displaySymbol).toBe('#');
         expect(structure.displayColor).toBe('#fff');
+
+        expect(GAME_STATE.structureRepo.get(structure.id)).toBe(structure);
     });
 
     test('should create a structure with given id', () => {
