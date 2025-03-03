@@ -16,10 +16,18 @@ class Repository {
     }
 
     serialize() {
-        return JSON.stringify([...this.items.entries()].map(([id, entity]) => ({
-            id,
-            data: item.serialize(),
-        })));
+        return JSON.stringify(
+            this.getSerializedItemsArray()
+        );
+    }
+
+    getSerializedItemsArray() {
+        return [...this.items.entries()].map(
+            ([id, item]) => ({
+                id,
+                data: item.serialize(),
+            })
+        );
     }
 
     deserialize(serializedData, deserializer) {
