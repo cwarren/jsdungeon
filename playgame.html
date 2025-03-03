@@ -90,12 +90,12 @@
     <div id="info"></div>
 
     <script type="module">
-        import { gameState, initializeGameWorld } from "./gameStateClass.js";
+        import { GAME_STATE, initializeGameWorld } from "./gameStateClass.js";
         import { uiPaneMain, uiPaneInfo, setupUi } from "./ui/ui.js";
 
         initializeGameWorld();
-        setupUi(gameState);
-        uiPaneInfo.setInfo(gameState.getCurrentWorldLevel().getInfo());
+        setupUi(GAME_STATE);
+        uiPaneInfo.setInfo(GAME_STATE.getCurrentWorldLevel().getInfo());
     </script>
 </body>
 

@@ -1,4 +1,4 @@
-import { GameState, gameState, initializeGameWorld } from "./gameStateClass.js";
+import { GameState, GAME_STATE, initializeGameWorld } from "./gameStateClass.js";
 import { uiPaneMain, uiPaneMessages } from "./ui/ui.js";
 
 
@@ -10,9 +10,9 @@ const gameMetaActionsMap = {
 };
 
 function startNewGame() {
-    console.log("startNewGame", gameState);
-    if (GameState.statusesGameOver.includes(gameState.status)) {
-        gameState.reset();
+    console.log("startNewGame", GAME_STATE);
+    if (GameState.statusesGameOver.includes(GAME_STATE.status)) {
+        GAME_STATE.reset();
         initializeGameWorld();
         uiPaneMain.resetUIState();
         uiPaneMain.pushUIState("GAME_PLAY");
@@ -23,9 +23,9 @@ function startNewGame() {
 }
 
 function abandonCurrentGame() {
-    console.log("abandonCurrentGame", gameState);
-    if (gameState.status == 'ACTIVE') {
-        gameState.abandonGame();
+    console.log("abandonCurrentGame", GAME_STATE);
+    if (GAME_STATE.status == 'ACTIVE') {
+        GAME_STATE.abandonGame();
         uiPaneMain.resetUIState();
         uiPaneMain.pushUIState("GAME_OVER");
     } else {

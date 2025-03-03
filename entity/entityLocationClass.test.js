@@ -1,5 +1,5 @@
 import { EntityLocation } from './entityLocationClass';
-import { gameState } from '../gameStateClass';
+import { GAME_STATE } from '../gameStateClass';
 import { devTrace } from '../util';
 
 jest.mock('../util', () => ({
@@ -8,7 +8,7 @@ jest.mock('../util', () => ({
 }));
 
 jest.mock('../gameStateClass', () => ({
-  gameState: {
+  GAME_STATE: {
     world: [
       {
         levelWidth: 10,
@@ -69,12 +69,12 @@ describe('EntityLocation', () => {
     expect(entityLocation.x).toBe(6);
     expect(entityLocation.y).toBe(6);
     expect(entityLocation.z).toBe(0);
-    expect(gameState.world[0].grid[6][6].entity).toBe(entity);
+    expect(GAME_STATE.world[0].grid[6][6].entity).toBe(entity);
     expect(entity.determineVisibleCells).toHaveBeenCalled();
   });
 
   test('should not place entity in occupied cell', () => {
-    gameState.world[0].grid[6][6].entity = { type: 'otherEntity' };
+    GAME_STATE.world[0].grid[6][6].entity = { type: 'otherEntity' };
     const result = entityLocation.placeAt(6, 6, 0);
     expect(result).toBe(false);
     expect(entityLocation.x).toBe(5);
@@ -83,7 +83,7 @@ describe('EntityLocation', () => {
   });
 
   test('should place entity at specified cell', () => {
-    const targetCell = gameState.world[0].grid[7][7];
+    const targetCell = GAME_STATE.world[0].grid[7][7];
     const result = entityLocation.placeAtCell(targetCell);
     expect(result).toBe(true);
     expect(entityLocation.x).toBe(7);
@@ -94,7 +94,7 @@ describe('EntityLocation', () => {
   });
 
   test('should not place entity at occupied cell', () => {
-    const targetCell = gameState.world[0].grid[7][7];
+    const targetCell = GAME_STATE.world[0].grid[7][7];
     targetCell.entity = { type: 'otherEntity' };
     const result = entityLocation.placeAtCell(targetCell);
     expect(result).toBe(false);
@@ -105,7 +105,7 @@ describe('EntityLocation', () => {
 
   test('should get the correct world level', () => {
     const worldLevel = entityLocation.getWorldLevel();
-    expect(worldLevel).toEqual(gameState.world[0]);
+    expect(worldLevel).toEqual(GAME_STATE.world[0]);
   });
 
   test('should throw error if entity is not on a valid level', () => {

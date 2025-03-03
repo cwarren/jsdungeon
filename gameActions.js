@@ -1,4 +1,4 @@
-import { gameState } from "./gameStateClass.js";
+import { GAME_STATE } from "./gameStateClass.js";
 import { DEFAULT_ACTION_COST } from "./entity/entityClass.js";
 import { uiPaneMain } from "./ui/ui.js";
 import { devTrace } from "./util.js";
@@ -58,19 +58,19 @@ const DIRECTION_DELTAS = {
 // action functions should return the time cost of the action!
 
 function DEV_winGame()  { 
-    gameState.winGame();
+    GAME_STATE.winGame();
     return 0;
 }
 function DEV_loseGame() {
-    gameState.loseGame();
+    GAME_STATE.loseGame();
     return 0;
 }
 function DEV_dumpGameState() {
-    console.log("### dump game state", gameState);
+    console.log("### dump game state", GAME_STATE);
     return 0;
 }
 
-function avatarMove(dx,dy) { return gameState.avatar.tryMove(dx,dy); }
+function avatarMove(dx,dy) { return GAME_STATE.avatar.tryMove(dx,dy); }
 function moveAvatar_UL()   { return avatarMove(-1,-1) }
 function moveAvatar_U()    { return avatarMove(0,-1) }
 function moveAvatar_UR()   { return avatarMove(1,-1) }
@@ -83,30 +83,30 @@ function moveAvatar_DR()   { return avatarMove(1,1) }
 
 function ascendStairs() {
     devTrace(3,'action - ascend stairs');
-    const curCell = gameState.getAvatarCell();
+    const curCell = GAME_STATE.getAvatarCell();
     const stairsUp = curCell.structure;
     if (stairsUp && stairsUp.type == "STAIRS_UP") {
         console.log("going up stairs");
-        curCell.worldLevel.removeEntity(gameState.avatar);
-        gameState.currentLevel--;
+        curCell.worldLevel.removeEntity(GAME_STATE.avatar);
+        GAME_STATE.currentLevel--;
         const newCell = stairsUp.connectsTo.getCell();
         newCell.worldLevel.handleAvatarEnteringLevel(newCell);
     } else {
         console.log("cannot ascend - no stairs up");
     }
-    console.log("gameState after ascending", gameState);
-    return gameState.avatar.baseActionTime;
+    console.log("GAME_STATE after ascending", GAME_STATE);
+    return GAME_STATE.avatar.baseActionTime;
 }
 
 function descendStairs() {
     devTrace(3,'action - descend stairs');
-    const curCell = gameState.getAvatarCell();
+    const curCell = GAME_STATE.getAvatarCell();
     const stairsDown = curCell.structure;
     if (stairsDown && stairsDown.type == "STAIRS_DOWN") {
         console.log("going down stairs");
-        curCell.worldLevel.removeEntity(gameState.avatar);
-        gameState.currentLevel++;
-        const lowerWorldLevel = gameState.world[gameState.currentLevel]
+        curCell.worldLevel.removeEntity(GAME_STATE.avatar);
+        GAME_STATE.currentLevel++;
+        const lowerWorldLevel = GAME_STATE.world[GAME_STATE.currentLevel]
         if (! lowerWorldLevel.isGridGenerated()) {
             lowerWorldLevel.generate();
         }
@@ -115,18 +115,18 @@ function descendStairs() {
     } else {
         console.log("cannot descend - no stairs down");
     }
-    console.log("gameState after descending", gameState);
-    return gameState.avatar.baseActionTime;
+    console.log("GAME_STATE after descending", GAME_STATE);
+    return GAME_STATE.avatar.baseActionTime;
 }
 
 function runAvatar(deltas) {
     devTrace(7,`action - run avatar to deltas ${deltas.dx},${deltas.dy}`);
-    if (gameState.avatar.movement.isRunning) return; // Prevent multiple runs
+    if (GAME_STATE.avatar.movement.isRunning) return; // Prevent multiple runs
 
-    gameState.avatar.movement.startRunning(deltas);
+    GAME_STATE.avatar.movement.startRunning(deltas);
 
     // Perform the first move immediately
-    return gameState.avatar.continueRunning();
+    return GAME_STATE.avatar.continueRunning();
 }
 function runAvatar_UL()   { return runAvatar(DIRECTION_DELTAS["UL"]) }
 function runAvatar_U()    { return runAvatar(DIRECTION_DELTAS["U"]) }
@@ -139,8 +139,8 @@ function runAvatar_DR()   { return runAvatar(DIRECTION_DELTAS["DR"]) }
 
 function sleepAvatar(key, event) {
     // devTrace(3,`${key} - sleep avatar (not yet implemented)`, event);
-    gameState.avatar.startSleeping();
-    return gameState.avatar.continueSleeping();
+    GAME_STATE.avatar.startSleeping();
+    return GAME_STATE.avatar.continueSleeping();
 }
 
 function zoomIn()  { uiPaneMain.zoomIn(); return 0; }

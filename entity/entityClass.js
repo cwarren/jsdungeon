@@ -1,4 +1,4 @@
-import { gameState } from "../gameStateClass.js";
+import { GAME_STATE } from "../gameStateClass.js";
 import { EffDamage } from "../effect/effDamageClass.js";
 import { rollDice, getRandomListItem, constrainValue, devTrace, formatNumberForMessage, generateId } from "../util.js";
 import { ENTITIES_DEFINITIONS } from "./entityDefinitions.js";
@@ -530,7 +530,7 @@ class Entity {
       }
     });
 
-    gameState.world[this.location.z].removeEntity(this);
+    GAME_STATE.world[this.location.z].removeEntity(this);
     uiPaneMessages.addMessage(`${this.name} dies`);
 
     this.damagedBy = [];

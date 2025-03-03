@@ -4,7 +4,7 @@ import { Entity, DEFAULT_ACTION_COST } from './entityClass.js';
 import { getEntityDef } from "./entityDefinitions.js";
 import { EffGenDamage } from '../effect/effGenDamageClass.js';
 import { devTrace, constrainValue, rollDice, getRandomListItem, valueCalc } from '../util.js';
-import { gameState } from '../gameStateClass.js';
+import { GAME_STATE } from '../gameStateClass.js';
 import { uiPaneMessages, uiPaneInfo } from "../ui/ui.js";
 import { WorldLevelSpecification } from '../world/worldLevelSpecificationClass.js';
 import {
@@ -65,9 +65,9 @@ describe('EntityMovement', () => {
   const TEST_MOVEMENT_SPEC = Entity.ENTITIES["RAT_MALIGN"].movementSpec;
 
   beforeEach(() => {
-    gameState.reset();
-    gameState.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
-    worldLevel = gameState.world[0];
+    GAME_STATE.reset();
+    GAME_STATE.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
+    worldLevel = GAME_STATE.world[0];
     while (worldLevel.levelEntities.length > 0) {
       worldLevel.removeEntity(worldLevel.levelEntities[0]);
     }

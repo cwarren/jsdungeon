@@ -7,14 +7,14 @@
 </head>
 <body>
     <script type="module">
-        import { gameState } from "./gameStateClass.js";
+        import { GAME_STATE } from "./gameStateClass.js";
         import { resizeCanvas } from "./ui/ui.js";
 
         // Draw game on page load
-        resizeCanvas(gameState);
+        resizeCanvas(GAME_STATE);
 
         // Redraw game on window resize
-        window.addEventListener("resize", () => resizeCanvas(gameState));
+        window.addEventListener("resize", () => resizeCanvas(GAME_STATE));
     </script>
 </body>
 </html>

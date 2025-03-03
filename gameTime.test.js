@@ -1,13 +1,13 @@
 import { TurnQueue } from './gameTime';
 import { devTrace } from './util';
-import { gameState } from './gameStateClass';
+import { GAME_STATE } from './gameStateClass';
 
 jest.mock('./util', () => ({
     devTrace: jest.fn(),
 }));
 
 jest.mock('./gameStateClass', () => ({
-    gameState: {
+    GAME_STATE: {
         status: 'ACTIVE',
         handlePlayerActionTime: jest.fn(),
     },
@@ -113,7 +113,7 @@ describe('TurnQueue', () => {
     });
 
     test('should return null if game state is not active in next turn', () => {
-        gameState.status = 'INACTIVE';
+        GAME_STATE.status = 'INACTIVE';
         const entity = { type: 'test' };
         turnQueue.addEntity(entity, 5);
         const result = turnQueue.nextTurn();

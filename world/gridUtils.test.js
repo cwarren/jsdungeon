@@ -3,7 +3,7 @@ import { Entity, DEFAULT_ACTION_COST } from '../entity/entityClass.js';
 import { getEntityDef } from "../entity/entityDefinitions.js";
 import { EffGenDamage } from '../effect/effGenDamageClass.js';
 import { devTrace, constrainValue, rollDice, valueCalc } from '../util.js';
-import { gameState } from '../gameStateClass.js';
+import { GAME_STATE } from '../gameStateClass.js';
 import { uiPaneMessages, uiPaneInfo } from "../ui/ui.js";
 import { WorldLevelSpecification } from './worldLevelSpecificationClass.js';
 import {
@@ -19,7 +19,7 @@ import {
 } from './gridUtils';
 import { GridCell } from './gridCellClass';
 
-// NOTE: all the gameState and entity stuff and all the mocks are related to determining best path FOR ENTITY
+// NOTE: all the GAME_STATE and entity stuff and all the mocks are related to determining best path FOR ENTITY
 
 jest.mock('../util.js', () => ({
     devTrace: jest.fn(),
@@ -347,9 +347,9 @@ describe('determineCheapestMovementPathForEntity', () => {
     TEST_ENTITIES_DEFINITIONS.forEach((ent) => { Entity.ENTITIES[ent.type] = ent; })
 
     beforeEach(() => {
-        gameState.reset();
-        gameState.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
-        worldLevel = gameState.world[0];
+        GAME_STATE.reset();
+        GAME_STATE.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
+        worldLevel = GAME_STATE.world[0];
         while (worldLevel.levelEntities.length > 0) {
             worldLevel.removeEntity(worldLevel.levelEntities[0]);
         }

@@ -1,4 +1,4 @@
-import { GameState, gameState } from "./gameStateClass.js";
+import { GameState, GAME_STATE } from "./gameStateClass.js";
 import { gameActionsMap } from "./gameActions.js";
 import { gameMetaActionsMap } from "./gameMetaActions.js";
 import { textActionsMap } from "./textActions.js";
@@ -114,11 +114,11 @@ function executeUIAction(actionKey) {
 function executeGameAction(actionDef, key, event) {
     devTrace(3, `Executing action: ${actionDef.name}`);
     const actionTimeCost = actionDef.action(key, event);
-    gameState.handlePlayerActionTime(actionTimeCost);
+    GAME_STATE.handlePlayerActionTime(actionTimeCost);
 }
 
 function executeGameCommand(key, event) {
-    gameState.avatar.interruptOngoingActions();
+    GAME_STATE.avatar.interruptOngoingActions();
     const lookupKey = getLookupKey(key, event);
     const uiState = uiPaneMain.getCurrentUIState();
     const actionKey = getActionKey(uiState, lookupKey);

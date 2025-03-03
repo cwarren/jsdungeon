@@ -1,4 +1,4 @@
-import { GameState, gameState } from "./gameStateClass.js";
+import { GameState, GAME_STATE } from "./gameStateClass.js";
 import { uiPaneMain } from "./ui/ui.js";
 
 const uiActionsMap = {
@@ -13,9 +13,9 @@ const uiActionsMap = {
 };
 function uiGamePlay() { 
     // go to game play if there's an active game, otherwise show the game over screen
-    if (gameState.status == 'ACTIVE') {
+    if (GAME_STATE.status == 'ACTIVE') {
         uiPaneMain.pushUIState("GAME_PLAY");
-    } else if (GameState.statusesGameOver.includes(gameState.status)) {
+    } else if (GameState.statusesGameOver.includes(GAME_STATE.status)) {
         uiPaneMain.pushUIState("GAME_OVER");
     } else {
         uiPaneMain.resetUIState();

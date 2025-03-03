@@ -22,7 +22,7 @@ import {
   determineCellViewability,
 } from './gridUtils.js';
 import { devTrace, constrainValue, rollDice, valueCalc } from '../util.js';
-import { gameState } from '../gameStateClass.js';
+import { GAME_STATE } from '../gameStateClass.js';
 import { uiPaneMessages, uiPaneInfo } from "../ui/ui.js";
 import { WorldLevelSpecification } from './worldLevelSpecificationClass.js';
 
@@ -50,9 +50,9 @@ describe('WorldLevel Integration Tests', () => {
   let worldLevel;
 
   beforeEach(() => {
-    gameState.reset();
-    gameState.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
-    worldLevel = gameState.world[0];
+    GAME_STATE.reset();
+    GAME_STATE.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
+    worldLevel = GAME_STATE.world[0];
   });
 
   test('on generation should generate grid and populate level', () => {
@@ -78,7 +78,7 @@ describe('WorldLevel Integration Tests', () => {
   });
 
   test('should handle stairs correctly on level generation', () => {
-    const lowerWorldLevel = gameState.world[1];
+    const lowerWorldLevel = GAME_STATE.world[1];
 
     worldLevel.generate();
     expect(worldLevel.stairsUp).toBeNull();
@@ -96,13 +96,13 @@ describe('WorldLevel Integration Tests', () => {
     worldLevel.trackAvatarDepartureTime();
     expect(worldLevel.timeOfAvatarDeparture).toBe(0);
 
-    gameState.avatar.addTimeOnLevel(10);
-    expect(gameState.avatar.timeOnLevel).toBe(10);
+    GAME_STATE.avatar.addTimeOnLevel(10);
+    expect(GAME_STATE.avatar.timeOnLevel).toBe(10);
 
     worldLevel.handleAvatarEnteringLevel(worldLevel.grid[0][0]);
-    expect(worldLevel.levelEntities).toContain(gameState.avatar);
-    expect(worldLevel.grid[0][0].entity).toBe(gameState.avatar);
-    expect(gameState.avatar.timeOnLevel).toBe(0);
+    expect(worldLevel.levelEntities).toContain(GAME_STATE.avatar);
+    expect(worldLevel.grid[0][0].entity).toBe(GAME_STATE.avatar);
+    expect(GAME_STATE.avatar.timeOnLevel).toBe(0);
     expect(uiPaneMessages.addMessage).toHaveBeenCalledWith(`You enter level ${worldLevel.levelNumber + 1}`);
     expect(uiPaneInfo.setInfo).toHaveBeenCalled();
   });

@@ -1,6 +1,6 @@
 import { Avatar } from './avatarClass.js';
 import { Entity, DEFAULT_ACTION_COST } from './entityClass.js';
-import { gameState } from '../gameStateClass.js';
+import { GAME_STATE } from '../gameStateClass.js';
 import { devTrace, rollDice, formatNumberForMessage, valueCalc } from '../util.js';
 import { EffDamage } from '../effect/effDamageClass.js';
 import { EffectGenerator } from '../effect/effectGeneratorClass.js';
@@ -38,11 +38,11 @@ describe('Avatar', () => {
   let avatar;
 
   beforeEach(() => {
-    gameState.reset();
-    gameState.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
-    avatar = gameState.avatar;
+    GAME_STATE.reset();
+    GAME_STATE.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
+    avatar = GAME_STATE.avatar;
     jest.spyOn(avatar, 'healNaturally');
-    jest.spyOn(gameState, 'loseGame');
+    jest.spyOn(GAME_STATE, 'loseGame');
     jest.spyOn(Entity.prototype, 'die');
   });
 
@@ -101,7 +101,7 @@ describe('Avatar', () => {
     avatar.registerPaneMiniChar(uiPaneMiniChar);
 
     avatar.die();
-    expect(gameState.loseGame).toHaveBeenCalled();
+    expect(GAME_STATE.loseGame).toHaveBeenCalled();
     expect(Entity.prototype.die).toHaveBeenCalled();
     expect(uiPaneMain.pushUIState).toHaveBeenCalledWith("GAME_OVER");
     expect(uiPaneMiniChar.clearMiniChar).toHaveBeenCalled();

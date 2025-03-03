@@ -1,4 +1,4 @@
-import { gameState } from "./gameStateClass.js";
+import { GAME_STATE } from "./gameStateClass.js";
 import { devTrace } from "./util.js";
 
 const TIME_WRAP_LIMIT = 10000;
@@ -68,7 +68,7 @@ class TurnQueue {
     nextTurn() {
         devTrace(4,`do next turn on turn queue`, this);
         if (this.queue.length === 0) return null;
-        if (gameState.status != "ACTIVE") return null;
+        if (GAME_STATE.status != "ACTIVE") return null;
 
         let next = this.queue.shift();
         this.timePasses(next.time - this.previousActionTime);
@@ -89,7 +89,7 @@ class TurnQueue {
             actionTime = next.entity.takeTurn(); // Default action
         }
         
-        // Reschedule non-avatar entity based on action cost (avatar actions are handled separately, in gameState.handlePlayerActionTime)
+        // Reschedule non-avatar entity based on action cost (avatar actions are handled separately, in GAME_STATE.handlePlayerActionTime)
         // also, running entities (including avatar) are always rescheduled
         if (next.entity.type != "AVATAR" || next.entity.movement.isRunning || next.entity.movement.isSleeping) {
             next.time += actionTime;

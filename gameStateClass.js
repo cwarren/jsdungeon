@@ -84,7 +84,7 @@ class GameState {
 
     getCurrentWorldLevel() {
         devTrace(6,"getting current world level via game state");
-        return gameState.world[gameState.currentLevel];
+        return GAME_STATE.world[GAME_STATE.currentLevel];
     }
 
     //=====================
@@ -192,11 +192,11 @@ class GameState {
 
 
 // Create a single instance to maintain the game's state globally
-const gameState = new GameState();
+const GAME_STATE = new GameState();
 function initializeGameWorld() { // this is a hack until I put this stuff in a better location (probably just embed it in the class)
-    gameState.initialize(WORLD_LEVEL_SPECS_FOR_DEV);
-    gameState.advanceGameTime();
+    GAME_STATE.initialize(WORLD_LEVEL_SPECS_FOR_DEV);
+    GAME_STATE.advanceGameTime();
   }
 
 
-export { GameState, gameState, WORLD_LEVEL_SPECS_FOR_DEV, initializeGameWorld };
+export { GameState, GAME_STATE, WORLD_LEVEL_SPECS_FOR_DEV, initializeGameWorld };

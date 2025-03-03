@@ -1,6 +1,6 @@
 import { executeGameCommand, getLookupKey, getActionKey, executeUIAction, executeGameAction, keyBinding, gameActionsMap } from './gameCommands';
 import { uiPaneMain, getCurrentUIState } from './ui/ui.js';
-import { gameState } from './gameStateClass.js';
+import { GAME_STATE } from './gameStateClass.js';
 import { uiActionsMap } from './uiActions.js';
 import { devTrace } from './util.js';
 jest.mock('./util.js', () => ({
@@ -15,7 +15,7 @@ jest.mock('./ui/ui.js', () => ({
 }));
 
 jest.mock('./gameStateClass.js', () => ({
-    gameState: {
+    GAME_STATE: {
         handlePlayerActionTime: jest.fn(),
         avatar: {
             interruptOngoingActions: jest.fn(),
@@ -70,7 +70,7 @@ describe('gameCommands', () => {
             executeGameAction(actionDef, key, event);
 
             expect(mockAction).toHaveBeenCalledWith(key, event);
-            expect(gameState.handlePlayerActionTime).toHaveBeenCalledWith(10);
+            expect(GAME_STATE.handlePlayerActionTime).toHaveBeenCalledWith(10);
         });
     });
 
@@ -87,7 +87,7 @@ describe('gameCommands', () => {
             executeGameCommand(key, event);
 
             expect(mockAction).toHaveBeenCalled();
-            expect(gameState.avatar.interruptOngoingActions).toHaveBeenCalled();
+            expect(GAME_STATE.avatar.interruptOngoingActions).toHaveBeenCalled();
         });
 
         test('should execute gameplay action and handle player action time', () => {
@@ -102,7 +102,7 @@ describe('gameCommands', () => {
             executeGameCommand(key, event);
 
             expect(mockAction).toHaveBeenCalledWith(key, event);
-            expect(gameState.handlePlayerActionTime).toHaveBeenCalledWith(10);
+            expect(GAME_STATE.handlePlayerActionTime).toHaveBeenCalledWith(10);
         });
 
         test('should log message if no action is bound for key', () => {

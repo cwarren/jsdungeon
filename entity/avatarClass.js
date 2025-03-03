@@ -1,5 +1,5 @@
 import { Entity, DEFAULT_ACTION_COST } from "./entityClass.js";
-import { gameState } from "../gameStateClass.js";
+import { GAME_STATE } from "../gameStateClass.js";
 import { devTrace, rollDice } from "../util.js";
 import { EffDamage } from "../effect/effDamageClass.js";
 import { EffGenDamage } from "../effect/effGenDamageClass.js";
@@ -66,7 +66,7 @@ class Avatar extends Entity {
 
   die() {
     devTrace(1, "Avatar has died.");
-    gameState.loseGame();
+    GAME_STATE.loseGame();
     super.die();
   }
 

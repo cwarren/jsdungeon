@@ -1,6 +1,6 @@
 import { Entity } from './entityClass.js';
 import { getEntityDef } from "./entityDefinitions.js";
-import { gameState } from '../gameStateClass.js';
+import { GAME_STATE } from '../gameStateClass.js';
 import { rollDice, constrainValue, generateId } from '../util.js';
 import { EntityHealth } from './entityHealthClass.js';
 import { EntityLocation } from './entityLocationClass.js';
@@ -27,7 +27,7 @@ jest.mock('../ui/ui.js', () => ({
 }));
 
 jest.mock('../gameStateClass.js', () => ({
-  gameState: {
+  GAME_STATE: {
     world: [],
   },
 }));
@@ -63,9 +63,9 @@ describe('Entity', () => {
   beforeEach(() => {
     rollDice.mockReturnValue(100);
     entity = new Entity('testEntity1');
-    const testWorldLevel = new WorldLevel(gameState, 0, 10, 10);
+    const testWorldLevel = new WorldLevel(GAME_STATE, 0, 10, 10);
     testWorldLevel.generateGrid();
-    gameState.world = [testWorldLevel];
+    GAME_STATE.world = [testWorldLevel];
   });
 
   test('should initialize with correct values', () => {
@@ -92,7 +92,7 @@ describe('Entity', () => {
   });
 
   test('should place at cell', () => {
-    const targetCell = gameState.world[0].grid[5][6];
+    const targetCell = GAME_STATE.world[0].grid[5][6];
     expect(targetCell.entity).toBeUndefined();
     entity.placeAtCell(targetCell);
     expect(targetCell.entity).toBe(entity);
@@ -102,7 +102,7 @@ describe('Entity', () => {
   });
 
   test('should get cell', () => {
-    const targetCell = gameState.world[0].grid[5][6];
+    const targetCell = GAME_STATE.world[0].grid[5][6];
     entity.placeAtCell(targetCell);
     expect(entity.getCell()).toBe(targetCell);
   });
@@ -137,10 +137,10 @@ describe('Entity', () => {
 
       test('should die and remove entity from world', () => {
         entity.getDeathCredits = jest.fn(() => []);
-        entity.placeAtCell(gameState.world[0].grid[5][6]);
-        gameState.world[0].levelEntities = [entity];
+        entity.placeAtCell(GAME_STATE.world[0].grid[5][6]);
+        GAME_STATE.world[0].levelEntities = [entity];
         entity.die();
-        expect(gameState.world[0].levelEntities).toEqual([]);
+        expect(GAME_STATE.world[0].levelEntities).toEqual([]);
         expect(uiPaneMessages.addMessage).toHaveBeenCalledWith('Test Entity 1 dies');
       });
 
