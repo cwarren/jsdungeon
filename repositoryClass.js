@@ -1,5 +1,6 @@
 class Repository {
-    constructor() {
+    constructor(name = '') {
+        this.name = name;
         this.items = new Map(); // Or use an object for simple cases
     }
 
@@ -16,9 +17,10 @@ class Repository {
     }
 
     serialize() {
-        return JSON.stringify(
-            this.getSerializedItemsArray()
-        );
+        return JSON.stringify({
+            name: this.name,
+            items: this.getSerializedItemsArray()
+        });
     }
 
     getSerializedItemsArray() {
@@ -32,9 +34,10 @@ class Repository {
 
     deserialize(serializedData, deserializer) {
         const data = JSON.parse(serializedData);
+        this.name = data.name;
         this.items.clear();
-        for (const { id, data } of data) {
-            const item = deserializer(data);
+        for (const { id, dataIten } of data.items) {
+            const item = deserializer(dataIten);
             this.items.set(id, item);
         }
     }
