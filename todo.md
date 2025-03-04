@@ -1,9 +1,9 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
+* poc for save/load game (not the actual serialization stuff, but the UI and validate persistence interactions in general)
+
 * tackle game persistence
-* * implement an entity repository (and model for other instance repositories)
-* * * update all entity references (other than ofEntity) to use the entity repo key rather than a direct reference
 * * serialize & deserialize a bunch of stuff
 * * * game state in general
 * * * entity

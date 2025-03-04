@@ -1,3 +1,4 @@
+
 import { PersistLocalStorage } from "./persistLocalStorageClass.js";
 import { SaveSlot } from "./saveSlotClass.js";
 
@@ -5,7 +6,12 @@ describe("PersistLocalStorage", () => {
     let persist, saveSlot;
 
     beforeEach(() => {
-        persist = new PersistLocalStorage();
+        const mockUiPaneMessages = {
+            addMessage: jest.fn(),
+            ageMessages: jest.fn(),
+        };
+    
+        persist = new PersistLocalStorage(mockUiPaneMessages);
         saveSlot = new SaveSlot("testSlot");
         jest.spyOn(Storage.prototype, "setItem");
         jest.spyOn(Storage.prototype, "getItem");

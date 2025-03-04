@@ -2,7 +2,8 @@
 
 class Persist {
 
-    constructor() {
+    constructor(messagePane) {
+        this.messagePane = messagePane
     }
 
     // takes: a save slot and a game state
@@ -37,6 +38,8 @@ class Persist {
     tellUser(msg) {
         // TODO: replace this with showing the msg in the messages pane
         console.log(msg);
+        this.messagePane.ageMessages();
+        this.messagePane.addMessage(msg);
     }
 };
 

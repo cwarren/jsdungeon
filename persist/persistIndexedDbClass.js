@@ -2,8 +2,8 @@ import { Persist } from "./persistClass.js";
 import { SaveSlot } from "./saveSlotClass.js";
 
 class PersistIndexedDB extends Persist {
-    constructor() {
-        super(); // Ensures proper inheritance
+    constructor(messagePane) {
+        super(messagePane); // Ensures proper inheritance
         this.DB_NAME = "JSDungeonGameSavesDB";
         this.STORE_NAME = "saves";
         this.DB_VERSION = 1;

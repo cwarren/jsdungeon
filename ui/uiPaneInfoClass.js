@@ -12,6 +12,10 @@ class UIPaneInfo {
         this.clearInfo();
         infoElement.innerHTML = info;
     }
+
+    getInfo() {
+        return infoElement.innerHTML;
+    }
 }
 
 export { UIPaneInfo, infoElement };

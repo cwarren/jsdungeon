@@ -2,11 +2,10 @@ import { GameState, GAME_STATE } from "./gameStateClass.js";
 import { gameActionsMap } from "./gameActions.js";
 import { gameMetaActionsMap } from "./gameMetaActions.js";
 import { textActionsMap } from "./textActions.js";
+import { characterSheetActionsMap } from "./characterSheetActions.js";
 import { uiActionsMap } from "./uiActions.js";
 import { uiPaneMain } from "./ui/ui.js";
 import { devTrace } from "./util.js";
-
-// import { handlePlayerActionTime } from "./gameTime.js";
 
 const keyBinding = {
     "GAME_PLAY":
@@ -52,6 +51,7 @@ const keyBinding = {
     },
     "CHARACTER_SHEET": {
         "Escape": "POP_UI_STATE",
+        "N": "NAME_AVATAR",
         "?": "PUSH_HELP",
     },
     "INVENTORY": {
@@ -69,6 +69,8 @@ const keyBinding = {
     "GAME_META": {
         "N": "NEW_GAME",
         "A": "ABANDON_GAME",
+        "S": "SAVE_GAME",
+        "L": "LOAD_GAME",
         "Escape": "PUSH_GAME_PLAY",
         "?": "PUSH_HELP",
     },
@@ -88,6 +90,7 @@ const keyBinding = {
 const actionMaps = {
     "GAME_PLAY": gameActionsMap,
     "GAME_META": gameMetaActionsMap,
+    "CHARACTER_SHEET": characterSheetActionsMap,
     "HELP": textActionsMap,
 };
 

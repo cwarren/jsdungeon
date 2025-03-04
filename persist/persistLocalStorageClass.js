@@ -2,8 +2,8 @@ import { Persist } from "./persistClass.js";
 import { SaveSlot } from "./saveSlotClass.js";
 
 class PersistLocalStorage extends Persist {
-    constructor() {
-        super();
+    constructor(messagePane) {
+        super(messagePane);
         this.STORAGE_PREFIX = "JSDungeonGameSave_"; // Prefix to avoid conflicts
     }
 
@@ -39,7 +39,7 @@ class PersistLocalStorage extends Persist {
                 const parsedData = JSON.parse(saveData);
                 saveSlot.serializedData = parsedData.data;
                 saveSlot.isLoaded = true;
-                this.tellUser(`Loaded game from slot: ${saveSlot.name}`);
+                this.tellUser(`Loaded game '${saveSlot.name}'`);
             } else {
                 this.tellUser(`No save found in slot: ${saveSlot.name}`);
             }
