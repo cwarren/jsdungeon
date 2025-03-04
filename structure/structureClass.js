@@ -17,6 +17,22 @@ class Structure {
     getCell() {
       return this.worldLevel.grid[this.x][this.y];
     }
+
+    setWorldLevel(worldLevel) {
+      this.worldLevel = worldLevel;
+    }
+
+    forSerializing() {
+      return {
+        id: this.id,
+        x: this.x,
+        y: this.y,
+        z: this.z,
+        type: this.type,
+        displaySymbol: this.displaySymbol,
+        displayColor: this.displayColor,
+      };
+    }
   }
   
   export { Structure };

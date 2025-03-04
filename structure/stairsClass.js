@@ -5,6 +5,12 @@ class Stairs extends Structure {
     super(worldLevel, x, y, z, type, displaySymbol, displayColor, id);
     this.connectsTo = connectsTo;
   }
+
+  forSerializing() {
+    let base = super.forSerializing();
+    base['connectsTo'] = this.connectsTo.id;
+    return base;
+  }
 }
 
 export { Stairs };
