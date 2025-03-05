@@ -1,5 +1,5 @@
 import { GameState, GAME_STATE, initializeGameWorld } from "./gameStateClass.js";
-import { uiPaneMain, uiPaneMessages } from "./ui/ui.js";
+import { uiPaneMain, uiPaneMessages, uiPaneList } from "./ui/ui.js";
 import { PersistLocalStorage } from "./persist/persistLocalStorageClass.js";
 import { SaveSlot } from "./persist/saveSlotClass.js";
 
@@ -78,6 +78,8 @@ function loadGame() {
         }
         // if there are any existing saves:
         // TODO: show to the user the list of existing saves
+        // uiPaneList.setList('Saved Games',[{displayText: 'g1'},{displayText: 'g2'}]);
+        uiPaneList.setList('Saved Games', existingSaves.map(es => { return {displayText: es.name}; }) );
         // TODO: get from user the name of the save to load 
         const slotName = "my test save2";
         const saveSlot = new SaveSlot(slotName);

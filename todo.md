@@ -1,18 +1,22 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* poc for save/load game (not the actual serialization stuff, but the UI and validate persistence interactions in general)
+* list pane implementation
 
-* tackle game persistence
-* * serialize & deserialize a bunch of stuff
-* * * game state in general
-* * * entity
-* * * * avatar
-* * * * all the specials - vision, attributes, health, movement, etc.
-* * * world level
-* * * * grid - NOTE: this would greatly benefit from some compression - most grid cells are the same, so be smart about handling that
-* * * * grid cell
-* * * structure
+* game loading
+* * show list of saved games
+* * * use the list pane
+* * have the use choose one (single key? type in name? click in list pane? ???)
+
+* tackle game state serialization / deserialization
+* * game state in general
+* * entity
+* * * avatar
+* * * all the specials - vision, attributes, health, movement, etc.
+* * world level
+* * * grid - NOTE: this would greatly benefit from some compression - most grid cells are the same, so be smart about handling that
+* * * grid cell
+* * structure
 * * timing queue
 
 * create a help screen for the char sheet
