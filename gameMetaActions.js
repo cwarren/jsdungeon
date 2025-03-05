@@ -3,7 +3,7 @@ import { uiPaneMain, uiPaneMessages, uiPaneList } from "./ui/ui.js";
 import { PersistLocalStorage } from "./persist/persistLocalStorageClass.js";
 import { SaveSlot } from "./persist/saveSlotClass.js";
 
-let PERSIST = null; // set to new PersistLocalStorage(uiPaneMessages) on initial use - this avoids "Uncaught ReferenceError: Cannot access 'uiPaneMessages' before initialization"
+let PERSIST = null; // this is set to new PersistLocalStorage(uiPaneMessages) on initial use - this avoids "Uncaught ReferenceError: Cannot access 'uiPaneMessages' before initialization"
 
 //=====================
 
@@ -51,9 +51,7 @@ function saveGame() {
         }
         const saveSlot = new SaveSlot(slotName, GAME_STATE);
         saveSlot.serializedData = 'junk data for dev';
-        console.log('saveSlot pre-save: ', saveSlot);
         PERSIST.saveGame(saveSlot);
-        console.log('saveSlot post-save: ', saveSlot);
     } else {
         uiPaneMessages.ageMessages();
         uiPaneMessages.addMessage('There is no active game to save.');
@@ -65,27 +63,43 @@ function saveGame() {
 function loadGame() {
     console.log("CALLED loadGame");
     if (!PERSIST) { PERSIST = new PersistLocalStorage(uiPaneMessages); }
+
     if (GAME_STATE.status == 'ACTIVE') {
         uiPaneMessages.ageMessages();
         uiPaneMessages.addMessage("Cannot load a game because there's currently a game in progress.");
-    } else {
-        const existingSaves = PERSIST.getSaveSlots();
-        console.log('existing saves: ', existingSaves);
-        if (!existingSaves || existingSaves.length < 1) {
-            uiPaneMessages.ageMessages();
-            uiPaneMessages.addMessage('There are no saved games to load.');
-            return 0;
-        }
-        // if there are any existing saves:
-        // TODO: show to the user the list of existing saves
-        // uiPaneList.setList('Saved Games',[{displayText: 'g1'},{displayText: 'g2'}]);
-        uiPaneList.setList('Saved Games', existingSaves.map(es => { return {displayText: es.name}; }) );
-        // TODO: get from user the name of the save to load 
-        const slotName = "my test save2";
-        const saveSlot = new SaveSlot(slotName);
-        PERSIST.loadGame(saveSlot);
-        console.log('saveSlot post-load: ', saveSlot);
+        return 0;
     }
+
+    const existingSaves = PERSIST.getSaveSlots();
+    console.log('existing saves: ', existingSaves);
+    if (!existingSaves || existingSaves.length < 1) {
+        uiPaneMessages.ageMessages();
+        uiPaneMessages.addMessage('There are no saved games to load.');
+        return 0;
+    }
+
+    uiPaneList.setList('Saved Games', existingSaves.map(es => { return { displayText: es.name }; }));
+    uiPaneMain.eventHandler.startTextInput(
+        "GAME_TO_LOAD", "Name of game to load",
+        (slotName) => {
+            uiPaneList.clearList();
+            const [saveSlot] = existingSaves.filter(slot => slot.name === slotName);
+
+            if (!saveSlot) {
+                uiPaneMessages.ageMessages();
+                uiPaneMessages.addMessage(`NO GAME LOADED - No saved game named '${slotName}' was found.`);
+                return 0;
+            }
+            PERSIST.loadGame(saveSlot);
+            console.log('saveSlot post-load: ', saveSlot);
+        },
+        () => {
+            uiPaneList.clearList();
+            uiPaneMessages.ageMessages();
+            uiPaneMessages.addMessage(`NO GAME LOADED - game load cancelled.`);
+        }
+    );
+
     return 0;
 }
 

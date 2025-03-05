@@ -9,7 +9,9 @@ class UIPaneMainEventHandler {
 
         this.pressedKeys = new Set();
         this.inputMode = null;
+        this.textInputPrompt = null;
         this.inputCallback = null;
+        this.inputCancelledCallback = null;
         this.currentInputText = "";
         this.priorInfo = '';
 
@@ -80,19 +82,23 @@ class UIPaneMainEventHandler {
     }
 
     /*** TEXT INPUT HANDLING ***/
-    startTextInput(mode, callback) {
+    startTextInput(mode, prompt, callback, cancellationCallback = null) {
         devTrace(2, `Entering text input mode: ${mode}`);
         this.inputMode = mode;
+        this.textInputPrompt = prompt;
         this.inputCallback = callback;
+        this.inputCancelledCallback = cancellationCallback;
         this.currentInputText = "";
         this.priorInfo = uiPaneInfo.getInfo();
-        uiPaneInfo.setInfo(`Enter text: ${this.currentInputText}_`);
+        uiPaneInfo.setInfo(`${this.textInputPrompt}: ${this.currentInputText}_`);
     }
 
     stopTextInput() {
         devTrace(2, "Exiting text input mode.");
         this.inputMode = null;
+        this.textInputPrompt = null;
         this.inputCallback = null;
+        this.inputCancelledCallback = null;
         this.currentInputText = "";
         uiPaneInfo.setInfo(this.priorInfo);
         this.priorInfo = '';
@@ -100,6 +106,9 @@ class UIPaneMainEventHandler {
 
     handleTextInput(event) {
         if (event.key === "Escape") {
+            if (this.inputCancelledCallback) {
+                this.inputCancelledCallback();
+            }
             this.stopTextInput();
             return;
         }
@@ -123,7 +132,7 @@ class UIPaneMainEventHandler {
         console.log("updateTextInputDisplay");
         console.log("this.ui", this.ui);
 
-        uiPaneInfo.setInfo(`Enter text: ${this.currentInputText}_`);
+        uiPaneInfo.setInfo(`${this.textInputPrompt}: ${this.currentInputText}_`);
     }
 }
 

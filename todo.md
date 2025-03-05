@@ -1,13 +1,6 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* list pane implementation
-
-* game loading
-* * show list of saved games
-* * * use the list pane
-* * have the use choose one (single key? type in name? click in list pane? ???)
-
 * tackle game state serialization / deserialization
 * * game state in general
 * * entity
