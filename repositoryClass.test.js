@@ -29,6 +29,16 @@ describe("Repository", () => {
         expect(repository.get("item-1")).toBeUndefined();
     });
 
+    test("can reset the repository", () => {
+        repository.add(mockItem);
+        expect(repository.get("item-1")).toBe(mockItem);
+
+        repository.clear();
+        expect(repository.get("item-1")).toBeUndefined();
+        expect(repository.items.size).toEqual(0);
+    });
+
+
     test("returns undefined when retrieving a non-existent item", () => {
         expect(repository.get("non-existent-id")).toBeUndefined();
     });

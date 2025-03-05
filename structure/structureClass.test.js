@@ -44,4 +44,51 @@ describe('Structure', () => {
         const cell = structure.getCell();
         expect(cell).toEqual(GAME_STATE.world[0].grid[5][5]);
     });
+
+    test('should return correct serialization object from forSerializing', () => {
+        const serializedData = structure.forSerializing();
+        expect(serializedData).toEqual({
+            id: structure.id,
+            x: 5,
+            y: 5,
+            z: 0,
+            type: 'wall',
+            displaySymbol: '#',
+            displayColor: '#fff',
+        });
+    });
+
+    test('should serialize to a JSON string', () => {
+        const jsonString = structure.serialize();
+        const parsed = JSON.parse(jsonString);
+
+        expect(parsed).toEqual({
+            id: structure.id,
+            x: 5,
+            y: 5,
+            z: 0,
+            type: 'wall',
+            displaySymbol: '#',
+            displayColor: '#fff',
+        });
+    });
+
+    test('should correctly deserialize from JSON data', () => {
+        const serializedData = structure.serialize();
+        const parsedData = JSON.parse(serializedData);
+
+        const deserializedStructure = Structure.deserialize(parsedData, GAME_STATE.world[0]);
+
+        expect(deserializedStructure).toBeInstanceOf(Structure);
+        expect(deserializedStructure.id).toBe(structure.id);
+        expect(deserializedStructure.worldLevel).toBe(GAME_STATE.world[0]);
+        expect(deserializedStructure.x).toBe(5);
+        expect(deserializedStructure.y).toBe(5);
+        expect(deserializedStructure.z).toBe(0);
+        expect(deserializedStructure.type).toBe('wall');
+        expect(deserializedStructure.displaySymbol).toBe('#');
+        expect(deserializedStructure.displayColor).toBe('#fff');
+
+        expect(GAME_STATE.structureRepo.get(deserializedStructure.id)).toBe(deserializedStructure);
+    });
 });

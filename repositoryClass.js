@@ -16,6 +16,10 @@ class Repository {
         this.items.delete(id);
     }
 
+    clear() {
+        this.items = new Map();
+    }
+
     serialize() {
         return JSON.stringify({
             name: this.name,
