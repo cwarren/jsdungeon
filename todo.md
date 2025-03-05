@@ -2,16 +2,14 @@ to start server:
 PS E:\code\jsdungeon> docker-compose up --build
 
 * tackle game state serialization / deserialization
-* * game state in general
-* * structure
-* * * stairs
+* * world level
+* * * grid cell
+* * * grid - NOTE: this would greatly benefit from some compression - most grid cells are the same, so be smart about handling that
 * * entity
 * * * avatar
 * * * all the specials - vision, attributes, health, movement, etc.
-* * world level
-* * * grid - NOTE: this would greatly benefit from some compression - most grid cells are the same, so be smart about handling that
-* * * grid cell
 * * timing queue
+* * game state in general
 
 * create a help screen for the char sheet
 * * explain / summarize the character screen in general

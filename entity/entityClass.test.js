@@ -97,7 +97,7 @@ describe('Entity', () => {
 
   test('should place at cell', () => {
     const targetCell = GAME_STATE.world[0].grid[5][6];
-    expect(targetCell.entity).toBeUndefined();
+    expect(targetCell.entity).toBeNull();
     entity.placeAtCell(targetCell);
     expect(targetCell.entity).toBe(entity);
     expect(entity.location.x).toBe(5);

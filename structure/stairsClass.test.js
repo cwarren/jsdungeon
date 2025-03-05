@@ -102,7 +102,7 @@ describe('Stairs', () => {
 
     // Deserialize stairs first (connectsTo will not yet be resolved)
     const restoredStairs1 = Stairs.deserialize(stairsData, worldLevel);
-    expect(restoredStairs1.connectsTo).toBeUndefined(); // No connection yet
+    expect(restoredStairs1.connectsTo).toBeNull(); // No connection yet
 
     // Deserialize targetStairs, which should establish bidirectional linking
     const restoredStairs2 = Stairs.deserialize(targetStairsData, worldLevel);

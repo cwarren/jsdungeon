@@ -8,7 +8,7 @@ class GridCell {
 
     static ADJACENCY_DIRECTIONS = [
         { dx: -1, dy: -1 }, { dx: 0, dy: -1 }, { dx: 1, dy: -1 }, // Upper row
-        { dx: -1, dy: 0 },                  { dx: 1, dy: 0 },  // Sides
+        { dx: -1, dy: 0 }, { dx: 1, dy: 0 },  // Sides
         { dx: -1, dy: 1 }, { dx: 0, dy: 1 }, { dx: 1, dy: 1 }  // Lower row
     ];
     static ADJACENCY_DIRECTIONS_ORTHOGONAL = [{ dx: 0, dy: -1 }, { dx: -1, dy: 0 }, { dx: 1, dy: 0 }, { dx: 0, dy: 1 }];
@@ -17,7 +17,7 @@ class GridCell {
     static createDetached(terrain = "FLOOR") {
         return new GridCell(terrain);
     }
-    static createDetachedAt(x,y,terrain = "FLOOR") {
+    static createDetachedAt(x, y, terrain = "FLOOR") {
         const newCell = new GridCell(terrain);
         newCell.x = x;
         newCell.y = y;
@@ -26,7 +26,7 @@ class GridCell {
 
     static createAttached(x, y, worldLevel, terrain = "FLOOR") {
         const cell = GridCell.createDetached(terrain);
-        cell.attatchToWorldLevel(x,y,worldLevel);
+        cell.attatchToWorldLevel(x, y, worldLevel);
         return cell;
     }
 
@@ -39,21 +39,43 @@ class GridCell {
         this.isTraversible = type.isTraversible;
         this.entryMovementCost = type.entryMovementCost;
         this.isOpaque = type.isOpaque;
-        this.isViewable = ! this.isOpaque; // cells are viewable if they are not opaque or are next to a non-opaque cell - the latter has to be calculated in a pass through during level generation
+        this.isViewable = !this.isOpaque; // cells are viewable if they are not opaque or are next to a non-opaque cell - the latter has to be calculated in a pass through during level generation
         this.isVisible = false;
         this.color = type.color;
-        this.structure = undefined;
-        this.entity = undefined;
-        // console.log("created cell", this);
+        this.structure = null;
+        this.entity = null;
+        this.worldLevel = null;
     }
 
-    setPosition(x,y,z=0) {
+    forSerializing() {
+        return {
+            terrain: this.terrain,
+            x: this.x,
+            y: this.y,
+            z: this.z,
+            structure: this.structure ? this.structure.id : null,
+            entity: this.entity ? this.entity.id : null,
+        };
+    }
+
+    serialize() {
+        return JSON.stringify(this.forSerializing());
+    }
+
+    static deserialize(data, worldLevel) {
+        const gridCell = GridCell.createAttached(data.x, data.y, worldLevel, data.terrain);
+        if (data.structure) { gridCell.structure = worldLevel.gameState.structureRepo.get(data.structure); }
+        if (data.entity) { gridCell.entity = worldLevel.gameState.entityRepo.get(data.entity); }
+        return gridCell;  
+    }
+
+    setPosition(x, y, z = 0) {
         this.x = x;
         this.y = y;
         this.z = z;
     }
 
-    attatchToWorldLevel(x,y,worldLevel) {
+    attatchToWorldLevel(x, y, worldLevel) {
         this.x = x;
         this.y = y;
         this.setWorldLevel(worldLevel);
@@ -76,11 +98,11 @@ class GridCell {
             }
         }
 
-        return adjacentCells; 
+        return adjacentCells;
     }
 
     getDeltaToOtherCell(otherCell) {
-        return {dx: otherCell.x - this.x, dy: otherCell.y - this.y};
+        return { dx: otherCell.x - this.x, dy: otherCell.y - this.y };
     }
 
     /**

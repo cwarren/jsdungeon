@@ -9,7 +9,9 @@ class Repository {
     }
 
     get(id) {
-        return this.items.get(id);
+        const itm = this.items.get(id);
+        if (! itm ) { return null; }
+        return itm;
     }
 
     remove(id) {

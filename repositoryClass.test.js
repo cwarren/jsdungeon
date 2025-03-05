@@ -26,7 +26,7 @@ describe("Repository", () => {
     test("can remove an item by ID", () => {
         repository.add(mockItem);
         repository.remove("item-1");
-        expect(repository.get("item-1")).toBeUndefined();
+        expect(repository.get("item-1")).toBeNull();
     });
 
     test("can reset the repository", () => {
@@ -34,13 +34,13 @@ describe("Repository", () => {
         expect(repository.get("item-1")).toBe(mockItem);
 
         repository.clear();
-        expect(repository.get("item-1")).toBeUndefined();
+        expect(repository.get("item-1")).toBeNull();
         expect(repository.items.size).toEqual(0);
     });
 
 
-    test("returns undefined when retrieving a non-existent item", () => {
-        expect(repository.get("non-existent-id")).toBeUndefined();
+    test("returns null when retrieving a non-existent item", () => {
+        expect(repository.get("non-existent-id")).toBeNull();
     });
 
     test("getSerializedItemsArray returns correctly structured serialized items", () => {
@@ -106,7 +106,7 @@ describe("Repository", () => {
 
         repository.deserialize(serializedData, mockDeserializer);
 
-        expect(repository.get("item-1")).toBeUndefined();
+        expect(repository.get("item-1")).toBeNull();
         expect(repository.get("item-2")).toEqual({ id: "item-2", name: "New Item" });
         expect(repository.name).toBe("NewRepo");
     });
