@@ -11,6 +11,34 @@ class TurnQueue {
         this.previousActionTime = 0;
     }
 
+    forSerializing() {
+        return {
+            queue: this.queue.map(entry => {
+                return {
+                    entity: entry.entity.id,
+                    time: entry.time
+                }
+            }),
+            elapsedTime: this.elapsedTime,
+            previousActionTime: this.previousActionTime
+        };
+    }
+
+    static deserialize(data, gameState) {
+        const turnQueue = new TurnQueue();
+        turnQueue.queue = data.queue.map(entry => {
+            const ent = gameState.entityRepo.get(entry.entity);
+            return {
+                entity: ent ? ent : entry.entity,
+                time: entry.time
+            }
+        }
+        );
+        turnQueue.elapsedTime = data.elapsedTime;
+        turnQueue.previousActionTime = data.previousActionTime;
+        return turnQueue;
+    }
+
     clear() {
         devTrace(5,'clearing turn queue', this);
         this.queue = [];

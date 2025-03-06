@@ -1,6 +1,7 @@
 import { TurnQueue } from './gameTime';
 import { devTrace } from './util';
 import { GAME_STATE } from './gameStateClass';
+import { Repository } from './repositoryClass';
 
 jest.mock('./util', () => ({
     devTrace: jest.fn(),
@@ -15,9 +16,18 @@ jest.mock('./gameStateClass', () => ({
 
 describe('TurnQueue', () => {
     let turnQueue;
+    let mockEntity1, mockEntity2;
 
     beforeEach(() => {
         turnQueue = new TurnQueue();
+
+        mockEntity1 = { id: 'entity-1', type: 'test1' };
+        mockEntity2 = { id: 'entity-2', type: 'test2' };
+
+        const entityRepo = new Repository();
+        entityRepo.add(mockEntity1);
+        entityRepo.add(mockEntity2);
+        GAME_STATE.entityRepo = entityRepo;
     });
 
     test('should initialize with empty queue and zero elapsed time', () => {
@@ -118,5 +128,81 @@ describe('TurnQueue', () => {
         turnQueue.addEntity(entity, 5);
         const result = turnQueue.nextTurn();
         expect(result).toBeNull();
+    });
+
+    test('should return correct serialization object from forSerializing', () => {
+        turnQueue.addEntity(mockEntity1, 5);
+        turnQueue.addEntity(mockEntity2, 10);
+        turnQueue.elapsedTime = 100;
+        turnQueue.previousActionTime = 50;
+
+        const serializedData = turnQueue.forSerializing();
+        expect(serializedData).toEqual({
+            queue: [
+                { entity: 'entity-1', time: 5 },
+                { entity: 'entity-2', time: 10 }
+            ],
+            elapsedTime: 100,
+            previousActionTime: 50
+        });
+    });
+
+    test('should serialize to a JSON string', () => {
+        turnQueue.addEntity(mockEntity1, 5);
+        turnQueue.addEntity(mockEntity2, 10);
+        turnQueue.elapsedTime = 100;
+        turnQueue.previousActionTime = 50;
+
+        const jsonString = JSON.stringify(turnQueue.forSerializing());
+        const parsed = JSON.parse(jsonString);
+
+        expect(parsed).toEqual({
+            queue: [
+                { entity: 'entity-1', time: 5 },
+                { entity: 'entity-2', time: 10 }
+            ],
+            elapsedTime: 100,
+            previousActionTime: 50
+        });
+    });
+
+    test('should deserialize and restore TurnQueue correctly', () => {
+        const serializedData = {
+            queue: [
+                { entity: 'entity-1', time: 5 },
+                { entity: 'entity-2', time: 10 }
+            ],
+            elapsedTime: 100,
+            previousActionTime: 50
+        };
+
+        const deserializedQueue = TurnQueue.deserialize(serializedData, GAME_STATE);
+
+        expect(deserializedQueue).toBeInstanceOf(TurnQueue);
+        expect(deserializedQueue.elapsedTime).toBe(100);
+        expect(deserializedQueue.previousActionTime).toBe(50);
+        expect(deserializedQueue.queue.length).toBe(2);
+        expect(deserializedQueue.queue[0].entity).toBe(mockEntity1);
+        expect(deserializedQueue.queue[0].time).toBe(5);
+        expect(deserializedQueue.queue[1].entity).toBe(mockEntity2);
+        expect(deserializedQueue.queue[1].time).toBe(10);
+    });
+
+    test('should handle missing entities during deserialization', () => {
+        const serializedData = {
+            queue: [
+                { entity: 'entity-1', time: 5 },
+                { entity: 'missing-entity', time: 10 }
+            ],
+            elapsedTime: 100,
+            previousActionTime: 50
+        };
+
+        const deserializedQueue = TurnQueue.deserialize(serializedData, GAME_STATE);
+
+        expect(deserializedQueue).toBeInstanceOf(TurnQueue);
+        expect(deserializedQueue.queue.length).toBe(2);
+        expect(deserializedQueue.queue[0].entity).toBe(mockEntity1);
+        expect(deserializedQueue.queue[1].entity).toBe('missing-entity');
     });
 });
