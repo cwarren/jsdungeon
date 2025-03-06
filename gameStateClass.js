@@ -162,19 +162,20 @@ class GameState {
 }
 
 const WORLD_LEVEL_SPECS_FOR_DEV = [
-    WorldLevelSpecification.generateWorldLevelSpec({ type: 'EMPTY', width: 15, height: 10 }),
-    WorldLevelSpecification.generateWorldLevelSpec({ type: 'TOWN', width: 30, height: 20 }),
-    WorldLevelSpecification.generateWorldLevelSpec({ type: 'ROOMS_SUBDIVIDE', width: 30, height: 20 }),
-    WorldLevelSpecification.generateWorldLevelSpec({ type: 'ROOMS_RANDOM', width: 30, height: 20 }),
-    WorldLevelSpecification.generateWorldLevelSpec({ type: 'PUDDLES', width: 30, height: 20 }),
-    WorldLevelSpecification.generateWorldLevelSpec({ type: 'BURROW', width: 30, height: 20 }),
-    WorldLevelSpecification.generateWorldLevelSpec({ type: 'NEST', width: 30, height: 20 }),
-    WorldLevelSpecification.generateWorldLevelSpec({ type: 'CAVES_SHATTERED', width: 30, height: 20 }),
-    WorldLevelSpecification.generateWorldLevelSpec({ type: 'CAVES', width: 30, height: 20 }),
-    WorldLevelSpecification.generateWorldLevelSpec({ type: 'CAVES_LARGE', width: 30, height: 20 }),
-    WorldLevelSpecification.generateWorldLevelSpec({ type: 'CAVES_HUGE', width: 30, height: 20 }),
-    WorldLevelSpecification.generateWorldLevelSpec({ type: 'EMPTY', width: 30, height: 20 }),
-    WorldLevelSpecification.generateWorldLevelSpec({ type: 'RANDOM', width: 30, height: 20 }),
+    WorldLevelSpecification.generateWorldLevelSpec({ type: 'EMPTY', width: 6, height: 4 }),
+    // WorldLevelSpecification.generateWorldLevelSpec({ type: 'EMPTY', width: 15, height: 10 }),
+    // WorldLevelSpecification.generateWorldLevelSpec({ type: 'TOWN', width: 30, height: 20 }),
+    // WorldLevelSpecification.generateWorldLevelSpec({ type: 'ROOMS_SUBDIVIDE', width: 30, height: 20 }),
+    // WorldLevelSpecification.generateWorldLevelSpec({ type: 'ROOMS_RANDOM', width: 30, height: 20 }),
+    // WorldLevelSpecification.generateWorldLevelSpec({ type: 'PUDDLES', width: 30, height: 20 }),
+    // WorldLevelSpecification.generateWorldLevelSpec({ type: 'BURROW', width: 30, height: 20 }),
+    // WorldLevelSpecification.generateWorldLevelSpec({ type: 'NEST', width: 30, height: 20 }),
+    // WorldLevelSpecification.generateWorldLevelSpec({ type: 'CAVES_SHATTERED', width: 30, height: 20 }),
+    // WorldLevelSpecification.generateWorldLevelSpec({ type: 'CAVES', width: 30, height: 20 }),
+    // WorldLevelSpecification.generateWorldLevelSpec({ type: 'CAVES_LARGE', width: 30, height: 20 }),
+    // WorldLevelSpecification.generateWorldLevelSpec({ type: 'CAVES_HUGE', width: 30, height: 20 }),
+    // WorldLevelSpecification.generateWorldLevelSpec({ type: 'EMPTY', width: 30, height: 20 }),
+    // WorldLevelSpecification.generateWorldLevelSpec({ type: 'RANDOM', width: 30, height: 20 }),
 ];
 
 

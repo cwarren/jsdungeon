@@ -48,6 +48,35 @@ class WorldLevel {
 
     // ---------------------
 
+    forSerializing() {
+        let serialGrid = [];
+        if (this.grid && this.grid.length > 0) {
+            for (let y = 0; y < this.levelHeight; y++) {
+                for (let x = 0; x < this.levelWidth; x++) {
+                    const cell = this.grid[x][y];
+                    serialGrid.push(cell.forSerializing());
+                }
+            }
+        } else {
+            serialGrid = null;
+        }
+        return {
+            levelNumber: this.levelNumber,
+            levelWidth: this.levelWidth,
+            levelHeight: this.levelHeight,
+            levelType: this.levelType,
+            grid: serialGrid,
+            levelEntities: this.levelEntities.map(ent => { return ent.id; }),
+            levelStructures: this.levelStructures.map(ent => { return ent.id; }),
+            stairsDown: this.stairsDown ? this.stairsDown.id : null,
+            stairsUp: this.stairsUp ? this.stairsUp.id : null,
+            turnQueue: this.turnQueue.forSerializing(),
+            timeOfAvatarDeparture: this.timeOfAvatarDeparture,
+        }
+    }
+
+    // ---------------------
+
     static getFromSpecification(gameState, levelNumber, worldLevelSpecification) {
         const wl = new WorldLevel(gameState, levelNumber, worldLevelSpecification.width, worldLevelSpecification.height, worldLevelSpecification.type);
         wl.generationParams = worldLevelSpecification.typeGenerationParams ? worldLevelSpecification.typeGenerationParams : null;

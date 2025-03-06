@@ -30,13 +30,14 @@ import { Repository } from '../repositoryClass.js';
 
 jest.mock('../util.js', () => ({
   devTrace: jest.fn(),
+  // devTrace: jest.requireActual('../util.js').devTrace,
   constrainValue: jest.fn((value, min, max) => Math.max(min, Math.min(max, value))),
   generateId: jest.requireActual('../util.js').generateId,
 }));
 
 jest.mock('./gridGeneration', () => ({
-  setWorldLevelForGridCells: jest.fn(),
-  generateGrid_empty: jest.fn(() => []),
+  setWorldLevelForGridCells: jest.requireActual('./gridGeneration.js').setWorldLevelForGridCells,
+  generateGrid_empty: jest.requireActual('./gridGeneration.js').generateGrid_empty,
   generateGrid_random: jest.fn(() => []),
   generateGrid_caves: jest.fn(() => []),
   generateGrid_caves_shattered: jest.fn(() => []),
@@ -56,14 +57,15 @@ jest.mock('./gridUtils', () => ({
 }));
 
 jest.mock('../gameTime', () => ({
-  TurnQueue: jest.fn().mockImplementation(() => ({
-    addEntity: jest.fn(),
-    addEntityAtBeginningOfTurnQueue: jest.fn(),
-    removeEntity: jest.fn(),
-    runTimeFor: jest.fn(),
-    elapsedTime: 0,
-    queue: [],
-  })),
+  TurnQueue: jest.requireActual('../gameTime.js').TurnQueue,
+  // TurnQueue: jest.fn().mockImplementation(() => ({
+  //     addEntity: jest.fn(),
+  //   addEntityAtBeginningOfTurnQueue: jest.fn(),
+  //   removeEntity: jest.fn(),
+  //   runTimeFor: jest.fn(),
+  //   elapsedTime: 0,
+  //   queue: [],
+  // })),
 }));
 
 jest.mock('../entity/entityClass', () => ({
@@ -76,8 +78,8 @@ jest.mock('../entity/entityClass', () => ({
 }));
 
 jest.mock('../ui/ui.js', () => ({
-  uiPaneMessages: { addMessage: jest.fn()},
-  uiPaneInfo: { setInfo: jest.fn()},
+  uiPaneMessages: { addMessage: jest.fn() },
+  uiPaneInfo: { setInfo: jest.fn() },
 }));
 
 describe('WorldLevel', () => {
@@ -94,6 +96,7 @@ describe('WorldLevel', () => {
       setTurnQueue: jest.fn(),
       world: [],
       structureRepo: new Repository('stru'),
+      entityRepo: new Repository('ent'),
     };
     worldLevel = new WorldLevel(gameState, 0, 10, 10, 'EMPTY');
     gameState.world[0] = worldLevel; // Add the world level to the gameState's world array
@@ -122,7 +125,7 @@ describe('WorldLevel', () => {
   });
 
   test('should get a valid world level from a WorldLevelSpecification', () => {
-    const levelFromSpec = WorldLevel.getFromSpecification(gameState, 5, WorldLevelSpecification.generateWorldLevelSpec({width: 18, height: 12, type: "RANDOM"}));
+    const levelFromSpec = WorldLevel.getFromSpecification(gameState, 5, WorldLevelSpecification.generateWorldLevelSpec({ width: 18, height: 12, type: "RANDOM" }));
     expect(levelFromSpec.gameState).toBe(gameState);
     expect(levelFromSpec.levelNumber).toBe(5);
     expect(levelFromSpec.levelWidth).toBe(18);
@@ -133,10 +136,10 @@ describe('WorldLevel', () => {
 
   test('should generate grid and set world level for grid cells', () => {
     worldLevel.generateGrid();
-    expect(generateGrid_empty).toHaveBeenCalledWith(10, 10, null);
-    expect(setWorldLevelForGridCells).toHaveBeenCalledWith(worldLevel, []);
-    expect(determineCellViewability).toHaveBeenCalledWith([]);
-    expect(worldLevel.grid).toEqual([]);
+    expect(worldLevel.grid.length).toBe(10);
+    expect(worldLevel.grid[0].length).toBe(10);
+    expect(worldLevel.grid[0][0].worldLevel).toBe(worldLevel);
+    expect(worldLevel.grid[0][0].z).toBe(worldLevel.levelNumber);
   });
 
   test('should populate level with entities', () => {
@@ -154,14 +157,18 @@ describe('WorldLevel', () => {
   });
 
   test('should add entity to level', () => {
+    jest.spyOn(worldLevel.turnQueue, 'addEntity'); 
+
     const entity = new Entity('RAT_INSIDIOUS');
     worldLevel.addEntity(entity);
+
     expect(worldLevel.levelEntities).toContain(entity);
     expect(entity.placeAtCell).toHaveBeenCalled();
     expect(worldLevel.turnQueue.addEntity).toHaveBeenCalledWith(entity);
   });
 
   test('should add entity at beginning of turn queue', () => {
+    jest.spyOn(worldLevel.turnQueue, 'addEntityAtBeginningOfTurnQueue'); 
     const entity = new Entity('RAT_INSIDIOUS');
     worldLevel.addEntityAtBeginningOfTurnQueue(entity);
     expect(worldLevel.levelEntities).toContain(entity);
@@ -170,9 +177,12 @@ describe('WorldLevel', () => {
   });
 
   test('should remove entity from level', () => {
+    jest.spyOn(worldLevel.turnQueue, 'removeEntity'); 
+
     const entity = new Entity('RAT_INSIDIOUS');
     worldLevel.levelEntities.push(entity);
     worldLevel.removeEntity(entity);
+
     expect(worldLevel.levelEntities).not.toContain(entity);
     expect(worldLevel.turnQueue.removeEntity).toHaveBeenCalledWith(entity);
   });
@@ -200,11 +210,14 @@ describe('WorldLevel', () => {
   });
 
   test('should track avatar departure and handle avatar entering level', () => {
+    jest.spyOn(worldLevel.turnQueue, 'runTimeFor'); // Spy on the function
+
     worldLevel.trackAvatarDepartureTime();
     expect(worldLevel.timeOfAvatarDeparture).toBe(0);
 
     const entryCell = { x: 0, y: 0, z: 0 };
     worldLevel.handleAvatarEnteringLevel(entryCell);
+    
     expect(constrainValue).toHaveBeenCalledWith(0, 0, DEFAULT_ACTION_COST * 100);
     expect(gameState.avatar.resetTimeOnLevel).toHaveBeenCalled();
     expect(gameState.setTurnQueue).toHaveBeenCalledWith(worldLevel.turnQueue);
@@ -215,4 +228,43 @@ describe('WorldLevel', () => {
     expect(uiPaneMessages.addMessage).toHaveBeenCalledWith(`You enter level ${worldLevel.levelNumber + 1}`);
     expect(uiPaneInfo.setInfo).toHaveBeenCalled();
   });
+
+  describe('WorldLevel Serialization', () => {
+    test('should return correct serialization object from forSerializing', () => {
+      // Mock entities and structures with IDs
+      const mockEntity1 = { id: 'entity-1' };
+      const mockEntity2 = { id: 'entity-2' };
+      gameState.entityRepo.add(mockEntity1);
+      gameState.entityRepo.add(mockEntity2);
+      const mockStructure1 = { id: 'structure-1' };
+      const mockStructure2 = { id: 'structure-2' };
+      gameState.structureRepo.add(mockStructure1);
+      gameState.structureRepo.add(mockStructure2);
+
+      worldLevel.generate();
+
+      worldLevel.levelEntities = [mockEntity1, mockEntity2];
+      worldLevel.levelStructures = [mockStructure1, mockStructure2];
+      worldLevel.stairsDown = mockStructure1;
+      worldLevel.stairsUp = mockStructure2;
+      worldLevel.timeOfAvatarDeparture = 42;
+
+      const serializedData = worldLevel.forSerializing();
+
+      expect(serializedData.levelNumber).toEqual(worldLevel.levelNumber);
+      expect(serializedData.levelWidth).toEqual(worldLevel.levelWidth);
+      expect(serializedData.levelHeight).toEqual(worldLevel.levelHeight);
+      expect(serializedData.levelType).toEqual(worldLevel.levelType);
+      expect(serializedData.levelEntities).toEqual(['entity-1', 'entity-2']);
+      expect(serializedData.levelStructures).toEqual(['structure-1', 'structure-2']);
+      expect(serializedData.stairsDown).toEqual('structure-1');
+      expect(serializedData.stairsUp).toEqual('structure-2');
+      expect(serializedData.turnQueue).toEqual(worldLevel.turnQueue.forSerializing());
+      expect(serializedData.timeOfAvatarDeparture).toEqual(42);
+
+      expect(serializedData.grid.length).toEqual(worldLevel.levelWidth*worldLevel.levelHeight);
+      expect(serializedData.grid[0]).toEqual(expect.objectContaining({ terrain: 'FLOOR', x: 0, y: 0, z: 0, structure: null, entity: null }));
+    });
+  });
+
 });
