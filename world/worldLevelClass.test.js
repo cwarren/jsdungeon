@@ -27,6 +27,7 @@ import { rollDice } from '../util.js';
 import { uiPaneMessages, uiPaneInfo } from "../ui/ui.js";
 import { WorldLevelSpecification } from './worldLevelSpecificationClass.js';
 import { Repository } from '../repositoryClass.js';
+import { GridCell } from './gridCellClass.js';
 
 jest.mock('../util.js', () => ({
   devTrace: jest.fn(),
@@ -230,25 +231,31 @@ describe('WorldLevel', () => {
   });
 
   describe('WorldLevel Serialization', () => {
-    test('should return correct serialization object from forSerializing', () => {
-      // Mock entities and structures with IDs
-      const mockEntity1 = { id: 'entity-1' };
-      const mockEntity2 = { id: 'entity-2' };
+    let mockEntity1;
+    let mockEntity2; 
+    let mockStructure1;
+    let mockStructure2;
+
+    beforeEach(() => {
+      mockEntity1 = { id: 'entity-1' }; 
+      mockEntity2 = { id: 'entity-2' };
       gameState.entityRepo.add(mockEntity1);
       gameState.entityRepo.add(mockEntity2);
-      const mockStructure1 = { id: 'structure-1' };
-      const mockStructure2 = { id: 'structure-2' };
+
+      mockStructure1 = { id: 'structure-1' };
+      mockStructure2 = { id: 'structure-2' };
       gameState.structureRepo.add(mockStructure1);
       gameState.structureRepo.add(mockStructure2);
 
       worldLevel.generate();
-
       worldLevel.levelEntities = [mockEntity1, mockEntity2];
       worldLevel.levelStructures = [mockStructure1, mockStructure2];
       worldLevel.stairsDown = mockStructure1;
       worldLevel.stairsUp = mockStructure2;
       worldLevel.timeOfAvatarDeparture = 42;
+    });
 
+    test('should return correct serialization object from forSerializing', () => {
       const serializedData = worldLevel.forSerializing();
 
       expect(serializedData.levelNumber).toEqual(worldLevel.levelNumber);
@@ -264,6 +271,41 @@ describe('WorldLevel', () => {
 
       expect(serializedData.grid.length).toEqual(worldLevel.levelWidth*worldLevel.levelHeight);
       expect(serializedData.grid[0]).toEqual(expect.objectContaining({ terrain: 'FLOOR', x: 0, y: 0, z: 0, structure: null, entity: null }));
+    });
+
+    test('should correctly deserialize WorldLevel from serialized data', () => {
+      const serializedData = worldLevel.forSerializing();
+      const deserializedWorldLevel = WorldLevel.deserialize(serializedData, gameState);
+
+      expect(deserializedWorldLevel).toBeInstanceOf(WorldLevel);
+      expect(deserializedWorldLevel.levelNumber).toEqual(worldLevel.levelNumber);
+      expect(deserializedWorldLevel.levelWidth).toEqual(worldLevel.levelWidth);
+      expect(deserializedWorldLevel.levelHeight).toEqual(worldLevel.levelHeight);
+      expect(deserializedWorldLevel.levelType).toEqual(worldLevel.levelType);
+      expect(deserializedWorldLevel.timeOfAvatarDeparture).toEqual(42);
+
+      expect(deserializedWorldLevel.levelEntities).toEqual([mockEntity1, mockEntity2]);
+      expect(deserializedWorldLevel.levelStructures).toEqual([mockStructure1, mockStructure2]);
+      expect(deserializedWorldLevel.stairsDown).toEqual(mockStructure1);
+      expect(deserializedWorldLevel.stairsUp).toEqual(mockStructure2);
+
+      expect(deserializedWorldLevel.turnQueue).toBeInstanceOf(TurnQueue);
+      expect(deserializedWorldLevel.turnQueue.queue.length).toEqual(worldLevel.turnQueue.queue.length);
+      // NOTE: just checking the queue length, as the queue entries are tested in the TurnQueue tests
+
+      expect(deserializedWorldLevel.grid.length).toEqual(worldLevel.grid.length);
+      expect(deserializedWorldLevel.grid[0].length).toEqual(worldLevel.grid[0].length);
+
+      for (let y = 0; y < worldLevel.levelHeight; y++) {
+        for (let x = 0; x < worldLevel.levelWidth; x++) {
+          expect(deserializedWorldLevel.grid[x][y]).toBeInstanceOf(GridCell);
+          expect(deserializedWorldLevel.grid[x][y].terrain).toEqual(worldLevel.grid[x][y].terrain);
+          expect(deserializedWorldLevel.grid[x][y].x).toEqual(worldLevel.grid[x][y].x);
+          expect(deserializedWorldLevel.grid[x][y].y).toEqual(worldLevel.grid[x][y].y);
+          expect(deserializedWorldLevel.grid[x][y].z).toEqual(worldLevel.grid[x][y].z);
+          expect(deserializedWorldLevel.grid[x][y].worldLevel).toBe(deserializedWorldLevel);
+        }
+      }
     });
   });
 

@@ -24,6 +24,7 @@ import {
 import { TurnQueue } from "../gameTime.js";
 import { Entity, DEFAULT_ACTION_COST } from "../entity/entityClass.js";
 import { uiPaneMessages, uiPaneInfo } from "../ui/ui.js";
+import { GridCell } from "./gridCellClass.js";
 
 const MAX_ENTITY_PLACEMENT_ATTEMPTS = 20;
 const MAX_TIME_AWAY_TO_CARE_ABOUT = DEFAULT_ACTION_COST * 100;
@@ -51,8 +52,8 @@ class WorldLevel {
     forSerializing() {
         let serialGrid = [];
         if (this.grid && this.grid.length > 0) {
-            for (let y = 0; y < this.levelHeight; y++) {
-                for (let x = 0; x < this.levelWidth; x++) {
+            for (let x = 0; x < this.levelWidth; x++) {
+                for (let y = 0; y < this.levelHeight; y++) {
                     const cell = this.grid[x][y];
                     serialGrid.push(cell.forSerializing());
                 }
@@ -73,6 +74,28 @@ class WorldLevel {
             turnQueue: this.turnQueue.forSerializing(),
             timeOfAvatarDeparture: this.timeOfAvatarDeparture,
         }
+    }
+
+    static deserialize(data, gameState) {
+        const worldLevel = new WorldLevel(gameState, data.levelNumber, data.levelWidth, data.levelHeight, data.levelType);
+        if (data.grid) {
+            worldLevel.grid = [];
+            let gridIndex = 0;
+            for (let x = 0; x < data.levelWidth; x++) {
+                worldLevel.grid[x] = [];
+                for (let y = 0; y < data.levelHeight; y++) {
+                    worldLevel.grid[x][y] = GridCell.deserialize(data.grid[gridIndex], worldLevel);
+                    gridIndex++;
+                }
+            }
+        }
+        worldLevel.levelEntities = data.levelEntities.map(entId => { return gameState.entityRepo.get(entId); });
+        worldLevel.levelStructures = data.levelStructures.map(entId => { return gameState.structureRepo.get(entId); });
+        worldLevel.stairsDown = data.stairsDown ? gameState.structureRepo.get(data.stairsDown) : null;
+        worldLevel.stairsUp = data.stairsUp ? gameState.structureRepo.get(data.stairsUp) : null;
+        worldLevel.turnQueue = TurnQueue.deserialize(data.turnQueue, gameState);
+        worldLevel.timeOfAvatarDeparture = data.timeOfAvatarDeparture;
+        return worldLevel;
     }
 
     // ---------------------
