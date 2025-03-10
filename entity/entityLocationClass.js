@@ -61,6 +61,36 @@ class EntityLocation {
   getManhattenDistanceToEntity(otherEntity) {
     return Math.abs(this.x - otherEntity.location.x) + Math.abs(this.y - otherEntity.location.y);
   }
+
+  /**
+   * Prepares the location attributes for serialization.
+   * @returns {Object} A simple object representing the location attributes.
+   */
+  forSerializing() {
+    return {
+      x: this.x,
+      y: this.y,
+      z: this.z
+    };
+  }
+
+  /**
+   * Serializes the location attributes into a JSON string.
+   * @returns {string} The serialized JSON representation.
+   */
+  serialize() {
+    return JSON.stringify(this.forSerializing());
+  }
+
+  /**
+   * Deserializes a given data object into a new EntityLocation instance.
+   * @param {Object} data - The serialized data object.
+   * @param {Object} ofEntity - The entity this location belongs to.
+   * @returns {EntityLocation} A new instance with restored values.
+   */
+  static deserialize(data, ofEntity) {
+    return new EntityLocation(ofEntity, data.x, data.y, data.z);
+  }
 }
 
 export { EntityLocation };

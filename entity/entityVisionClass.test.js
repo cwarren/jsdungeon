@@ -144,4 +144,8 @@ describe('EntityVision', () => {
         expect(visibleEntities[0].relation).toBe('HOSTILE_TO');
         expect(visibleEntities[0].manhattenDistance).toBe(2);
     });
+
+    describe('EntityVision - serialization', () => {
+        // TODO: implement tests for forSerializing, serialize, deserialize
+    });
 });

@@ -463,4 +463,52 @@ describe('EntityMovement', () => {
       expect(entityMovement.movementPath).toEqual([worldLevel.grid[2][0], worldLevel.grid[3][0], worldLevel.grid[4][0]]);
     });
   });
+
+  describe('EntityMovement - serialization', () => {
+    test('should serialize correctly', () => {
+      entityMovement.isRunning = true;
+      entityMovement.runDelta = { dx: 1, dy: 0 };
+      entityMovement.destinationCell = { x: 7, y: 7, z: 0 };
+      entityMovement.movementPath = [{ x: 6, y: 6, z: 0 }, { x: 7, y: 7, z: 0 }];
+      entityMovement.isSleeping = true;
+
+      const serializedData = entityMovement.forSerializing();
+      expect(serializedData).toEqual({
+        isRunning: true,
+        runDelta: { dx: 1, dy: 0 },
+        type: entityMovement.type,
+        actionTime: entityMovement.actionTime,
+        destinationCell: { x: 7, y: 7, z: 0 },
+        movementPath: [{ x: 6, y: 6, z: 0 }, { x: 7, y: 7, z: 0 }],
+        isSleeping: true,
+      });
+    });
+
+    test('should serialize to JSON string correctly', () => {
+      entityMovement.isRunning = true;
+      const jsonString = entityMovement.serialize();
+      const parsed = JSON.parse(jsonString);
+      expect(parsed).toEqual(entityMovement.forSerializing());
+    });
+
+    test('should deserialize correctly', () => {
+      const data = {
+        isRunning: true,
+        runDelta: { dx: 1, dy: 0 },
+        type: "WALK",
+        actionTime: 100,
+        destinationCell: { x: 7, y: 7, z: 0 },
+        movementPath: [{ x: 6, y: 6, z: 0 }, { x: 7, y: 7, z: 0 }],
+        isSleeping: false,
+      };
+
+      const deserializedMovement = EntityMovement.deserialize(data, entity);
+      expect(deserializedMovement).toBeInstanceOf(EntityMovement);
+      expect(deserializedMovement.isRunning).toBe(true);
+      expect(deserializedMovement.runDelta).toEqual({ dx: 1, dy: 0 });
+      expect(deserializedMovement.destinationCell).toEqual({ x: 7, y: 7, z: 0 });
+      expect(deserializedMovement.movementPath).toEqual([{ x: 6, y: 6, z: 0 }, { x: 7, y: 7, z: 0 }]);
+      expect(deserializedMovement.isSleeping).toBe(false);
+    });
+  });
 });

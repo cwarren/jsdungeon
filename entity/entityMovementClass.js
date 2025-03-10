@@ -262,6 +262,48 @@ class EntityMovement {
         this.setPathToDestination();
         return this.moveWanderAimless();
     }
+
+    // SERIALIZATION
+
+    /**
+     * Prepares the movement attributes for serialization.
+     * @returns {Object} A simple object representing the movement attributes.
+     */
+    forSerializing() {
+        return {
+            isRunning: this.isRunning,
+            runDelta: this.runDelta,
+            type: this.type,
+            actionTime: this.actionTime,
+            destinationCell: this.destinationCell ? { x: this.destinationCell.x, y: this.destinationCell.y, z: this.destinationCell.z } : null,
+            movementPath: this.movementPath.map(cell => ({ x: cell.x, y: cell.y, z: cell.z })),
+            isSleeping: this.isSleeping
+        };
+    }
+
+    /**
+     * Serializes the movement attributes into a JSON string.
+     * @returns {string} The serialized JSON representation.
+     */
+    serialize() {
+        return JSON.stringify(this.forSerializing());
+    }
+
+    /**
+     * Deserializes a given data object into a new EntityMovement instance.
+     * @param {Object} data - The serialized data object.
+     * @param {Object} ofEntity - The entity this movement belongs to.
+     * @returns {EntityMovement} A new instance with restored values.
+     */
+    static deserialize(data, ofEntity) {
+        const movement = new EntityMovement(ofEntity, { movementType: data.type, baseMovementTime: data.actionTime });
+        movement.isRunning = data.isRunning;
+        movement.runDelta = data.runDelta;
+        movement.destinationCell = data.destinationCell ? { x: data.destinationCell.x, y: data.destinationCell.y, z: data.destinationCell.z } : null;
+        movement.movementPath = data.movementPath.map(cell => ({ x: cell.x, y: cell.y, z: cell.z }));
+        movement.isSleeping = data.isSleeping;
+        return movement;
+    }
 }
 
 export { EntityMovement, DEFAULT_MOVEMENT_ACTION_COST, DEFAULT_MOVEMENT_SPEC };

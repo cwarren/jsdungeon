@@ -118,4 +118,35 @@ describe('EntityLocation', () => {
     const distance = entityLocation.getManhattenDistanceToEntity(otherEntity);
     expect(distance).toBe(4);
   });
+
+  describe('EntityLocation - serialization', () => {
+    test('should serialize correctly', () => {
+      const serializedData = entityLocation.forSerializing();
+      expect(serializedData).toEqual({
+        x: 5,
+        y: 5,
+        z: 0
+      });
+    });
+  
+    test('should serialize to JSON string correctly', () => {
+      const jsonString = entityLocation.serialize();
+      const parsed = JSON.parse(jsonString);
+      expect(parsed).toEqual({
+        x: 5,
+        y: 5,
+        z: 0
+      });
+    });
+  
+    test('should deserialize correctly', () => {
+      const data = { x: 3, y: 4, z: 1 };
+      const deserializedLocation = EntityLocation.deserialize(data, entity);
+      expect(deserializedLocation).toBeInstanceOf(EntityLocation);
+      expect(deserializedLocation.ofEntity).toBe(entity);
+      expect(deserializedLocation.x).toBe(3);
+      expect(deserializedLocation.y).toBe(4);
+      expect(deserializedLocation.z).toBe(1);
+    });
+  });
 });
