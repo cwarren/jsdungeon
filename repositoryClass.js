@@ -38,14 +38,15 @@ class Repository {
         );
     }
 
-    deserialize(serializedData, deserializer) {
+    // TODO: replace this with the static deserialize pattern used elsewhere
+    static deserialize(serializedData, deserializer, ...args) {
         const data = JSON.parse(serializedData);
-        this.name = data.name;
-        this.items.clear();
+        const repo = new Repository(data.name);
         for (const { id, dataIten } of data.items) {
-            const item = deserializer(dataIten);
-            this.items.set(id, item);
+            const item = deserializer(dataIten, ...args);
+            repo.add(item);
         }
+        return repo;
     }
 }
 

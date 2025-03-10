@@ -86,10 +86,10 @@ describe("Repository", () => {
         });
         const mockDeserializer = jest.fn((data) => ({ id: "item-1", ...data }));
 
-        repository.deserialize(serializedData, mockDeserializer);
+        const newRepo = Repository.deserialize(serializedData, mockDeserializer);
 
-        expect(repository.name).toBe("RestoredRepo");
-        expect(repository.get("item-1")).toEqual({ id: "item-1", name: "Restored Item" });
+        expect(newRepo.name).toBe("RestoredRepo");
+        expect(newRepo.get("item-1")).toEqual({ id: "item-1", name: "Restored Item" });
         expect(mockDeserializer).toHaveBeenCalledWith({ name: "Restored Item" });
     });
 
@@ -104,11 +104,11 @@ describe("Repository", () => {
         });
         const mockDeserializer = jest.fn((data) => ({ id: "item-2", ...data }));
 
-        repository.deserialize(serializedData, mockDeserializer);
+        const newRepo = Repository.deserialize(serializedData, mockDeserializer);
 
-        expect(repository.get("item-1")).toBeNull();
-        expect(repository.get("item-2")).toEqual({ id: "item-2", name: "New Item" });
-        expect(repository.name).toBe("NewRepo");
+        expect(newRepo.get("item-1")).toBeNull();
+        expect(newRepo.get("item-2")).toEqual({ id: "item-2", name: "New Item" });
+        expect(newRepo.name).toBe("NewRepo");
     });
 
     test("serializes an empty repository correctly", () => {
@@ -116,9 +116,9 @@ describe("Repository", () => {
     });
 
     test("deserializes an empty string without errors", () => {
-        repository.deserialize(JSON.stringify({ name: "EmptyRepo", items: [] }), jest.fn());
-        expect(repository.items.size).toBe(0);
-        expect(repository.name).toBe("EmptyRepo");
+        const newRepo = Repository.deserialize(JSON.stringify({ name: "EmptyRepo", items: [] }), jest.fn());
+        expect(newRepo.items.size).toBe(0);
+        expect(newRepo.name).toBe("EmptyRepo");
     });
 
     test("ensures each item in deserialization calls the deserializer", () => {
@@ -131,12 +131,30 @@ describe("Repository", () => {
         });
         const mockDeserializer = jest.fn((data) => ({ id: data.name, ...data }));
 
-        repository.deserialize(serializedData, mockDeserializer);
+        const newRepo = Repository.deserialize(serializedData, mockDeserializer);
+        console.log(newRepo);
 
         expect(mockDeserializer).toHaveBeenCalledTimes(2);
-        expect(repository.get("item-1")).toEqual({ id: "Item One", name: "Item One" });
-        expect(repository.get("item-2")).toEqual({ id: "Item Two", name: "Item Two" });
+        expect(newRepo.get("Item One")).toEqual({ id: "Item One", name: "Item One" });
+        expect(newRepo.get("Item Two")).toEqual({ id: "Item Two", name: "Item Two" });
     });
+
+    test("deserialization correctly passes additional arguments to deserializer", () => {
+        const serializedData = JSON.stringify({
+            name: "RepoWithArgs",
+            items: [
+                { id: "item-1", dataIten: { name: "Item One" } },
+            ],
+        });
+        const mockDeserializer = jest.fn((data, arg1, arg2) => ({ id: "item-1", ...data, arg1, arg2 }));
+    
+        const newRepo = Repository.deserialize(serializedData, mockDeserializer, "extra1", "extra2");
+    
+        expect(mockDeserializer).toHaveBeenCalledWith({ name: "Item One" }, "extra1", "extra2");
+        expect(newRepo.get("item-1")).toEqual({ id: "item-1", name: "Item One", arg1: "extra1", arg2: "extra2" });
+    });
+
+    
 
     test("removing a non-existent item does not throw an error", () => {
         expect(() => repository.remove("non-existent-id")).not.toThrow();
