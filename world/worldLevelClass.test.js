@@ -59,14 +59,6 @@ jest.mock('./gridUtils', () => ({
 
 jest.mock('../gameTime', () => ({
   TurnQueue: jest.requireActual('../gameTime.js').TurnQueue,
-  // TurnQueue: jest.fn().mockImplementation(() => ({
-  //     addEntity: jest.fn(),
-  //   addEntityAtBeginningOfTurnQueue: jest.fn(),
-  //   removeEntity: jest.fn(),
-  //   runTimeFor: jest.fn(),
-  //   elapsedTime: 0,
-  //   queue: [],
-  // })),
 }));
 
 jest.mock('../entity/entityClass', () => ({
@@ -242,8 +234,8 @@ describe('WorldLevel', () => {
       gameState.entityRepo.add(mockEntity1);
       gameState.entityRepo.add(mockEntity2);
 
-      mockStructure1 = { id: 'structure-1' };
-      mockStructure2 = { id: 'structure-2' };
+      mockStructure1 = { id: 'structure-1', connectsTo: 'structure-2', setWorldLevel: jest.fn(), reconnect: jest.fn() };
+      mockStructure2 = { id: 'structure-2',  connectsTo: 'structure-1', setWorldLevel: jest.fn(), reconnect: jest.fn() };
       gameState.structureRepo.add(mockStructure1);
       gameState.structureRepo.add(mockStructure2);
 
@@ -288,6 +280,9 @@ describe('WorldLevel', () => {
       expect(deserializedWorldLevel.levelStructures).toEqual([mockStructure1, mockStructure2]);
       expect(deserializedWorldLevel.stairsDown).toEqual(mockStructure1);
       expect(deserializedWorldLevel.stairsUp).toEqual(mockStructure2);
+
+      expect(deserializedWorldLevel.levelStructures[0].setWorldLevel).toHaveBeenCalled();
+      expect(deserializedWorldLevel.levelStructures[0].reconnect).toHaveBeenCalled();
 
       expect(deserializedWorldLevel.turnQueue).toBeInstanceOf(TurnQueue);
       expect(deserializedWorldLevel.turnQueue.queue.length).toEqual(worldLevel.turnQueue.queue.length);

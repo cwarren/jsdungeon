@@ -50,6 +50,7 @@ class WorldLevel {
     // ---------------------
 
     forSerializing() {
+        
         let serialGrid = [];
         if (this.grid && this.grid.length > 0) {
             for (let x = 0; x < this.levelWidth; x++) {
@@ -61,6 +62,7 @@ class WorldLevel {
         } else {
             serialGrid = null;
         }
+
         return {
             levelNumber: this.levelNumber,
             levelWidth: this.levelWidth,
@@ -76,8 +78,23 @@ class WorldLevel {
         }
     }
 
+    // NOTE: order of operations is important here - the entities and structures need to be hydrated 
+    // and structures attached before the grid... and the entity and structure repos need to have been
+    // restored before this is called
     static deserialize(data, gameState) {
+
         const worldLevel = new WorldLevel(gameState, data.levelNumber, data.levelWidth, data.levelHeight, data.levelType);
+
+        let hydratedEnties = data.levelEntities.map(entId => { return gameState.entityRepo.get(entId); });
+
+        let hydratedStructures = data.levelStructures.map(entId => { return gameState.structureRepo.get(entId); });
+        // make each structure attached to this new world level since basic structure deserializing leaves them detatched, and reconnect stairs
+        hydratedStructures.forEach(structure => {
+            structure.setWorldLevel(worldLevel);
+            if (structure.reconnect);
+                structure.reconnect(gameState.structureRepo);
+        });
+
         if (data.grid) {
             worldLevel.grid = [];
             let gridIndex = 0;
@@ -89,8 +106,8 @@ class WorldLevel {
                 }
             }
         }
-        worldLevel.levelEntities = data.levelEntities.map(entId => { return gameState.entityRepo.get(entId); });
-        worldLevel.levelStructures = data.levelStructures.map(entId => { return gameState.structureRepo.get(entId); });
+        worldLevel.levelEntities = hydratedEnties;
+        worldLevel.levelStructures = hydratedStructures;
         worldLevel.stairsDown = data.stairsDown ? gameState.structureRepo.get(data.stairsDown) : null;
         worldLevel.stairsUp = data.stairsUp ? gameState.structureRepo.get(data.stairsUp) : null;
         worldLevel.turnQueue = TurnQueue.deserialize(data.turnQueue, gameState);

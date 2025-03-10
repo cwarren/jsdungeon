@@ -42,9 +42,6 @@ class Stairs extends Structure {
         connectionTarget.connectsTo = this;
       }
     }
-    // if (this.connectsTo && (! this.connectsTo.connectsTo || typeof this.connectsTo.connectsTo === 'string')) {
-    //   this.connectsTo.connectsTo = this;
-    // }
   }
 }
 
