@@ -48,6 +48,47 @@ class EntityAttributes {
     return summary;
   }
 
+  /**
+   * Prepares the attributes for serialization.
+   * @returns {Object} A simple object representing the attributes.
+   */
+  forSerializing() {
+    return {
+      strength: this.strength,
+      dexterity: this.dexterity,
+      fortitude: this.fortitude,
+      recovery: this.recovery,
+      psyche: this.psyche,
+      awareness: this.awareness,
+      stability: this.stability,
+      will: this.will,
+      aura: this.aura,
+      refinement: this.refinement,
+      depth: this.depth,
+      flow: this.flow
+    };
+  }
+
+  /**
+   * Serializes the attributes into a JSON string.
+   * @returns {string} The serialized JSON representation.
+   */
+  serialize() {
+    return JSON.stringify(this.forSerializing());
+  }
+
+  /**
+   * Deserializes a given data object into a new EntityAttributes instance.
+   * @param {Object} data - The serialized data object.
+   * @param {Object} ofEntity - The entity these attributes belong to.
+   * @returns {EntityAttributes} A new instance with restored values.
+   */
+  static deserialize(data, ofEntity) {
+    const attributes = new EntityAttributes(ofEntity);
+    Object.assign(attributes, data);
+    return attributes;
+  }
+
   // THIS IS AN EXTREMELY IMPORTANT NUMBER!!!!
   static BASE_VALUE = 100; // this is the "normal" / "average" value for each attribute - generally, above this gives bonuses, below gives penalties
   // This number is used in many calculations
