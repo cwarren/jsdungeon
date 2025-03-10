@@ -58,7 +58,7 @@ class UIPaneMainRendererGamePlay extends UIPaneMainRenderer {
                 const cell = worldLevel.grid[col][row];
                 if (this.ui.gameState.avatar.vision.visibleCells.has(cell)) {
                     this.drawGridCell(cell, offsetX, offsetY, cellSize, gridSpacing);
-                } else if (this.ui.gameState.avatar.vision.seenCells.has(cell)) {
+                } else if (this.ui.gameState.avatar.vision.seenCells.has(`${cell.x},${cell.y},${cell.z}`)) {
                     this.drawGridCellFaint(cell, offsetX, offsetY, cellSize, gridSpacing);
                 }
             }
@@ -92,7 +92,7 @@ class UIPaneMainRendererGamePlay extends UIPaneMainRenderer {
         worldLevel.levelStructures.forEach(structure => {
             const structureCell = structure.getCell();
             if (this.ui.gameState.avatar.vision.visibleCells.has(structureCell) ||
-                this.ui.gameState.avatar.vision.seenCells.has(structureCell)) {
+                this.ui.gameState.avatar.vision.seenCells.has(`${structureCell.x},${structureCell.y},${structureCell.z}`)) {
                 this.drawStructure(structure, offsetX, offsetY, cellSize, gridSpacing);
             }
         });

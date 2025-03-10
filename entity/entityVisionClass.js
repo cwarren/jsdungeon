@@ -73,7 +73,7 @@ class EntityVision {
           if (lx < 0 || lx >= grid.length || ly < 0 || ly >= grid[0].length) { continue; } // Skip out-of-bounds cells
           let cell = grid[lx][ly];
           this.visibleCells.add(cell);
-          this.seenCells.add(cell);
+          this.seenCells.add(`${cell.x},${cell.y},${cell.z}`);
           if (cell.isOpaque) {
             obstructed = true;
             break; // Stop tracing further along this line
