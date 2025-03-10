@@ -93,4 +93,53 @@ describe('EntityHealth', () => {
     entityHealth.takeDamage(100);
     expect(entityHealth.isAlive()).toBe(false);
   });
+
+  describe('EntityHealth - serialization', () => {
+    test('should return correct serialization object from forSerializing', () => {
+      entityHealth.curHealth = 80;
+      entityHealth.lastNaturalHealTime = 200;
+      const serializedData = entityHealth.forSerializing();
+      expect(serializedData).toEqual({
+        maxHealth: 100,
+        curHealth: 80,
+        naturalHealingRate: 0.001,
+        naturalHealingTicks: 250,
+        lastNaturalHealTime: 200
+      });
+    });
+
+    test('should serialize to a JSON string correctly', () => {
+      entityHealth.curHealth = 80;
+      entityHealth.lastNaturalHealTime = 200;
+      const jsonString = entityHealth.serialize();
+      const parsed = JSON.parse(jsonString);
+      expect(parsed).toEqual({
+        maxHealth: 100,
+        curHealth: 80,
+        naturalHealingRate: 0.001,
+        naturalHealingTicks: 250,
+        lastNaturalHealTime: 200
+      });
+    });
+
+    test('should deserialize correctly', () => {
+      const data = {
+        maxHealth: 100,
+        curHealth: 80,
+        naturalHealingRate: 0.001,
+        naturalHealingTicks: 250,
+        lastNaturalHealTime: 200
+      };
+
+      const deserializedHealth = EntityHealth.deserialize(data, mockEntity);
+      expect(deserializedHealth).toBeInstanceOf(EntityHealth);
+      expect(deserializedHealth.ofEntity).toBe(mockEntity);
+      expect(deserializedHealth.maxHealth).toBe(100);
+      expect(deserializedHealth.curHealth).toBe(80);
+      expect(deserializedHealth.naturalHealingRate).toBe(0.001);
+      expect(deserializedHealth.naturalHealingTicks).toBe(250);
+      expect(deserializedHealth.lastNaturalHealTime).toBe(200);
+    });
+  });
+
 });

@@ -14,7 +14,7 @@ class EntityHealth {
   constructor(ofEntity, maxHealth, naturalHealingRate = DEFAULT_NATURAL_HEALING_RATE, naturalHealingTicks = DEFAULT_NATURAL_HEALING_TICKS) {
     if (maxHealth <= 0) {
       console.log(ofEntity);
-      console.log("maxHealth naturalHealingRate naturalHealingTicks",maxHealth, naturalHealingRate, naturalHealingTicks);
+      console.log("maxHealth naturalHealingRate naturalHealingTicks", maxHealth, naturalHealingRate, naturalHealingTicks);
       throw new Error("maxHealth must be greater than 0");
     }
     this.ofEntity = ofEntity;
@@ -87,6 +87,46 @@ class EntityHealth {
       currentHealth: this.curHealth,
       maxHealth: this.maxHealth,
     };
+  }
+
+  /**
+     * Prepares the health attributes for serialization.
+     * @returns {Object} A simple object representing the health attributes.
+     */
+  forSerializing() {
+    return {
+      maxHealth: this.maxHealth,
+      curHealth: this.curHealth,
+      naturalHealingRate: this.naturalHealingRate,
+      naturalHealingTicks: this.naturalHealingTicks,
+      lastNaturalHealTime: this.lastNaturalHealTime
+    };
+  }
+
+  /**
+   * Serializes the health attributes into a JSON string.
+   * @returns {string} The serialized JSON representation.
+   */
+  serialize() {
+    return JSON.stringify(this.forSerializing());
+  }
+
+  /**
+   * Deserializes a given data object into a new EntityHealth instance.
+   * @param {Object} data - The serialized data object.
+   * @param {Object} ofEntity - The entity this health belongs to.
+   * @returns {EntityHealth} A new instance with restored values.
+   */
+  static deserialize(data, ofEntity) {
+    const health = new EntityHealth(
+      ofEntity,
+      data.maxHealth,
+      data.naturalHealingRate,
+      data.naturalHealingTicks
+    );
+    health.curHealth = data.curHealth;
+    health.lastNaturalHealTime = data.lastNaturalHealTime;
+    return health;
   }
 }
 
