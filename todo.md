@@ -1,15 +1,9 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* revise entity vision seen cells to use a 3-tuple instead of a direct cell reference
-* * update use of entity vision seenCells to be based on those 3-tuples instead of direct cell references
-* * add a util method or function somewhere to get a cell from a 3-tuple (if that function doesn't already exist)
-
 * tackle game state serialization / deserialization
 * * entity
-* * * sub parts
-* * * * vision
-* * avatar
+* * * avatar
 * * game state in general
 
 

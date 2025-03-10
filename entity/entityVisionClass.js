@@ -8,8 +8,8 @@ class EntityVision {
     this.ofEntity = ofEntity;
     this.location = ofEntity.location;
     this.viewRadius = viewRadius;
-    this.visibleCells = new Set();
-    this.seenCells = new Set();
+    this.visibleCells = new Set(); // a set of references to cells that are visible to the entity
+    this.seenCells = new Set(); // a set of string-based 3-tuples of the x,y,z coordinates of cells that have been seen
   }
 
   isVisibleToEntity(otherEntity) {
@@ -81,6 +81,23 @@ class EntityVision {
         }
       }
     }
+  }
+
+  forSerializing() {
+    return {
+      viewRadius: this.viewRadius,
+      seenCells: Array.from(this.seenCells), // Convert Set to array for serialization
+    };
+  }
+
+  serialize() {
+    return JSON.stringify(this.forSerializing());
+  }
+
+  static deserialize(data, ofEntity) {
+    const entityVision = new EntityVision(ofEntity, data.viewRadius);
+    entityVision.seenCells = new Set(data.seenCells); // Convert array back to Set
+    return entityVision;
   }
 
 }

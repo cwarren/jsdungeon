@@ -148,6 +148,50 @@ describe('EntityVision', () => {
     });
 
     describe('EntityVision - serialization', () => {
-        // TODO: implement tests for forSerializing, serialize, deserialize
+        test('should return correct serialization object from forSerializing', () => {
+            entityVision.seenCells.add("1,1,0");
+            entityVision.seenCells.add("2,2,0");
+
+            const serializedData = entityVision.forSerializing();
+            expect(serializedData).toEqual({
+                viewRadius: ENITY_VISION_RANGE,
+                seenCells: ["1,1,0", "2,2,0"]
+            });
+        });
+
+        test('should serialize to a JSON string', () => {
+            entityVision.seenCells.add("3,3,0");
+            entityVision.seenCells.add("4,4,0");
+
+            const jsonString = entityVision.serialize();
+            const parsed = JSON.parse(jsonString);
+
+            expect(parsed).toEqual({
+                viewRadius: ENITY_VISION_RANGE,
+                seenCells: ["3,3,0", "4,4,0"]
+            });
+        });
+
+        test('should deserialize correctly', () => {
+            const serializedData = {
+                viewRadius: 4,
+                seenCells: ["5,5,0", "6,6,0"]
+            };
+
+            const deserializedVision = EntityVision.deserialize(serializedData, entity);
+            expect(deserializedVision).toBeInstanceOf(EntityVision);
+            expect(deserializedVision.viewRadius).toBe(4);
+            expect(deserializedVision.seenCells).toEqual(new Set(["5,5,0", "6,6,0"]));
+        });
+
+        test('should maintain seenCells across serialization/deserialization', () => {
+            entityVision.seenCells.add("7,7,0");
+            entityVision.seenCells.add("8,8,0");
+
+            const jsonString = entityVision.serialize();
+            const deserializedVision = EntityVision.deserialize(JSON.parse(jsonString), entity);
+
+            expect(deserializedVision.seenCells).toEqual(new Set(["7,7,0", "8,8,0"]));
+        });
     });
 });
