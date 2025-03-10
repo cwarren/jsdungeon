@@ -26,16 +26,25 @@ class Stairs extends Structure {
     );
 
     // If connectsTo is defined, resolve it using structureRepo
+    stairs.connectsTo = data.connectsTo;
     if (data.connectsTo && worldLevel) {
-      stairs.connectsTo = worldLevel.gameState.structureRepo.get(data.connectsTo);
-      
-      // if the other half hasn't been connected back yet, do so (for a pair of stairs, the first one will be left unconnected, and then when the second is deserialized it will hook the first up to it)
-      if (stairs.connectsTo && ! stairs.connectsTo.connectsTo) {
-        stairs.connectsTo.connectsTo = stairs;
-      }
+      stairs.reconnect(worldLevel.gameState.structureRepo);
     }
 
     return stairs;
+  }
+
+  reconnect(structureRepo) {
+    if (this.connectsTo && typeof this.connectsTo === 'string') {
+      const connectionTarget = structureRepo.get(this.connectsTo);
+      if (connectionTarget) {
+        this.connectsTo = connectionTarget;
+        connectionTarget.connectsTo = this;
+      }
+    }
+    // if (this.connectsTo && (! this.connectsTo.connectsTo || typeof this.connectsTo.connectsTo === 'string')) {
+    //   this.connectsTo.connectsTo = this;
+    // }
   }
 }
 
