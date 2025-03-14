@@ -43,7 +43,7 @@ class Entity {
     this.relations = Entity.ENTITIES[type].relations;
 
     // used in combat AI and for relationship stuff
-    this.damagedBy = []; // array of {damageSource, damage}
+    this.damagedBy = []; // array of {damageSource: string or object, damageSourceType: string, damage; EffDamage instance} objects
 
     this.baseKillPoints = 10; // worth this many advancement points when killed
     this.currentAdvancementPoints = 0;
@@ -52,6 +52,62 @@ class Entity {
 
     GAME_STATE.entityRepo.add(this);
   }
+
+  //======================================================================
+  // SERIALIZATION
+
+  forSerializing() {
+    return {
+      id: this.id,
+      type: this.type,
+      name: this.name,
+      baseActionTime: this.baseActionTime,
+      attributes: this.attributes.forSerializing(),
+      location: this.location.forSerializing(),
+      vision: this.vision.forSerializing(),
+      movement: this.movement.forSerializing(),
+      health: this.health.forSerializing(),
+      damagedBy: this.damagedBy.map(dmg => ({
+        damageSource: typeof dmg.damageSource === 'object' ? dmg.damageSource.id : dmg.damageSource,
+        damageSourceType: dmg.damageSourceType,
+        damage: dmg.damage.forSerializing(),
+      })),
+      baseKillPoints: this.baseKillPoints,
+      currentAdvancementPoints: this.currentAdvancementPoints,
+      actionStartingTime: this.actionStartingTime
+    };
+  }
+
+  serialize() {
+    return JSON.stringify(this.forSerializing());
+  }
+
+  static deserialize(data) {
+    const entity = new Entity(data.type, data.id);
+
+    entity.name = data.name;
+    entity.baseActionTime = data.baseActionTime;
+
+    // Restore attributes, location, vision, movement, and health
+    entity.attributes = EntityAttributes.deserialize(data.attributes, entity);
+    entity.location = EntityLocation.deserialize(data.location, entity);
+    entity.vision = EntityVision.deserialize(data.vision, entity);
+    entity.movement = EntityMovement.deserialize(data.movement, entity);
+    entity.health = EntityHealth.deserialize(data.health, entity);
+
+    entity.damagedBy = data.damagedBy.map(dmg => ({
+      damageSource: dmg.damageSource, // NOTE: these are all strings; they're de-referenced on use as needed
+      damageSourceType: dmg.damageSourceType,
+      damage: EffDamage.deserialize(dmg.damage)
+    }));
+
+    entity.baseKillPoints = data.baseKillPoints;
+    entity.currentAdvancementPoints = data.currentAdvancementPoints;
+    entity.actionStartingTime = data.actionStartingTime;
+
+    return entity;
+  }
+
 
   //======================================================================
   // INSPECTION & INFORMATION
@@ -181,7 +237,10 @@ class Entity {
   }
 
   getEntitiesThatDamagedMe() {
-    return this.damagedBy.map(damBy => damBy.damageSource);
+    this.deRefDamagedBy();
+    return this.damagedBy
+      .filter(damBy => damBy.damageSourceType == 'Entity')
+      .map(damBy => damBy.damageSource);
   }
 
   dealWithAdjacentEntities() {
@@ -459,6 +518,7 @@ class Entity {
   // ------------------
   // HEALTH
 
+  // this assumes the damage source is an entity; this will be revised when we have other damage sources
   takeDamageFrom(effDam, otherEntity) {
     devTrace(4, "taking attack damage from entity", this, effDam, otherEntity);
 
@@ -468,11 +528,13 @@ class Entity {
 
     this.health.takeDamage(damAmount);
 
+    this.deRefDamagedBy();
+
     let existingEntry = this.damagedBy.find(entry => entry.damageSource === otherEntity);
     if (existingEntry) {
       existingEntry.damage.amount += damAmount;
     } else {
-      this.damagedBy.push({ "damageSource": otherEntity, "damage": new EffDamage(damAmount) });
+      this.damagedBy.push({ "damageSource": otherEntity, damageSourceType: 'Entity', "damage": new EffDamage(damAmount) });
     }
 
     uiPaneMessages.addMessage(`${this.name} takes ${formatNumberForMessage(damAmount)} damage from ${otherEntity.name}`);
@@ -540,6 +602,16 @@ class Entity {
     this.vision.seenCells.clear();
   }
 
+  deRefDamagedBy() {
+    this.damagedBy.forEach(entry => {
+      if (typeof entry.damageSource === 'string') {
+        if (entry.damageSourceType === 'Entity') {
+          entry.damageSource = GAME_STATE.entityRepo.getEntity(entry.damageSource);
+        }
+      }
+    });
+  }
+
   // get proportional responsibility for damage dealt to this entity
   getDeathCredits() {
     devTrace(6, "determining death credits for entity", this);
@@ -547,6 +619,9 @@ class Entity {
     if (totalDamage === 0) {
       return []; // No damage dealt, return an empty array
     }
+
+    this.deRefDamagedBy();
+
     return this.damagedBy.map(entry => ({
       damageSource: entry.damageSource,
       proportionalDamage: entry.damage.amount / totalDamage
@@ -565,14 +640,14 @@ class Entity {
       new ModifierLayer(
         [],
         [(this.attributes.fortitude - EntityAttributes.BASE_VALUE) / 11,
-          (this.attributes.strength - EntityAttributes.BASE_VALUE) / 34,]
+        (this.attributes.strength - EntityAttributes.BASE_VALUE) / 34,]
       ),
       new ModifierLayer(
         [this.attributes.fortitude / EntityAttributes.BASE_VALUE,
-          Math.sqrt(this.attributes.depth / EntityAttributes.BASE_VALUE),],
+        Math.sqrt(this.attributes.depth / EntityAttributes.BASE_VALUE),],
         [(this.attributes.stability - EntityAttributes.BASE_VALUE) / 47,
-          (this.attributes.aura - EntityAttributes.BASE_VALUE) / 55,
-          (this.attributes.depth - EntityAttributes.BASE_VALUE) / 26,]
+        (this.attributes.aura - EntityAttributes.BASE_VALUE) / 55,
+        (this.attributes.depth - EntityAttributes.BASE_VALUE) / 26,]
       ),
       new ModifierLayer(
         [Math.sqrt(this.attributes.fortitude / EntityAttributes.BASE_VALUE),],

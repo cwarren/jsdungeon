@@ -150,8 +150,8 @@ describe('Entity', () => {
 
       test('should calculate death credits correctly', () => {
         entity.damagedBy = [
-          { damageSource: 'source1', damage: { amount: 30 } },
-          { damageSource: 'source2', damage: { amount: 70 } },
+          { damageSource: 'source1', damageSourceType: 'foo', damage: { amount: 30 } },
+          { damageSource: 'source2', damageSourceType: 'foo', damage: { amount: 70 } },
         ];
         const deathCredits = entity.getDeathCredits();
         expect(deathCredits).toEqual([
@@ -308,7 +308,7 @@ describe('Entity', () => {
 
       test('should add damage source to damagedBy if first attack', () => {
         defender.takeDamageFrom(mockEffDam_defHit, attacker);
-        expect(defender.damagedBy).toEqual([{ damageSource: attacker, damage: mockEffDam_defHit }]);
+        expect(defender.damagedBy).toEqual([{ damageSource: attacker, damageSourceType: 'Entity', damage: mockEffDam_defHit }]);
       });
 
       test('should accumulate damage for repeated attacks', () => {
@@ -324,8 +324,8 @@ describe('Entity', () => {
         defender.takeDamageFrom(new EffDamage(4), secondAttacker);
         expect(defender.damagedBy.length).toBe(2);
         expect(defender.damagedBy).toEqual([
-          { damageSource: attacker, damage: expect.objectContaining({ amount: 5 }) },
-          { damageSource: secondAttacker, damage: expect.objectContaining({ amount: 4 }) },
+          { damageSource: attacker, damageSourceType: 'Entity', damage: expect.objectContaining({ amount: 5 }) },
+          { damageSource: secondAttacker, damageSourceType: 'Entity', damage: expect.objectContaining({ amount: 4 }) },
         ]);
       });
 
@@ -459,6 +459,100 @@ describe('Entity', () => {
       expect(wormVine.getRelationshipTo(insidiousRat)).toBe("VIOLENT_TO");
     });
 
+  });
+
+  describe('Entity - Serializing', () => {
+    test('should generate serializeable object correctly', () => {
+      entity.placeAtCell(GAME_STATE.world[0].grid[5][5]);
+      entity.health.curHealth = 75;
+      entity.currentAdvancementPoints = 42;
+      entity.damagedBy = [
+          { damageSource: 'entity-2', damageSourceType: 'Entity', damage: new EffDamage(10) }
+      ];
+
+      const serializedData = entity.forSerializing();
+
+      expect(serializedData).toEqual({
+          id: entity.id,
+          type: entity.type,
+          name: entity.name,
+          baseActionTime: entity.baseActionTime,
+          attributes: entity.attributes.forSerializing(),
+          location: entity.location.forSerializing(),
+          vision: entity.vision.forSerializing(),
+          movement: entity.movement.forSerializing(),
+          health: entity.health.forSerializing(),
+          damagedBy: [
+              {
+                  damageSource: 'entity-2',
+                  damageSourceType: 'Entity',
+                  damage: new EffDamage(10).forSerializing()
+              }
+          ],
+          baseKillPoints: entity.baseKillPoints,
+          currentAdvancementPoints: 42,
+          actionStartingTime: entity.actionStartingTime,
+      });
+
+      expect(typeof serializedData.id).toBe('string');
+      expect(serializedData.id.length).toBeGreaterThan(1);
+      expect(serializedData.location).toBeTruthy();
+      expect(serializedData.vision).toBeTruthy();
+      expect(serializedData.movement).toBeTruthy();
+      expect(serializedData.health).toBeTruthy();
+  });
+
+  test('should serialize to JSON string correctly', () => {
+      entity.placeAtCell(GAME_STATE.world[0].grid[5][5]);
+      entity.health.curHealth = 75;
+      entity.currentAdvancementPoints = 42;
+
+      const jsonString = entity.serialize();
+      const parsedData = JSON.parse(jsonString);
+
+      expect(parsedData).toEqual(entity.forSerializing());
+      expect(typeof jsonString).toBe('string');
+  });
+
+  test('should deserialize correctly', () => {
+      entity.placeAtCell(GAME_STATE.world[0].grid[5][5]);
+      entity.health.curHealth = 75;
+      entity.currentAdvancementPoints = 42;
+      entity.damagedBy = [
+          { damageSource: 'entity-2', damageSourceType: 'Entity', damage: new EffDamage(10) }
+      ];
+
+      const serializedData = entity.forSerializing();
+      const deserializedEntity = Entity.deserialize(serializedData);
+
+      expect(deserializedEntity.id).toBe(entity.id);
+      expect(deserializedEntity.type).toBe(entity.type);
+      expect(deserializedEntity.name).toBe(entity.name);
+      expect(deserializedEntity.displaySymbol).toBe(entity.displaySymbol);
+      expect(deserializedEntity.displayColor).toBe(entity.displayColor);
+      expect(deserializedEntity.baseActionTime).toBe(entity.baseActionTime);
+      expect(deserializedEntity.attributes.forSerializing()).toEqual(entity.attributes.forSerializing());
+      expect(deserializedEntity.location.forSerializing()).toEqual(entity.location.forSerializing());
+      expect(deserializedEntity.vision.forSerializing()).toEqual(entity.vision.forSerializing());
+      expect(deserializedEntity.movement.forSerializing()).toEqual(entity.movement.forSerializing());
+      expect(deserializedEntity.health.forSerializing()).toEqual(entity.health.forSerializing());
+      expect(deserializedEntity.meleeAttack).toEqual(entity.meleeAttack);
+      expect(deserializedEntity.relations).toEqual(entity.relations);
+      expect(deserializedEntity.damagedBy).toHaveLength(1);
+      expect(deserializedEntity.damagedBy[0].damageSource).toBe('entity-2');
+      expect(deserializedEntity.damagedBy[0].damageSourceType).toBe('Entity');
+      expect(deserializedEntity.damagedBy[0].damage.amount).toBe(10);
+      expect(deserializedEntity.baseKillPoints).toBe(entity.baseKillPoints);
+      expect(deserializedEntity.currentAdvancementPoints).toBe(42);
+      expect(deserializedEntity.actionStartingTime).toBe(entity.actionStartingTime);
+  });
+
+  test('should correctly re-add the entity to the gameState repository on deserialization', () => {
+      const serializedData = entity.forSerializing();
+      const deserializedEntity = Entity.deserialize(serializedData);
+
+      expect(GAME_STATE.entityRepo.get(deserializedEntity.id)).toBe(deserializedEntity);
+  });
   });
 
 });

@@ -2,11 +2,9 @@ to start server:
 PS E:\code\jsdungeon> docker-compose up --build
 
 * tackle game state serialization / deserialization
-* * entity
-* * * handling damagedBy will take a bit of doing. need to persist the id and type of the source along with the amount. the restoration branches on the type to look up the appropriate thing in the appropriate repo. One the entities (and other things) have been created and loaded in the repo there needs to be a second pass to replace all the ids with actual object references... OR go ahead and make the updates for the ids be the primary thing and de-reference on use. Consider a cache approach maybe, where when used there's a check for the id vs object ref, and if id replace with object ref before use.
-* * * pull all the avatar initialization stuff into a separate function, and have the constructor take an optional source data which is the serialized entity; constructor branches on presence of that param, initializing from provided data if present or else the 'normal' (existing) type-based initialization if not
-* * * handle any avatar specialness
+* * handle any avatar specialness (basic entity done)
 * * game state in general
+* * * repos
 
 NOTE: keep in mind all the challenges (and solutions) regarding entities, because items will likely require something similar
 
