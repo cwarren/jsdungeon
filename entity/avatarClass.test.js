@@ -7,10 +7,12 @@ import { EffectGenerator } from '../effect/effectGeneratorClass.js';
 import { uiPaneMain, uiPaneMessages } from "../ui/ui.js";
 import { UIPaneMiniChar, miniCharElement } from '../ui/uiPaneMiniCharClass.js';
 import { WorldLevelSpecification } from '../world/worldLevelSpecificationClass.js';
+import { getEntityDef } from "./entityDefinitions.js";
 
-const WORLD_LEVEL_SPECS_FOR_TESTING= [
-    WorldLevelSpecification.generateWorldLevelSpec({type: 'EMPTY', width: 10, height: 10}),
-  ];
+
+const WORLD_LEVEL_SPECS_FOR_TESTING = [
+  WorldLevelSpecification.generateWorldLevelSpec({ type: 'EMPTY', width: 10, height: 10 }),
+];
 
 jest.mock('../util.js', () => ({
   devTrace: jest.fn(),
@@ -22,8 +24,8 @@ jest.mock('../util.js', () => ({
 
 jest.mock('../ui/ui.js', () => ({
   uiPaneMessages: { addMessage: jest.fn() },
-  uiPaneMain: { 
-    resetUIState: jest.fn(), 
+  uiPaneMain: {
+    resetUIState: jest.fn(),
     pushUIState: jest.fn(),
   },
 }));
@@ -71,10 +73,10 @@ describe('Avatar', () => {
   });
 
 
-  test('should register minichar pane', () =>{
+  test('should register minichar pane', () => {
     const uiPaneMiniChar = new UIPaneMiniChar(null);
-    uiPaneMiniChar.getPageElement = jest.fn(() => {return {innerHTML: ''}; });
-    
+    uiPaneMiniChar.getPageElement = jest.fn(() => { return { innerHTML: '' }; });
+
     expect(avatar.paneMiniChar).toBeNull();
     expect(uiPaneMiniChar.avatar).toBeNull();
 
@@ -82,9 +84,9 @@ describe('Avatar', () => {
     expect(avatar.paneMiniChar).toBe(uiPaneMiniChar);
     expect(uiPaneMiniChar.avatar).toBe(avatar);
   });
-  test('should unregister minichar pane', () =>{
+  test('should unregister minichar pane', () => {
     const uiPaneMiniChar = new UIPaneMiniChar(null);
-    uiPaneMiniChar.getPageElement = jest.fn(() => {return {innerHTML: ''}; });
+    uiPaneMiniChar.getPageElement = jest.fn(() => { return { innerHTML: '' }; });
     avatar.registerPaneMiniChar(uiPaneMiniChar);
     expect(avatar.paneMiniChar).toBe(uiPaneMiniChar);
     expect(uiPaneMiniChar.avatar).toBe(avatar);
@@ -96,7 +98,7 @@ describe('Avatar', () => {
 
   test('should die and lose game', () => {
     const uiPaneMiniChar = new UIPaneMiniChar(null);
-    uiPaneMiniChar.getPageElement = jest.fn(() => {return {innerHTML: ''}; });
+    uiPaneMiniChar.getPageElement = jest.fn(() => { return { innerHTML: '' }; });
     jest.spyOn(uiPaneMiniChar, 'clearMiniChar');
     avatar.registerPaneMiniChar(uiPaneMiniChar);
 
@@ -111,7 +113,7 @@ describe('Avatar', () => {
 
   test('should get melee attack effect generators', () => {
     const effGens = avatar.getMeleeHitEffectGenerators();
-    effGens.forEach( efGe => {
+    effGens.forEach(efGe => {
       expect(efGe).toBeInstanceOf(EffectGenerator);
     });
   });
@@ -125,5 +127,61 @@ describe('Avatar', () => {
     avatar.showNaturalHealingMessage('Healing message');
     // added .not for healing messages suppressed for now - later this will have a settings flag
     expect(uiPaneMessages.addMessage).not.toHaveBeenCalledWith('Healing message');
+  });
+
+  describe('Avatar - Serialization', () => {
+    test('should serialize to a plain object correctly', () => {
+      avatar.timeOnLevel = 120;
+      avatar.meleeAttack = false;
+
+      const serialized = avatar.forSerializing();
+
+      expect(serialized).toEqual({
+        ...Entity.prototype.forSerializing.call(avatar), // Ensure base class properties are included
+        timeOnLevel: 120,
+        meleeAttack: false,
+      });
+    });
+
+    test('should serialize to JSON correctly', () => {
+      avatar.timeOnLevel = 75;
+      avatar.meleeAttack = true;
+
+      const jsonString = avatar.serialize();
+
+      expect(jsonString).toBe(
+        JSON.stringify({
+          ...Entity.prototype.forSerializing.call(avatar),
+          timeOnLevel: 75,
+          meleeAttack: true,
+        })
+      );
+    });
+
+    test('should deserialize from a plain object correctly', () => {
+      const data = avatar.forSerializing();
+
+      const deserializedAvatar = Avatar.deserialize(data);
+
+      expect(deserializedAvatar).toBeInstanceOf(Avatar);
+      expect(deserializedAvatar.id).toBe(avatar.id);
+      expect(deserializedAvatar.type).toBe('AVATAR');
+      expect(deserializedAvatar.timeOnLevel).toBe(avatar.timeOnLevel);
+      expect(deserializedAvatar.meleeAttack).toBe(true);
+    });
+
+    test('should deserialize from JSON correctly', () => {
+      const jsonString =avatar.serialize();
+
+      const parsedData = JSON.parse(jsonString);
+
+      const deserializedAvatar = Avatar.deserialize(parsedData);
+
+      expect(deserializedAvatar).toBeInstanceOf(Avatar);
+      expect(deserializedAvatar.id).toBe(avatar.id);
+      expect(deserializedAvatar.type).toBe('AVATAR');
+      expect(deserializedAvatar.timeOnLevel).toBe(avatar.timeOnLevel);
+      expect(deserializedAvatar.meleeAttack).toBe(true);
+    });
   });
 });

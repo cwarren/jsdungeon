@@ -5,13 +5,58 @@ import { EffDamage } from "../effect/effDamageClass.js";
 import { EffGenDamage } from "../effect/effGenDamageClass.js";
 import { uiPaneMessages } from "../ui/ui.js";
 
+import { EntityHealth } from "./entityHealthClass.js";
+import { EntityLocation } from "./entityLocationClass.js";
+import { EntityMovement } from "./entityMovementClass.js";
+import { EntityVision } from "./entityVisionClass.js";
+import { EntityAttributes } from "./entityAttributesClass.js";
+
 
 class Avatar extends Entity {
-  constructor() {
-    super("AVATAR");
+  constructor(id = null) {
+    super("AVATAR", id);
     this.timeOnLevel = 0;
     this.meleeAttack = true;
     this.paneMiniChar = null;
+  }
+
+  forSerializing() {
+    const baseSerial = super.forSerializing();
+    return {
+      ...baseSerial,
+      timeOnLevel: this.timeOnLevel,
+      meleeAttack: this.meleeAttack,
+    };
+  }
+
+  // this re-creates the same logic as the Entity.deserialize method, but with the Avatar class
+  static deserialize(data) {
+    const avatar = new Avatar(data.id);
+
+    avatar.name = data.name;
+    avatar.baseActionTime = data.baseActionTime;
+
+    // Restore attributes, location, vision, movement, and health
+    avatar.attributes = EntityAttributes.deserialize(data.attributes, avatar);
+    avatar.location = EntityLocation.deserialize(data.location, avatar);
+    avatar.vision = EntityVision.deserialize(data.vision, avatar);
+    avatar.movement = EntityMovement.deserialize(data.movement, avatar);
+    avatar.health = EntityHealth.deserialize(data.health, avatar);
+
+    avatar.damagedBy = data.damagedBy.map(dmg => ({
+      damageSource: dmg.damageSource, // NOTE: these are all strings; they're de-referenced on use as needed
+      damageSourceType: dmg.damageSourceType,
+      damage: EffDamage.deserialize(dmg.damage)
+    }));
+
+    avatar.baseKillPoints = data.baseKillPoints;
+    avatar.currentAdvancementPoints = data.currentAdvancementPoints;
+    avatar.actionStartingTime = data.actionStartingTime;
+
+    avatar.timeOnLevel = data.timeOnLevel;
+    avatar.meleeAttack = data.meleeAttack;
+
+    return avatar;
   }
 
   getCharSheetInfo() {
