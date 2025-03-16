@@ -22,28 +22,29 @@ class Repository {
         this.items = new Map();
     }
 
-    serialize() {
-        return JSON.stringify({
+    forSerializing() {
+        return {
             name: this.name,
-            items: this.getSerializedItemsArray()
-        });
+            items: this.getItemsArrayForSerializing()
+        }
     }
 
-    getSerializedItemsArray() {
+    getItemsArrayForSerializing() {
         return [...this.items.entries()].map(
-            ([id, item]) => ({
-                id,
-                data: item.serialize(),
-            })
+            ([id, item]) => (
+                item.forSerializing()
+            )
         );
     }
 
-    // TODO: replace this with the static deserialize pattern used elsewhere
-    static deserialize(serializedData, deserializer, ...args) {
-        const data = JSON.parse(serializedData);
+    serialize() {
+        return JSON.stringify(this.forSerializing());
+    }
+
+    static deserialize(data, itemDeserializer, ...itemDeserializerArgs) {
         const repo = new Repository(data.name);
-        for (const { id, dataIten } of data.items) {
-            const item = deserializer(dataIten, ...args);
+        for (const itemData of data.items) {
+            const item = itemDeserializer(itemData, ...itemDeserializerArgs);
             repo.add(item);
         }
         return repo;
