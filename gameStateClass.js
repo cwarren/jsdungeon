@@ -1,4 +1,5 @@
 import { Entity } from "./entity/entityClass.js";
+import { Structure } from "./structure/structureClass.js";
 import { WorldLevel } from "./world/worldLevelClass.js";
 import { Avatar } from "./entity/avatarClass.js";
 import { devTrace } from "./util.js";
@@ -24,6 +25,45 @@ class GameState {
         this.currentTurnQueue = null; // each world level has it's own turn queue; this is set as the avatar goes up and down levels
         this.entityRepo = new Repository('entities');
         this.structureRepo = new Repository('structures');
+    }
+
+    forSerializing() {
+        devTrace(4, "getting game state for serializing"); 
+        return {
+            entityRepo: this.entityRepo.forSerializing(),
+            structureRepo: this.structureRepo.forSerializing(),
+            score: this.score,
+            currentLevel: this.currentLevel,
+            isPlaying: this.isPlaying,
+            status: this.status,
+            world: this.world.map(wl => wl.forSerializing()),
+            avatar: this.avatar.forSerializing(),
+        };
+    }
+
+    serialize() {
+        devTrace(4, "serializing game state");
+        return JSON.stringify(this.forSerializing());
+    }
+
+    static deserialize(data) {
+        const newGameState = new GameState();
+
+        newGameState.entityRepo = Repository.deserialize(data.entityRepo, Entity.deserialize);
+        newGameState.structureRepo = Repository.deserialize(data.structureRepo, Structure.deserialize);
+
+        newGameState.score = data.score;
+        newGameState.currentLevel = data.currentLevel;
+        newGameState.isPlaying = data.isPlaying;
+        newGameState.status = data.status;
+
+        newGameState.world = data.world.map(wlData => WorldLevel.deserialize(wlData));
+        
+        newGameState.avatar = Avatar.deserialize(data.avatar);
+        
+        newGameState.currentTurnQueue = newGameState.world[newGameState.currentLevel].turnQueue;
+
+        return newGameState;
     }
 
     initialize(levelSpecifications) {
@@ -179,8 +219,11 @@ const WORLD_LEVEL_SPECS_FOR_DEV = [
 ];
 
 
+// TODO: defintely hack-y to have game state as a global - need to refactor at some point to actually inject it where needed
+
 // Create a single instance to maintain the game's state globally
-const GAME_STATE = new GameState();
+let GAME_STATE = new GameState();
+
 function initializeGameWorld() { // this is a hack until I put this stuff in a better location (probably just embed it in the class)
     GAME_STATE.initialize(WORLD_LEVEL_SPECS_FOR_DEV);
     GAME_STATE.advanceGameTime();

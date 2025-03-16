@@ -29,7 +29,7 @@ class Avatar extends Entity {
     };
   }
 
-  // this re-creates the same logic as the Entity.deserialize method, but with the Avatar class
+  // this re-creates the same logic as the Entity.deserialize method, but with the Avatar class as the base (a refactor could improve this, but for now it's fine)
   static deserialize(data) {
     const avatar = new Avatar(data.id);
 

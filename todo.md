@@ -2,13 +2,14 @@ to start server:
 PS E:\code\jsdungeon> docker-compose up --build
 
 * tackle game state serialization / deserialization
-* * handle any avatar specialness (basic entity done)
-* * game state in general
-* * * repos
-
-NOTE: keep in mind all the challenges (and solutions) regarding entities, because items will likely require something similar
-
+* create gameState tests
+* * create tests for gameState serialization
 * actually save and restore/load games
+* * NOTE / REMEMBER: the GAME_STATE is embedded in the SaveSlot that the save and load functions have access to... though it's an injected reference; will have to restore to a new game state then mutate the original based on that, for now (hack-ish, but should get the job done)
+* * on save, serialize the game state
+* * * dump to console
+* * on load, parse json and deserialize the data
+* * * dump to console
 
 * consider removing the automatic repo registration from entity and structure instantiation... or maybe add a flag for it to the call.... or maybe keep it out but instead generally use some factory functions that handle that kind of thing
 

@@ -39,7 +39,7 @@ class Structure {
     return JSON.stringify(this.forSerializing());
   }
 
-  static deserialize(data, worldLevel) {
+  static deserialize(data, worldLevel = null) {
     return new Structure(
       worldLevel,
       data.x,
