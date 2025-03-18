@@ -3,7 +3,7 @@ import { Entity, DEFAULT_ACTION_COST } from '../entity/entityClass.js';
 import { getEntityDef } from "../entity/entityDefinitions.js";
 import { EffGenDamage } from '../effect/effGenDamageClass.js';
 import { devTrace, constrainValue, rollDice, valueCalc } from '../util.js';
-import { GAME_STATE } from '../gameStateClass.js';
+import { GameState } from '../gameStateClass.js';
 import { uiPaneMessages, uiPaneInfo } from "../ui/ui.js";
 import { WorldLevelSpecification } from './worldLevelSpecificationClass.js';
 import {
@@ -337,6 +337,7 @@ describe('determineCheapestMovementPath', () => {
 
 describe('determineCheapestMovementPathForEntity', () => {
     let worldLevel;
+    let gameState;
 
     const TEST_ENTITIES_DEFINITIONS = [
         getEntityDef('WORM_VINE'),
@@ -347,9 +348,9 @@ describe('determineCheapestMovementPathForEntity', () => {
     TEST_ENTITIES_DEFINITIONS.forEach((ent) => { Entity.ENTITIES[ent.type] = ent; })
 
     beforeEach(() => {
-        GAME_STATE.reset();
-        GAME_STATE.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
-        worldLevel = GAME_STATE.world[0];
+        gameState  = new GameState();
+        gameState.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
+        worldLevel = gameState.world[0];
         while (worldLevel.levelEntities.length > 0) {
             worldLevel.removeEntity(worldLevel.levelEntities[0]);
         }
@@ -370,9 +371,9 @@ describe('determineCheapestMovementPathForEntity', () => {
         const occupiedCell = worldLevel.grid[1][5];
         const endCell = worldLevel.grid[1][8];
 
-        const targetEntity = new Entity('WORM_VINE');
-        const blockingEntity = new Entity('MOLD_PALE');
-        const movingEntity = new Entity('RAT_MALIGN');
+        const targetEntity = new Entity(gameState, 'WORM_VINE');
+        const blockingEntity = new Entity(gameState, 'MOLD_PALE');
+        const movingEntity = new Entity(gameState, 'RAT_MALIGN');
 
         worldLevel.addEntity(movingEntity, startCell);
         worldLevel.addEntity(blockingEntity, occupiedCell);

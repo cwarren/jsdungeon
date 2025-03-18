@@ -1,6 +1,8 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
+* change GAME_STATE from a generally accessible global instead to inject it where needed - avoid some of those messy circular dependencies, and generally just cleaner / better
+
 * tackle game state serialization / deserialization
 * create gameState tests
 * * NOTE: these tests are quite messy due to the global GAME_STATE use; probably have to do the work now to inject it where needed....
@@ -8,18 +10,7 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * * * !! gameStateClass.js !!
 * * * * !! playgame.html !!
 
-* * * * entityClass.js - inject on initialization, then use local reference
-* * * * * avatarClass.js - update to use local copy
-* * * * entityLocationClass.js - update to use ofEntity reference
-* * * * entityMovementClass.js - update to use ofEntity reference
-* * * * entityVisionClass.test.js - update to use ofEntity reference
-
 * * * * gameTime.js - inject on initialization, then use local reference
-
-* * * * various tests to be updated
-* * * * * structureClass.test.js
-* * * * * gridUtils.test.js
-* * * * * worldLevelClass.integration.test.js (NOTE: probably shift these few into the worldLevelClass.test.js file - the integration distinction isn't as useful now)
 
 
 * * create tests for gameState serialization
@@ -32,7 +23,7 @@ PS E:\code\jsdungeon> docker-compose up --build
 
 * consider removing the automatic repo registration from entity and structure instantiation... or maybe add a flag for it to the call.... or maybe keep it out but instead generally use some factory functions that handle that kind of thing
 
-* change GAME_STATE from a generally accessible global instead to inject it where needed - avoid some of those messy circular dependencies, and generally just cleaner / better
+
 
 * create a help screen for the char sheet
 * * explain / summarize the character screen in general

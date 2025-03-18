@@ -1,5 +1,4 @@
 import { Entity, DEFAULT_ACTION_COST } from "./entityClass.js";
-import { GAME_STATE } from "../gameStateClass.js";
 import { devTrace, rollDice } from "../util.js";
 import { EffDamage } from "../effect/effDamageClass.js";
 import { EffGenDamage } from "../effect/effGenDamageClass.js";
@@ -13,8 +12,8 @@ import { EntityAttributes } from "./entityAttributesClass.js";
 
 
 class Avatar extends Entity {
-  constructor(id = null) {
-    super("AVATAR", id);
+  constructor(gameState, id = null) {
+    super(gameState, "AVATAR", id);
     this.timeOnLevel = 0;
     this.meleeAttack = true;
     this.paneMiniChar = null;
@@ -30,8 +29,8 @@ class Avatar extends Entity {
   }
 
   // this re-creates the same logic as the Entity.deserialize method, but with the Avatar class as the base (a refactor could improve this, but for now it's fine)
-  static deserialize(data) {
-    const avatar = new Avatar(data.id);
+  static deserialize(data, gameState) {
+    const avatar = new Avatar(gameState, data.id);
 
     avatar.name = data.name;
     avatar.baseActionTime = data.baseActionTime;
@@ -111,7 +110,7 @@ class Avatar extends Entity {
 
   die() {
     devTrace(1, "Avatar has died.");
-    GAME_STATE.loseGame();
+    this.gameState.loseGame();
     super.die();
   }
 

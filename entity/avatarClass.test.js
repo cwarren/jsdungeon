@@ -1,6 +1,6 @@
 import { Avatar } from './avatarClass.js';
 import { Entity, DEFAULT_ACTION_COST } from './entityClass.js';
-import { GAME_STATE } from '../gameStateClass.js';
+import { GameState } from '../gameStateClass.js';
 import { devTrace, rollDice, formatNumberForMessage, valueCalc } from '../util.js';
 import { EffDamage } from '../effect/effDamageClass.js';
 import { EffectGenerator } from '../effect/effectGeneratorClass.js';
@@ -38,13 +38,14 @@ jest.mock('../ui/uiPaneMiniCharClass.js', () => ({
 
 describe('Avatar', () => {
   let avatar;
+  let gameState;
 
   beforeEach(() => {
-    GAME_STATE.reset();
-    GAME_STATE.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
-    avatar = GAME_STATE.avatar;
+    gameState = new GameState();
+    gameState.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
+    avatar = gameState.avatar;
     jest.spyOn(avatar, 'healNaturally');
-    jest.spyOn(GAME_STATE, 'loseGame');
+    jest.spyOn(gameState, 'loseGame');
     jest.spyOn(Entity.prototype, 'die');
   });
 
@@ -103,7 +104,7 @@ describe('Avatar', () => {
     avatar.registerPaneMiniChar(uiPaneMiniChar);
 
     avatar.die();
-    expect(GAME_STATE.loseGame).toHaveBeenCalled();
+    expect(gameState.loseGame).toHaveBeenCalled();
     expect(Entity.prototype.die).toHaveBeenCalled();
     expect(uiPaneMain.pushUIState).toHaveBeenCalledWith("GAME_OVER");
     expect(uiPaneMiniChar.clearMiniChar).toHaveBeenCalled();
@@ -161,7 +162,7 @@ describe('Avatar', () => {
     test('should deserialize from a plain object correctly', () => {
       const data = avatar.forSerializing();
 
-      const deserializedAvatar = Avatar.deserialize(data);
+      const deserializedAvatar = Avatar.deserialize(data, gameState);
 
       expect(deserializedAvatar).toBeInstanceOf(Avatar);
       expect(deserializedAvatar.id).toBe(avatar.id);
@@ -175,7 +176,7 @@ describe('Avatar', () => {
 
       const parsedData = JSON.parse(jsonString);
 
-      const deserializedAvatar = Avatar.deserialize(parsedData);
+      const deserializedAvatar = Avatar.deserialize(parsedData, gameState);
 
       expect(deserializedAvatar).toBeInstanceOf(Avatar);
       expect(deserializedAvatar.id).toBe(avatar.id);

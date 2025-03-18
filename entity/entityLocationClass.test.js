@@ -1,5 +1,4 @@
 import { EntityLocation } from './entityLocationClass';
-import { GAME_STATE } from '../gameStateClass';
 import { devTrace } from '../util';
 
 jest.mock('../util', () => ({
@@ -7,32 +6,31 @@ jest.mock('../util', () => ({
   generateId: jest.requireActual('../util.js').generateId,
 }));
 
-jest.mock('../gameStateClass', () => ({
-  GAME_STATE: {
-    world: [
-      {
-        levelWidth: 10,
-        levelHeight: 10,
-        grid: Array.from({ length: 10 }, (_, x) =>
-          Array.from({ length: 10 }, (_, y) => ({
-            x,
-            y,
-            z: 0,
-            entity: null,
-            getAdjacentCells: jest.fn(() => []),
-          }))
-        ),
-      },
-    ],
-  },
-}));
-
 describe('EntityLocation', () => {
   let entity;
   let entityLocation;
+  let gameState;
 
   beforeEach(() => {
-    entity = { type: 'testEntity', determineVisibleCells: jest.fn() };
+    gameState = {
+      world: [
+        {
+          levelWidth: 10,
+          levelHeight: 10,
+          grid: Array.from({ length: 10 }, (_, x) =>
+            Array.from({ length: 10 }, (_, y) => ({
+              x,
+              y,
+              z: 0,
+              entity: null,
+              getAdjacentCells: jest.fn(() => []),
+            }))
+          ),
+        },
+      ],
+    };
+
+    entity = { gameState: gameState, type: 'testEntity', determineVisibleCells: jest.fn() };
     entityLocation = new EntityLocation(entity, 5, 5, 0);
   });
 
@@ -69,12 +67,12 @@ describe('EntityLocation', () => {
     expect(entityLocation.x).toBe(6);
     expect(entityLocation.y).toBe(6);
     expect(entityLocation.z).toBe(0);
-    expect(GAME_STATE.world[0].grid[6][6].entity).toBe(entity);
+    expect(gameState.world[0].grid[6][6].entity).toBe(entity);
     expect(entity.determineVisibleCells).toHaveBeenCalled();
   });
 
   test('should not place entity in occupied cell', () => {
-    GAME_STATE.world[0].grid[6][6].entity = { type: 'otherEntity' };
+    gameState.world[0].grid[6][6].entity = { type: 'otherEntity' };
     const result = entityLocation.placeAt(6, 6, 0);
     expect(result).toBe(false);
     expect(entityLocation.x).toBe(5);
@@ -83,7 +81,7 @@ describe('EntityLocation', () => {
   });
 
   test('should place entity at specified cell', () => {
-    const targetCell = GAME_STATE.world[0].grid[7][7];
+    const targetCell = gameState.world[0].grid[7][7];
     const result = entityLocation.placeAtCell(targetCell);
     expect(result).toBe(true);
     expect(entityLocation.x).toBe(7);
@@ -94,7 +92,7 @@ describe('EntityLocation', () => {
   });
 
   test('should not place entity at occupied cell', () => {
-    const targetCell = GAME_STATE.world[0].grid[7][7];
+    const targetCell = gameState.world[0].grid[7][7];
     targetCell.entity = { type: 'otherEntity' };
     const result = entityLocation.placeAtCell(targetCell);
     expect(result).toBe(false);
@@ -105,7 +103,7 @@ describe('EntityLocation', () => {
 
   test('should get the correct world level', () => {
     const worldLevel = entityLocation.getWorldLevel();
-    expect(worldLevel).toEqual(GAME_STATE.world[0]);
+    expect(worldLevel).toEqual(gameState.world[0]);
   });
 
   test('should throw error if entity is not on a valid level', () => {

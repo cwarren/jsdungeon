@@ -1,4 +1,3 @@
-import { GAME_STATE } from "../gameStateClass.js";
 import { EffDamage } from "../effect/effDamageClass.js";
 import { rollDice, getRandomListItem, constrainValue, devTrace, formatNumberForMessage, generateId } from "../util.js";
 import { ENTITIES_DEFINITIONS } from "./entityDefinitions.js";
@@ -15,7 +14,8 @@ const DEFAULT_ACTION_COST = 100;
 
 class Entity {
 
-  constructor(type, id = null) {
+  constructor(gameState, type, id = null) {
+    this.gameState = gameState;
     this.id = id ? id : generateId();
     this.type = type;
     this.name = Entity.ENTITIES[type].name;
@@ -50,7 +50,7 @@ class Entity {
 
     this.actionStartingTime = 0;
 
-    GAME_STATE.entityRepo.add(this);
+    this.gameState.entityRepo.add(this);
   }
 
   //======================================================================
@@ -82,8 +82,8 @@ class Entity {
     return JSON.stringify(this.forSerializing());
   }
 
-  static deserialize(data) {
-    const entity = new Entity(data.type, data.id);
+  static deserialize(data, gameState) {
+    const entity = new Entity(gameState, data.type, data.id);
 
     entity.name = data.name;
     entity.baseActionTime = data.baseActionTime;
@@ -594,7 +594,7 @@ class Entity {
       }
     });
 
-    GAME_STATE.world[this.location.z].removeEntity(this);
+    this.gameState.world[this.location.z].removeEntity(this);
     uiPaneMessages.addMessage(`${this.name} dies`);
 
     this.damagedBy = [];
@@ -606,7 +606,7 @@ class Entity {
     this.damagedBy.forEach(entry => {
       if (typeof entry.damageSource === 'string') {
         if (entry.damageSourceType === 'Entity') {
-          entry.damageSource = GAME_STATE.entityRepo.getEntity(entry.damageSource);
+          entry.damageSource = this.gameState.entityRepo.getEntity(entry.damageSource);
         }
       }
     });

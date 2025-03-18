@@ -197,7 +197,7 @@ class WorldLevel {
         devTrace(2, "populating level");
         //console.log("world level population (TO BE IMPLEMENTED (1 insidious rat for now))");
         for (let i = 0; i < 1; i++) {
-            const ent = new Entity("RAT_INSIDIOUS");
+            const ent = new Entity(this.gameState, "RAT_INSIDIOUS");
             this.placeEntityRandomly(ent);
         }
     }

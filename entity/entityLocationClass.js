@@ -1,6 +1,4 @@
 import { devTrace } from "../util.js";
-import { GAME_STATE } from "../gameStateClass.js";
-
 
 class EntityLocation {
   constructor(ofEntity, x, y, z = 0) {
@@ -12,11 +10,11 @@ class EntityLocation {
 
   getCell() {
     devTrace(6, "getting cell for entity", this.ofEntity);
-    return GAME_STATE.world[this.z].grid[this.x][this.y];
+    return this.ofEntity.gameState.world[this.z].grid[this.x][this.y];
   }
   getCellAtDelta(dx, dy) {
     devTrace(6, `getting cell at delta ${dx},${dy} for entity`, this.ofEntity);
-    const currentLevel = GAME_STATE.world[this.z];
+    const currentLevel = this.ofEntity.gameState.world[this.z];
     if (!currentLevel) { return null };
     const newX = this.x + dx;
     const newY = this.y + dy;
@@ -33,7 +31,7 @@ class EntityLocation {
 
   placeAt(x, y, z) {
     devTrace(5, `placing at location ${x} ${y} ${z}`, this.ofEntity);
-    return this.placeAtCell(GAME_STATE.world[z ? z : 0].grid[x][y]);
+    return this.placeAtCell(this.ofEntity.gameState.world[z ? z : 0].grid[x][y]);
   }
 
   placeAtCell(targetCell) {
@@ -51,7 +49,7 @@ class EntityLocation {
   }
 
   getWorldLevel() {
-    const currentLevel = GAME_STATE.world[this.z];
+    const currentLevel = this.ofEntity.gameState.world[this.z];
     if (!currentLevel) {
       throw new Error(`Entity ${this.ofEntity.type} is not on a valid level`);
     };

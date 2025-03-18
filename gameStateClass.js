@@ -49,8 +49,8 @@ class GameState {
     static deserialize(data) {
         const newGameState = new GameState();
 
-        newGameState.entityRepo = Repository.deserialize(data.entityRepo, Entity.deserialize);
-        newGameState.structureRepo = Repository.deserialize(data.structureRepo, Structure.deserialize);
+        newGameState.entityRepo = Repository.deserialize(data.entityRepo, Entity.deserialize, newGameState);
+        newGameState.structureRepo = Repository.deserialize(data.structureRepo, Structure.deserialize, newGameState);
 
         newGameState.score = data.score;
         newGameState.currentLevel = data.currentLevel;
@@ -84,7 +84,7 @@ class GameState {
 
     setUpAvatar(initialFloor) {
         devTrace(3, "setting up avatar in game state on initial floor", initialFloor);
-        const avatar = new Avatar();
+        const avatar = new Avatar(this);
         initialFloor.placeEntityRandomlyAtBeginningOfTurnQueue(avatar);
 
         this.avatar = avatar;
@@ -100,19 +100,19 @@ class GameState {
     populateLevelWithEntities(worldLevel) {
         devTrace(4, "populating world level with entities", worldLevel);
         for (let i = 0; i < 4; i++) {
-            const ent = new Entity("MOLD_PALE");
+            const ent = new Entity(this,"MOLD_PALE");
             worldLevel.placeEntityRandomly(ent);
         }
         for (let i = 0; i < 2; i++) {
-            const ent = new Entity("WORM_VINE");
+            const ent = new Entity(this,"WORM_VINE");
             worldLevel.placeEntityRandomly(ent);
         }
         for (let i = 0; i < 1; i++) {
-            const ent = new Entity("RAT_INSIDIOUS");
+            const ent = new Entity(this,"RAT_INSIDIOUS");
             worldLevel.placeEntityRandomly(ent);
         }
         for (let i = 0; i < 2; i++) {
-            const ent = new Entity("RAT_MALIGN");
+            const ent = new Entity(this,"RAT_MALIGN");
             worldLevel.placeEntityRandomly(ent);
         }
     }

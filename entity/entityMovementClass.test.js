@@ -4,7 +4,7 @@ import { Entity, DEFAULT_ACTION_COST } from './entityClass.js';
 import { getEntityDef } from "./entityDefinitions.js";
 import { EffGenDamage } from '../effect/effGenDamageClass.js';
 import { devTrace, constrainValue, rollDice, getRandomListItem, valueCalc } from '../util.js';
-import { GAME_STATE } from '../gameStateClass.js';
+import { GameState } from '../gameStateClass.js';
 import { uiPaneMessages, uiPaneInfo } from "../ui/ui.js";
 import { WorldLevelSpecification } from '../world/worldLevelSpecificationClass.js';
 import {
@@ -53,6 +53,8 @@ describe('EntityMovement', () => {
   let entityLocation;
   let entityMovement;
 
+  let gameState;
+
   let worldLevel;
 
   const TEST_ENTITIES_DEFINITIONS = [
@@ -65,14 +67,14 @@ describe('EntityMovement', () => {
   const TEST_MOVEMENT_SPEC = Entity.ENTITIES["RAT_MALIGN"].movementSpec;
 
   beforeEach(() => {
-    GAME_STATE.reset();
-    GAME_STATE.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
-    worldLevel = GAME_STATE.world[0];
+    gameState = new GameState();
+    gameState.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
+    worldLevel = gameState.world[0];
     while (worldLevel.levelEntities.length > 0) {
       worldLevel.removeEntity(worldLevel.levelEntities[0]);
     }
 
-    entity = new Entity("RAT_MALIGN");
+    entity = new Entity(gameState, "RAT_MALIGN");
     worldLevel.addEntity(entity, worldLevel.grid[0][0]);
     entityLocation = entity.location;
     entityMovement = entity.movement;
@@ -116,7 +118,7 @@ describe('EntityMovement', () => {
 
   test('should try to move to a cell and handle occupied cell', () => {
     jest.spyOn(entity, 'handleAttemptedMoveIntoOccupiedCell');
-    const entityInTargetCell = new Entity("MOLD_PALE");
+    const entityInTargetCell = new Entity(gameState, "MOLD_PALE");
     worldLevel.addEntity(entityInTargetCell, worldLevel.grid[1][1]);
 
     const resultMovementCost = entityMovement.tryMove(1, 1);
@@ -224,7 +226,7 @@ describe('EntityMovement', () => {
       test('should return true for canSleep when adjacent entity is not hostile or violent AND at less than max health', () => {
         // Add a neutral entity nearby
         const occupiedCell = worldLevel.grid[1][0]; // Adjacent to (0,0)
-        const entityInOccupiedCell = new Entity("MOLD_PALE");
+        const entityInOccupiedCell = new Entity(gameState, "MOLD_PALE");
         worldLevel.addEntity(entityInOccupiedCell, occupiedCell);
         entity.health.curHealth = 50; // Not at max health
         entity.health.maxHealth = 100;
@@ -235,7 +237,7 @@ describe('EntityMovement', () => {
       test('should return false for canSleep when a hostile entity is adjacent', () => {
         // Add a hostile entity nearby
         const occupiedCell = worldLevel.grid[1][0]; // Adjacent to (0,0)
-        const hostileEntity = new Entity("RAT_MALIGN");
+        const hostileEntity = new Entity(gameState, "RAT_MALIGN");
 
         worldLevel.addEntity(hostileEntity, occupiedCell);
 
@@ -245,7 +247,7 @@ describe('EntityMovement', () => {
       test('should return false for canSleep when a violent entity is adjacent', () => {
         // Add a violent entity nearby
         const occupiedCell = worldLevel.grid[0][1]; // Adjacent to (0,0)
-        const violentEntity = new Entity("WORM_VINE");
+        const violentEntity = new Entity(gameState, "WORM_VINE");
         worldLevel.addEntity(violentEntity, occupiedCell);
         // Ensure violent relationship
         jest.spyOn(entity, 'getRelationshipTo').mockReturnValue("VIOLENT_TO");
@@ -265,7 +267,7 @@ describe('EntityMovement', () => {
 
       // Add a hostile entity to ensure canSleep() returns false
       const occupiedCell = worldLevel.grid[1][1];
-      const hostileEntity = new Entity("RAT_MALIGN");
+      const hostileEntity = new Entity(gameState, "RAT_MALIGN");
       worldLevel.addEntity(hostileEntity, occupiedCell);
       jest.spyOn(entityMovement, 'canSleep').mockReturnValue(false);
 
@@ -326,7 +328,7 @@ describe('EntityMovement', () => {
 
     test('should check if can run to deltas and return false due to adjacent entity', () => {
       const traversibleCell = worldLevel.grid[1][1];
-      const entityInTargetCell = new Entity("MOLD_PALE");
+      const entityInTargetCell = new Entity(gameState, "MOLD_PALE");
       worldLevel.addEntity(entityInTargetCell, traversibleCell);
 
       const result = entityMovement.canRunToDeltas(1, 1);
@@ -441,7 +443,7 @@ describe('EntityMovement', () => {
 
     test('movement type implementation - should move wander aggressive pure', () => {
       jest.spyOn(entityMovement, 'tryMoveToCell');
-      const hostileToEntity = new Entity("WORM_VINE");
+      const hostileToEntity = new Entity(gameState, "WORM_VINE");
       hostileToEntity.vision.baseViewRadius = 20;
       worldLevel.addEntity(hostileToEntity, worldLevel.grid[2][2]); // NOTE: this is within the vision range of the default entity
 

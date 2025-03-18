@@ -1,5 +1,5 @@
 import { Structure } from './structureClass.js';
-import { GAME_STATE } from '../gameStateClass.js';
+import { GameState } from '../gameStateClass.js';
 import { WorldLevelSpecification } from '../world/worldLevelSpecificationClass.js';
 import { devTrace, generateId } from '../util.js';
 jest.mock('../util.js', () => ({
@@ -15,16 +15,17 @@ const WORLD_LEVEL_SPECS_FOR_TESTING= [
   
 describe('Structure', () => {
     let structure;
+    let gameState;
 
     beforeEach(() => {
-        GAME_STATE.reset();
-        GAME_STATE.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
-        structure = new Structure(GAME_STATE.world[0], 5, 5, 0, 'wall', '#', '#fff');
+        gameState = new GameState();
+        gameState.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
+        structure = new Structure(gameState.world[0], 5, 5, 0, 'wall', '#', '#fff');
     });
 
     test('should create a structure with specified properties', () => {
         expect(structure.id.length).toBeGreaterThan(1);
-        expect(structure.worldLevel).toBe(GAME_STATE.world[0]);
+        expect(structure.worldLevel).toBe(gameState.world[0]);
         expect(structure.x).toBe(5);
         expect(structure.y).toBe(5);
         expect(structure.z).toBe(0);
@@ -32,17 +33,17 @@ describe('Structure', () => {
         expect(structure.displaySymbol).toBe('#');
         expect(structure.displayColor).toBe('#fff');
 
-        expect(GAME_STATE.structureRepo.get(structure.id)).toBe(structure);
+        expect(gameState.structureRepo.get(structure.id)).toBe(structure);
     });
 
     test('should create a structure with given id', () => {
-        const s = new Structure(GAME_STATE.world[0], 5, 5, 0, 'wall', '#', '#fff', 'foo');
+        const s = new Structure(gameState.world[0], 5, 5, 0, 'wall', '#', '#fff', 'foo');
         expect(s.id).toEqual('foo');
     });
 
     test('should return the correct cell from getCell', () => {
         const cell = structure.getCell();
-        expect(cell).toEqual(GAME_STATE.world[0].grid[5][5]);
+        expect(cell).toEqual(gameState.world[0].grid[5][5]);
     });
 
     test('should return correct serialization object from forSerializing', () => {
@@ -77,11 +78,11 @@ describe('Structure', () => {
         const serializedData = structure.serialize();
         const parsedData = JSON.parse(serializedData);
 
-        const deserializedStructure = Structure.deserialize(parsedData, GAME_STATE.world[0]);
+        const deserializedStructure = Structure.deserialize(parsedData, gameState.world[0]);
 
         expect(deserializedStructure).toBeInstanceOf(Structure);
         expect(deserializedStructure.id).toBe(structure.id);
-        expect(deserializedStructure.worldLevel).toBe(GAME_STATE.world[0]);
+        expect(deserializedStructure.worldLevel).toBe(gameState.world[0]);
         expect(deserializedStructure.x).toBe(5);
         expect(deserializedStructure.y).toBe(5);
         expect(deserializedStructure.z).toBe(0);
@@ -89,6 +90,6 @@ describe('Structure', () => {
         expect(deserializedStructure.displaySymbol).toBe('#');
         expect(deserializedStructure.displayColor).toBe('#fff');
 
-        expect(GAME_STATE.structureRepo.get(deserializedStructure.id)).toBe(deserializedStructure);
+        expect(gameState.structureRepo.get(deserializedStructure.id)).toBe(deserializedStructure);
     });
 });

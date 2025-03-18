@@ -142,7 +142,7 @@ describe('WorldLevel', () => {
   });
 
   test('should place entity randomly', () => {
-    const entity = new Entity('RAT_INSIDIOUS');
+    const entity = new Entity(gameState, 'RAT_INSIDIOUS');
     worldLevel.addEntity = jest.fn();
     worldLevel.placeEntityRandomly(entity);
     expect(getRandomEmptyCellOfTerrainInGrid).toHaveBeenCalledWith('FLOOR', worldLevel.grid);
@@ -152,7 +152,7 @@ describe('WorldLevel', () => {
   test('should add entity to level', () => {
     jest.spyOn(worldLevel.turnQueue, 'addEntity'); 
 
-    const entity = new Entity('RAT_INSIDIOUS');
+    const entity = new Entity(gameState, 'RAT_INSIDIOUS');
     worldLevel.addEntity(entity);
 
     expect(worldLevel.levelEntities).toContain(entity);
@@ -162,7 +162,7 @@ describe('WorldLevel', () => {
 
   test('should add entity at beginning of turn queue', () => {
     jest.spyOn(worldLevel.turnQueue, 'addEntityAtBeginningOfTurnQueue'); 
-    const entity = new Entity('RAT_INSIDIOUS');
+    const entity = new Entity(gameState, 'RAT_INSIDIOUS');
     worldLevel.addEntityAtBeginningOfTurnQueue(entity);
     expect(worldLevel.levelEntities).toContain(entity);
     expect(entity.placeAtCell).toHaveBeenCalled();
@@ -172,7 +172,7 @@ describe('WorldLevel', () => {
   test('should remove entity from level', () => {
     jest.spyOn(worldLevel.turnQueue, 'removeEntity'); 
 
-    const entity = new Entity('RAT_INSIDIOUS');
+    const entity = new Entity(gameState, 'RAT_INSIDIOUS');
     worldLevel.levelEntities.push(entity);
     worldLevel.removeEntity(entity);
 

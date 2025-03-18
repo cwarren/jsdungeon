@@ -1,27 +1,8 @@
 import { EntityVision } from './entityVisionClass';
-import { GAME_STATE } from '../gameStateClass.js';
 import { devTrace } from '../util.js';
 jest.mock('../util.js', () => ({
     devTrace: jest.fn(),
     generateId: jest.requireActual('../util.js').generateId,
-}));
-
-jest.mock('../gameStateClass', () => ({
-    GAME_STATE: {
-        world: [
-            {
-                grid: Array.from({ length: 10 }, (_, x) =>
-                    Array.from({ length: 10 }, (_, y) => ({
-                        x,
-                        y,
-                        z: 0,
-                        entity: null,
-                        isOpaque: false,
-                    }))
-                ),
-            },
-        ],
-    },
 }));
 
 const ENITY_VISION_RANGE = 5;
@@ -32,58 +13,78 @@ describe('EntityVision', () => {
     let otherEntity;
     let otherEntityOutOfSight;
     let otherEntityHidden;
+    let gameState;
 
     beforeEach(() => {
+        gameState = {
+            world: [
+                {
+                    grid: Array.from({ length: 10 }, (_, x) =>
+                        Array.from({ length: 10 }, (_, y) => ({
+                            x,
+                            y,
+                            z: 0,
+                            entity: null,
+                            isOpaque: false,
+                        }))
+                    ),
+                },
+            ],
+        };
         entity = {
+            gameState: gameState,
             type: 'testEntity',
             location: {
                 x: 2,
                 y: 2,
                 z: 0,
-                getWorldLevel: jest.fn(() => GAME_STATE.world[0]),
+                getWorldLevel: jest.fn(() => gameState.world[0]),
                 getManhattenDistanceToEntity: jest.fn(() => 2),
             },
-            getCell: jest.fn(() => GAME_STATE.world[0].grid[2][2]),
+            getCell: jest.fn(() => gameState.world[0].grid[2][2]),
             getRelationshipTo: jest.fn(() => 'HOSTILE_TO'),
         };
-        GAME_STATE.world[0].grid[2][2].entity = entity;
+        gameState.world[0].grid[2][2].entity = entity;
 
         otherEntity = {
+            gameState: gameState,
             type: 'otherEntity',
             location: {
                 x: 3,
                 y: 3,
                 z: 0,
-                getWorldLevel: jest.fn(() => GAME_STATE.world[0]),
+                getWorldLevel: jest.fn(() => gameState.world[0]),
             },
-            getCell: jest.fn(() => GAME_STATE.world[0].grid[3][3]),
+            getCell: jest.fn(() => gameState.world[0].grid[3][3]),
         };
-        GAME_STATE.world[0].grid[3][3].entity = otherEntity;
+        gameState.world[0].grid[3][3].entity = otherEntity;
 
         otherEntityOutOfSight = {
+            gameState: gameState,
             type: 'otherEntityOutOfSight',
             location: {
                 x: 9,
                 y: 9,
                 z: 0,
-                getWorldLevel: jest.fn(() => GAME_STATE.world[0]),
+                getWorldLevel: jest.fn(() => gameState.world[0]),
             },
-            getCell: jest.fn(() => GAME_STATE.world[0].grid[9][9]),
+            getCell: jest.fn(() => gameState.world[0].grid[9][9]),
         };
-        GAME_STATE.world[0].grid[9][9].entity = otherEntityOutOfSight;
+        gameState.world[0].grid[9][9].entity = otherEntityOutOfSight;
 
         otherEntityHidden = {
+            gameState: gameState,
             type: 'otherEntityHidden',
             location: {
                 x: 4,
                 y: 2,
                 z: 0,
-                getWorldLevel: jest.fn(() => GAME_STATE.world[0]),
+                getWorldLevel: jest.fn(() => gameState.world[0]),
             },
-            getCell: jest.fn(() => GAME_STATE.world[0].grid[4][2]),
+            getCell: jest.fn(() => gameState.world[0].grid[4][2]),
         };
-        GAME_STATE.world[0].grid[3][2].isOpaque = true;
-        GAME_STATE.world[0].grid[4][2].entity = otherEntityHidden;
+        gameState.world[0].grid[3][2].isOpaque = true;
+        gameState.world[0].grid[4][2].entity = otherEntityHidden;
 
         entityVision = new EntityVision(entity, ENITY_VISION_RANGE);
     });
@@ -123,13 +124,13 @@ describe('EntityVision', () => {
         console.log(vision.seenCells);
         expect(vision.visibleCells.size).toBe(24); // 25 in a 5x5 square minus one hidden on the other side of an opaque cell
         expect(vision.visibleCells.size).toEqual(vision.seenCells.size);
-        expect(vision.visibleCells.has(GAME_STATE.world[0].grid[2][2])).toBe(false); // can't see the hidden cell
-        expect(vision.visibleCells.has(GAME_STATE.world[0].grid[2][4])).toBe(true); // can see non-hidden cell in range
-        expect(vision.visibleCells.has(GAME_STATE.world[0].grid[1][7])).toBe(false); // cannot see cell out of range
+        expect(vision.visibleCells.has(gameState.world[0].grid[2][2])).toBe(false); // can't see the hidden cell
+        expect(vision.visibleCells.has(gameState.world[0].grid[2][4])).toBe(true); // can see non-hidden cell in range
+        expect(vision.visibleCells.has(gameState.world[0].grid[1][7])).toBe(false); // cannot see cell out of range
     });
 
     test('entity should correctly determine visible cells for non-integer vision radius', () => {
-        GAME_STATE.world[0].grid[3][2].isOpaque = false; // remove the usual opaque cell for this test - just muddies the waters
+        gameState.world[0].grid[3][2].isOpaque = false; // remove the usual opaque cell for this test - just muddies the waters
         const vision = new EntityVision(otherEntity, 2.5);
         vision.determineVisibleCells();
         expect(vision.visibleCells.size).toBe(21); // 9-box, plus 3 on each side

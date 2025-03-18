@@ -22,7 +22,7 @@ import {
   determineCellViewability,
 } from './gridUtils.js';
 import { devTrace, constrainValue, rollDice, valueCalc } from '../util.js';
-import { GAME_STATE } from '../gameStateClass.js';
+import { GameState } from '../gameStateClass.js';
 import { uiPaneMessages, uiPaneInfo } from "../ui/ui.js";
 import { WorldLevelSpecification } from './worldLevelSpecificationClass.js';
 
@@ -48,11 +48,12 @@ const WORLD_LEVEL_SPECS_FOR_TESTING= [
 
 describe('WorldLevel Integration Tests', () => {
   let worldLevel;
+  let gameState;
 
   beforeEach(() => {
-    GAME_STATE.reset();
-    GAME_STATE.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
-    worldLevel = GAME_STATE.world[0];
+    gameState = new GameState();
+    gameState.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
+    worldLevel = gameState.world[0];
   });
 
   test('on generation should generate grid and populate level', () => {
@@ -68,7 +69,7 @@ describe('WorldLevel Integration Tests', () => {
   });
 
   test('should add and remove entities correctly', () => {
-    const entity = new Entity('RAT_INSIDIOUS');
+    const entity = new Entity(gameState, 'RAT_INSIDIOUS');
     worldLevel.addEntity(entity, worldLevel.grid[0][0]);
     expect(worldLevel.levelEntities).toContain(entity);
     expect(worldLevel.grid[0][0].entity).toBe(entity);
@@ -78,7 +79,7 @@ describe('WorldLevel Integration Tests', () => {
   });
 
   test('should handle stairs correctly on level generation', () => {
-    const lowerWorldLevel = GAME_STATE.world[1];
+    const lowerWorldLevel = gameState.world[1];
 
     worldLevel.generate();
     expect(worldLevel.stairsUp).toBeNull();
@@ -96,13 +97,13 @@ describe('WorldLevel Integration Tests', () => {
     worldLevel.trackAvatarDepartureTime();
     expect(worldLevel.timeOfAvatarDeparture).toBe(0);
 
-    GAME_STATE.avatar.addTimeOnLevel(10);
-    expect(GAME_STATE.avatar.timeOnLevel).toBe(10);
+    gameState.avatar.addTimeOnLevel(10);
+    expect(gameState.avatar.timeOnLevel).toBe(10);
 
     worldLevel.handleAvatarEnteringLevel(worldLevel.grid[0][0]);
-    expect(worldLevel.levelEntities).toContain(GAME_STATE.avatar);
-    expect(worldLevel.grid[0][0].entity).toBe(GAME_STATE.avatar);
-    expect(GAME_STATE.avatar.timeOnLevel).toBe(0);
+    expect(worldLevel.levelEntities).toContain(gameState.avatar);
+    expect(worldLevel.grid[0][0].entity).toBe(gameState.avatar);
+    expect(gameState.avatar.timeOnLevel).toBe(0);
     expect(uiPaneMessages.addMessage).toHaveBeenCalledWith(`You enter level ${worldLevel.levelNumber + 1}`);
     expect(uiPaneInfo.setInfo).toHaveBeenCalled();
   });

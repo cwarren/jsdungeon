@@ -1,6 +1,5 @@
 import { Entity } from './entityClass.js';
 import { getEntityDef } from "./entityDefinitions.js";
-import { GAME_STATE } from '../gameStateClass.js';
 import { rollDice, constrainValue, generateId } from '../util.js';
 import { EntityHealth } from './entityHealthClass.js';
 import { EntityLocation } from './entityLocationClass.js';
@@ -25,12 +24,6 @@ jest.mock('../util.js', () => ({
 
 jest.mock('../ui/ui.js', () => ({
   uiPaneMessages: { addMessage: jest.fn() },
-}));
-
-jest.mock('../gameStateClass.js', () => ({
-  GAME_STATE: {
-    world: [],
-  },
 }));
 
 const TEST_DAMAGE_SPEC = { damager: new EffGenDamage("1d6+4", [], 0), baseActionTime: 100 };
@@ -60,14 +53,15 @@ TEST_ENTITIES_DEFINITIONS.forEach((ent) => { Entity.ENTITIES[ent.type] = ent; })
 
 describe('Entity', () => {
   let entity;
+  let gameState;
 
   beforeEach(() => {
     rollDice.mockReturnValue(100);
-    GAME_STATE.entityRepo = new Repository('entities');
-    entity = new Entity('testEntity1');
-    const testWorldLevel = new WorldLevel(GAME_STATE, 0, 10, 10);
+    gameState = { entityRepo: new Repository('entities'), world: [] };
+    entity = new Entity(gameState, 'testEntity1');
+    const testWorldLevel = new WorldLevel(gameState, 0, 10, 10);
     testWorldLevel.generateGrid();
-    GAME_STATE.world = [testWorldLevel];
+    gameState.world = [testWorldLevel];
   });
 
   test('should initialize with correct values', () => {
@@ -87,16 +81,16 @@ describe('Entity', () => {
     expect(entity.currentAdvancementPoints).toBe(0);
     expect(entity.actionStartingTime).toBe(0);
 
-    expect(GAME_STATE.entityRepo.get(entity.id)).toBe(entity);
+    expect(gameState.entityRepo.get(entity.id)).toBe(entity);
   });
 
   test('should initialize with passed in id', () => {
-    const e = new Entity('testEntity1','foo');
+    const e = new Entity(gameState, 'testEntity1','foo');
     expect(e.id).toEqual('foo');
   });
 
   test('should place at cell', () => {
-    const targetCell = GAME_STATE.world[0].grid[5][6];
+    const targetCell = gameState.world[0].grid[5][6];
     expect(targetCell.entity).toBeNull();
     entity.placeAtCell(targetCell);
     expect(targetCell.entity).toBe(entity);
@@ -106,7 +100,7 @@ describe('Entity', () => {
   });
 
   test('should get cell', () => {
-    const targetCell = GAME_STATE.world[0].grid[5][6];
+    const targetCell = gameState.world[0].grid[5][6];
     entity.placeAtCell(targetCell);
     expect(entity.getCell()).toBe(targetCell);
   });
@@ -125,8 +119,8 @@ describe('Entity', () => {
 
     beforeEach(() => {
       rollDice.mockReturnValue(100);
-      attacker = new Entity('RAT_MALIGN');
-      defender = new Entity('WORM_VINE');
+      attacker = new Entity(gameState, 'RAT_MALIGN');
+      defender = new Entity(gameState, 'WORM_VINE');
       attack = attacker.createAttack(defender);
     });
 
@@ -134,17 +128,17 @@ describe('Entity', () => {
 
       beforeEach(() => {
         rollDice.mockReturnValue(100);
-        attacker = new Entity('RAT_MALIGN');
-        defender = new Entity('WORM_VINE');
+        attacker = new Entity(gameState, 'RAT_MALIGN');
+        defender = new Entity(gameState, 'WORM_VINE');
         attack = attacker.createAttack(defender);
       });
 
       test('should die and remove entity from world', () => {
         entity.getDeathCredits = jest.fn(() => []);
-        entity.placeAtCell(GAME_STATE.world[0].grid[5][6]);
-        GAME_STATE.world[0].levelEntities = [entity];
+        entity.placeAtCell(gameState.world[0].grid[5][6]);
+        gameState.world[0].levelEntities = [entity];
         entity.die();
-        expect(GAME_STATE.world[0].levelEntities).toEqual([]);
+        expect(gameState.world[0].levelEntities).toEqual([]);
         expect(uiPaneMessages.addMessage).toHaveBeenCalledWith('Test Entity 1 dies');
       });
 
@@ -171,8 +165,8 @@ describe('Entity', () => {
 
       beforeEach(() => {
         rollDice.mockReturnValue(100);
-        attacker = new Entity('RAT_MALIGN');
-        defender = new Entity('WORM_VINE');
+        attacker = new Entity(gameState, 'RAT_MALIGN');
+        defender = new Entity(gameState, 'WORM_VINE');
         attack = attacker.createAttack(defender);
       });
 
@@ -232,8 +226,8 @@ describe('Entity', () => {
 
       beforeEach(() => {
         rollDice.mockReturnValue(100);
-        attacker = new Entity('RAT_MALIGN');
-        defender = new Entity('WORM_VINE');
+        attacker = new Entity(gameState, 'RAT_MALIGN');
+        defender = new Entity(gameState, 'WORM_VINE');
         attacker.health.curHealth = 10;
         defender.health.curHealth = 10;
         attack = attacker.createAttack(defender);
@@ -291,8 +285,8 @@ describe('Entity', () => {
 
       beforeEach(() => {
         rollDice.mockReturnValue(100);
-        attacker = new Entity('RAT_MALIGN');
-        defender = new Entity('WORM_VINE');
+        attacker = new Entity(gameState, 'RAT_MALIGN');
+        defender = new Entity(gameState, 'WORM_VINE');
         attacker.health.curHealth = 10;
         defender.health.curHealth = 10;
         mockEffDam_defHit = new EffDamage(5);
@@ -319,7 +313,7 @@ describe('Entity', () => {
       });
 
       test('should add a new entry for a different attacker', () => {
-        const secondAttacker = new Entity('RAT_INSIDIOUS');
+        const secondAttacker = new Entity(gameState, 'RAT_INSIDIOUS');
         defender.takeDamageFrom(mockEffDam_defHit, attacker);
         defender.takeDamageFrom(new EffDamage(4), secondAttacker);
         expect(defender.damagedBy.length).toBe(2);
@@ -366,8 +360,8 @@ describe('Entity', () => {
 
       beforeEach(() => {
         rollDice.mockReturnValue(100);
-        attacker = new Entity('RAT_MALIGN');
-        defender = new Entity('WORM_VINE');
+        attacker = new Entity(gameState, 'RAT_MALIGN');
+        defender = new Entity(gameState, 'WORM_VINE');
         attacker.health.curHealth = 10;
         defender.health.curHealth = 10;
         mockEffDam_defHit = new EffDamage(1);
@@ -395,7 +389,7 @@ describe('Entity', () => {
   describe('Entity - Relationships', () => {
 
     test('should get default action for other entity based on relationship', () => {
-      const otherEntity = new Entity('testEntity1');
+      const otherEntity = new Entity(gameState, 'testEntity1');
       entity.getRelationshipTo = jest.fn((otherEntity) => 'HOSTILE_TO');
       expect(entity.getDefaultActionFor(otherEntity)).toBe('ATTACK');
 
@@ -416,11 +410,11 @@ describe('Entity', () => {
     });
 
     test('should get correct relationship between entities', () => {
-      const avatar = new Entity('AVATAR');
-      const paleMold = new Entity('MOLD_PALE');
-      const wormVine = new Entity('WORM_VINE');
-      const insidiousRat = new Entity('RAT_INSIDIOUS');
-      const malignRat = new Entity('RAT_MALIGN');
+      const avatar = new Entity(gameState, 'AVATAR');
+      const paleMold = new Entity(gameState, 'MOLD_PALE');
+      const wormVine = new Entity(gameState, 'WORM_VINE');
+      const insidiousRat = new Entity(gameState, 'RAT_INSIDIOUS');
+      const malignRat = new Entity(gameState, 'RAT_MALIGN');
 
       expect(avatar.getRelationshipTo(paleMold)).toBe("NEUTRAL_TO");
       expect(avatar.getRelationshipTo(wormVine)).toBe("HOSTILE_TO");
@@ -451,8 +445,8 @@ describe('Entity', () => {
     test('should have violent relationship to an otherwise neutral entity that has damaged it', () => {
       rollDice.mockReturnValue(100); // needed to ensure the worm vine has enough health that it doesn't die when it takes damage, ALSO ensure that stats are 100
 
-      const wormVine = new Entity('WORM_VINE');
-      const insidiousRat = new Entity('RAT_INSIDIOUS');
+      const wormVine = new Entity(gameState, 'WORM_VINE');
+      const insidiousRat = new Entity(gameState, 'RAT_INSIDIOUS');
       expect(wormVine.getRelationshipTo(insidiousRat)).toBe("NEUTRAL_TO");
 
       wormVine.takeDamageFrom(new EffDamage(2), insidiousRat);
@@ -463,7 +457,7 @@ describe('Entity', () => {
 
   describe('Entity - Serializing', () => {
     test('should generate serializeable object correctly', () => {
-      entity.placeAtCell(GAME_STATE.world[0].grid[5][5]);
+      entity.placeAtCell(gameState.world[0].grid[5][5]);
       entity.health.curHealth = 75;
       entity.currentAdvancementPoints = 42;
       entity.damagedBy = [
@@ -503,7 +497,7 @@ describe('Entity', () => {
   });
 
   test('should serialize to JSON string correctly', () => {
-      entity.placeAtCell(GAME_STATE.world[0].grid[5][5]);
+      entity.placeAtCell(gameState.world[0].grid[5][5]);
       entity.health.curHealth = 75;
       entity.currentAdvancementPoints = 42;
 
@@ -515,7 +509,7 @@ describe('Entity', () => {
   });
 
   test('should deserialize correctly', () => {
-      entity.placeAtCell(GAME_STATE.world[0].grid[5][5]);
+      entity.placeAtCell(gameState.world[0].grid[5][5]);
       entity.health.curHealth = 75;
       entity.currentAdvancementPoints = 42;
       entity.damagedBy = [
@@ -523,7 +517,7 @@ describe('Entity', () => {
       ];
 
       const serializedData = entity.forSerializing();
-      const deserializedEntity = Entity.deserialize(serializedData);
+      const deserializedEntity = Entity.deserialize(serializedData, gameState);
 
       expect(deserializedEntity.id).toBe(entity.id);
       expect(deserializedEntity.type).toBe(entity.type);
@@ -549,9 +543,9 @@ describe('Entity', () => {
 
   test('should correctly re-add the entity to the gameState repository on deserialization', () => {
       const serializedData = entity.forSerializing();
-      const deserializedEntity = Entity.deserialize(serializedData);
+      const deserializedEntity = Entity.deserialize(serializedData, gameState);
 
-      expect(GAME_STATE.entityRepo.get(deserializedEntity.id)).toBe(deserializedEntity);
+      expect(gameState.entityRepo.get(deserializedEntity.id)).toBe(deserializedEntity);
   });
   });
 
