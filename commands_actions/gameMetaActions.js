@@ -1,7 +1,7 @@
-import { GameState, GAME_STATE, initializeGameWorld } from "./gameStateClass.js";
-import { uiPaneMain, uiPaneMessages, uiPaneList } from "./ui/ui.js";
-import { PersistLocalStorage } from "./persist/persistLocalStorageClass.js";
-import { SaveSlot } from "./persist/saveSlotClass.js";
+import { GameState, initializeGameWorld } from "../gameStateClass.js";
+import { uiPaneMain, uiPaneMessages, uiPaneList } from "../ui/ui.js";
+import { PersistLocalStorage } from "../persist/persistLocalStorageClass.js";
+import { SaveSlot } from "../persist/saveSlotClass.js";
 
 let PERSIST = null; // this is set to new PersistLocalStorage(uiPaneMessages) on initial use - this avoids "Uncaught ReferenceError: Cannot access 'uiPaneMessages' before initialization"
 
@@ -14,9 +14,9 @@ const gameMetaActionsMap = {
     LOAD_GAME: { name: "Load Game", description: "Load a saved game", action: loadGame },
 };
 
-function startNewGame() {
-    if (GameState.statusesGameOver.includes(GAME_STATE.status)) {
-        GAME_STATE.reset();
+function startNewGame(gameState, key, event) {
+    if (GameState.statusesGameOver.includes(gameState.status)) {
+        gameState.reset();
         initializeGameWorld();
         uiPaneMain.resetUIState();
         uiPaneMain.pushUIState("GAME_PLAY");
@@ -27,9 +27,9 @@ function startNewGame() {
     return 0;
 }
 
-function abandonCurrentGame() {
-    if (GAME_STATE.status == 'ACTIVE') {
-        GAME_STATE.abandonGame();
+function abandonCurrentGame(gameState, key, event) {
+    if (gameState.status == 'ACTIVE') {
+        gameState.abandonGame();
         uiPaneMain.resetUIState();
         uiPaneMain.pushUIState("GAME_OVER");
     } else {
@@ -39,17 +39,17 @@ function abandonCurrentGame() {
     return 0;
 }
 
-function saveGame() {
+function saveGame(gameState, key, event) {
     console.log("CALLED saveGame");
     if (!PERSIST) { PERSIST = new PersistLocalStorage(uiPaneMessages); }
-    if (GAME_STATE.status == 'ACTIVE') {
-        const slotName = GAME_STATE.avatar.name;
+    if (gameState.status == 'ACTIVE') {
+        const slotName = gameState.avatar.name;
         if (slotName == 'Avatar') {
             uiPaneMessages.ageMessages();
             uiPaneMessages.addMessage('GAME NOT SAVED! Name your character to something other than Avatar before saving.');
             return 0;
         }
-        const saveSlot = new SaveSlot(slotName, GAME_STATE);
+        const saveSlot = new SaveSlot(slotName, gameState);
         saveSlot.serializedData = 'junk data for dev';
         PERSIST.saveGame(saveSlot);
     } else {
@@ -60,11 +60,11 @@ function saveGame() {
     return 0;
 }
 
-function loadGame() {
+function loadGame(gameState, key, event) {
     console.log("CALLED loadGame");
     if (!PERSIST) { PERSIST = new PersistLocalStorage(uiPaneMessages); }
 
-    if (GAME_STATE.status == 'ACTIVE') {
+    if (gameState.status == 'ACTIVE') {
         uiPaneMessages.ageMessages();
         uiPaneMessages.addMessage("Cannot load a game because there's currently a game in progress.");
         return 0;

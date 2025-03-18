@@ -1,4 +1,4 @@
-import { uiPaneMain } from "./ui/ui.js";
+import { uiPaneMain } from "../ui/ui.js";
 
 const textActionsMap = {
     LINE_UP: { name: "Line up", description: "Move one line towards the beginning of the text", action: lineUp },
@@ -9,22 +9,22 @@ const textActionsMap = {
 
 // TODO: figure out how to get the relevant textBlock (instance of TextBlock) passed to these functions... or some other approach such as getting it from ui function
 
-function lineUp() {
+function lineUp(gameState, key, event) {
     uiPaneMain.getCurrentHelpTextBlock().scrollUp();
     return 0;
 }
 
-function lineDown() {
+function lineDown(gameState, key, event) {
     uiPaneMain.getCurrentHelpTextBlock().scrollDown();
     return 0;
 }
 
-function scrollUp() {
+function scrollUp(gameState, key, event) {
     uiPaneMain.getCurrentHelpTextBlock().scrollUp(12);
     return 0;
 }
 
-function scrollDown() {
+function scrollDown(gameState, key, event) {
     uiPaneMain.getCurrentHelpTextBlock().scrollDown(12);
     return 0;
 }

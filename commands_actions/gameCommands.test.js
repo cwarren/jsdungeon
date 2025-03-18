@@ -1,32 +1,42 @@
 import { executeGameCommand, getLookupKey, getActionKey, executeUIAction, executeGameAction, keyBinding, gameActionsMap } from './gameCommands';
-import { uiPaneMain, getCurrentUIState } from './ui/ui.js';
-import { GAME_STATE } from './gameStateClass.js';
+import { uiPaneMain, getCurrentUIState } from '../ui/ui.js';
+// import { GAME_STATE } from '../gameStateClass.js';
 import { uiActionsMap } from './uiActions.js';
-import { devTrace } from './util.js';
-jest.mock('./util.js', () => ({
+import { devTrace } from '../util.js';
+jest.mock('../util.js', () => ({
     devTrace: jest.fn(),
 }));
 
-jest.mock('./ui/ui.js', () => ({
+jest.mock('../ui/ui.js', () => ({
     getCurrentUIState: jest.fn(),
     uiPaneMain: {
         getCurrentUIState: jest.fn(),
     }
 }));
 
-jest.mock('./gameStateClass.js', () => ({
-    GAME_STATE: {
-        handlePlayerActionTime: jest.fn(),
-        avatar: {
-            interruptOngoingActions: jest.fn(),
-        }
-    },
-}));
+// jest.mock('../gameStateClass.js', () => ({
+//     GAME_STATE: {
+//         handlePlayerActionTime: jest.fn(),
+//         avatar: {
+//             interruptOngoingActions: jest.fn(),
+//         }
+//     },
+// }));
 
 describe('gameCommands', () => {
+
+    let gameState;
+
     beforeEach(() => {
         jest.clearAllMocks();
         keyBinding['HELP'] = { '?': 'PUSH_HELP' };
+
+        gameState = {
+            avatar: {
+                interruptOngoingActions: jest.fn(),
+            },
+            handlePlayerActionTime: jest.fn(),
+        };
     });
 
     describe('getLookupKey', () => {
@@ -51,12 +61,12 @@ describe('gameCommands', () => {
         test('should execute UI action if actionKey exists', () => {
             const mockAction = jest.fn();
             uiActionsMap['PUSH_HELP'] = { action: mockAction };
-            expect(executeUIAction('PUSH_HELP')).toBe(true);
-            expect(mockAction).toHaveBeenCalled();
+            expect(executeUIAction(gameState,'PUSH_HELP')).toBe(true);
+            expect(mockAction).toHaveBeenCalledWith(gameState);
         });
 
         test('should return false if actionKey does not exist', () => {
-            expect(executeUIAction('NON_EXISTENT_ACTION')).toBe(false);
+            expect(executeUIAction(gameState,'NON_EXISTENT_ACTION')).toBe(false);
         });
     });
 
@@ -67,27 +77,29 @@ describe('gameCommands', () => {
             const key = 'w';
             const event = { ctrlKey: false };
 
-            executeGameAction(actionDef, key, event);
+            executeGameAction(gameState, actionDef, key, event);
 
-            expect(mockAction).toHaveBeenCalledWith(key, event);
-            expect(GAME_STATE.handlePlayerActionTime).toHaveBeenCalledWith(10);
+            expect(mockAction).toHaveBeenCalledWith(gameState, key, event);
+            expect(gameState.handlePlayerActionTime).toHaveBeenCalledWith(10);
         });
     });
 
     describe('executeGameCommand', () => {
         test('should execute UI control action', () => {
-            const mockAction = jest.fn();
-            uiActionsMap['PUSH_HELP'] = { name: "Help", description: "Details about the commands available", action: mockAction };
+            const mockUiAction = jest.fn();
+            uiActionsMap['PUSH_HELP'] = { name: "Help", description: "Details about the commands available", action: mockUiAction };
             const key = '?';
             const event = { ctrlKey: false };
 
             uiPaneMain.getCurrentUIState.mockReturnValue('HELP');
-            keyBinding['HELP'] = { '?': 'PUSH_HELP' };
+            // keyBinding['HELP'] = { '?': 'PUSH_HELP' };
 
-            executeGameCommand(key, event);
+            executeGameCommand(gameState, key, event);
 
-            expect(mockAction).toHaveBeenCalled();
-            expect(GAME_STATE.avatar.interruptOngoingActions).toHaveBeenCalled();
+            // console.log(mockUiAction.mock.calls)
+
+            expect(mockUiAction).toHaveBeenCalledWith(gameState);
+            expect(gameState.avatar.interruptOngoingActions).toHaveBeenCalled();
         });
 
         test('should execute gameplay action and handle player action time', () => {
@@ -99,10 +111,10 @@ describe('gameCommands', () => {
             uiPaneMain.getCurrentUIState.mockReturnValue('GAME_PLAY');
             keyBinding['GAME_PLAY'] = { 'w': 'MOVE_UP' };
 
-            executeGameCommand(key, event);
+            executeGameCommand(gameState, key, event);
 
-            expect(mockAction).toHaveBeenCalledWith(key, event);
-            expect(GAME_STATE.handlePlayerActionTime).toHaveBeenCalledWith(10);
+            expect(mockAction).toHaveBeenCalledWith(gameState, key, event);
+            expect(gameState.handlePlayerActionTime).toHaveBeenCalledWith(10);
         });
 
         test('should log message if no action is bound for key', () => {
@@ -113,7 +125,7 @@ describe('gameCommands', () => {
             uiPaneMain.getCurrentUIState.mockReturnValue('GAME_PLAY');
             keyBinding['GAME_PLAY'] = {};
 
-            executeGameCommand(key, event);
+            executeGameCommand(gameState, key, event);
 
             expect(console.log).toHaveBeenCalledWith('No action bound for key: GAME_PLAY x');
         });
@@ -127,7 +139,7 @@ describe('gameCommands', () => {
             uiPaneMain.getCurrentUIState.mockReturnValue('HELP');
             keyBinding['HELP'] = { 'CTRL-h': 'PUSH_HELP' };
 
-            executeGameCommand(key, event);
+            executeGameCommand(gameState,key, event);
 
             expect(mockAction).toHaveBeenCalled();
         });

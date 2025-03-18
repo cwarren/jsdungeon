@@ -1,4 +1,4 @@
-import { constrainValue } from "./util.js";
+import { constrainValue } from "../util.js";
 
 class TextBlock {
     constructor(baseText) {

@@ -1,13 +1,13 @@
-import { TextBlock } from './textBlockClass.js';
+import { TextBlock } from '../ui/textBlockClass.js';
 import { textActionsMap } from './textActions.js';
-import { uiPaneMain } from './ui/ui.js';
-import { devTrace } from './util.js';
-jest.mock('./util.js', () => ({
+import { uiPaneMain } from '../ui/ui.js';
+import { devTrace } from '../util.js';
+jest.mock('../util.js', () => ({
     devTrace: jest.fn(),
-    constrainValue: jest.requireActual('./util.js').constrainValue,
+    constrainValue: jest.requireActual('../util.js').constrainValue,
 }));
 
-jest.mock('./ui/ui.js', () => ({
+jest.mock('../ui/ui.js', () => ({
     uiPaneMain: {
         initializeCanvasClickListeners: jest.fn(),
         initializeEventListeners: jest.fn(),

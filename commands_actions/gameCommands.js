@@ -1,11 +1,10 @@
-import { GameState, GAME_STATE } from "./gameStateClass.js";
 import { gameActionsMap } from "./gameActions.js";
 import { gameMetaActionsMap } from "./gameMetaActions.js";
 import { textActionsMap } from "./textActions.js";
 import { characterSheetActionsMap } from "./characterSheetActions.js";
 import { uiActionsMap } from "./uiActions.js";
-import { uiPaneMain } from "./ui/ui.js";
-import { devTrace } from "./util.js";
+import { uiPaneMain } from "../ui/ui.js";
+import { devTrace } from "../util.js";
 
 const keyBinding = {
     "GAME_PLAY":
@@ -106,22 +105,22 @@ function getActionKey(uiState, lookupKey) {
     return keyBinding[uiState][lookupKey];
 }
 
-function executeUIAction(actionKey) {
+function executeUIAction(gameState, actionKey) {
     if (uiActionsMap[actionKey]) {
-        uiActionsMap[actionKey].action();
+        uiActionsMap[actionKey].action(gameState);
         return true;
     }
     return false;
 }
 
-function executeGameAction(actionDef, key, event) {
+function executeGameAction(gameState, actionDef, key, event) {
     devTrace(3, `Executing action: ${actionDef.name}`);
-    const actionTimeCost = actionDef.action(key, event);
-    GAME_STATE.handlePlayerActionTime(actionTimeCost);
+    const actionTimeCost = actionDef.action(gameState, key, event);
+    gameState.handlePlayerActionTime(actionTimeCost);
 }
 
-function executeGameCommand(key, event) {
-    GAME_STATE.avatar.interruptOngoingActions();
+function executeGameCommand(gameState, key, event) {
+    gameState.avatar.interruptOngoingActions();
     const lookupKey = getLookupKey(key, event);
     const uiState = uiPaneMain.getCurrentUIState();
     const actionKey = getActionKey(uiState, lookupKey);
@@ -131,13 +130,13 @@ function executeGameCommand(key, event) {
         return;
     }
 
-    if (executeUIAction(actionKey)) {
+    if (executeUIAction(gameState, actionKey)) {
         return;
     }
 
     const actionMap = actionMaps[uiState];
     const actionDef = actionMap[actionKey];
-    executeGameAction(actionDef, key, event);
+    executeGameAction(gameState, actionDef, key, event);
 }
 
 export { executeGameCommand, getLookupKey, getActionKey, executeUIAction, executeGameAction, gameActionsMap, keyBinding, actionMaps };

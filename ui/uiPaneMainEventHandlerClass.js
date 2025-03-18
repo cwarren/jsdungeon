@@ -1,4 +1,4 @@
-import { executeGameCommand } from "../gameCommands.js";
+import { executeGameCommand } from "../commands_actions/gameCommands.js";
 import { devTrace } from "../util.js";
 import { uiPaneInfo } from "./ui.js";
 
@@ -76,7 +76,7 @@ class UIPaneMainEventHandler {
                 return;
             }
 
-            executeGameCommand(event.key, event);
+            executeGameCommand(this.ui.gameState, event.key, event);
             this.ui.resizeCanvas();
         }
     }

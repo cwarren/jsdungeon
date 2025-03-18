@@ -1,8 +1,8 @@
 import { TextBlock } from './textBlockClass';
-import { devTrace } from './util.js';
-jest.mock('./util.js', () => ({
+import { devTrace } from '../util.js';
+jest.mock('../util.js', () => ({
     devTrace: jest.fn(),
-    constrainValue: jest.requireActual('./util.js').constrainValue,
+    constrainValue: jest.requireActual('../util.js').constrainValue,
 }));
 
 describe('TextBlock', () => {

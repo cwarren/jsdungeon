@@ -12,10 +12,10 @@ describe('SaveSlot', () => {
     });
 
     test('initializes with a save name and given gamestate', () => {
-        const GAME_STATE = { level: 5, score: 1000 };
-        const slot = new SaveSlot('Slot2', GAME_STATE);
+        const gameState = { level: 5, score: 1000 };
+        const slot = new SaveSlot('Slot2', gameState);
         expect(slot.name).toBe('Slot2');
-        expect(slot.gamestate).toEqual(GAME_STATE);
+        expect(slot.gamestate).toEqual(gameState);
         expect(slot.isLoaded).toBe(false);
         expect(slot.serializedData).toBe('');
         expect(slot.isSaved).toBe(false);

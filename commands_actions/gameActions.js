@@ -1,7 +1,6 @@
-import { GAME_STATE } from "./gameStateClass.js";
-import { DEFAULT_ACTION_COST } from "./entity/entityClass.js";
-import { uiPaneMain } from "./ui/ui.js";
-import { devTrace } from "./util.js";
+// import { DEFAULT_ACTION_COST } from "../entity/entityClass.js";
+import { uiPaneMain } from "../ui/ui.js";
+import { devTrace } from "../util.js";
 
 
 /* template for new action map entry:
@@ -57,56 +56,56 @@ const DIRECTION_DELTAS = {
 // IMPORTANT!!!!
 // action functions should return the time cost of the action!
 
-function DEV_winGame()  { 
-    GAME_STATE.winGame();
+function DEV_winGame(gameState, key, event)  { 
+    gameState.winGame();
     return 0;
 }
-function DEV_loseGame() {
-    GAME_STATE.loseGame();
+function DEV_loseGame(gameState, key, event) {
+    gameState.loseGame();
     return 0;
 }
-function DEV_dumpGameState() {
-    console.log("### dump game state", GAME_STATE);
+function DEV_dumpGameState(gameState, key, event) {
+    console.log("### dump game state", gameState);
     return 0;
 }
 
-function avatarMove(dx,dy) { return GAME_STATE.avatar.tryMove(dx,dy); }
-function moveAvatar_UL()   { return avatarMove(-1,-1) }
-function moveAvatar_U()    { return avatarMove(0,-1) }
-function moveAvatar_UR()   { return avatarMove(1,-1) }
-function moveAvatar_L()    { return avatarMove(-1,0) }
-function moveAvatar_wait() { return DEFAULT_ACTION_COST; }
-function moveAvatar_R()    { return avatarMove(1,0) }
-function moveAvatar_DL()   { return avatarMove(-1,1) }
-function moveAvatar_D()    { return avatarMove(0,1) }
-function moveAvatar_DR()   { return avatarMove(1,1) }
+function avatarMove(gameState, dx,dy) { return gameState.avatar.tryMove(dx,dy); }
+function moveAvatar_UL(gameState, key, event)   { return avatarMove(gameState, -1,-1) }
+function moveAvatar_U(gameState, key, event)    { return avatarMove(gameState, 0,-1) }
+function moveAvatar_UR(gameState, key, event)   { return avatarMove(gameState, 1,-1) }
+function moveAvatar_L(gameState, key, event)    { return avatarMove(gameState, -1,0) }
+function moveAvatar_wait(gameState, key, event) { return gameState.avatar.baseActionTime; }
+function moveAvatar_R(gameState, key, event)    { return avatarMove(gameState, 1,0) }
+function moveAvatar_DL(gameState, key, event)   { return avatarMove(gameState, -1,1) }
+function moveAvatar_D(gameState, key, event)    { return avatarMove(gameState, 0,1) }
+function moveAvatar_DR(gameState, key, event)   { return avatarMove(gameState, 1,1) }
 
-function ascendStairs() {
+function ascendStairs(gameState, key, event) {
     devTrace(3,'action - ascend stairs');
-    const curCell = GAME_STATE.getAvatarCell();
+    const curCell = gameState.getAvatarCell();
     const stairsUp = curCell.structure;
     if (stairsUp && stairsUp.type == "STAIRS_UP") {
         console.log("going up stairs");
-        curCell.worldLevel.removeEntity(GAME_STATE.avatar);
-        GAME_STATE.currentLevel--;
+        curCell.worldLevel.removeEntity(gameState.avatar);
+        gameState.currentLevel--;
         const newCell = stairsUp.connectsTo.getCell();
         newCell.worldLevel.handleAvatarEnteringLevel(newCell);
     } else {
         console.log("cannot ascend - no stairs up");
     }
-    console.log("GAME_STATE after ascending", GAME_STATE);
-    return GAME_STATE.avatar.baseActionTime;
+    console.log("gameState after ascending", gameState);
+    return gameState.avatar.baseActionTime;
 }
 
-function descendStairs() {
+function descendStairs(gameState, key, event) {
     devTrace(3,'action - descend stairs');
-    const curCell = GAME_STATE.getAvatarCell();
+    const curCell = gameState.getAvatarCell();
     const stairsDown = curCell.structure;
     if (stairsDown && stairsDown.type == "STAIRS_DOWN") {
         console.log("going down stairs");
-        curCell.worldLevel.removeEntity(GAME_STATE.avatar);
-        GAME_STATE.currentLevel++;
-        const lowerWorldLevel = GAME_STATE.world[GAME_STATE.currentLevel]
+        curCell.worldLevel.removeEntity(gameState.avatar);
+        gameState.currentLevel++;
+        const lowerWorldLevel = gameState.world[gameState.currentLevel]
         if (! lowerWorldLevel.isGridGenerated()) {
             lowerWorldLevel.generate();
         }
@@ -115,36 +114,36 @@ function descendStairs() {
     } else {
         console.log("cannot descend - no stairs down");
     }
-    console.log("GAME_STATE after descending", GAME_STATE);
-    return GAME_STATE.avatar.baseActionTime;
+    console.log("gameState after descending", gameState);
+    return gameState.avatar.baseActionTime;
 }
 
-function runAvatar(deltas) {
+function runAvatar(gameState, deltas) {
     devTrace(7,`action - run avatar to deltas ${deltas.dx},${deltas.dy}`);
-    if (GAME_STATE.avatar.movement.isRunning) return; // Prevent multiple runs
+    if (gameState.avatar.movement.isRunning) return; // Prevent multiple runs
 
-    GAME_STATE.avatar.movement.startRunning(deltas);
+    gameState.avatar.movement.startRunning(deltas);
 
     // Perform the first move immediately
-    return GAME_STATE.avatar.continueRunning();
+    return gameState.avatar.continueRunning();
 }
-function runAvatar_UL()   { return runAvatar(DIRECTION_DELTAS["UL"]) }
-function runAvatar_U()    { return runAvatar(DIRECTION_DELTAS["U"]) }
-function runAvatar_UR()   { return runAvatar(DIRECTION_DELTAS["UR"]) }
-function runAvatar_L()    { return runAvatar(DIRECTION_DELTAS["L"]) }
-function runAvatar_R()    { return runAvatar(DIRECTION_DELTAS["R"]) }
-function runAvatar_DL()   { return runAvatar(DIRECTION_DELTAS["DL"]) }
-function runAvatar_D()    { return runAvatar(DIRECTION_DELTAS["D"]) }
-function runAvatar_DR()   { return runAvatar(DIRECTION_DELTAS["DR"]) }
+function runAvatar_UL(gameState, key, event)   { return runAvatar(gameState, DIRECTION_DELTAS["UL"]) }
+function runAvatar_U(gameState, key, event)    { return runAvatar(gameState, DIRECTION_DELTAS["U"]) }
+function runAvatar_UR(gameState, key, event)   { return runAvatar(gameState, DIRECTION_DELTAS["UR"]) }
+function runAvatar_L(gameState, key, event)    { return runAvatar(gameState, DIRECTION_DELTAS["L"]) }
+function runAvatar_R(gameState, key, event)    { return runAvatar(gameState, DIRECTION_DELTAS["R"]) }
+function runAvatar_DL(gameState, key, event)   { return runAvatar(gameState, DIRECTION_DELTAS["DL"]) }
+function runAvatar_D(gameState, key, event)    { return runAvatar(gameState, DIRECTION_DELTAS["D"]) }
+function runAvatar_DR(gameState, key, event)   { return runAvatar(gameState, DIRECTION_DELTAS["DR"]) }
 
-function sleepAvatar(key, event) {
+function sleepAvatar(gameState, key, event) {
     // devTrace(3,`${key} - sleep avatar (not yet implemented)`, event);
-    GAME_STATE.avatar.startSleeping();
-    return GAME_STATE.avatar.continueSleeping();
+    gameState.avatar.startSleeping();
+    return gameState.avatar.continueSleeping();
 }
 
-function zoomIn()  { uiPaneMain.zoomIn(); return 0; }
-function zoomOut()  { uiPaneMain.zoomOut(); return 0; }
-function zoomReset()  { uiPaneMain.zoomReset(); return 0;  }
+function zoomIn(gameState, key, event)  { uiPaneMain.zoomIn(); return 0; }
+function zoomOut(gameState, key, event)  { uiPaneMain.zoomOut(); return 0; }
+function zoomReset(gameState, key, event)  { uiPaneMain.zoomReset(); return 0;  }
 
 export { gameActionsMap };
