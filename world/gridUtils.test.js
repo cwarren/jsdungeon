@@ -19,7 +19,7 @@ import {
 } from './gridUtils';
 import { GridCell } from './gridCellClass';
 
-// NOTE: all the GAME_STATE and entity stuff and all the mocks are related to determining best path FOR ENTITY
+// NOTE: all the game state and entity stuff and all the mocks are related to determining best path FOR ENTITY
 
 jest.mock('../util.js', () => ({
     devTrace: jest.fn(),

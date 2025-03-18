@@ -1,6 +1,5 @@
 import { executeGameCommand, getLookupKey, getActionKey, executeUIAction, executeGameAction, keyBinding, gameActionsMap } from './gameCommands';
 import { uiPaneMain, getCurrentUIState } from '../ui/ui.js';
-// import { GAME_STATE } from '../gameStateClass.js';
 import { uiActionsMap } from './uiActions.js';
 import { devTrace } from '../util.js';
 jest.mock('../util.js', () => ({
@@ -13,15 +12,6 @@ jest.mock('../ui/ui.js', () => ({
         getCurrentUIState: jest.fn(),
     }
 }));
-
-// jest.mock('../gameStateClass.js', () => ({
-//     GAME_STATE: {
-//         handlePlayerActionTime: jest.fn(),
-//         avatar: {
-//             interruptOngoingActions: jest.fn(),
-//         }
-//     },
-// }));
 
 describe('gameCommands', () => {
 
