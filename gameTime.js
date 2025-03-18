@@ -1,11 +1,11 @@
-import { GAME_STATE } from "./gameStateClass.js";
 import { devTrace } from "./util.js";
 
 const TIME_WRAP_LIMIT = 10000;
 
 // Priority queue for timing entities, supporting an action cost / action point system
 class TurnQueue {
-    constructor() {
+    constructor(gameState) {
+        this.gameState = gameState;
         this.queue = [];
         this.elapsedTime = 0;
         this.previousActionTime = 0;
@@ -25,7 +25,7 @@ class TurnQueue {
     }
 
     static deserialize(data, gameState) {
-        const turnQueue = new TurnQueue();
+        const turnQueue = new TurnQueue(gameState);
         turnQueue.queue = data.queue.map(entry => {
             const ent = gameState.entityRepo.get(entry.entity);
             return {
@@ -96,7 +96,7 @@ class TurnQueue {
     nextTurn() {
         devTrace(4,`do next turn on turn queue`, this);
         if (this.queue.length === 0) return null;
-        if (GAME_STATE.status != "ACTIVE") return null;
+        if (this.gameState.status != "ACTIVE") return null;
 
         let next = this.queue.shift();
         this.timePasses(next.time - this.previousActionTime);
@@ -116,8 +116,8 @@ class TurnQueue {
         } else {
             actionTime = next.entity.takeTurn(); // Default action
         }
-        
-        // Reschedule non-avatar entity based on action cost (avatar actions are handled separately, in GAME_STATE.handlePlayerActionTime)
+
+        // Reschedule non-avatar entity based on action cost (avatar actions are handled separately, in this.gameState.handlePlayerActionTime)
         // also, running entities (including avatar) are always rescheduled
         if (next.entity.type != "AVATAR" || next.entity.movement.isRunning || next.entity.movement.isSleeping) {
             next.time += actionTime;

@@ -203,7 +203,7 @@ class GameState {
 
 const WORLD_LEVEL_SPECS_FOR_DEV = [
     WorldLevelSpecification.generateWorldLevelSpec({ type: 'EMPTY', width: 6, height: 4 }),
-    // WorldLevelSpecification.generateWorldLevelSpec({ type: 'EMPTY', width: 15, height: 10 }),
+    WorldLevelSpecification.generateWorldLevelSpec({ type: 'EMPTY', width: 15, height: 10 }),
     // WorldLevelSpecification.generateWorldLevelSpec({ type: 'TOWN', width: 30, height: 20 }),
     // WorldLevelSpecification.generateWorldLevelSpec({ type: 'ROOMS_SUBDIVIDE', width: 30, height: 20 }),
     // WorldLevelSpecification.generateWorldLevelSpec({ type: 'ROOMS_RANDOM', width: 30, height: 20 }),

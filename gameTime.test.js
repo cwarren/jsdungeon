@@ -1,33 +1,29 @@
 import { TurnQueue } from './gameTime';
 import { devTrace } from './util';
-import { GAME_STATE } from './gameStateClass';
 import { Repository } from './repositoryClass';
 
 jest.mock('./util', () => ({
     devTrace: jest.fn(),
 }));
 
-jest.mock('./gameStateClass', () => ({
-    GAME_STATE: {
-        status: 'ACTIVE',
-        handlePlayerActionTime: jest.fn(),
-    },
-}));
-
 describe('TurnQueue', () => {
     let turnQueue;
     let mockEntity1, mockEntity2;
+    let gameState;
 
     beforeEach(() => {
-        turnQueue = new TurnQueue();
+        gameState = {
+            status: 'ACTIVE',
+            handlePlayerActionTime: jest.fn(),
+            entityRepo: new Repository('entities'),
+        };
+        turnQueue = new TurnQueue(gameState);
 
-        mockEntity1 = { id: 'entity-1', type: 'test1' };
-        mockEntity2 = { id: 'entity-2', type: 'test2' };
+        mockEntity1 = { gameState: gameState, id: 'entity-1', type: 'test1' };
+        mockEntity2 = { gameState: gameState, id: 'entity-2', type: 'test2' };
 
-        const entityRepo = new Repository();
-        entityRepo.add(mockEntity1);
-        entityRepo.add(mockEntity2);
-        GAME_STATE.entityRepo = entityRepo;
+        gameState.entityRepo.add(mockEntity1);
+        gameState.entityRepo.add(mockEntity2);
     });
 
     test('should initialize with empty queue and zero elapsed time', () => {
@@ -101,13 +97,20 @@ describe('TurnQueue', () => {
 
     test('should handle next turn', () => {
         const entity = {
+            gameState: gameState,
             type: 'test',
             setActionStartingTime: jest.fn(),
             takeTurn: jest.fn().mockReturnValue(10),
             movement: { isRunning: false },
         };
         turnQueue.addEntity(entity, 5);
+
+        console.log(gameState);
+        console.log(turnQueue);
+        console.log(turnQueue.queue);
+        
         const result = turnQueue.nextTurn();
+
         expect(result).toBe(entity);
         expect(turnQueue.previousActionTime).toBe(5);
         expect(entity.setActionStartingTime).toHaveBeenCalledWith(5);
@@ -123,7 +126,7 @@ describe('TurnQueue', () => {
     });
 
     test('should return null if game state is not active in next turn', () => {
-        GAME_STATE.status = 'INACTIVE';
+        gameState.status = 'INACTIVE';
         const entity = { type: 'test' };
         turnQueue.addEntity(entity, 5);
         const result = turnQueue.nextTurn();
@@ -176,7 +179,7 @@ describe('TurnQueue', () => {
             previousActionTime: 50
         };
 
-        const deserializedQueue = TurnQueue.deserialize(serializedData, GAME_STATE);
+        const deserializedQueue = TurnQueue.deserialize(serializedData, gameState);
 
         expect(deserializedQueue).toBeInstanceOf(TurnQueue);
         expect(deserializedQueue.elapsedTime).toBe(100);
@@ -198,7 +201,7 @@ describe('TurnQueue', () => {
             previousActionTime: 50
         };
 
-        const deserializedQueue = TurnQueue.deserialize(serializedData, GAME_STATE);
+        const deserializedQueue = TurnQueue.deserialize(serializedData, gameState);
 
         expect(deserializedQueue).toBeInstanceOf(TurnQueue);
         expect(deserializedQueue.queue.length).toBe(2);

@@ -10,8 +10,6 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * * * !! gameStateClass.js !!
 * * * * !! playgame.html !!
 
-* * * * gameTime.js - inject on initialization, then use local reference
-
 
 * * create tests for gameState serialization
 * actually save and restore/load games

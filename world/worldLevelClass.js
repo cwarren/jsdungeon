@@ -41,7 +41,7 @@ class WorldLevel {
         this.levelStructures = [];
         this.stairsDown = null;
         this.stairsUp = null;
-        this.turnQueue = new TurnQueue();
+        this.turnQueue = new TurnQueue(this.gameState);
         this.timeOfAvatarDeparture = 0;
         this.generationParams = null;
         // console.log("new world level", this);
