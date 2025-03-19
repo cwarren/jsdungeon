@@ -1,15 +1,8 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* change GAME_STATE from a generally accessible global instead to inject it where needed - avoid some of those messy circular dependencies, and generally just cleaner / better
-
 * tackle game state serialization / deserialization
 * create gameState tests
-* * NOTE: these tests are quite messy due to the global GAME_STATE use; probably have to do the work now to inject it where needed....
-* * * global uses of GAME_STATE
-* * * * !! gameStateClass.js !!
-* * * * !! playgame.html !!
-
 * * create tests for gameState serialization
 * actually save and restore/load games
 * * NOTE / REMEMBER: the GAME_STATE is embedded in the SaveSlot that the save and load functions have access to... though it's an injected reference; will have to restore to a new game state then mutate the original based on that, for now (hack-ish, but should get the job done)
