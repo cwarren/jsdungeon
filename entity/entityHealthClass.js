@@ -15,7 +15,7 @@ class EntityHealth {
     if (maxHealth <= 0) {
       console.log(ofEntity);
       console.log("maxHealth naturalHealingRate naturalHealingTicks", maxHealth, naturalHealingRate, naturalHealingTicks);
-      throw new Error("maxHealth must be greater than 0");
+      throw new Error("maxHealth must be greater than 0 when instantiating an EntityHealth object");
     }
     this.ofEntity = ofEntity;
     this.maxHealth = maxHealth;

@@ -9,7 +9,6 @@ class UIPaneMainRendererHelp extends UIPaneMainRenderer {
         super(ui, canvas);
         this.helpTextBlocks = {};
         this.initializeHelpTextBlocks(keyBinding, actionMaps);
-        console.log("initialized help text blocks", this.helpTextBlocks);
         this.currentHelpTextBlock = null;
     }
 

@@ -84,7 +84,6 @@ function determineCellViewability(grid) {
     for (let x = 0; x < levelWidth; x++) {
         for (let y = 0; y < levelHeight; y++) {
             let cell = grid[x][y];
-            // console.log(`cell ${x} ${y}`, cell);
             if (!cell.isOpaque) {
                 cell.isViewable = true;
             } else {

@@ -30,6 +30,7 @@ class EntityMovement {
         if (targetCell.entity) {
             return this.ofEntity.handleAttemptedMoveIntoOccupiedCell(targetCell);
         } else {
+            // TODO: add message to message pane about not being able to move into a wall (or other non-traversable terrain)
             console.log(`move prevented because target cell is not traversable: ${targetCell.terrain} at ${targetCell.x} ${targetCell.y} ${targetCell.z}`);
             return 0;
         }

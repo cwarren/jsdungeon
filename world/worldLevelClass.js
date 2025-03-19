@@ -44,7 +44,6 @@ class WorldLevel {
         this.turnQueue = new TurnQueue(this.gameState);
         this.timeOfAvatarDeparture = 0;
         this.generationParams = null;
-        // console.log("new world level", this);
     }
 
     // ---------------------
@@ -91,8 +90,9 @@ class WorldLevel {
         // make each structure attached to this new world level since basic structure deserializing leaves them detatched, and reconnect stairs
         hydratedStructures.forEach(structure => {
             structure.setWorldLevel(worldLevel);
-            if (structure.reconnect);
+            if (structure.reconnect) {
                 structure.reconnect(gameState.structureRepo);
+            }
         });
 
         if (data.grid) {
@@ -195,7 +195,7 @@ class WorldLevel {
     }
     populate() {
         devTrace(2, "populating level");
-        //console.log("world level population (TO BE IMPLEMENTED (1 insidious rat for now))");
+        //TODO: console.log("world level population (TO BE IMPLEMENTED (1 insidious rat for now))");
         for (let i = 0; i < 1; i++) {
             const ent = new Entity(this.gameState, "RAT_INSIDIOUS");
             this.placeEntityRandomly(ent);

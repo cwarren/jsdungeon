@@ -269,10 +269,12 @@ class Entity {
       return this.doMeleeAttackOn(targetCell.entity);
     }
     if (defaultAction == 'BUMP') {
+      // TODO: put a message in the message pane about this, and change the console.log to a devTrace
       console.log(`move prevented because target cell is already occupied: ${targetCell.entity.name} at ${targetCell.x} ${targetCell.y} ${targetCell.z}`);
       return 0;
     }
     if (defaultAction == 'SWAP') {
+      // TODO: put a message in the message pane about this, and change the console.log to a devTrace
       console.log(`SWAP ACTION NOT YET IMPLEMENTED: ${targetCell.entity.name} at ${targetCell.x} ${targetCell.y} ${targetCell.z}`);
       return 0;
     }
@@ -406,9 +408,7 @@ class Entity {
       ),
     ]);
 
-    // console.log(`AAAAAAAAAAAAAAA ${this.name} attackPrecisionModifiers`, attackPrecisionModifiers);
     attackPrecision = attackPrecisionModifier.appliedTo(attackPrecision);
-    // console.log(`BBBBBBBBBBBBBBB ${this.name} attackPrecision`, attackPrecision);
     return Math.floor(attackPrecision);
   }
 
@@ -441,9 +441,7 @@ class Entity {
       ),
     ]);
 
-    // console.log(`CCCCCCCCCCCCCCC ${this.name} attackEvasionModifiers`, attackEvasionModifiers);
     attackEvasion = attackEvasionModifier.appliedTo(attackEvasion);
-    // console.log(`DDDDDDDDDDDDDDD ${this.name} attackEvasion`, attackEvasion);
     return Math.floor(attackEvasion);
   }
 
@@ -552,7 +550,6 @@ class Entity {
   // NOTE: modifers for mitigation are inverted relative to most other cases, as the point is reduction, not increase
   getMitigatedDamageAmount(effDam, effSource) {
     let damAmount = effDam.amount;
-    // console.log(`initial damage amount: ${damAmount}`);
 
     if (effDam.types.includes('PHYSICAL')) {
       // attribute-based: fortitude (moderate), strength (minor), aura (very minor)
@@ -577,7 +574,6 @@ class Entity {
       damAmount = physicalMitigtionAttributeModifer.appliedTo(damAmount);
     }
 
-    // console.log(`    mitigated damage amount: ${damAmount}`);
     return damAmount;
   }
 

@@ -25,7 +25,6 @@ function generateGrid_empty(width, height, generationParams = {}) {
     const newGrid = Array.from({ length: width }, (_, col) =>
         Array.from({ length: height }, (_, row) => GridCell.createDetachedAt(col, row, startingTerrain))
     );
-    //  console.log("empty grid", newGrid);
     return newGrid;
 }
 
@@ -39,7 +38,6 @@ function generateGrid_random(width, height, generationParams = {}) {
             return GridCell.createDetachedAt(col, row, randomTerrain);
         })
     );
-    //  console.log("random grid", newGrid);
     return newGrid;
 }
 

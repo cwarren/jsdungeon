@@ -129,9 +129,6 @@ class UIPaneMainEventHandler {
     }
 
     updateTextInputDisplay() {
-        console.log("updateTextInputDisplay");
-        console.log("this.ui", this.ui);
-
         uiPaneInfo.setInfo(`${this.textInputPrompt}: ${this.currentInputText}_`);
     }
 }

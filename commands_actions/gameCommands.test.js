@@ -82,11 +82,8 @@ describe('gameCommands', () => {
             const event = { ctrlKey: false };
 
             uiPaneMain.getCurrentUIState.mockReturnValue('HELP');
-            // keyBinding['HELP'] = { '?': 'PUSH_HELP' };
 
             executeGameCommand(gameState, key, event);
-
-            // console.log(mockUiAction.mock.calls)
 
             expect(mockUiAction).toHaveBeenCalledWith(gameState);
             expect(gameState.avatar.interruptOngoingActions).toHaveBeenCalled();

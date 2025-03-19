@@ -104,10 +104,6 @@ describe('TurnQueue', () => {
             movement: { isRunning: false },
         };
         turnQueue.addEntity(entity, 5);
-
-        console.log(gameState);
-        console.log(turnQueue);
-        console.log(turnQueue.queue);
         
         const result = turnQueue.nextTurn();
 

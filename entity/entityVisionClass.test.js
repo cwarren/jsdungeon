@@ -120,8 +120,6 @@ describe('EntityVision', () => {
     test('entity should correctly determine visible cells', () => {
         const vision = new EntityVision(otherEntityHidden, 3);
         vision.determineVisibleCells();
-        console.log(vision.visibleCells);
-        console.log(vision.seenCells);
         expect(vision.visibleCells.size).toBe(24); // 25 in a 5x5 square minus one hidden on the other side of an opaque cell
         expect(vision.visibleCells.size).toEqual(vision.seenCells.size);
         expect(vision.visibleCells.has(gameState.world[0].grid[2][2])).toBe(false); // can't see the hidden cell

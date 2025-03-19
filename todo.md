@@ -13,7 +13,7 @@ PS E:\code\jsdungeon> docker-compose up --build
 
 * consider removing the automatic repo registration from entity and structure instantiation... or maybe add a flag for it to the call.... or maybe keep it out but instead generally use some factory functions that handle that kind of thing
 
-
+* in gameActions, replace console.log with message pane messages... or just remove them
 
 * create a help screen for the char sheet
 * * explain / summarize the character screen in general

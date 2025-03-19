@@ -20,7 +20,6 @@ class UIPaneMiniChar {
 
     refreshMiniChar(charInfo) {
         this.clearMiniChar();
-        // console.log(charInfo);
         this.getPageElement().innerHTML = this.getDisplayTextFromInfo(charInfo);
     }
 

@@ -80,12 +80,9 @@ describe('GridCell', () => {
 
         test('should deserialize and restore GridCell object correctly', () => {
             const serializedData = gridCell.serialize();
-            // console.log('serializedData:', serializedData);
             const parsedData = JSON.parse(serializedData);
-            // console.log('parsedData:', parsedData);
 
             const deserializedCell = GridCell.deserialize(parsedData, worldLevel);
-            // console.log('deserializedCell:', deserializedCell);
 
             expect(deserializedCell).toBeInstanceOf(GridCell);
             expect(deserializedCell.x).toBe(5);

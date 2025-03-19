@@ -37,7 +37,7 @@ class GameState {
             isPlaying: this.isPlaying,
             status: this.status,
             world: this.world.map(wl => wl.forSerializing()),
-            avatar: this.avatar.forSerializing(),
+            avatar: this.avatar.id,
         };
     }
 
@@ -50,16 +50,19 @@ class GameState {
         const newGameState = new GameState();
 
         newGameState.entityRepo = Repository.deserialize(data.entityRepo, Entity.deserialize, newGameState);
-        newGameState.structureRepo = Repository.deserialize(data.structureRepo, Structure.deserialize, newGameState);
+        newGameState.structureRepo = Repository.deserialize(data.structureRepo, Structure.deserialize);
 
         newGameState.score = data.score;
         newGameState.currentLevel = data.currentLevel;
         newGameState.isPlaying = data.isPlaying;
         newGameState.status = data.status;
 
-        newGameState.world = data.world.map(wlData => WorldLevel.deserialize(wlData));
+        newGameState.world = data.world.map(wlData => WorldLevel.deserialize(wlData, newGameState));
         
-        newGameState.avatar = Avatar.deserialize(data.avatar);
+        const avatarData = data.entityRepo.items.find(ent => ent.id == data.avatar)
+
+        newGameState.avatar = Avatar.deserialize(avatarData, newGameState);
+        newGameState.entityRepo.add(newGameState.avatar); // this overwrites the Entity instance in the repo with the Avatar one
         
         newGameState.currentTurnQueue = newGameState.world[newGameState.currentLevel].turnQueue;
 
