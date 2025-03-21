@@ -1,6 +1,10 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
+need a clear way to say/do: "use this game state object to drive the game"
+* NOTE: gameMetaActions.startNewGame works well! Look to that as a pattern....
+* probably need some kind of copyFromOtherGameState
+
 * tackle game state serialization / deserialization
 * actually save and restore/load games
 * * NOTE / REMEMBER: the gameState is embedded in the SaveSlot that the save and load functions have access to... though it's an injected reference; will have to restore to a new game state then mutate the original based on that, for now (hack-ish, but should get the job done)

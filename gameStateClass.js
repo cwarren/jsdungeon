@@ -130,7 +130,7 @@ class GameState {
 
     getCurrentWorldLevel() {
         devTrace(6, "getting current world level via game state");
-        return GAME_STATE.world[GAME_STATE.currentLevel];
+        return this.world[this.currentLevel];
     }
 
     //=====================
@@ -221,16 +221,4 @@ const WORLD_LEVEL_SPECS_FOR_DEV = [
     // WorldLevelSpecification.generateWorldLevelSpec({ type: 'RANDOM', width: 30, height: 20 }),
 ];
 
-
-// TODO: defintely hack-y to have game state as a global - need to refactor at some point to actually inject it where needed
-
-// Create a single instance to maintain the game's state globally
-let GAME_STATE = new GameState();
-
-function initializeGameWorld() { // this is a hack until I put this stuff in a better location (probably just embed it in the class)
-    GAME_STATE.initialize(WORLD_LEVEL_SPECS_FOR_DEV);
-    GAME_STATE.advanceGameTime();
-}
-
-
-export { GameState, GAME_STATE, WORLD_LEVEL_SPECS_FOR_DEV, initializeGameWorld };
+export { GameState,  WORLD_LEVEL_SPECS_FOR_DEV };

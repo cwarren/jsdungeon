@@ -101,7 +101,7 @@ function getLookupKey(key, event) {
 }
 
 function getActionKey(uiState, lookupKey) {
-    devTrace(3, 'getActionKey: keybinding, uiState, lookupKey', keyBinding, uiState, lookupKey);
+    devTrace(8, 'getActionKey: keybinding, uiState, lookupKey', keyBinding, uiState, lookupKey);
     return keyBinding[uiState][lookupKey];
 }
 

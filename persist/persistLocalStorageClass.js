@@ -42,6 +42,7 @@ class PersistLocalStorage extends Persist {
                 saveSlot.persistencePlainObject = parsedData.data;
                 saveSlot.isLoaded = true;
                 this.tellUser(`Loaded game '${saveSlot.name}'`);
+                console.log('Loaded save slot:', saveSlot);
             } else {
                 this.tellUser(`No save found in slot: ${saveSlot.name}`);
             }

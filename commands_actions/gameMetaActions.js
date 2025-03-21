@@ -1,4 +1,4 @@
-import { GameState, initializeGameWorld } from "../gameStateClass.js";
+import { GameState, WORLD_LEVEL_SPECS_FOR_DEV } from "../gameStateClass.js";
 import { uiPaneMain, uiPaneMessages, uiPaneList } from "../ui/ui.js";
 import { PersistLocalStorage } from "../persist/persistLocalStorageClass.js";
 import { SaveSlot } from "../persist/saveSlotClass.js";
@@ -17,7 +17,9 @@ const gameMetaActionsMap = {
 function startNewGame(gameState, key, event) {
     if (GameState.statusesGameOver.includes(gameState.status)) {
         gameState.reset();
-        initializeGameWorld();
+        gameState.initialize(WORLD_LEVEL_SPECS_FOR_DEV);
+        gameState.advanceGameTime()
+
         uiPaneMain.resetUIState();
         uiPaneMain.pushUIState("GAME_PLAY");
     } else {
@@ -90,6 +92,8 @@ function loadGame(gameState, key, event) {
                 return 0;
             }
             PERSIST.loadGame(saveSlot);
+            saveSlot.gameState = GameState.deserialize(saveSlot.persistencePlainObject);
+            // gameState.copyFromOtherGameState(saveSlot.gameState);
             console.log('saveSlot post-load: ', saveSlot);
         },
         () => {
