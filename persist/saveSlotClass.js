@@ -1,8 +1,8 @@
 class SaveSlot {
-    constructor(saveName, gamestate=null) {
+    constructor(saveName, gameState=null) {
         this.name = saveName;
-        this.gamestate = gamestate;
-        this.serializedData = '';
+        this.gameState = gameState;
+        this.persistencePlainObject = {};
         this.isLoaded =false;
         this.isSaved = false;
         this.timestampLastSaved = null;

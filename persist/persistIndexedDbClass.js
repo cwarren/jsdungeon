@@ -57,7 +57,7 @@ class PersistIndexedDB extends Persist {
             await new Promise((resolve, reject) => {
                 const request = store.put({
                     [this.KEY_PATH]: saveSlot.name,
-                    data: saveSlot.serializedData,
+                    data: saveSlot.persistencePlainObject,
                     timestamp: saveTimestamp,
                 });
                 request.onsuccess = resolve;
@@ -96,7 +96,7 @@ class PersistIndexedDB extends Persist {
             console.log("load result:", result);
 
             if (result) {
-                saveSlot.serializedData = result.data;
+                saveSlot.persistencePlainObject = result.data;
                 saveSlot.isLoaded = true;
                 this.tellUser(`Loaded game ${saveSlot.name}`);
             } else {

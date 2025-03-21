@@ -50,7 +50,6 @@ function saveGame(gameState, key, event) {
             return 0;
         }
         const saveSlot = new SaveSlot(slotName, gameState);
-        saveSlot.serializedData = 'junk data for dev';
         PERSIST.saveGame(saveSlot);
     } else {
         uiPaneMessages.ageMessages();

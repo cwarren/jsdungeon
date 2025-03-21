@@ -2,10 +2,8 @@ to start server:
 PS E:\code\jsdungeon> docker-compose up --build
 
 * tackle game state serialization / deserialization
-* create gameState tests
-* * create tests for gameState serialization
 * actually save and restore/load games
-* * NOTE / REMEMBER: the GAME_STATE is embedded in the SaveSlot that the save and load functions have access to... though it's an injected reference; will have to restore to a new game state then mutate the original based on that, for now (hack-ish, but should get the job done)
+* * NOTE / REMEMBER: the gameState is embedded in the SaveSlot that the save and load functions have access to... though it's an injected reference; will have to restore to a new game state then mutate the original based on that, for now (hack-ish, but should get the job done)
 * * on save, serialize the game state
 * * * dump to console
 * * on load, parse json and deserialize the data

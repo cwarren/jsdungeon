@@ -14,9 +14,11 @@ class PersistLocalStorage extends Persist {
             const saveTimestamp = Date.now();
             const saveData = {
                 name: saveSlot.name,
-                data: saveSlot.serializedData,
+                data: saveSlot.gameState.forSerializing(),
                 timestamp: saveTimestamp
             };
+
+            console.log(`saveData for slot: ${saveSlot.name}`, saveData);
 
             localStorage.setItem(this.STORAGE_PREFIX + saveSlot.name, JSON.stringify(saveData));
 
@@ -37,7 +39,7 @@ class PersistLocalStorage extends Persist {
 
             if (saveData) {
                 const parsedData = JSON.parse(saveData);
-                saveSlot.serializedData = parsedData.data;
+                saveSlot.persistencePlainObject = parsedData.data;
                 saveSlot.isLoaded = true;
                 this.tellUser(`Loaded game '${saveSlot.name}'`);
             } else {

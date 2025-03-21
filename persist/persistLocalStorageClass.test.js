@@ -4,6 +4,7 @@ import { SaveSlot } from "./saveSlotClass.js";
 
 describe("PersistLocalStorage", () => {
     let persist, saveSlot;
+    const mockPersistencePlainObject = { level: 5, inventory: ["sword", "shield"] };
 
     beforeEach(() => {
         const mockUiPaneMessages = {
@@ -12,7 +13,7 @@ describe("PersistLocalStorage", () => {
         };
     
         persist = new PersistLocalStorage(mockUiPaneMessages);
-        saveSlot = new SaveSlot("testSlot");
+        saveSlot = new SaveSlot("testSlot", {forSerializing: () => { return mockPersistencePlainObject; }});
         jest.spyOn(Storage.prototype, "setItem");
         jest.spyOn(Storage.prototype, "getItem");
         jest.spyOn(Storage.prototype, "removeItem");
@@ -28,7 +29,8 @@ describe("PersistLocalStorage", () => {
     // ===========================
 
     test("should save game to localStorage", () => {
-        saveSlot.serializedData = { level: 5, inventory: ["sword", "shield"] };
+        saveSlot.persistencePlainObject = mockPersistencePlainObject;
+
         persist.saveGame(saveSlot);
 
         expect(localStorage.setItem).toHaveBeenCalledWith(
@@ -38,7 +40,7 @@ describe("PersistLocalStorage", () => {
 
         const savedData = JSON.parse(localStorage.setItem.mock.calls[0][1]);
         expect(savedData.name).toBe("testSlot");
-        expect(savedData.data).toEqual(saveSlot.serializedData);
+        expect(savedData.data).toEqual(saveSlot.persistencePlainObject);
         expect(savedData.timestamp).toBeDefined();
     });
 
@@ -55,7 +57,7 @@ describe("PersistLocalStorage", () => {
         persist.loadGame(saveSlot);
 
         expect(localStorage.getItem).toHaveBeenCalledWith("JSDungeonGameSave_testSlot");
-        expect(saveSlot.serializedData).toEqual(savedState.data);
+        expect(saveSlot.persistencePlainObject).toEqual(savedState.data);
         expect(saveSlot.isLoaded).toBe(true);
     });
 
@@ -100,7 +102,7 @@ describe("PersistLocalStorage", () => {
     test("should handle loading a non-existent save gracefully", () => {
         persist.loadGame(saveSlot);
         expect(localStorage.getItem).toHaveBeenCalledWith("JSDungeonGameSave_testSlot");
-        expect(saveSlot.serializedData).toEqual('');
+        expect(saveSlot.persistencePlainObject).toEqual({});
         expect(saveSlot.isLoaded).toBe(false);
     });
 
