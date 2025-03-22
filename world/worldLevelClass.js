@@ -46,6 +46,11 @@ class WorldLevel {
         this.generationParams = null;
     }
 
+    setGameState(gameState) {
+        this.gameState = gameState;
+        this.turnQueue.setGameState(gameState);
+    }
+
     // ---------------------
 
     forSerializing() {

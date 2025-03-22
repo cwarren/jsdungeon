@@ -18,7 +18,7 @@ function startNewGame(gameState, key, event) {
     if (GameState.statusesGameOver.includes(gameState.status)) {
         gameState.reset();
         gameState.initialize(WORLD_LEVEL_SPECS_FOR_DEV);
-        gameState.advanceGameTime()
+        gameState.advanceGameTime();
 
         uiPaneMain.resetUIState();
         uiPaneMain.pushUIState("GAME_PLAY");
@@ -93,7 +93,11 @@ function loadGame(gameState, key, event) {
             }
             PERSIST.loadGame(saveSlot);
             saveSlot.gameState = GameState.deserialize(saveSlot.persistencePlainObject);
-            // gameState.copyFromOtherGameState(saveSlot.gameState);
+            gameState.copyFromOtherGameState(saveSlot.gameState);
+
+            uiPaneMain.setGameState(gameState);
+            uiPaneMain.resetUIState();
+            uiPaneMain.pushUIState("GAME_PLAY");
             console.log('saveSlot post-load: ', saveSlot);
         },
         () => {

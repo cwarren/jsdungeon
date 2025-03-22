@@ -11,6 +11,11 @@ class TurnQueue {
         this.previousActionTime = 0;
     }
 
+    setGameState(gameState) {
+        devTrace(5,`set game state for turn queue`, gameState);
+        this.gameState = gameState;
+    }
+
     forSerializing() {
         return {
             queue: this.queue.map(entry => {

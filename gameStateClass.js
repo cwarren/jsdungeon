@@ -1,7 +1,8 @@
 import { Entity } from "./entity/entityClass.js";
-import { Structure } from "./structure/structureClass.js";
-import { WorldLevel } from "./world/worldLevelClass.js";
 import { Avatar } from "./entity/avatarClass.js";
+import { Structure } from "./structure/structureClass.js";
+import { Stairs } from "./structure/stairsClass.js";
+import { WorldLevel } from "./world/worldLevelClass.js";
 import { devTrace } from "./util.js";
 import { uiPaneMain, uiPaneMessages, uiPaneInfo, uiPaneMiniChar } from "./ui/ui.js";
 import { WorldLevelSpecification } from "./world/worldLevelSpecificationClass.js";
@@ -49,21 +50,36 @@ class GameState {
     static deserialize(data) {
         const newGameState = new GameState();
 
-        newGameState.entityRepo = Repository.deserialize(data.entityRepo, Entity.deserialize, newGameState);
-        newGameState.structureRepo = Repository.deserialize(data.structureRepo, Structure.deserialize);
+        // NOTE: we cannot deserialize the structureRepo using the generic Structure class because the repo-based 
+        // deserialization assumues that all structures are of the same type and we have Stairs (and other) structures
+        // that need to be deserialized using their specific class so we have to do it manually
+        newGameState.structureRepo = new Repository(data.structureRepo.name);
+        data.structureRepo.items.forEach(structureData => {
+            let structure;
+            if (structureData.type === 'STAIRS_UP' || structureData.type === 'STAIRS_DOWN') {
+                structure = Stairs.deserialize(structureData, newGameState.world[structureData.z]);
+            } else {
+                // For other structures, use the generic Structure class
+                structure = Structure.deserialize(structureData, newGameState.world[structureData.z]);
+            }
+            newGameState.structureRepo.add(structure);
+        });
+
+        // the entityRepo can be deserialized using the generic Entity class because all entities are of the same
+        // type, except for the Avatar, which is handled after-the-fact
+        newGameState.entityRepo = Repository.deserialize(data.entityRepo, Entity.deserialize, newGameState);        
+        const avatarData = data.entityRepo.items.find(ent => ent.id == data.avatar)
+        newGameState.avatar = Avatar.deserialize(avatarData, newGameState);
+        newGameState.entityRepo.add(newGameState.avatar); // this overwrites the Entity instance in the repo with the Avatar one
 
         newGameState.score = data.score;
         newGameState.currentLevel = data.currentLevel;
         newGameState.isPlaying = data.isPlaying;
         newGameState.status = data.status;
 
+        // IMPORTANT: this has to be done after the avatar is added to the entityRepo, otherwise the world level will reference a disconnected avatar
         newGameState.world = data.world.map(wlData => WorldLevel.deserialize(wlData, newGameState));
-        
-        const avatarData = data.entityRepo.items.find(ent => ent.id == data.avatar)
 
-        newGameState.avatar = Avatar.deserialize(avatarData, newGameState);
-        newGameState.entityRepo.add(newGameState.avatar); // this overwrites the Entity instance in the repo with the Avatar one
-        
         newGameState.currentTurnQueue = newGameState.world[newGameState.currentLevel].turnQueue;
 
         return newGameState;
@@ -118,6 +134,35 @@ class GameState {
             const ent = new Entity(this,"RAT_MALIGN");
             worldLevel.placeEntityRandomly(ent);
         }
+    }
+
+    copyFromOtherGameState(otherGameState) {
+        devTrace(4, "copying game state from another game state", otherGameState);
+
+        this.score =  otherGameState.score;
+        this.currentLevel = otherGameState.currentLevel;
+        this.isPlaying = otherGameState.isPlaying;
+        this.status = otherGameState.status;
+
+        this.world = otherGameState.world;
+        this.world.forEach((wl, index) => {
+            wl.setGameState(this);
+        });
+
+        this.avatar = otherGameState.avatar;
+        this.avatar.gameState = this;
+        this.avatar.registerPaneMiniChar(uiPaneMiniChar);
+        this.avatar.determineVisibleCells();
+
+        this.entityRepo = otherGameState.entityRepo;
+        this.entityRepo.items.forEach(entity => {
+            entity.setGameState(this);
+        });
+
+
+        this.structureRepo = otherGameState.structureRepo;
+
+        this.currentTurnQueue = this.world[this.currentLevel].turnQueue;
     }
 
     //=====================

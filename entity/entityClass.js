@@ -53,6 +53,11 @@ class Entity {
     this.gameState.entityRepo.add(this);
   }
 
+  setGameState(gameState) {
+    devTrace(5, `set game state for entity`, gameState);
+    this.gameState = gameState;
+  }
+
   //======================================================================
   // SERIALIZATION
 
@@ -602,7 +607,7 @@ class Entity {
     this.damagedBy.forEach(entry => {
       if (typeof entry.damageSource === 'string') {
         if (entry.damageSourceType === 'Entity') {
-          entry.damageSource = this.gameState.entityRepo.getEntity(entry.damageSource);
+          entry.damageSource = this.gameState.entityRepo.get(entry.damageSource);
         }
       }
     });

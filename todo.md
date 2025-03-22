@@ -1,9 +1,11 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-need a clear way to say/do: "use this game state object to drive the game"
-* NOTE: gameMetaActions.startNewGame works well! Look to that as a pattern....
-* probably need some kind of copyFromOtherGameState
+* on entity death, remove that entity from the repo
+
+ITEM: somehow the entities (looks like maybe just the avatar?) in the world level entities list has been disconnected from the actual avatar. It starts with the same values, but doesn't change when the avatar moves or takes damage
+
+
 
 * tackle game state serialization / deserialization
 * actually save and restore/load games

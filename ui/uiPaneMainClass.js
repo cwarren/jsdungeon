@@ -32,6 +32,10 @@ class UIPaneMain {
         };
     }
 
+    setGameState(gameState) {
+        this.gameState = gameState;
+    }
+
     getCurrentUIState() {
         return this.stateManager.getCurrentUIState();
     }
