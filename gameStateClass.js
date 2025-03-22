@@ -136,6 +136,7 @@ class GameState {
         }
     }
 
+    // NOTE: this is a slight misnomer - it mutates that data in otherGameState to point to this
     copyFromOtherGameState(otherGameState) {
         devTrace(4, "copying game state from another game state", otherGameState);
 
@@ -158,7 +159,6 @@ class GameState {
         this.entityRepo.items.forEach(entity => {
             entity.setGameState(this);
         });
-
 
         this.structureRepo = otherGameState.structureRepo;
 

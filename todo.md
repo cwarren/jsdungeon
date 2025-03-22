@@ -2,22 +2,16 @@ to start server:
 PS E:\code\jsdungeon> docker-compose up --build
 
 * on entity death, remove that entity from the repo
+* * and from avatar.damagedBy
+* * * ??? and from all entity.damagedBy in the repo? potential entity count scaling issues here, but maybe not big enough to worry about
 
-ITEM: somehow the entities (looks like maybe just the avatar?) in the world level entities list has been disconnected from the actual avatar. It starts with the same values, but doesn't change when the avatar moves or takes damage
-
-
-
-* tackle game state serialization / deserialization
-* actually save and restore/load games
-* * NOTE / REMEMBER: the gameState is embedded in the SaveSlot that the save and load functions have access to... though it's an injected reference; will have to restore to a new game state then mutate the original based on that, for now (hack-ish, but should get the job done)
-* * on save, serialize the game state
-* * * dump to console
-* * on load, parse json and deserialize the data
-* * * dump to console
-
-* consider removing the automatic repo registration from entity and structure instantiation... or maybe add a flag for it to the call.... or maybe keep it out but instead generally use some factory functions that handle that kind of thing
-
-* in gameActions, replace console.log with message pane messages... or just remove them
+* add tests for
+* * world level set game state - validate that the turn queue also has it set
+* * game state deserialize - validate that the avatar in the post-deserialize world level references the same object as gameState.avatar
+* * game state deserialize - validate that the structure repo restoration correctly handles stairs vs generic structures
+* * game state - add tests for copyFromOtherGameState
+* * * rename it to ingestOtherGameState to imply that it muck with the other game state
+* * * validate that copied things reference the correct gameState
 
 * create a help screen for the char sheet
 * * explain / summarize the character screen in general
@@ -25,32 +19,44 @@ ITEM: somehow the entities (looks like maybe just the avatar?) in the world leve
 
 * messages
 * * for gaining advancement points
-* * for blocked actions / commands, with why
-* * * stairs don't exists
-* * * wall in the way
-* * * can't run while adjacent to stairs
-* * * can't run while adjacent to entity
-* * * can't sleep while adjacent to entity
-
-* more robust vision radius
-* * add a getLightRadius to entities
-* * add a hasDarkVision flag to entities
-* * add a getVisionRadius to entities
-* * * baseVisionRadius is some calc driven by stats (mainly awareness)
-* * * if has darkvision, then visionRadius = baseVisionRadius
-* * * otherwise, visionRadius is min of light radius and baseVisionRadius
-
-* figure out where and how to handle critical hits and evades
-* * special effect generation?
-* * double normal effects?
+* * in gameActions, replace console.log with message pane messages... or just remove them
+* * * for blocked actions / commands, with why
+* * * * stairs don't exists
+* * * * wall in the way
+* * * * can't run while adjacent to stairs
+* * * * can't run while adjacent to entity
+* * * * can't sleep while adjacent to entity
 
 * extended messages
 * * keep a longer message buffer; small number of most recent are shown in message pane, but much larger set is saved and can be separately viewed
 * * add a UI mode to see longer messages
 
+* create a basic item class
+* create item definitions
+
+* create an item container class
+* * container constraints - volume & weight
+
+* give entities an inventory (at least, some of them)
+* give gridCells an optional inventory
+* get and drop items (transfer between entity inv and gridCell inven)
+* * UI for general container-to-container transfer of items
+
+* create a chest structure
+* * with an inventory
+* * implement structure interaction
+
+* equipment
+* * slots
+* * equippables
+* * UI mode
+* * entity calcs use equipped things
+
 * skills for entities / skill system
 * * what they are
 * * how they work in general
+
+* consider removing the automatic repo registration from entity and structure instantiation... or maybe add a flag for it to the call.... or maybe keep it out but instead generally use some factory functions that handle that kind of thing
 
 * more mob stuff
 * * simple status sheets for mobs (for display in info block when attacking or otherwise interacting with that mob)
@@ -76,6 +82,19 @@ ITEM: somehow the entities (looks like maybe just the avatar?) in the world leve
 * when an entity dies, remove it from the damagedBy lists of other entities
 * * maybe have to add to entities a list of thing's they've damaged... though that could get messy, especially for the avatar
 * * decide whether death credits able to go to already dead things is a feature or a bug...
+* * * when resolving death credits, check to see if the entity-to-credit still exists in the entity repo...?
+
+* more robust vision radius
+* * add a getLightRadius to entities
+* * add a hasDarkVision flag to entities
+* * add a getVisionRadius to entities
+* * * baseVisionRadius is some calc driven by stats (mainly awareness)
+* * * if has darkvision, then visionRadius = baseVisionRadius
+* * * otherwise, visionRadius is min of light radius and baseVisionRadius
+
+* figure out where and how to handle critical hits and evades
+* * special effect generation?
+* * double normal effects?
 
 * when running, stop if a mob becomes newly visible
 * when running, stop if a structure becomes newly visible
@@ -94,16 +113,6 @@ ITEM: somehow the entities (looks like maybe just the avatar?) in the world leve
 * * chance for a level to have a river through it (carve)
 
 * add sleeping-related and running-related tests to gameTime.test.js
-
-* create a basic item class
-
-* create an item container class
-
-* equipment
-* * slots
-* * equippables
-* * UI mode
-* * entity calcs use equipped things
 
 * create AI modules that can be plugged into entities rather than stuffing all the options directly in the entity class
 
