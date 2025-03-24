@@ -69,6 +69,7 @@ class Avatar extends Entity {
       naturalHealAmount: this.health.getHealAmountPerInterval(),
       naturalHealInterval: this.health.naturalHealingTicks,
       timeOnLevel: this.timeOnLevel,
+      worldDepth: this.location.z,
     };
   }
 

@@ -26,14 +26,11 @@ class UIPaneMiniChar {
     getDisplayTextFromInfo(charInfo) {
         let displayText = `<p class='charName'>${charInfo.name}</p>`
         + `Health: ${Math.floor(charInfo.curHealth)} of ${charInfo.maxHealth}<br/>`
-        // + '<div class="smallText">'
-        // + `heals ${formatNumberForMessage(charInfo.naturalHealAmount)}<br/>`
-        // + `per ${charInfo.naturalHealInterval} time<br/>`
-        // + '</div>'
         + '<br/>'
         + `AP: ${charInfo.curAdvancementPoints}<br/>`
         + '<br/>'
-        + 'time on this level:<br/>'
+        + `depth: ${charInfo.worldDepth}<br/>`
+        + 'time at depth:<br/>'
         + `${charInfo.timeOnLevel}`
         ;
 

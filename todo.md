@@ -1,15 +1,6 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* do some thinking about save versioning
-* * probably add some version tracking, but postpone any fancy handling of different versions
-* * * beyond maybe filtering save slots to compatible versions
-* * make persist getSaveSlots filter on the version
-
-* add UI handling for no-saves-found (and for only-older-version saves found)
-
-* add current level to mini-char info, and remove "this" from time on level text
-
 * on entity death, remove that entity from the repo
 * * and from avatar.damagedBy
 * * * ??? and from all entity.damagedBy in the repo? potential entity count scaling issues here, but maybe not big enough to worry about
@@ -161,6 +152,24 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * figure out why the infinite processing happens
 * * fix it
 * * * test to expose? depends on the particular issue/reason....
+* the test gridGeneration.test.js very occasionally fails with, and will pass after re-running things sans changes
+ FAIL  world/gridGeneration.test.js
+  ● Grid Generation - Integration Tests › generateGrid_roomsAndCorridors_subdivide creates connected room networks
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      126 |
+      127 |     beforeEach(() => {
+    > 128 |         worldLevel = {
+          |         ^
+      129 |             levelNumber: 1,
+      130 |             levelWidth: 10,
+      131 |             levelHeight: 10,
+
+      at Object.<anonymous> (world/gridGeneration.test.js:128:9)
 
 
 LONG TERM
