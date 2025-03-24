@@ -2,7 +2,7 @@ to start server:
 PS E:\code\jsdungeon> docker-compose up --build
 
 * add tests for these cases that had to be handled during save/load coding
-* * world level set game state - validate that the turn queue also has it set
+
 * * game state deserialize - validate that the avatar in the post-deserialize world level references the same object as gameState.avatar
 * * game state deserialize - validate that the structure repo restoration correctly handles stairs vs generic structures
 * * game state - add tests for copyFromOtherGameState

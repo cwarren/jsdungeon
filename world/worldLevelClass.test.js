@@ -117,6 +117,19 @@ describe('WorldLevel', () => {
     expect(worldLevel.timeOfAvatarDeparture).toBe(0);
   });
 
+  test('should set gameState', () => {
+    expect(worldLevel.gameState).toBe(gameState);
+    expect(worldLevel.turnQueue.gameState).toBe(gameState);
+
+    const mockNewGameState = {data: 'super shallow mocked game state'};
+
+    worldLevel.setGameState(mockNewGameState);
+
+    expect(worldLevel.gameState).toBe(mockNewGameState);
+    expect(worldLevel.turnQueue.gameState).toBe(mockNewGameState);
+  });
+
+
   test('should get a valid world level from a WorldLevelSpecification', () => {
     const levelFromSpec = WorldLevel.getFromSpecification(gameState, 5, WorldLevelSpecification.generateWorldLevelSpec({ width: 18, height: 12, type: "RANDOM" }));
     expect(levelFromSpec.gameState).toBe(gameState);
