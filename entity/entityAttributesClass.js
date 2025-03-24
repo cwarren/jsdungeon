@@ -43,7 +43,7 @@ class EntityAttributes {
   getAttributeSummary() {
     let summary = {};
     for (const key of EntityAttributes.ATTRIBUTE_ORDERING) {
-        summary[key] = this[key];
+      summary[key] = this[key];
     }
     return summary;
   }
@@ -199,6 +199,18 @@ class EntityAttributes {
       exampleImpact: 'impacts how quickly you regain energy (MP), and how quickly you deal with lingering spiritual damage or other effects'
     },
   };
+
+  static getExplanationText() {
+    let explanationText = '';
+    for (const attrKey of EntityAttributes.ATTRIBUTE_ORDERING) {
+      const attrInfo = EntityAttributes.ATTRIBUTE_INFORMATION[attrKey];
+      explanationText += "\n\n"
+        + `${attrInfo.name} (${attrInfo.abbreviation}) - ${attrInfo.realm} ${attrInfo.type}\n`
+        + `This attribute reflects ${attrInfo.description}. For example, it ${attrInfo.exampleImpact}.`
+        ;
+    }
+    return explanationText;
+  }
 }
 
 export { EntityAttributes };

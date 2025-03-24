@@ -1,11 +1,6 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* explain / summarize the character screen in general
-* * fill out getExplanationText in UIPaneMainRendererCharacterSheet
-* * * add some general info
-* * * generate help text for attributes from info in EntityAttributes - add a getHelpText static method to that class
-
 * messages
 * * for gaining advancement points
 * * in gameActions, replace console.log with message pane messages... or just remove them
@@ -47,6 +42,9 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * when a grid cell has a single item, show that item
 * * when a grid cell has more than one item, render each on top of each other (don't really need special handling for an item pile... though might want a render limit if the list is huge)
 
+* implement automatic text-wrapping for text block - character screen help is a good in-game testing area for this
+* * NOTE: all that kind of stuff is already handed in HTML - should NOT have to re-create all that....
+
 * extended messages
 * * keep a longer message buffer; small number of most recent are shown in message pane, but much larger set is saved and can be separately viewed
 * * add a UI mode to see longer messages
@@ -84,11 +82,6 @@ PS E:\code\jsdungeon> docker-compose up --build
 
 * healing currently is checked when an entity takes it's turn, which could lead to some weird healing bursts for slow-acting entities. Consider moving it to a global check (anchored at world level, triggered by game time?)
 
-* when an entity dies, remove it from the damagedBy lists of other entities
-* * maybe have to add to entities a list of thing's they've damaged... though that could get messy, especially for the avatar
-* * decide whether death credits able to go to already dead things is a feature or a bug...
-* * * when resolving death credits, check to see if the entity-to-credit still exists in the entity repo...?
-
 * more robust vision radius
 * * add a getLightRadius to entities
 * * add a hasDarkVision flag to entities
@@ -118,6 +111,9 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * chance for a level to have a river through it (carve)
 
 * add sleeping-related and running-related tests to gameTime.test.js
+
+* improved layout / presentation of command help text - figure out how to have it well aligned and how to scale it with screen width
+* * NOTE: all that kind of stuff is already handed in HTML - should NOT have to re-create all that....
 
 * create AI modules that can be plugged into entities rather than stuffing all the options directly in the entity class
 

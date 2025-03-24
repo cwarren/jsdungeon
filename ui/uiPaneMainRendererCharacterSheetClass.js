@@ -79,7 +79,16 @@ class UIPaneMainRendererCharacterSheet extends UIPaneMainRenderer {
 
     // override
     getExplanationText() {
-        return "\nIt's a character sheet";
+        return "\n"
+        + "This screen shows detailed information about your avatar itself, not about and items or skills or anything like that.\n"
+        + "The first section shows how many advancement points you have to spend, and how many you have spent in the past.\n"
+        + "The next section shows your primary attributes. The specific meanings of those attributes are detailed below. "
+        + "At a high level, attributes are the intersection of Body, Mind, and Spirit with Power, Control, Resistance, and Recovery - this gives 12 primary attributes. "
+        + "These in turn drive the derived values such as Health Pool, Focus, Mojo (magic, miracle, mental, mystical), sight radius, and so on, as well as combat, skills, etc."
+        + "the basedline value for an attribute is 100. Higher is better, lower is worse.\n"
+        + "Recovery rates are given in terms of 't', which is game ticks. A typical action takes 100 ticks - '100t'. Distances, such as View Distance, are in terms of grid spaces.\n"
+        + EntityAttributes.getExplanationText()
+        + "\n";
     }
 }
 
