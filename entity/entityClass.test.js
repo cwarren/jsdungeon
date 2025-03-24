@@ -130,16 +130,42 @@ describe('Entity', () => {
         rollDice.mockReturnValue(100);
         attacker = new Entity(gameState, 'RAT_MALIGN');
         defender = new Entity(gameState, 'WORM_VINE');
-        attack = attacker.createAttack(defender);
       });
 
-      test('should die and remove entity from world', () => {
+      test('should die and remove entity from world and the entity repo', () => {
         entity.getDeathCredits = jest.fn(() => []);
         entity.placeAtCell(gameState.world[0].grid[5][6]);
         gameState.world[0].levelEntities = [entity];
+        expect(gameState.entityRepo.get(entity.id)).not.toBeNull();
+
         entity.die();
+
         expect(gameState.world[0].levelEntities).toEqual([]);
         expect(uiPaneMessages.addMessage).toHaveBeenCalledWith('Test Entity 1 dies');
+        expect(gameState.entityRepo.get(entity.id)).toBeNull();
+      });
+
+      test('purge given entity from damagedBy', () => {
+        defender.damagedBy.push({ "damageSource": entity, damageSourceType: 'Entity', "damage": new EffDamage(2) });
+        const attackerDamageBy = { "damageSource": attacker, damageSourceType: 'Entity', "damage": new EffDamage(1) };
+        defender.damagedBy.push(attackerDamageBy);
+        
+        defender.purgeEntityFromDamageTracking(entity);
+
+        expect(defender.damagedBy).toEqual([attackerDamageBy]);
+      });
+
+      test('on death should be purged from other entities damagedBy', () => {
+        entity.getDeathCredits = jest.fn(() => []);
+        entity.placeAtCell(gameState.world[0].grid[5][6]);
+        gameState.world[0].levelEntities = [entity];
+        expect(gameState.entityRepo.get(entity.id)).not.toBeNull();
+
+        defender.damagedBy.push({ "damageSource": entity, damageSourceType: 'Entity', "damage": new EffDamage(2) });
+
+        entity.die();
+
+        expect(defender.damagedBy).toEqual([]);
       });
 
       test('should calculate death credits correctly', () => {

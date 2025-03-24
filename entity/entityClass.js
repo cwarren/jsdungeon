@@ -248,6 +248,11 @@ class Entity {
       .map(damBy => damBy.damageSource);
   }
 
+  purgeEntityFromDamageTracking(entity) {
+    const purged = this.damagedBy.filter(damBy => damBy.damageSourceType != 'Entity' || damBy.damageSource.id != entity.id);
+    this.damagedBy = purged;
+  }
+
   dealWithAdjacentEntities() {
     const hostiles = [];
     const superHostiles = [];
@@ -596,6 +601,13 @@ class Entity {
     });
 
     this.gameState.world[this.location.z].removeEntity(this);
+    this.gameState.entityRepo.remove(this.id);
+
+    // once this entity is dead it doesn't get credit in the future for killing anything...
+    this.gameState.entityRepo.items.forEach((entity, entityId) => {
+      entity.purgeEntityFromDamageTracking(this);
+    });
+    
     uiPaneMessages.addMessage(`${this.name} dies`);
 
     this.damagedBy = [];

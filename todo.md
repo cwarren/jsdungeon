@@ -1,10 +1,6 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* on entity death, remove that entity from the repo
-* * and from avatar.damagedBy
-* * * ??? and from all entity.damagedBy in the repo? potential entity count scaling issues here, but maybe not big enough to worry about
-
 * add tests for these cases that had to be handled during save/load coding
 * * world level set game state - validate that the turn queue also has it set
 * * game state deserialize - validate that the avatar in the post-deserialize world level references the same object as gameState.avatar
@@ -27,15 +23,15 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * * * can't run while adjacent to entity
 * * * * can't sleep while adjacent to entity
 
-* extended messages
-* * keep a longer message buffer; small number of most recent are shown in message pane, but much larger set is saved and can be separately viewed
-* * add a UI mode to see longer messages
-
 * create a basic item class
-* create item definitions
+* * persistence / serializing support
+* create a few basic item definitions
 
 * create an item container class
 * * container constraints - volume & weight
+
+* items repository in game state
+* * persistence for items
 
 * give entities an inventory (at least, some of them)
 * give gridCells an optional inventory
@@ -45,6 +41,22 @@ PS E:\code\jsdungeon> docker-compose up --build
 * create a chest structure
 * * with an inventory
 * * implement structure interaction
+
+* inventory UI
+* * inventory screen
+* * * held by (avatar, structure, on floor, etc.)
+* * * stub out commands
+* * * * drop command
+* * * * examine command
+* * * * wear / wield command (does nothing for now)
+* * help screen for inventory
+* * pick up command to get an item in a grid cell
+* * when a grid cell has a single item, show that item
+* * when a grid cell has more than one item, render each on top of each other (don't really need special handling for an item pile... though might want a render limit if the list is huge)
+
+* extended messages
+* * keep a longer message buffer; small number of most recent are shown in message pane, but much larger set is saved and can be separately viewed
+* * add a UI mode to see longer messages
 
 * equipment
 * * slots
