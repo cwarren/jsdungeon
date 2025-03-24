@@ -13,7 +13,8 @@ describe("PersistLocalStorage", () => {
         };
     
         persist = new PersistLocalStorage(mockUiPaneMessages);
-        saveSlot = new SaveSlot("testSlot", {forSerializing: () => { return mockPersistencePlainObject; }});
+        // saveSlot = new SaveSlot("testSlot", {forSerializing: () => { return mockPersistencePlainObject; }});
+        saveSlot = persist.createSaveSlot("testSlot", {forSerializing: () => { return mockPersistencePlainObject; }});
         jest.spyOn(Storage.prototype, "setItem");
         jest.spyOn(Storage.prototype, "getItem");
         jest.spyOn(Storage.prototype, "removeItem");

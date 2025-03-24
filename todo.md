@@ -1,11 +1,21 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
+* do some thinking about save versioning
+* * probably add some version tracking, but postpone any fancy handling of different versions
+* * * beyond maybe filtering save slots to compatible versions
+* * make saveSlot creation a factory method in the persist class (this is the place to insert version info)
+* * * tests for that
+* * * update gameMetaActions to use that method instead of direct instantiation of save slot
+* * make persist getSaveSlots filter on the version
+
+* add UI handling for no-saves-found (and for only-older-version saves found)
+
 * on entity death, remove that entity from the repo
 * * and from avatar.damagedBy
 * * * ??? and from all entity.damagedBy in the repo? potential entity count scaling issues here, but maybe not big enough to worry about
 
-* add tests for
+* add tests for these cases that had to be handled during save/load coding
 * * world level set game state - validate that the turn queue also has it set
 * * game state deserialize - validate that the avatar in the post-deserialize world level references the same object as gameState.avatar
 * * game state deserialize - validate that the structure repo restoration correctly handles stairs vs generic structures

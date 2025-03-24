@@ -136,7 +136,7 @@ class GameState {
         }
     }
 
-    // NOTE: this is a slight misnomer - it mutates that data in otherGameState to point to this
+    // NOTE: this mutates the data in otherGameState to point to this
     copyFromOtherGameState(otherGameState) {
         devTrace(4, "copying game state from another game state", otherGameState);
 

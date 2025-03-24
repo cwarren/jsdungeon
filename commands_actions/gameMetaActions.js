@@ -1,7 +1,7 @@
 import { GameState, WORLD_LEVEL_SPECS_FOR_DEV } from "../gameStateClass.js";
 import { uiPaneMain, uiPaneMessages, uiPaneList } from "../ui/ui.js";
 import { PersistLocalStorage } from "../persist/persistLocalStorageClass.js";
-import { SaveSlot } from "../persist/saveSlotClass.js";
+// import { SaveSlot } from "../persist/saveSlotClass.js";
 
 let PERSIST = null; // this is set to new PersistLocalStorage(uiPaneMessages) on initial use - this avoids "Uncaught ReferenceError: Cannot access 'uiPaneMessages' before initialization"
 
@@ -51,7 +51,8 @@ function saveGame(gameState, key, event) {
             uiPaneMessages.addMessage('GAME NOT SAVED! Name your character to something other than Avatar before saving.');
             return 0;
         }
-        const saveSlot = new SaveSlot(slotName, gameState);
+        // const saveSlot = new SaveSlot(slotName, gameState);
+        const saveSlot = PERSIST.createSaveSlot(slotName, gameState);
         PERSIST.saveGame(saveSlot);
     } else {
         uiPaneMessages.ageMessages();

@@ -1,9 +1,11 @@
 // NOTE: this defines an interface; the are specific PersistX sub-classes that implement the details of particular persistence methods
+import { SaveSlot } from "./saveSlotClass.js";
 
 class Persist {
 
     constructor(messagePane) {
-        this.messagePane = messagePane
+        this.messagePane = messagePane;
+        this.saveVersion = "0.1"; // version of the persistence system
     }
 
     // takes: a save slot and a game state
@@ -31,6 +33,14 @@ class Persist {
     // returns: n/a
     deleteSavedGame(saveSlot) {
         // stub
+    }
+
+    //------------------------
+
+    createSaveSlot(saveName, gameState=null) {
+        // creates a new SaveSlot object with the given name and the current saveVersion
+        // returns: a new SaveSlot object
+        return new SaveSlot(saveName, this.saveVersion, gameState);
     }
 
     //------------------------
