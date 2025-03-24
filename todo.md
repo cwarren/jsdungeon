@@ -1,14 +1,6 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* add tests for these cases that had to be handled during save/load coding
-
-* * game state deserialize - validate that the avatar in the post-deserialize world level references the same object as gameState.avatar
-* * game state deserialize - validate that the structure repo restoration correctly handles stairs vs generic structures
-* * game state - add tests for copyFromOtherGameState
-* * * rename it to ingestOtherGameState to imply that it muck with the other game state
-* * * validate that copied things reference the correct gameState
-
 * create a help screen for the char sheet
 * * explain / summarize the character screen in general
 * * generate help text for attributes from info in EntityAttributes - add a getHelpText static method to that class

@@ -94,7 +94,7 @@ function loadGame(gameState, key, event) {
             }
             PERSIST.loadGame(saveSlot);
             saveSlot.gameState = GameState.deserialize(saveSlot.persistencePlainObject);
-            gameState.copyFromOtherGameState(saveSlot.gameState);
+            gameState.ingestOtherGameState(saveSlot.gameState);
 
             uiPaneMain.setGameState(gameState);
             uiPaneMain.resetUIState();

@@ -137,7 +137,7 @@ class GameState {
     }
 
     // NOTE: this mutates the data in otherGameState to point to this
-    copyFromOtherGameState(otherGameState) {
+    ingestOtherGameState(otherGameState) {
         devTrace(4, "copying game state from another game state", otherGameState);
 
         this.score =  otherGameState.score;

@@ -8,6 +8,7 @@ import { WorldLevelSpecification } from "./world/worldLevelSpecificationClass.js
 import { devTrace } from "./util.js";
 import { TurnQueue } from "./gameTime.js";
 import { uiPaneMain } from "./ui/ui.js";
+import { Stairs } from "./structure/stairsClass.js";
 
 jest.mock('./util.js', () => ({
     devTrace: jest.fn(),
@@ -123,6 +124,24 @@ describe("GameState Tests", () => {
         expect(gameState.avatar.unregisterPaneMiniChar).toHaveBeenCalled();
         expect(uiPaneMain.resetUIState).toHaveBeenCalled();
         expect(uiPaneMain.pushUIState).toHaveBeenCalled();
+    });
+
+    test("ingesting other game state should update gameState reference accordingly", () => {
+        gameState.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
+        gameState.avatar.unregisterPaneMiniChar = jest.fn();
+        gameState.avatar.registerPaneMiniChar = jest.fn();
+
+        const otherGameState = new GameState();
+        otherGameState.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
+        otherGameState.avatar.unregisterPaneMiniChar = jest.fn();
+        otherGameState.avatar.registerPaneMiniChar = jest.fn();
+
+        expect(otherGameState.avatar.gameState).not.toBe(gameState);
+
+        gameState.ingestOtherGameState(otherGameState);
+
+        expect(otherGameState.avatar.gameState).toBe(gameState);
+        expect(otherGameState.world[0].gameState).toBe(gameState);
     });
 
     describe("GameState - serialization", () => {
@@ -455,6 +474,13 @@ describe("GameState Tests", () => {
             expect(deserializedGameState.avatar.id).toBe("id-m8gaq511-to8i9-2");
             expect(deserializedGameState.avatar.timeOnLevel).toBe(120);
             expect(deserializedGameState.currentTurnQueue).toEqual(deserializedGameState.world[0].turnQueue);
+
+            // level entity avatar is referencing the same object as game state avatar
+            expect(deserializedGameState.world[0].levelEntities[1]).toBe(deserializedGameState.avatar);
+
+            // ensure stair structures are deserialized correctly
+            expect(deserializedGameState.structureRepo.get('id-m8gaq511-oab4j-1')).toBeInstanceOf(Stairs);
+
         });
     });
 });
