@@ -4,12 +4,11 @@ PS E:\code\jsdungeon> docker-compose up --build
 * do some thinking about save versioning
 * * probably add some version tracking, but postpone any fancy handling of different versions
 * * * beyond maybe filtering save slots to compatible versions
-* * make saveSlot creation a factory method in the persist class (this is the place to insert version info)
-* * * tests for that
-* * * update gameMetaActions to use that method instead of direct instantiation of save slot
 * * make persist getSaveSlots filter on the version
 
 * add UI handling for no-saves-found (and for only-older-version saves found)
+
+* add current level to mini-char info, and remove "this" from time on level text
 
 * on entity death, remove that entity from the repo
 * * and from avatar.damagedBy

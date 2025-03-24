@@ -11,6 +11,7 @@ describe('SaveSlot', () => {
         expect(slot.isSaved).toBe(false);
         expect(slot.timestampLastSaved).toBeNull();
         expect(slot.saveVersion).toBe("0.0");
+        expect(slot.errorMessage).toEqual('');
     });
 
     test('initializes with a save name and given gamestate', () => {
@@ -25,6 +26,7 @@ describe('SaveSlot', () => {
         expect(slot.isSaved).toBe(false);
         expect(slot.timestampLastSaved).toBeNull();
         expect(slot.saveVersion).toBe("0.1");
+        expect(slot.errorMessage).toEqual('');
     });
 });
 

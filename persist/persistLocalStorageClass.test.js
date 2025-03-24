@@ -1,6 +1,5 @@
 
 import { PersistLocalStorage } from "./persistLocalStorageClass.js";
-import { SaveSlot } from "./saveSlotClass.js";
 
 describe("PersistLocalStorage", () => {
     let persist, saveSlot;
@@ -13,7 +12,6 @@ describe("PersistLocalStorage", () => {
         };
     
         persist = new PersistLocalStorage(mockUiPaneMessages);
-        // saveSlot = new SaveSlot("testSlot", {forSerializing: () => { return mockPersistencePlainObject; }});
         saveSlot = persist.createSaveSlot("testSlot", {forSerializing: () => { return mockPersistencePlainObject; }});
         jest.spyOn(Storage.prototype, "setItem");
         jest.spyOn(Storage.prototype, "getItem");
@@ -40,18 +38,49 @@ describe("PersistLocalStorage", () => {
         );
 
         const savedData = JSON.parse(localStorage.setItem.mock.calls[0][1]);
+
         expect(savedData.name).toBe("testSlot");
         expect(savedData.data).toEqual(saveSlot.persistencePlainObject);
         expect(savedData.timestamp).toBeDefined();
+        expect(savedData.saveVersion).toBe(persist.saveVersion);
+
     });
 
     // ===========================
 
-    test("should load game from localStorage", () => {
+    test("should not load game from localStorage when save version is not compatible", () => {
         const savedState = {
             name: "testSlot",
             data: { level: 10, inventory: ["bow", "arrows"] },
             timestamp: Date.now(),
+            saveVersion: "bad save version",
+        };
+
+        localStorage.setItem("JSDungeonGameSave_testSlot", JSON.stringify(savedState));
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+        persist.loadGame(saveSlot);
+
+        expect(localStorage.getItem).toHaveBeenCalledWith("JSDungeonGameSave_testSlot");
+
+        expect(saveSlot.persistencePlainObject).toEqual({});
+        expect(saveSlot.isLoaded).toBe(false);
+        expect(saveSlot.errorMessage).not.toEqual('');
+
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+            expect.stringContaining(saveSlot.name),
+            expect.any(Error)
+        );
+    
+        consoleErrorSpy.mockRestore();
+    });
+
+    test("should load game from localStorage when save version is compatible", () => {
+        const savedState = {
+            name: "testSlot",
+            data: { level: 10, inventory: ["bow", "arrows"] },
+            timestamp: Date.now(),
+            saveVersion: persist.saveVersion,
         };
 
         localStorage.setItem("JSDungeonGameSave_testSlot", JSON.stringify(savedState));
@@ -60,17 +89,40 @@ describe("PersistLocalStorage", () => {
         expect(localStorage.getItem).toHaveBeenCalledWith("JSDungeonGameSave_testSlot");
         expect(saveSlot.persistencePlainObject).toEqual(savedState.data);
         expect(saveSlot.isLoaded).toBe(true);
+        expect(saveSlot.errorMessage).toEqual('');
     });
 
     // ===========================
 
-    test("should return a list of saved games", () => {
+    test("should not return save slots with incompatible save versions", () => {
         localStorage.setItem(
             "JSDungeonGameSave_testSlot",
             JSON.stringify({
                 name: "testSlot",
                 data: { level: 3 },
                 timestamp: Date.now(),
+                saveVersion: "bad save version",
+            })
+        );
+
+        jest.spyOn(Storage.prototype, "key").mockImplementation((index) => {
+            return index === 0 ? "JSDungeonGameSave_testSlot" : null;
+        });
+
+        const saves = persist.getSaveSlots();
+
+        expect(saves.length).toBe(0);
+    });
+
+
+    test("should return a list of saved games with compatible save versions", () => {
+        localStorage.setItem(
+            "JSDungeonGameSave_testSlot",
+            JSON.stringify({
+                name: "testSlot",
+                data: { level: 3 },
+                timestamp: Date.now(),
+                saveVersion: persist.saveVersion,
             })
         );
 

@@ -7,6 +7,7 @@ class SaveSlot {
         this.isSaved = false;
         this.timestampLastSaved = null;
         this.saveVersion = saveVersion;
+        this.errorMessage = '';
     }
 }
 
