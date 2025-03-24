@@ -8,7 +8,6 @@ class UIPaneMainRendererHelp extends UIPaneMainRenderer {
     constructor(ui, canvas) {
         super(ui, canvas);
         this.helpTextBlocks = {};
-        this.initializeHelpTextBlocks(keyBinding, actionMaps);
         this.currentHelpTextBlock = null;
     }
 
@@ -40,16 +39,14 @@ class UIPaneMainRendererHelp extends UIPaneMainRenderer {
         }
     }
 
-
-
     //=====================
 
-    initializeHelpTextBlocks(keyBindings, actionMaps) {
-        for (const commandSet in keyBindings) {
-            if (actionMaps[commandSet]) {
-                this.helpTextBlocks[commandSet] = new TextBlock(
-                    createHelpText(keyBindings[commandSet], actionMaps[commandSet], uiActionsMap)
-                );
+    initializeHelpTextBlocks() {
+            for (const commandSetIdentifier in keyBinding) {
+            if (actionMaps[commandSetIdentifier]) {
+                const commandHelpText = createHelpText(keyBinding[commandSetIdentifier], actionMaps[commandSetIdentifier], uiActionsMap);
+                const additionHelpInfo = this.ui.renderers[commandSetIdentifier].getExplanationText();
+                this.helpTextBlocks[commandSetIdentifier] = new TextBlock(commandHelpText + additionHelpInfo);
             }
         }
     }

@@ -1,9 +1,10 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* create a help screen for the char sheet
-* * explain / summarize the character screen in general
-* * generate help text for attributes from info in EntityAttributes - add a getHelpText static method to that class
+* explain / summarize the character screen in general
+* * fill out getExplanationText in UIPaneMainRendererCharacterSheet
+* * * add some general info
+* * * generate help text for attributes from info in EntityAttributes - add a getHelpText static method to that class
 
 * messages
 * * for gaining advancement points

@@ -52,6 +52,11 @@ class UIPaneMainRenderer {
         // sub-class overrides, leading with super();
     }
 
+    // this is used to provide screen-specific help information beyond just the commands the screen supports
+    getExplanationText() {
+        // sub-class overrides
+        return '';
+    }
 }
 
 export { UIPaneMainRenderer };

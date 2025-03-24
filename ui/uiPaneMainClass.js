@@ -30,6 +30,7 @@ class UIPaneMain {
             "MAP_SCREEN": new UIPaneMainRendererMapScreen(this, this.canvas),
             "PROSE_SECTION": new UIPaneMainRendererProseSection(this, this.canvas),
         };
+        this.renderers['HELP'].initializeHelpTextBlocks();
     }
 
     setGameState(gameState) {

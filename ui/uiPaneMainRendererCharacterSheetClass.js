@@ -76,6 +76,11 @@ class UIPaneMainRendererCharacterSheet extends UIPaneMainRenderer {
     }
 
     //=====================
+
+    // override
+    getExplanationText() {
+        return "\nIt's a character sheet";
+    }
 }
 
 export { UIPaneMainRendererCharacterSheet };
