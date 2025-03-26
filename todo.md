@@ -2,7 +2,6 @@ to start server:
 PS E:\code\jsdungeon> docker-compose up --build
 
 * messages
-* * for gaining advancement points
 * * in gameActions, replace console.log with message pane messages... or just remove them
 * * * for blocked actions / commands, with why
 * * * * stairs don't exists

@@ -1,5 +1,5 @@
 import { Entity, DEFAULT_ACTION_COST } from "./entityClass.js";
-import { devTrace, rollDice } from "../util.js";
+import { devTrace, rollDice, formatNumberForMessage } from "../util.js";
 import { EffDamage } from "../effect/effDamageClass.js";
 import { EffGenDamage } from "../effect/effGenDamageClass.js";
 import { uiPaneMessages } from "../ui/ui.js";
@@ -9,7 +9,6 @@ import { EntityLocation } from "./entityLocationClass.js";
 import { EntityMovement } from "./entityMovementClass.js";
 import { EntityVision } from "./entityVisionClass.js";
 import { EntityAttributes } from "./entityAttributesClass.js";
-
 
 class Avatar extends Entity {
   constructor(gameState, id = null) {
@@ -142,6 +141,8 @@ class Avatar extends Entity {
   receiveAdvancementPoints(points) {
     super.receiveAdvancementPoints(points);
     this.updateMiniChar();
+    uiPaneMessages.addMessage(`${this.name} gets ${formatNumberForMessage(points)} advancement points`);
+
   }
 
   takeDamageFrom(dam, otherEntity) {
