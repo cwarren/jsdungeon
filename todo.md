@@ -1,15 +1,6 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* messages
-* * in gameActions, replace console.log with message pane messages... or just remove them
-* * * for blocked actions / commands, with why
-* * * * stairs don't exists
-* * * * wall in the way
-* * * * can't run while adjacent to stairs
-* * * * can't run while adjacent to entity
-* * * * can't sleep while adjacent to entity
-
 * create a basic item class
 * * persistence / serializing support
 * create a few basic item definitions

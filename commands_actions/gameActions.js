@@ -1,5 +1,5 @@
 // import { DEFAULT_ACTION_COST } from "../entity/entityClass.js";
-import { uiPaneMain } from "../ui/ui.js";
+import { uiPaneMain, uiPaneMessages } from "../ui/ui.js";
 import { devTrace } from "../util.js";
 
 
@@ -85,15 +85,13 @@ function ascendStairs(gameState, key, event) {
     const curCell = gameState.getAvatarCell();
     const stairsUp = curCell.structure;
     if (stairsUp && stairsUp.type == "STAIRS_UP") {
-        console.log("going up stairs");
         curCell.worldLevel.removeEntity(gameState.avatar);
         gameState.currentLevel--;
         const newCell = stairsUp.connectsTo.getCell();
         newCell.worldLevel.handleAvatarEnteringLevel(newCell);
     } else {
-        console.log("cannot ascend - no stairs up");
+        uiPaneMessages.addMessage("Cannot ascend - no stairs up here");
     }
-    console.log("gameState after ascending", gameState);
     return gameState.avatar.baseActionTime;
 }
 
@@ -102,7 +100,6 @@ function descendStairs(gameState, key, event) {
     const curCell = gameState.getAvatarCell();
     const stairsDown = curCell.structure;
     if (stairsDown && stairsDown.type == "STAIRS_DOWN") {
-        console.log("going down stairs");
         curCell.worldLevel.removeEntity(gameState.avatar);
         gameState.currentLevel++;
         const lowerWorldLevel = gameState.world[gameState.currentLevel]
@@ -112,9 +109,8 @@ function descendStairs(gameState, key, event) {
         const newCell = stairsDown.connectsTo.getCell();
         newCell.worldLevel.handleAvatarEnteringLevel(newCell);
     } else {
-        console.log("cannot descend - no stairs down");
+        uiPaneMessages.addMessage("Cannot descend - no stairs down here");
     }
-    console.log("gameState after descending", gameState);
     return gameState.avatar.baseActionTime;
 }
 

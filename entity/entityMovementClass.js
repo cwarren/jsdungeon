@@ -1,6 +1,7 @@
 import { devTrace, getRandomListItem } from "../util.js";
 import { GridCell } from "../world/gridCellClass.js";
 import { getRandomCellOfTerrainInGrid, determineCheapestMovementPathForEntity, computeBresenhamLine } from "../world/gridUtils.js";
+import { uiPaneMessages } from "../ui/ui.js";
 
 const DEFAULT_MOVEMENT_ACTION_COST = 100;
 const DEFAULT_MOVEMENT_SPEC = { movementType: "STATIONARY", baseMovementTime: DEFAULT_MOVEMENT_ACTION_COST };
@@ -18,6 +19,13 @@ class EntityMovement {
         this.isSleeping = false;
     }
 
+    // UI METHODS
+    messageAvatar(msg) {
+        if (this.ofEntity.type == 'AVATAR') {
+            uiPaneMessages.addMessage(msg);
+        }
+    }
+
     // MOVEMENT METHODS
 
     tryMove(dx, dy) {
@@ -30,7 +38,7 @@ class EntityMovement {
         if (targetCell.entity) {
             return this.ofEntity.handleAttemptedMoveIntoOccupiedCell(targetCell);
         } else {
-            // TODO: add message to message pane about not being able to move into a wall (or other non-traversable terrain)
+            this.messageAvatar(`You cannot move there because it's not traversible`);
             console.log(`move prevented because target cell is not traversable: ${targetCell.terrain} at ${targetCell.x} ${targetCell.y} ${targetCell.z}`);
             return 0;
         }
@@ -76,7 +84,7 @@ class EntityMovement {
         // cannot sleep if already at max health
         if (this.ofEntity.health.curHealth >= this.ofEntity.health.maxHealth) {
             devTrace(6, `${this.ofEntity.type} is already at max health and does not need to sleep`, this.ofEntity);
-            // TODO: add message to message pane about not sleeping when already at full health
+            this.messageAvatar(`You cannot sleep because you're already at full health`);
             return false;
         }
 
@@ -87,7 +95,7 @@ class EntityMovement {
                 const relation = this.ofEntity.getRelationshipTo(cell.entity);
                 if (relation === "HOSTILE_TO" || relation === "VIOLENT_TO") {
                     devTrace(6, `${this.ofEntity.type} cannot sleep due to ${cell.entity.type} ${relation} it`, this.ofEntity, cell.entity);
-                    // TODO: add message to message pane about not sleeping when dangerous entity is close by
+                    this.messageAvatar(`You cannot sleep because there's danger nearby`);
                     return false;
                 }
             }
@@ -118,11 +126,13 @@ class EntityMovement {
 
     startSleeping() {
         devTrace(5, `${this.ofEntity.type} is starting to sleep`, this.ofEntity);
+        this.messageAvatar('You fall asleep.')
         this.isSleeping = true;
     }
 
     stopSleeping() {
         devTrace(5, `${this.ofEntity.type} stopped sleeping`, this.ofEntity);
+        this.messageAvatar('You wake up.')
         this.isSleeping = false;
     }
 
@@ -138,11 +148,20 @@ class EntityMovement {
         // if the destination can be moved to, there are still other conditions that may interrupt running
         // NOTE: taking damage will also stop running, though that's handled in the damage taking method
         const adjacentCells = this.location.getCell().getAdjacentCells();
-        const hasAdjacentInterrupt = adjacentCells.some(cell =>
-            !(cell.structure === undefined || cell.structure == null) ||  // stop if adjacent to a structure
+        const hasAdjacentStructure = adjacentCells.some(cell =>
+            !(cell.structure === undefined || cell.structure == null)  // stop if adjacent to a structure
+        );
+        if (hasAdjacentStructure) { 
+            this.messageAvatar("You stop running because you're next to a structure of some sort.")
+            return false;
+        }
+        const hasAdjacentEntity = adjacentCells.some(cell =>
             !(cell.entity === undefined || cell.entity == null) // stop if adjacent to a mob
         );
-        if (hasAdjacentInterrupt) { return false; }
+        if (hasAdjacentEntity) { 
+            this.messageAvatar("You stop running because you're next to a creature of some sort.")
+            return false;
+        }
 
         // TODO: add check to stop running when at a corner
 
