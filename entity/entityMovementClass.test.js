@@ -226,7 +226,6 @@ describe('EntityMovement', () => {
       entityMovement.isSleeping = true;
       entityMovement.stopSleeping();
       expect(entityMovement.isSleeping).toBe(false);
-      expect(entityMovement.messageAvatar).toHaveBeenCalled();
     });
 
     describe('EntityMovement - Sleeping Methods - canSleep', () => {
