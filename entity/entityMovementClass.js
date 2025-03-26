@@ -132,7 +132,6 @@ class EntityMovement {
 
     stopSleeping() {
         devTrace(5, `${this.ofEntity.type} stopped sleeping`, this.ofEntity);
-        this.messageAvatar('You wake up.')
         this.isSleeping = false;
     }
 
