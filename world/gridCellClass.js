@@ -1,3 +1,5 @@
+import { ItemIdContainer } from "../item/itemIdContainerClass";
+
 class GridCell {
     static TYPES = {
         FLOOR: { terrain: "FLOOR", isTraversible: true, entryMovementCost: 10, isOpaque: false, color: "#888" },
@@ -45,17 +47,26 @@ class GridCell {
         this.structure = null;
         this.entity = null;
         this.worldLevel = null;
+        this.inventory = null;
     }
 
     forSerializing() {
-        return {
+        const plainObject = {
             terrain: this.terrain,
             x: this.x,
             y: this.y,
             z: this.z,
-            structure: this.structure ? this.structure.id : null,
-            entity: this.entity ? this.entity.id : null,
         };
+        if (this.structure) { 
+            plainObject['structure'] = this.structure.id; 
+        }  
+        if (this.entity) {  
+            plainObject['entity'] = this.entity.id; 
+        }  
+        if (this.inventory) {
+            plainObject['inventory'] = this.inventory.forSerializing();
+        }
+        return plainObject;
     }
 
     serialize() {
@@ -66,6 +77,7 @@ class GridCell {
         const gridCell = GridCell.createAttached(data.x, data.y, worldLevel, data.terrain);
         if (data.structure) { gridCell.structure = worldLevel.gameState.structureRepo.get(data.structure); }
         if (data.entity) { gridCell.entity = worldLevel.gameState.entityRepo.get(data.entity); }
+        if (data.inventory) { gridCell.inventory = ItemIdContainer.deserialize(data.inventory); }
         return gridCell;  
     }
 
