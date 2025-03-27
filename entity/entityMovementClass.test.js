@@ -27,6 +27,7 @@ jest.mock('../util.js', () => ({
   valueCalc: jest.requireActual('../util.js').valueCalc,
   getRandomListItem: jest.fn(),
   generateId: jest.requireActual('../util.js').generateId,
+  idOf: jest.requireActual('../util.js').idOf,
 }));
 
 jest.mock('../ui/ui.js', () => ({

@@ -2,10 +2,6 @@ to start server:
 PS E:\code\jsdungeon> docker-compose up --build
 
 * give gridCells an optional inventory
-* * construct as null
-* * serialize
-* * * forSerializing - skip if inven is null
-* * * deserialize - only set if data is there
 * * add a couple of test rocks on level gen (similar to entity population)
 * * draw gridCell inventory when gridCell is drawn
 
@@ -179,3 +175,4 @@ LONG TERM
 * split into FE & BE, so the game mechanics are handled server-side
 * deploy to AWS
 * player account system?
+* maybe implement mix-in support so that things like inventory interaction methods can be de-duped (e.g. Entity, GridCell, ContainerStructure, and ContainerItem all have inventories)

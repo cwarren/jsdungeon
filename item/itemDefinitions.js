@@ -2,7 +2,7 @@ import { EffGenDamage } from "../effect/effGenDamageClass.js";
 
 const ITEM_DEFINITIONS = [
   {
-    type: "ROCK", name: "Rock", displaySymbol: ".", displayColor: "#fff",
+    type: "ROCK", name: "Rock", displaySymbol: "*", displayColor: "#fff",
   },
 ];
 

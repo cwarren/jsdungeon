@@ -17,6 +17,7 @@ jest.mock('./util.js', () => ({
     valueCalc: jest.requireActual('./util.js').valueCalc,
     formatNumberForMessage: jest.fn(() => '10'),
     generateId: jest.requireActual('./util.js').generateId,
+    idOf: jest.requireActual('./util.js').idOf,
 }));
 
 jest.mock('./ui/ui.js', () => ({

@@ -28,12 +28,14 @@ import { uiPaneMessages, uiPaneInfo } from "../ui/ui.js";
 import { WorldLevelSpecification } from './worldLevelSpecificationClass.js';
 import { Repository } from '../repositoryClass.js';
 import { GridCell } from './gridCellClass.js';
+import { Item } from '../item/itemClass.js';
 
 jest.mock('../util.js', () => ({
   devTrace: jest.fn(),
   // devTrace: jest.requireActual('../util.js').devTrace,
   constrainValue: jest.fn((value, min, max) => Math.max(min, Math.min(max, value))),
   generateId: jest.requireActual('../util.js').generateId,
+  idOf: jest.requireActual('../util.js').idOf,
 }));
 
 jest.mock('./gridGeneration', () => ({
@@ -52,8 +54,13 @@ jest.mock('./gridGeneration', () => ({
   generateGrid_puddles: jest.fn(() => []),
 }));
 
+const mockCell = GridCell.createDetached();
+mockCell.x = 0;
+mockCell.y = 0;
+mockCell.z = 0;
+
 jest.mock('./gridUtils', () => ({
-  getRandomEmptyCellOfTerrainInGrid: jest.fn(() => ({ x: 0, y: 0, z: 0, entity: null, isTraversible: true })),
+  getRandomEmptyCellOfTerrainInGrid: jest.fn(() => (mockCell)),
   determineCellViewability: jest.fn(),
 }));
 
@@ -90,6 +97,7 @@ describe('WorldLevel', () => {
       world: [],
       structureRepo: new Repository('stru'),
       entityRepo: new Repository('ent'),
+      itemRepo: new Repository('items'),
     };
     worldLevel = new WorldLevel(gameState, 0, 10, 10, 'EMPTY');
     gameState.world[0] = worldLevel; // Add the world level to the gameState's world array
@@ -121,7 +129,7 @@ describe('WorldLevel', () => {
     expect(worldLevel.gameState).toBe(gameState);
     expect(worldLevel.turnQueue.gameState).toBe(gameState);
 
-    const mockNewGameState = {data: 'super shallow mocked game state'};
+    const mockNewGameState = { data: 'super shallow mocked game state' };
 
     worldLevel.setGameState(mockNewGameState);
 
@@ -148,66 +156,89 @@ describe('WorldLevel', () => {
     expect(worldLevel.grid[0][0].z).toBe(worldLevel.levelNumber);
   });
 
-  test('should populate level with entities', () => {
+  test('should populate level with entities and items', () => {
     worldLevel.placeEntityRandomly = jest.fn();
+    worldLevel.placeItemRandomly = jest.fn();
     worldLevel.populate();
     expect(worldLevel.placeEntityRandomly).toHaveBeenCalled();
+    expect(worldLevel.placeItemRandomly).toHaveBeenCalled();
   });
 
-  test('should place entity randomly', () => {
-    const entity = new Entity(gameState, 'RAT_INSIDIOUS');
-    worldLevel.addEntity = jest.fn();
-    worldLevel.placeEntityRandomly(entity);
-    expect(getRandomEmptyCellOfTerrainInGrid).toHaveBeenCalledWith('FLOOR', worldLevel.grid);
-    expect(worldLevel.addEntity).toHaveBeenCalledWith(entity, { x: 0, y: 0, z: 0, entity: null, isTraversible: true });
+  describe('WorldLevel - entities', () => {
+
+    test('should place entity randomly', () => {
+      const entity = new Entity(gameState, 'RAT_INSIDIOUS');
+      worldLevel.addEntity = jest.fn();
+      worldLevel.placeEntityRandomly(entity);
+      expect(getRandomEmptyCellOfTerrainInGrid).toHaveBeenCalledWith('FLOOR', worldLevel.grid);
+      expect(worldLevel.addEntity).toHaveBeenCalledWith(entity, mockCell);
+    });
+
+    test('should add entity to level', () => {
+      jest.spyOn(worldLevel.turnQueue, 'addEntity');
+
+      const entity = new Entity(gameState, 'RAT_INSIDIOUS');
+      worldLevel.addEntity(entity);
+
+      expect(worldLevel.levelEntities).toContain(entity);
+      expect(entity.placeAtCell).toHaveBeenCalled();
+      expect(worldLevel.turnQueue.addEntity).toHaveBeenCalledWith(entity);
+    });
+
+    test('should add entity at beginning of turn queue', () => {
+      jest.spyOn(worldLevel.turnQueue, 'addEntityAtBeginningOfTurnQueue');
+      const entity = new Entity(gameState, 'RAT_INSIDIOUS');
+      worldLevel.addEntityAtBeginningOfTurnQueue(entity);
+      expect(worldLevel.levelEntities).toContain(entity);
+      expect(entity.placeAtCell).toHaveBeenCalled();
+      expect(worldLevel.turnQueue.addEntityAtBeginningOfTurnQueue).toHaveBeenCalledWith(entity);
+    });
+
+    test('should remove entity from level', () => {
+      jest.spyOn(worldLevel.turnQueue, 'removeEntity');
+
+      const entity = new Entity(gameState, 'RAT_INSIDIOUS');
+      worldLevel.levelEntities.push(entity);
+      worldLevel.removeEntity(entity);
+
+      expect(worldLevel.levelEntities).not.toContain(entity);
+      expect(worldLevel.turnQueue.removeEntity).toHaveBeenCalledWith(entity);
+    });
+
   });
 
-  test('should add entity to level', () => {
-    jest.spyOn(worldLevel.turnQueue, 'addEntity'); 
+  describe('WorldLevel - items', () => {
+    test('should place item randomly in level', () => {
+      const item = new Item('ROCK');
+      worldLevel.addItem = jest.fn();
 
-    const entity = new Entity(gameState, 'RAT_INSIDIOUS');
-    worldLevel.addEntity(entity);
+      worldLevel.placeItemRandomly(item);
 
-    expect(worldLevel.levelEntities).toContain(entity);
-    expect(entity.placeAtCell).toHaveBeenCalled();
-    expect(worldLevel.turnQueue.addEntity).toHaveBeenCalledWith(entity);
+      expect(getRandomEmptyCellOfTerrainInGrid).toHaveBeenCalledWith('FLOOR', worldLevel.grid);
+      expect(worldLevel.addItem).toHaveBeenCalledWith(item, mockCell);
+    });
   });
 
-  test('should add entity at beginning of turn queue', () => {
-    jest.spyOn(worldLevel.turnQueue, 'addEntityAtBeginningOfTurnQueue'); 
-    const entity = new Entity(gameState, 'RAT_INSIDIOUS');
-    worldLevel.addEntityAtBeginningOfTurnQueue(entity);
-    expect(worldLevel.levelEntities).toContain(entity);
-    expect(entity.placeAtCell).toHaveBeenCalled();
-    expect(worldLevel.turnQueue.addEntityAtBeginningOfTurnQueue).toHaveBeenCalledWith(entity);
-  });
 
-  test('should remove entity from level', () => {
-    jest.spyOn(worldLevel.turnQueue, 'removeEntity'); 
+  describe('WorldLevel - structures', () => {
 
-    const entity = new Entity(gameState, 'RAT_INSIDIOUS');
-    worldLevel.levelEntities.push(entity);
-    worldLevel.removeEntity(entity);
+    test('should add stairs down', () => {
+      worldLevel.addStairsDown();
+      expect(getRandomEmptyCellOfTerrainInGrid).toHaveBeenCalledWith('FLOOR', worldLevel.grid);
+      expect(worldLevel.stairsDown).toBeInstanceOf(Structure);
+      expect(worldLevel.levelStructures).toContain(worldLevel.stairsDown);
+    });
 
-    expect(worldLevel.levelEntities).not.toContain(entity);
-    expect(worldLevel.turnQueue.removeEntity).toHaveBeenCalledWith(entity);
-  });
+    test('should add stairs up and connect to stairs down', () => {
+      const stairsDown = new Stairs(worldLevel, 0, 0, 1, 'STAIRS_DOWN', '>');
+      worldLevel.addStairsUpTo(stairsDown);
+      expect(getRandomEmptyCellOfTerrainInGrid).toHaveBeenCalledWith('FLOOR', worldLevel.grid);
+      expect(worldLevel.stairsUp).toBeInstanceOf(Structure);
+      expect(worldLevel.levelStructures).toContain(worldLevel.stairsUp);
+      expect(stairsDown.connectsTo).toBe(worldLevel.stairsUp);
+      expect(worldLevel.stairsUp.connectsTo).toBe(stairsDown);
+    });
 
-  test('should add stairs down', () => {
-    worldLevel.addStairsDown();
-    expect(getRandomEmptyCellOfTerrainInGrid).toHaveBeenCalledWith('FLOOR', worldLevel.grid);
-    expect(worldLevel.stairsDown).toBeInstanceOf(Structure);
-    expect(worldLevel.levelStructures).toContain(worldLevel.stairsDown);
-  });
-
-  test('should add stairs up and connect to stairs down', () => {
-    const stairsDown = new Stairs(worldLevel, 0, 0, 1, 'STAIRS_DOWN', '>');
-    worldLevel.addStairsUpTo(stairsDown);
-    expect(getRandomEmptyCellOfTerrainInGrid).toHaveBeenCalledWith('FLOOR', worldLevel.grid);
-    expect(worldLevel.stairsUp).toBeInstanceOf(Structure);
-    expect(worldLevel.levelStructures).toContain(worldLevel.stairsUp);
-    expect(stairsDown.connectsTo).toBe(worldLevel.stairsUp);
-    expect(worldLevel.stairsUp.connectsTo).toBe(stairsDown);
   });
 
   test('should track avatar departure time', () => {
@@ -223,7 +254,7 @@ describe('WorldLevel', () => {
 
     const entryCell = { x: 0, y: 0, z: 0 };
     worldLevel.handleAvatarEnteringLevel(entryCell);
-    
+
     expect(constrainValue).toHaveBeenCalledWith(0, 0, DEFAULT_ACTION_COST * 100);
     expect(gameState.avatar.resetTimeOnLevel).toHaveBeenCalled();
     expect(gameState.setTurnQueue).toHaveBeenCalledWith(worldLevel.turnQueue);
@@ -237,18 +268,18 @@ describe('WorldLevel', () => {
 
   describe('WorldLevel Serialization', () => {
     let mockEntity1;
-    let mockEntity2; 
+    let mockEntity2;
     let mockStructure1;
     let mockStructure2;
 
     beforeEach(() => {
-      mockEntity1 = { id: 'entity-1' }; 
+      mockEntity1 = { id: 'entity-1' };
       mockEntity2 = { id: 'entity-2' };
       gameState.entityRepo.add(mockEntity1);
       gameState.entityRepo.add(mockEntity2);
 
       mockStructure1 = { id: 'structure-1', connectsTo: 'structure-2', setWorldLevel: jest.fn(), reconnect: jest.fn() };
-      mockStructure2 = { id: 'structure-2',  connectsTo: 'structure-1', setWorldLevel: jest.fn(), reconnect: jest.fn() };
+      mockStructure2 = { id: 'structure-2', connectsTo: 'structure-1', setWorldLevel: jest.fn(), reconnect: jest.fn() };
       gameState.structureRepo.add(mockStructure1);
       gameState.structureRepo.add(mockStructure2);
 
@@ -274,8 +305,8 @@ describe('WorldLevel', () => {
       expect(serializedData.turnQueue).toEqual(worldLevel.turnQueue.forSerializing());
       expect(serializedData.timeOfAvatarDeparture).toEqual(42);
 
-      expect(serializedData.grid.length).toEqual(worldLevel.levelWidth*worldLevel.levelHeight);
-      expect(serializedData.grid[0]).toEqual(expect.objectContaining({ terrain: 'FLOOR', x: 0, y: 0, z: 0, structure: null, entity: null }));
+      expect(serializedData.grid.length).toEqual(worldLevel.levelWidth * worldLevel.levelHeight);
+      expect(serializedData.grid[0]).toEqual(expect.objectContaining({ terrain: 'FLOOR', x: 0, y: 0, z: 0 }));
     });
 
     test('should correctly deserialize WorldLevel from serialized data', () => {

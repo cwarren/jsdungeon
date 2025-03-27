@@ -7,6 +7,7 @@ jest.mock('../util.js', () => ({
     rollDice: jest.requireActual('../util.js').rollDice,
     valueCalc: jest.requireActual('../util.js').valueCalc,
     generateId: jest.requireActual('../util.js').generateId,
+    idOf: jest.requireActual('../util.js').idOf,
 }));
 
 const WORLD_LEVEL_SPECS_FOR_TESTING= [

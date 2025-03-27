@@ -25,8 +25,10 @@ import { TurnQueue } from "../gameTime.js";
 import { Entity, DEFAULT_ACTION_COST } from "../entity/entityClass.js";
 import { uiPaneMessages, uiPaneInfo } from "../ui/ui.js";
 import { GridCell } from "./gridCellClass.js";
+import { Item } from "../item/itemClass.js";
 
 const MAX_ENTITY_PLACEMENT_ATTEMPTS = 20;
+const MAX_ITEM_PLACEMENT_ATTEMPTS = 20;
 const MAX_TIME_AWAY_TO_CARE_ABOUT = DEFAULT_ACTION_COST * 100;
 
 class WorldLevel {
@@ -205,6 +207,36 @@ class WorldLevel {
             const ent = new Entity(this.gameState, "RAT_INSIDIOUS");
             this.placeEntityRandomly(ent);
         }
+
+        // TODO: real item population (just a couple of rocks for now)
+        for (let i = 0; i < 2; i++) {
+            const item = Item.makeItem("ROCK");
+            this.gameState.itemRepo.add(item);
+            this.placeItemRandomly(item);
+        }
+    }
+
+    placeItemRandomly(item, avoidCellSet = null) {
+        devTrace(3, `placing item ${item.type} randomly in world level`, this, item, avoidCellSet);
+        let possiblePlacementCell = getRandomEmptyCellOfTerrainInGrid("FLOOR", this.grid);
+        let placementAttempts = 1;
+        if (avoidCellSet) {
+            while (avoidCellSet.has(possiblePlacementCell) && (placementAttempts < MAX_ITEM_PLACEMENT_ATTEMPTS)) {
+                possiblePlacementCell = getRandomEmptyCellOfTerrainInGrid("FLOOR", this.grid);
+                placementAttempts++;
+            }
+        }
+        if (placementAttempts >= MAX_ITEM_PLACEMENT_ATTEMPTS) {
+            console.log("could not place item in world level - placement attempts exceed max placement attempts");
+        } else {
+            this.addItem(item, possiblePlacementCell);
+        }
+    }
+
+    addItem(item, targetCell) {
+        // console.log("add item targetCell", targetCell);
+        devTrace(3, `adding item ${item.type} to a world level at ${targetCell.x} ${targetCell.y} ${targetCell.z}`, this);
+        targetCell.giveItem(item);
     }
 
     placeEntityRandomly(entity, avoidCellSet) {

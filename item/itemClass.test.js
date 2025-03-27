@@ -19,7 +19,7 @@ describe('Item', () => {
         expect(item.id).toBe('custom-id-001');
         expect(item.type).toBe('ROCK');
         expect(item.name).toBe('Rock');
-        expect(item.displaySymbol).toBe('.');
+        expect(item.displaySymbol).toBe('*');
         expect(item.displayColor).toBe('#fff');
     });
 
@@ -75,7 +75,7 @@ describe('Item', () => {
                 id: 'restored-1',
                 type: 'ROCK',
                 name: 'Restored Rock',
-                displaySymbol: '*',
+                displaySymbol: ',',
                 displayColor: '#0f0',
             };
 
@@ -85,7 +85,7 @@ describe('Item', () => {
             expect(item.id).toBe('restored-1');
             expect(item.type).toBe('ROCK'); // taken from getItemDef
             expect(item.name).toBe('Restored Rock'); // overridden
-            expect(item.displaySymbol).toBe('*');
+            expect(item.displaySymbol).toBe(',');
             expect(item.displayColor).toBe('#0f0');
         });
 
