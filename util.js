@@ -132,6 +132,13 @@ function generateId(prefix = "id") {
     return `${prefix}-${timestamp}-${randomPart}-${counter}`;
 }
 
+function idOf(itemObjectOrId) {
+    if (typeof itemObjectOrId === 'object' && itemObjectOrId !== null) {
+        return itemObjectOrId.id;
+    }
+    return itemObjectOrId;
+}
+
 export {
     rollDice,
     rollDiceGroup,
@@ -144,4 +151,5 @@ export {
     formatNumberForMessage,
     formatNumberForShortDisplay,
     generateId,
+    idOf
 };

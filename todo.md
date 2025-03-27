@@ -1,10 +1,6 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* create a basic item class
-* * persistence / serializing support
-* create a few basic item definitions
-
 * create an item container class
 * * container constraints - volume & weight
 

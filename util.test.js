@@ -9,6 +9,7 @@ import {
     constrainValue,
     createHelpText,
     generateId,
+    idOf,
 } from './util';
 
 describe('devTrace', () => {
@@ -265,6 +266,20 @@ describe("generateId", () => {
             ids.add(generateId());
         }
         expect(ids.size).toBe(100); // Ensures all IDs are unique
+    });
+});
+
+describe('idOf', () => {
+    test('should return the orig value when passed a non-object', () => {
+        const res = idOf('a-plain-id');
+
+        expect(res).toEqual('a-plain-id');
+    });
+
+    test('should return the object when passed an object', () => {
+        const res = idOf({id: 'an-object-id'});
+
+        expect(res).toEqual('an-object-id');
     });
 });
 
