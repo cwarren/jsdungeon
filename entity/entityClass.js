@@ -9,6 +9,7 @@ import { EntityVision } from "./entityVisionClass.js";
 import { Attack } from "../effect/attackClass.js";
 import { EntityAttributes } from "./entityAttributesClass.js";
 import { ValueModifier, ModifierLayer } from "../valueModifierClass.js";
+import { ItemIdContainer } from "../item/itemIdContainerClass.js";
 
 const DEFAULT_ACTION_COST = 100;
 
@@ -50,6 +51,8 @@ class Entity {
 
     this.actionStartingTime = 0;
 
+    this.inventory = null;
+
     this.gameState.entityRepo.add(this);
   }
 
@@ -79,7 +82,8 @@ class Entity {
       })),
       baseKillPoints: this.baseKillPoints,
       currentAdvancementPoints: this.currentAdvancementPoints,
-      actionStartingTime: this.actionStartingTime
+      actionStartingTime: this.actionStartingTime,
+      inventory: this.inventory ? this.inventory.forSerializing() : null,
     };
   }
 
@@ -109,6 +113,11 @@ class Entity {
     entity.baseKillPoints = data.baseKillPoints;
     entity.currentAdvancementPoints = data.currentAdvancementPoints;
     entity.actionStartingTime = data.actionStartingTime;
+
+    entity.inventory = null;
+    if (data.inventory && data.inventory.length > 0) {
+      entity.inventory = ItemIdContainer.deserialize(data.inventory);
+    }
 
     return entity;
   }
@@ -607,7 +616,7 @@ class Entity {
     this.gameState.entityRepo.items.forEach((entity, entityId) => {
       entity.purgeEntityFromDamageTracking(this);
     });
-    
+
     uiPaneMessages.addMessage(`${this.name} dies`);
 
     this.damagedBy = [];

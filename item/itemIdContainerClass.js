@@ -1,4 +1,4 @@
-import { idOf } from "../util";
+import { idOf } from "../util.js";
 
 class ItemIdContainer {
     constructor(itemList = []) {

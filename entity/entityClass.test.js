@@ -11,6 +11,7 @@ import { EffGenDamage } from '../effect/effGenDamageClass.js';
 import { EffDamage } from '../effect/effDamageClass.js';
 import { Attack } from '../effect/attackClass.js';
 import { Repository } from '../repositoryClass.js';
+import { ItemIdContainer } from '../item/itemIdContainerClass.js';
 
 // NOTE: many of these tests are more integration tests than unit tests
 
@@ -19,6 +20,7 @@ jest.mock('../util.js', () => ({
   constrainValue: jest.requireActual('../util.js').constrainValue,
   formatNumberForMessage: jest.requireActual('../util.js').formatNumberForMessage,
   generateId: jest.requireActual('../util.js').generateId,
+  idOf: jest.requireActual('../util.js').idOf,
   devTrace: jest.fn(),
 }));
 
@@ -80,6 +82,7 @@ describe('Entity', () => {
     expect(entity.baseKillPoints).toBe(10);
     expect(entity.currentAdvancementPoints).toBe(0);
     expect(entity.actionStartingTime).toBe(0);
+    expect(entity.inventory).toBeNull();
 
     expect(gameState.entityRepo.get(entity.id)).toBe(entity);
   });
@@ -512,6 +515,7 @@ describe('Entity', () => {
           baseKillPoints: entity.baseKillPoints,
           currentAdvancementPoints: 42,
           actionStartingTime: entity.actionStartingTime,
+          inventory: null,
       });
 
       expect(typeof serializedData.id).toBe('string');
@@ -565,6 +569,40 @@ describe('Entity', () => {
       expect(deserializedEntity.baseKillPoints).toBe(entity.baseKillPoints);
       expect(deserializedEntity.currentAdvancementPoints).toBe(42);
       expect(deserializedEntity.actionStartingTime).toBe(entity.actionStartingTime);
+      expect(deserializedEntity.inventory).toBeNull();
+  });
+
+  test('should deserialize with empty inventory correctly', () => {
+    entity.placeAtCell(gameState.world[0].grid[5][5]);
+    entity.health.curHealth = 75;
+    entity.currentAdvancementPoints = 42;
+    entity.damagedBy = [
+        { damageSource: 'entity-2', damageSourceType: 'Entity', damage: new EffDamage(10) }
+    ];
+
+    const serializedData = entity.forSerializing();
+    serializedData.inventory = [];
+
+    const deserializedEntity = Entity.deserialize(serializedData, gameState);
+
+    expect(deserializedEntity.inventory).toBeNull();
+  });
+
+  test('should deserialize with full inventory correctly', () => {
+    entity.placeAtCell(gameState.world[0].grid[5][5]);
+    entity.health.curHealth = 75;
+    entity.currentAdvancementPoints = 42;
+    entity.damagedBy = [
+        { damageSource: 'entity-2', damageSourceType: 'Entity', damage: new EffDamage(10) }
+    ];
+
+    const serializedData = entity.forSerializing();
+    serializedData.inventory = ['item-id-123'];
+
+    const deserializedEntity = Entity.deserialize(serializedData, gameState);
+
+    expect(deserializedEntity.inventory).toBeInstanceOf(ItemIdContainer);
+    expect(deserializedEntity.inventory.has('item-id-123')).toEqual(true);
   });
 
   test('should correctly re-add the entity to the gameState repository on deserialization', () => {

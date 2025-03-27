@@ -1,12 +1,6 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* create an item container class
-* * container constraints - volume & weight
-
-* items repository in game state
-* * persistence for items
-
 * give entities an inventory (at least, some of them)
 * give gridCells an optional inventory
 * get and drop items (transfer between entity inv and gridCell inven)
