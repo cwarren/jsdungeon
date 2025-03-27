@@ -26,6 +26,12 @@ class ItemIdContainer {
         return this.itemIdList.includes(idOf(itemObjectOrId));
     }
 
+    isEmpty() {
+        return this.itemIdList.length == 0;
+    }
+
+    //================
+
     add(itemObjectOrId) {
         if (! this.has(itemObjectOrId)) {
             this.itemIdList.push(idOf(itemObjectOrId));
@@ -40,10 +46,12 @@ class ItemIdContainer {
         }
     }
 
-    passItemTo(itemObjectOrId, otherItemContainer) {
+    giveItemTo(itemObjectOrId, otherItemContainer) {
         if (this.has(itemObjectOrId)) {
             this.remove(itemObjectOrId);
             otherItemContainer.add(itemObjectOrId);
+        } else {
+            console.log(`item ${idOf(itemObjectOrId)} does not exist in source container and so cannot be transferred`);
         }
     }
 
@@ -51,6 +59,8 @@ class ItemIdContainer {
         if (otherItemContainer.has(itemObjectOrId)) {
             otherItemContainer.remove(itemObjectOrId);
             this.add(itemObjectOrId);
+        } else {
+            console.log(`item ${idOf(itemObjectOrId)} does not exist in source container and so cannot be transferred`);
         }
     }
 

@@ -88,7 +88,7 @@ describe('Entity', () => {
   });
 
   test('should initialize with passed in id', () => {
-    const e = new Entity(gameState, 'testEntity1','foo');
+    const e = new Entity(gameState, 'testEntity1', 'foo');
     expect(e.id).toEqual('foo');
   });
 
@@ -110,7 +110,7 @@ describe('Entity', () => {
 
   test('should calculate vision radius correctly', () => {
     entity.attributes.setAttributes(Entity.ENTITIES['testEntity1'].attributes);
-    const expectedViewRadius = Math.floor((Entity.ENTITIES['testEntity1'].baseViewRadius + 0/15 + 0/50 + 0/40) * 1.1 * 1);
+    const expectedViewRadius = Math.floor((Entity.ENTITIES['testEntity1'].baseViewRadius + 0 / 15 + 0 / 50 + 0 / 40) * 1.1 * 1);
     expect(entity.getViewRadius()).toBe(expectedViewRadius);
   });
 
@@ -152,7 +152,7 @@ describe('Entity', () => {
         defender.damagedBy.push({ "damageSource": entity, damageSourceType: 'Entity', "damage": new EffDamage(2) });
         const attackerDamageBy = { "damageSource": attacker, damageSourceType: 'Entity', "damage": new EffDamage(1) };
         defender.damagedBy.push(attackerDamageBy);
-        
+
         defender.purgeEntityFromDamageTracking(entity);
 
         expect(defender.damagedBy).toEqual([attackerDamageBy]);
@@ -484,38 +484,130 @@ describe('Entity', () => {
 
   });
 
+  describe('Entity - inventory', () => {
+    let sourceEntity, targetEntity;
+    const item1 = { id: 'item-1' };
+    const item2 = { id: 'item-2' };
+
+    beforeEach(() => {
+      sourceEntity = new Entity(gameState, 'testEntity1');
+      targetEntity = new Entity(gameState, 'testEntity1');
+    });
+
+    test('should give item to entity and store it in inventory', () => {
+      expect(entity.inventory).toBeNull(); // initially null
+      entity.giveItem(item1);
+      expect(entity.inventory).toBeInstanceOf(ItemIdContainer);
+      expect(entity.inventory.has('item-1')).toBe(true);
+    });
+
+    test('should not duplicate items when giving same item twice', () => {
+      entity.giveItem(item1);
+      entity.giveItem(item1);
+      expect(entity.inventory.itemIdList).toEqual(['item-1']);
+    });
+
+    test('should remove item from inventory with takeItem', () => {
+      entity.giveItem(item1);
+      entity.giveItem(item2);
+      entity.takeItem('item-1');
+      expect(entity.inventory.has('item-1')).toBe(false);
+      expect(entity.inventory.has('item-2')).toBe(true);
+    });
+
+    test('should not throw if removing from empty or missing inventory', () => {
+      expect(() => entity.takeItem('item-1')).not.toThrow();
+    });
+
+    test('should return true from isCarrying when item is in inventory', () => {
+      entity.giveItem('item-1');
+      expect(entity.isCarrying('item-1')).toBe(true);
+    });
+
+    test('should return false from isCarrying when inventory is null or item missing', () => {
+      expect(entity.isCarrying('item-1')).toBe(false);
+      entity.giveItem('item-2');
+      expect(entity.isCarrying('item-1')).toBe(false);
+    });
+
+    test('takeItemFrom should transfer item from external container into entity inventory', () => {
+      const externalContainer = new ItemIdContainer(['item-1']);
+      sourceEntity.takeItemFrom('item-1', externalContainer);
+  
+      expect(sourceEntity.inventory.has('item-1')).toBe(true);
+      expect(externalContainer.has('item-1')).toBe(false);
+    });
+  
+    test('takeItemFrom should not add if source container is empty', () => {
+      const externalContainer = new ItemIdContainer();
+      const result = sourceEntity.takeItemFrom('item-1', externalContainer);
+  
+      expect(sourceEntity.inventory).toBeNull(); // Should not initialize if nothing added
+      expect(externalContainer.itemIdList).toEqual([]);
+    });
+  
+    test('giveItemTo should transfer item to another container', () => {
+      const targetContainer = new ItemIdContainer();
+      sourceEntity.giveItem(item1);
+      sourceEntity.giveItemTo(item1, targetContainer);
+  
+      expect(sourceEntity.inventory.has(item1)).toBe(false);
+      expect(targetContainer.has(item1)).toBe(true);
+    });
+  
+    test('giveItemTo should not transfer if entity inventory is empty', () => {
+      const targetContainer = new ItemIdContainer();
+      sourceEntity.giveItemTo(item1, targetContainer);
+  
+      expect(targetContainer.has(item1)).toBe(false);
+    });
+  
+    test('giveItemTo should not transfer if no container provided', () => {
+      sourceEntity.giveItem(item1);
+      sourceEntity.giveItemTo(item1, null);
+      expect(sourceEntity.inventory.has(item1)).toBe(true);
+    });
+  
+    test('takeItemFrom should not do anything if no container provided', () => {
+      sourceEntity.takeItemFrom('item-1', null);
+      expect(sourceEntity.inventory).toBeNull();
+    });
+
+  });
+
+
   describe('Entity - Serializing', () => {
     test('should generate serializeable object correctly', () => {
       entity.placeAtCell(gameState.world[0].grid[5][5]);
       entity.health.curHealth = 75;
       entity.currentAdvancementPoints = 42;
       entity.damagedBy = [
-          { damageSource: 'entity-2', damageSourceType: 'Entity', damage: new EffDamage(10) }
+        { damageSource: 'entity-2', damageSourceType: 'Entity', damage: new EffDamage(10) }
       ];
 
       const serializedData = entity.forSerializing();
 
       expect(serializedData).toEqual({
-          id: entity.id,
-          type: entity.type,
-          name: entity.name,
-          baseActionTime: entity.baseActionTime,
-          attributes: entity.attributes.forSerializing(),
-          location: entity.location.forSerializing(),
-          vision: entity.vision.forSerializing(),
-          movement: entity.movement.forSerializing(),
-          health: entity.health.forSerializing(),
-          damagedBy: [
-              {
-                  damageSource: 'entity-2',
-                  damageSourceType: 'Entity',
-                  damage: new EffDamage(10).forSerializing()
-              }
-          ],
-          baseKillPoints: entity.baseKillPoints,
-          currentAdvancementPoints: 42,
-          actionStartingTime: entity.actionStartingTime,
-          inventory: null,
+        id: entity.id,
+        type: entity.type,
+        name: entity.name,
+        baseActionTime: entity.baseActionTime,
+        attributes: entity.attributes.forSerializing(),
+        location: entity.location.forSerializing(),
+        vision: entity.vision.forSerializing(),
+        movement: entity.movement.forSerializing(),
+        health: entity.health.forSerializing(),
+        damagedBy: [
+          {
+            damageSource: 'entity-2',
+            damageSourceType: 'Entity',
+            damage: new EffDamage(10).forSerializing()
+          }
+        ],
+        baseKillPoints: entity.baseKillPoints,
+        currentAdvancementPoints: 42,
+        actionStartingTime: entity.actionStartingTime,
+        inventory: null,
       });
 
       expect(typeof serializedData.id).toBe('string');
@@ -524,9 +616,9 @@ describe('Entity', () => {
       expect(serializedData.vision).toBeTruthy();
       expect(serializedData.movement).toBeTruthy();
       expect(serializedData.health).toBeTruthy();
-  });
+    });
 
-  test('should serialize to JSON string correctly', () => {
+    test('should serialize to JSON string correctly', () => {
       entity.placeAtCell(gameState.world[0].grid[5][5]);
       entity.health.curHealth = 75;
       entity.currentAdvancementPoints = 42;
@@ -536,14 +628,14 @@ describe('Entity', () => {
 
       expect(parsedData).toEqual(entity.forSerializing());
       expect(typeof jsonString).toBe('string');
-  });
+    });
 
-  test('should deserialize correctly', () => {
+    test('should deserialize correctly', () => {
       entity.placeAtCell(gameState.world[0].grid[5][5]);
       entity.health.curHealth = 75;
       entity.currentAdvancementPoints = 42;
       entity.damagedBy = [
-          { damageSource: 'entity-2', damageSourceType: 'Entity', damage: new EffDamage(10) }
+        { damageSource: 'entity-2', damageSourceType: 'Entity', damage: new EffDamage(10) }
       ];
 
       const serializedData = entity.forSerializing();
@@ -570,47 +662,47 @@ describe('Entity', () => {
       expect(deserializedEntity.currentAdvancementPoints).toBe(42);
       expect(deserializedEntity.actionStartingTime).toBe(entity.actionStartingTime);
       expect(deserializedEntity.inventory).toBeNull();
-  });
+    });
 
-  test('should deserialize with empty inventory correctly', () => {
-    entity.placeAtCell(gameState.world[0].grid[5][5]);
-    entity.health.curHealth = 75;
-    entity.currentAdvancementPoints = 42;
-    entity.damagedBy = [
+    test('should deserialize with empty inventory correctly', () => {
+      entity.placeAtCell(gameState.world[0].grid[5][5]);
+      entity.health.curHealth = 75;
+      entity.currentAdvancementPoints = 42;
+      entity.damagedBy = [
         { damageSource: 'entity-2', damageSourceType: 'Entity', damage: new EffDamage(10) }
-    ];
+      ];
 
-    const serializedData = entity.forSerializing();
-    serializedData.inventory = [];
+      const serializedData = entity.forSerializing();
+      serializedData.inventory = [];
 
-    const deserializedEntity = Entity.deserialize(serializedData, gameState);
+      const deserializedEntity = Entity.deserialize(serializedData, gameState);
 
-    expect(deserializedEntity.inventory).toBeNull();
-  });
+      expect(deserializedEntity.inventory).toBeNull();
+    });
 
-  test('should deserialize with full inventory correctly', () => {
-    entity.placeAtCell(gameState.world[0].grid[5][5]);
-    entity.health.curHealth = 75;
-    entity.currentAdvancementPoints = 42;
-    entity.damagedBy = [
+    test('should deserialize with full inventory correctly', () => {
+      entity.placeAtCell(gameState.world[0].grid[5][5]);
+      entity.health.curHealth = 75;
+      entity.currentAdvancementPoints = 42;
+      entity.damagedBy = [
         { damageSource: 'entity-2', damageSourceType: 'Entity', damage: new EffDamage(10) }
-    ];
+      ];
 
-    const serializedData = entity.forSerializing();
-    serializedData.inventory = ['item-id-123'];
+      const serializedData = entity.forSerializing();
+      serializedData.inventory = ['item-id-123'];
 
-    const deserializedEntity = Entity.deserialize(serializedData, gameState);
+      const deserializedEntity = Entity.deserialize(serializedData, gameState);
 
-    expect(deserializedEntity.inventory).toBeInstanceOf(ItemIdContainer);
-    expect(deserializedEntity.inventory.has('item-id-123')).toEqual(true);
-  });
+      expect(deserializedEntity.inventory).toBeInstanceOf(ItemIdContainer);
+      expect(deserializedEntity.inventory.has('item-id-123')).toEqual(true);
+    });
 
-  test('should correctly re-add the entity to the gameState repository on deserialization', () => {
+    test('should correctly re-add the entity to the gameState repository on deserialization', () => {
       const serializedData = entity.forSerializing();
       const deserializedEntity = Entity.deserialize(serializedData, gameState);
 
       expect(gameState.entityRepo.get(deserializedEntity.id)).toBe(deserializedEntity);
-  });
+    });
   });
 
 });

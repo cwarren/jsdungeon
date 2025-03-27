@@ -1,17 +1,30 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* entity inventory interactions
-* * give item to entity
-* * take item from entity
-
 * give gridCells an optional inventory
-* get and drop items (transfer between entity inv and gridCell inven)
-* * UI for general container-to-container transfer of items
+* * construct as null
+* * serialize
+* * * forSerializing - skip if inven is null
+* * * deserialize - only set if data is there
+* * add a couple of test rocks on level gen (similar to entity population)
+* * draw gridCell inventory when gridCell is drawn
 
-* create a chest structure
-* * with an inventory
-* * implement structure interaction
+* update entity movement to account for grid items
+* * interrupt running if entering a cell that has any items in it
+* * on entering a cell with items in it...
+* * * if single item, message to that effect
+* * * if multiple items, message that there are multiple and show the list in the list UI
+* * on exiting a cell with items in it, clear the list UI
+
+* implement a pick-up commands in game play (single, all)
+* * implement a pickUpSingleItem in Entity - takes a gridCell
+* * * if no items in the current space, message to that effect
+* * * if single item in the current space, transfer to the acting entity and clear the grid cell inventory entirely (null it)
+* * * if multiple items in the current space, get the first one
+* * * * NOTE: may want support methods to ease this
+* * implement a pickUpAllItems in Entity - takes a gridCell
+* * * ? pick up single item until grid cell is empty - could implement a bulk pick up, but this should do for now... (add note about that when implementing)
+* * create the gamePlay actions that cause the avatar to do those things
 
 * inventory UI
 * * inventory screen
@@ -24,6 +37,12 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * pick up command to get an item in a grid cell
 * * when a grid cell has a single item, show that item
 * * when a grid cell has more than one item, render each on top of each other (don't really need special handling for an item pile... though might want a render limit if the list is huge)
+
+* ?? UI for general container-to-container transfer of items
+
+* create a chest structure
+* * with an inventory
+* * implement structure interaction
 
 * implement automatic text-wrapping for text block - character screen help is a good in-game testing area for this
 * * NOTE: all that kind of stuff is already handed in HTML - should NOT have to re-create all that....
@@ -154,7 +173,7 @@ PS E:\code\jsdungeon> docker-compose up --build
       131 |             levelHeight: 10,
 
       at Object.<anonymous> (world/gridGeneration.test.js:128:9)
-
+* the worldLevelClass.integration.test.js occsionally hangs
 
 LONG TERM
 * split into FE & BE, so the game mechanics are handled server-side

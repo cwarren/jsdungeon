@@ -38,6 +38,14 @@ describe('ItemIdContainer', () => {
         expect(container.has('nonexistent')).toBe(false);
     });
 
+    test('checks if an item container is empty', () => {
+        expect(container.isEmpty()).toBe(true);
+        container.add(item1);
+        expect(container.isEmpty()).toBe(false);
+        container.remove(item1);
+        expect(container.isEmpty()).toBe(true);
+    });
+
     test('removes items', () => {
         container.add(item1);
         container.add(item2);
@@ -51,18 +59,18 @@ describe('ItemIdContainer', () => {
         expect(container.itemIdList).toEqual(['item-1']);
     });
 
-    test('passes item to another container', () => {
+    test('gives item to another container', () => {
         const target = new ItemIdContainer();
         container.add(item1);
-        container.passItemTo(item1, target);
+        container.giveItemTo(item1, target);
 
         expect(container.itemIdList).toEqual([]);
         expect(target.itemIdList).toEqual(['item-1']);
     });
 
-    test('does not pass if item is not present', () => {
+    test('does not give if item is not present', () => {
         const target = new ItemIdContainer();
-        container.passItemTo('item-1', target);
+        container.giveItemTo('item-1', target);
 
         expect(container.itemIdList).toEqual([]);
         expect(target.itemIdList).toEqual([]);

@@ -1,5 +1,5 @@
 import { EffDamage } from "../effect/effDamageClass.js";
-import { rollDice, getRandomListItem, constrainValue, devTrace, formatNumberForMessage, generateId } from "../util.js";
+import { rollDice, getRandomListItem, constrainValue, devTrace, formatNumberForMessage, generateId, idOf } from "../util.js";
 import { ENTITIES_DEFINITIONS } from "./entityDefinitions.js";
 import { uiPaneMessages } from "../ui/ui.js";
 import { EntityHealth, DEFAULT_NATURAL_HEALING_TICKS } from "./entityHealthClass.js";
@@ -764,6 +764,56 @@ class Entity {
     // by default, entities don't show messages for attacks, though some may (such as the avatar)
     // future: this is probably where we check to see if this entity is visible to the avatar and control message display based on that (at which point the doubled call in doMeleeAttackOn should be replaced by a this.showAttackMessages)
     // atk.sendMessageAboutAttackOutcome(uiPaneMessages); // TODO NEXT: replace this with a showAttackMessages(atk, pane) call, which the avatar overrides (send message only if attacker or defender is visible)
+  }
+
+  //======================================================================
+  // INVENTORY
+
+  giveItem(itemObjectOrId) {
+    if (! this.inventory) {
+      this.inventory = new ItemIdContainer();
+    }
+    this.inventory.add(itemObjectOrId);
+  }
+
+  takeItem(itemObjectOrId) {
+    if (! this.inventory) {
+      console.log(`Cannot remove item ${idOf(itemObjectOrId)} from empty or non-existent entity ${this.name} inventory`);
+      return;
+    }
+    this.inventory.remove(itemObjectOrId);
+  }
+
+  isCarrying(itemObjectOrId) {
+    if (! this.inventory) {
+      return false;
+    }
+    return this.inventory.has(itemObjectOrId);
+  }
+
+  takeItemFrom(itemObjectOrId, itemIdContainer) {
+    if (! itemIdContainer || itemIdContainer.isEmpty()) {
+      console.log(`Cannot take item ${idOf(itemObjectOrId)} from empty or non-existent container`);
+      return;
+    }
+    if (! this.inventory) {
+      this.inventory = new ItemIdContainer();
+    }
+    
+    this.inventory.takeItemFrom(itemObjectOrId, itemIdContainer);
+  }
+
+  giveItemTo(itemObjectOrId, itemIdContainer) {
+    if (! itemIdContainer) {
+      console.log(`Cannot put item ${idOf(itemObjectOrId)} into non-existent container`);
+      return;
+    }
+    if (! this.inventory || this.inventory.isEmpty()) {
+      console.log(`Cannot give item ${idOf(itemObjectOrId)} from empty or non-existent entity ${this.name} inventory`);
+      return;
+    }
+
+    this.inventory.giveItemTo(itemObjectOrId, itemIdContainer);
   }
 
   //================================================
