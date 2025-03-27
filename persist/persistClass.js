@@ -5,7 +5,7 @@ class Persist {
 
     constructor(messagePane) {
         this.messagePane = messagePane;
-        this.saveVersion = "0.1"; // version of the persistence system
+        this.saveVersion = "0.1"; // updated / incremented when older save files would not be compatible
     }
 
     // takes: a save slot and a game state

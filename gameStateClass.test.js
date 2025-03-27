@@ -9,6 +9,7 @@ import { devTrace } from "./util.js";
 import { TurnQueue } from "./gameTime.js";
 import { uiPaneMain } from "./ui/ui.js";
 import { Stairs } from "./structure/stairsClass.js";
+import { Item } from "./item/itemClass.js";
 
 jest.mock('./util.js', () => ({
     devTrace: jest.fn(),
@@ -47,6 +48,7 @@ describe("GameState Tests", () => {
         expect(gameState.currentTurnQueue).toBeNull();
         expect(gameState.entityRepo).toBeInstanceOf(Repository);
         expect(gameState.structureRepo).toBeInstanceOf(Repository);
+        expect(gameState.itemRepo).toBeInstanceOf(Repository);
     });
 
 
@@ -62,6 +64,7 @@ describe("GameState Tests", () => {
         expect(gameState.currentTurnQueue).toBeInstanceOf(TurnQueue);
         expect(gameState.entityRepo).toBeInstanceOf(Repository);
         expect(gameState.structureRepo).toBeInstanceOf(Repository);
+        expect(gameState.itemRepo).toBeInstanceOf(Repository);
     });
 
 
@@ -273,6 +276,17 @@ describe("GameState Tests", () => {
                         }
                     ]
                 },
+                itemRepo: {
+                    name: 'items', items: [
+                        {
+                            id: 'simple-item-id-123',
+                            type: 'ROCK',
+                            name: 'Rock',
+                            displaySymbol: '.',
+                            displayColor: '#fff'
+                        }
+                    ]
+                },
                 score: 1,
                 currentLevel: 0,
                 isPlaying: true,
@@ -446,6 +460,7 @@ describe("GameState Tests", () => {
             expect(gameStateForSerializing).toEqual({
                 entityRepo: gameState.entityRepo.forSerializing(),
                 structureRepo: gameState.structureRepo.forSerializing(),
+                itemRepo: gameState.itemRepo.forSerializing(),
                 score: gameState.score,
                 currentLevel: gameState.currentLevel,
                 isPlaying: gameState.isPlaying,
@@ -467,6 +482,8 @@ describe("GameState Tests", () => {
             expect(deserializedGameState.entityRepo.items.size).toEqual(2);
             expect(deserializedGameState.structureRepo).toBeInstanceOf(Repository);
             expect(deserializedGameState.structureRepo.items.size).toEqual(1);
+            expect(deserializedGameState.itemRepo).toBeInstanceOf(Repository);
+            expect(deserializedGameState.itemRepo.items.size).toEqual(1);
             expect(deserializedGameState.world.length).toBe(2);
             expect(deserializedGameState.world[0]).toBeInstanceOf(WorldLevel);
             expect(deserializedGameState.world[1]).toBeInstanceOf(WorldLevel);
@@ -481,6 +498,21 @@ describe("GameState Tests", () => {
             // ensure stair structures are deserialized correctly
             expect(deserializedGameState.structureRepo.get('id-m8gaq511-oab4j-1')).toBeInstanceOf(Stairs);
 
+            // ensure stair structures are deserialized correctly
+            expect(deserializedGameState.itemRepo.get('simple-item-id-123')).toBeInstanceOf(Item);
+
         });
+
+        test("should deserialize from plain object when item repo is missing", () => {
+            gameStateAsPlainObject.itemRepo = null;
+    
+            const deserializedGameState = GameState.deserialize(gameStateAsPlainObject);
+    
+            expect(deserializedGameState).toBeInstanceOf(GameState);
+            expect(deserializedGameState.itemRepo).toBeInstanceOf(Repository);
+            expect(deserializedGameState.itemRepo.items.size).toEqual(0);
+        });
+
     });
+
 });

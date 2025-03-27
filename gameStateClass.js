@@ -2,6 +2,7 @@ import { Entity } from "./entity/entityClass.js";
 import { Avatar } from "./entity/avatarClass.js";
 import { Structure } from "./structure/structureClass.js";
 import { Stairs } from "./structure/stairsClass.js";
+import { Item } from "./item/itemClass.js";
 import { WorldLevel } from "./world/worldLevelClass.js";
 import { devTrace } from "./util.js";
 import { uiPaneMain, uiPaneMessages, uiPaneInfo, uiPaneMiniChar } from "./ui/ui.js";
@@ -26,6 +27,7 @@ class GameState {
         this.currentTurnQueue = null; // each world level has it's own turn queue; this is set as the avatar goes up and down levels
         this.entityRepo = new Repository('entities');
         this.structureRepo = new Repository('structures');
+        this.itemRepo = new Repository('items');
     }
 
     forSerializing() {
@@ -33,6 +35,7 @@ class GameState {
         return {
             entityRepo: this.entityRepo.forSerializing(),
             structureRepo: this.structureRepo.forSerializing(),
+            itemRepo: this.itemRepo.forSerializing(),
             score: this.score,
             currentLevel: this.currentLevel,
             isPlaying: this.isPlaying,
@@ -49,6 +52,12 @@ class GameState {
 
     static deserialize(data) {
         const newGameState = new GameState();
+
+        if (data.itemRepo) {
+            newGameState.itemRepo = Repository.deserialize(data.itemRepo, Item.deserialize);
+        } else {
+            newGameState.itemRepo = new Repository('items');
+        }
 
         // NOTE: we cannot deserialize the structureRepo using the generic Structure class because the repo-based 
         // deserialization assumues that all structures are of the same type and we have Stairs (and other) structures
@@ -161,6 +170,8 @@ class GameState {
         });
 
         this.structureRepo = otherGameState.structureRepo;
+
+        this.itemRepo = otherGameState.itemRepo;
 
         this.currentTurnQueue = this.world[this.currentLevel].turnQueue;
     }
