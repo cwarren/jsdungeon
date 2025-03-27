@@ -1,4 +1,5 @@
-import { ItemIdContainer } from "../item/itemIdContainerClass";
+import { ItemIdContainer } from "../item/itemIdContainerClass.js";
+import { idOf } from "../util.js";
 
 class GridCell {
     static TYPES = {
@@ -50,6 +51,9 @@ class GridCell {
         this.inventory = null;
     }
 
+    //======================================================================
+    // SERIALIZATION
+
     forSerializing() {
         const plainObject = {
             terrain: this.terrain,
@@ -57,12 +61,12 @@ class GridCell {
             y: this.y,
             z: this.z,
         };
-        if (this.structure) { 
-            plainObject['structure'] = this.structure.id; 
-        }  
-        if (this.entity) {  
-            plainObject['entity'] = this.entity.id; 
-        }  
+        if (this.structure) {
+            plainObject['structure'] = this.structure.id;
+        }
+        if (this.entity) {
+            plainObject['entity'] = this.entity.id;
+        }
         if (this.inventory) {
             plainObject['inventory'] = this.inventory.forSerializing();
         }
@@ -78,8 +82,11 @@ class GridCell {
         if (data.structure) { gridCell.structure = worldLevel.gameState.structureRepo.get(data.structure); }
         if (data.entity) { gridCell.entity = worldLevel.gameState.entityRepo.get(data.entity); }
         if (data.inventory) { gridCell.inventory = ItemIdContainer.deserialize(data.inventory); }
-        return gridCell;  
+        return gridCell;
     }
+
+    //======================================================================
+    // GENERAL
 
     setPosition(x, y, z = 0) {
         this.x = x;
@@ -117,13 +124,65 @@ class GridCell {
         return { dx: otherCell.x - this.x, dy: otherCell.y - this.y };
     }
 
+    //======================================================================
+    // INVENTORY
+
+    giveItem(itemObjectOrId) {
+        if (!this.inventory) {
+            this.inventory = new ItemIdContainer();
+        }
+        this.inventory.add(itemObjectOrId);
+    }
+
+    takeItem(itemObjectOrId) {
+        if (!this.inventory) {
+            console.log(`Cannot remove item ${idOf(itemObjectOrId)} from empty or non-existent inventory of grid cell ${this.x} ${this.y} ${this.z}`);
+            return;
+        }
+        this.inventory.remove(itemObjectOrId);
+    }
+
+    hasItem(itemObjectOrId) {
+        if (!this.inventory) {
+            return false;
+        }
+        return this.inventory.has(itemObjectOrId);
+    }
+
+    takeItemFrom(itemObjectOrId, itemIdContainer) {
+        if (!itemIdContainer || itemIdContainer.isEmpty()) {
+            console.log(`Cannot take item ${idOf(itemObjectOrId)} from empty or non-existent container`);
+            return;
+        }
+        if (!this.inventory) {
+            this.inventory = new ItemIdContainer();
+        }
+
+        this.inventory.takeItemFrom(itemObjectOrId, itemIdContainer);
+    }
+
+    giveItemTo(itemObjectOrId, itemIdContainer) {
+        if (!itemIdContainer) {
+            console.log(`Cannot put item ${idOf(itemObjectOrId)} into non-existent container`);
+            return;
+        }
+        if (!this.inventory || this.inventory.isEmpty()) {
+            console.log(`Cannot give item ${idOf(itemObjectOrId)} from empty or non-existent inventory of grid cell ${this.x} ${this.y} ${this.z}`);
+            return;
+        }
+
+        this.inventory.giveItemTo(itemObjectOrId, itemIdContainer);
+    }
+
+    // UTILITY
+
     /**
- * Checks if any cell in the list has the specified property with the given value.
- * @param {GridCell[]} cellList - List of cells to check.
- * @param {string} propertyName - The property name to check.
- * @param {*} targetValue - The target value to match.
- * @returns {boolean} - True if any cell has the property equal to the target value, otherwise false.
- */
+     * Checks if any cell in the list has the specified property with the given value.
+     * @param {GridCell[]} cellList - List of cells to check.
+     * @param {string} propertyName - The property name to check.
+     * @param {*} targetValue - The target value to match.
+     * @returns {boolean} - True if any cell has the property equal to the target value, otherwise false.
+     */
     static anyCellHasPropertyOfValue(cellList, propertyName, targetValue) {
         return cellList.some(cell => cell[propertyName] === targetValue);
     }

@@ -778,7 +778,7 @@ class Entity {
 
   takeItem(itemObjectOrId) {
     if (! this.inventory) {
-      console.log(`Cannot remove item ${idOf(itemObjectOrId)} from empty or non-existent entity ${this.name} inventory`);
+      console.log(`Cannot remove item ${idOf(itemObjectOrId)} from empty or non-existent inventory of entity ${this.name}`);
       return;
     }
     this.inventory.remove(itemObjectOrId);
@@ -809,7 +809,7 @@ class Entity {
       return;
     }
     if (! this.inventory || this.inventory.isEmpty()) {
-      console.log(`Cannot give item ${idOf(itemObjectOrId)} from empty or non-existent entity ${this.name} inventory`);
+      console.log(`Cannot give item ${idOf(itemObjectOrId)} from empty or non-existent inventory of entity ${this.name}`);
       return;
     }
 

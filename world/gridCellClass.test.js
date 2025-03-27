@@ -1,9 +1,11 @@
 import { GridCell } from './gridCellClass';
 import { devTrace } from '../util.js';
 import { Repository } from '../repositoryClass.js';
+import { ItemIdContainer } from '../item/itemIdContainerClass.js';
 
 jest.mock('../util.js', () => ({
     devTrace: jest.fn(),
+    idOf: jest.requireActual('../util.js').idOf,
 }));
 
 describe('GridCell', () => {
@@ -189,5 +191,85 @@ describe('GridCell', () => {
         expect(newCell.entryMovementCost).toBe(120);
         expect(newCell.isOpaque).toBe(false);
         expect(newCell.color).toBe('#00008B');
+    });
+
+    describe('GridCell - inventory', () => {
+        test('should add an item to the inventory', () => {
+            const item = { id: 'item-1' };
+            gridCell.giveItem(item);
+
+            expect(gridCell.inventory).not.toBeNull();
+            expect(gridCell.inventory.has(item)).toBe(true);
+        });
+
+        test('should remove an item from the inventory', () => {
+            const item = { id: 'item-1' };
+            gridCell.giveItem(item);
+            gridCell.takeItem(item);
+
+            expect(gridCell.inventory.has(item)).toBe(false);
+        });
+
+        test('should check if an item exists in the inventory', () => {
+            const item = { id: 'item-1' };
+            gridCell.giveItem(item);
+
+            expect(gridCell.hasItem(item)).toBe(true);
+            gridCell.takeItem(item);
+            expect(gridCell.hasItem(item)).toBe(false);
+        });
+
+        test('should take an item from another container', () => {
+            const item = { id: 'item-1' };
+            const otherContainer = new ItemIdContainer();
+            otherContainer.add(item);
+
+            gridCell.takeItemFrom(item, otherContainer);
+
+            expect(gridCell.inventory.has(item)).toBe(true);
+            expect(otherContainer.has(item)).toBe(false);
+        });
+
+        test('should give an item to another container', () => {
+            const item = { id: 'item-1' };
+            const otherContainer = new ItemIdContainer();
+            gridCell.giveItem(item);
+
+            gridCell.giveItemTo(item, otherContainer);
+
+            expect(gridCell.inventory.has(item)).toBe(false);
+            expect(otherContainer.has(item)).toBe(true);
+        });
+
+        test('should handle giving an item to a non-existent container', () => {
+            const item = { id: 'item-1' };
+            gridCell.giveItem(item);
+
+            expect(() => gridCell.giveItemTo(item, null)).not.toThrow();
+            expect(gridCell.inventory.has(item)).toBe(true);
+        });
+
+        test('should handle taking an item from a non-existent container', () => {
+            const item = { id: 'item-1' };
+
+            expect(() => gridCell.takeItemFrom(item, null)).not.toThrow();
+            expect(gridCell.inventory).toBeNull();
+        });
+
+        test('should handle giving an item from an empty inventory', () => {
+            const item = { id: 'item-1' };
+            const otherContainer = new ItemIdContainer();
+
+            expect(() => gridCell.giveItemTo(item, otherContainer)).not.toThrow();
+            expect(otherContainer.has(item)).toBe(false);
+        });
+
+        test('should handle taking an item from an empty container', () => {
+            const item = { id: 'item-1' };
+            const emptyContainer = new ItemIdContainer();
+
+            expect(() => gridCell.takeItemFrom(item, emptyContainer)).not.toThrow();
+            expect(gridCell.inventory).toBeNull();
+        });
     });
 });
