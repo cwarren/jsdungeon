@@ -1,7 +1,10 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* give entities an inventory (at least, some of them)
+* entity inventory interactions
+* * give item to entity
+* * take item from entity
+
 * give gridCells an optional inventory
 * get and drop items (transfer between entity inv and gridCell inven)
 * * UI for general container-to-container transfer of items

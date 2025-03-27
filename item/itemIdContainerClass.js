@@ -2,11 +2,14 @@ import { idOf } from "../util.js";
 
 class ItemIdContainer {
     constructor(itemList = []) {
-        this.itemList = itemList.map(itm => idOf(itm));
+        this.itemIdList = [];
+        if (itemList.length > 0) {
+            this.itemIdList = itemList.map(itm => idOf(itm));
+        }
     }
 
     forSerializing() {
-        return [...this.itemList];
+        return [...this.itemIdList];
     }
 
     serialize() {
@@ -20,20 +23,20 @@ class ItemIdContainer {
     //================
 
     has(itemObjectOrId) {
-        return this.itemList.includes(idOf(itemObjectOrId));
+        return this.itemIdList.includes(idOf(itemObjectOrId));
     }
 
     add(itemObjectOrId) {
         if (! this.has(itemObjectOrId)) {
-            this.itemList.push(idOf(itemObjectOrId));
+            this.itemIdList.push(idOf(itemObjectOrId));
         }
     }
 
     remove(itemObjectOrId) {
         const itemId = idOf(itemObjectOrId);
-        const index = this.itemList.indexOf(itemId);
+        const index = this.itemIdList.indexOf(itemId);
         if (index !== -1) {
-            this.itemList.splice(index, 1);
+            this.itemIdList.splice(index, 1);
         }
     }
 
@@ -51,6 +54,11 @@ class ItemIdContainer {
         }
     }
 
+    //================
+
+    getItems(itemRepository) {
+        return this.itemIdList.map(itmId => itemRepository.get(itmId));
+    }
 }
 
 export { ItemIdContainer };
