@@ -824,9 +824,18 @@ class Entity {
     if (! targetCell.inventory) {
       return;
     }
-    const extractedItem = targetCell.inventory.extractFirst();
+    const extractedItem = targetCell.extractFirstItem();
     this.giveItem(extractedItem);
     this.showMessage(`You pick up the ${extractedItem.name}`);
+  }
+
+  takeAllItemsFromCell(targetCell) {
+    if (! targetCell.inventory) {
+      return;
+    }
+
+    targetCell.extractAllItems().forEach(item => { this.giveItem(item)});
+    this.showMessage(`You pick up everything there`);
   }
 
   //================================================

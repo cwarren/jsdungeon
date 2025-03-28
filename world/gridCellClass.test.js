@@ -244,6 +244,37 @@ describe('GridCell', () => {
             expect(extractedItem).toBe(item);
         });
 
+        test('should null inventory if extracting the last item',() => {
+            const item =  Item.makeItem("ROCK");
+            itemRepo.add(item);
+            gridCell.giveItem(item);
+
+            const extractedItem = gridCell.extractFirstItem();
+
+            expect(gridCell.hasItem(item)).toBe(false);
+
+            expect(extractedItem).toBeInstanceOf(Item);
+            expect(extractedItem).toBe(item);
+            expect(gridCell.inventory).toBeNull();
+        });
+
+        test('should null inventory and return all items if extracting all items',() => {
+            const item =  Item.makeItem("ROCK");
+            itemRepo.add(item);
+            gridCell.giveItem(item);
+            const item2 =  Item.makeItem("ROCK");
+            itemRepo.add(item2);
+            gridCell.giveItem(item2);
+
+            const extractedItems = gridCell.extractAllItems();
+
+            expect(extractedItems).toEqual([item, item2]);
+
+            expect(gridCell.hasItem(item)).toBe(false);
+            expect(gridCell.hasItem(item2)).toBe(false);
+            expect(gridCell.inventory).toBeNull();
+        });
+
         test('should check if an item exists in the inventory', () => {
             const item =  Item.makeItem("ROCK");
             gridCell.giveItem(item);

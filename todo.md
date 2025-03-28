@@ -2,13 +2,6 @@ to start server:
 PS E:\code\jsdungeon> docker-compose up --build
 
 * implement a pick-up commands in game play (single, all)
-* * implement a pickUpSingleItem in Entity - takes a gridCell
-* * * if no items in the current space, message to that effect
-* * * if single item in the current space, transfer to the acting entity and clear the grid cell inventory entirely (null it)
-* * * if multiple items in the current space, get the first one
-* * * * NOTE: may want support methods to ease this
-* * implement a pickUpAllItems in Entity - takes a gridCell
-* * * ? pick up single item until grid cell is empty - could implement a bulk pick up, but this should do for now... (add note about that when implementing)
 * * create the gamePlay actions that cause the avatar to do those things
 
 * inventory UI

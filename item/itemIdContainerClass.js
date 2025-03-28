@@ -50,6 +50,12 @@ class ItemIdContainer {
         return this.itemIdList.shift();
     }
 
+    extractAll() {
+        const extracted = this.itemIdList;
+        this.itemIdList = [];
+        return extracted;
+    }
+
     giveItemTo(itemObjectOrId, otherItemContainer) {
         if (this.has(itemObjectOrId)) {
             this.remove(itemObjectOrId);

@@ -57,10 +57,12 @@ TEST_ENTITIES_DEFINITIONS.forEach((ent) => { Entity.ENTITIES[ent.type] = ent; })
 describe('Entity', () => {
   let entity;
   let gameState;
+  let itemRepo;
 
   beforeEach(() => {
     rollDice.mockReturnValue(100);
-    gameState = { entityRepo: new Repository('entities'), world: [] };
+    itemRepo = new Repository('items');
+    gameState = { entityRepo: new Repository('entities'), itemRepo: itemRepo, world: [] };
     entity = new Entity(gameState, 'testEntity1');
     const testWorldLevel = new WorldLevel(gameState, 0, 10, 10);
     testWorldLevel.generateGrid();
@@ -587,6 +589,7 @@ describe('Entity', () => {
     test('takeSingleItemFromCell should get an item from a cell that has a single item', () => {
       const targetCell = gameState.world[0].grid[0][0];
       const item = Item.makeItem("ROCK");
+      itemRepo.add(item);
       targetCell.giveItem(item);
       expect(sourceEntity.hasItem(item)).toBe(false);
       expect(targetCell.hasItem(item)).toBe(true);
@@ -597,7 +600,26 @@ describe('Entity', () => {
       expect(sourceEntity.hasItem(item)).toBe(true);
       expect(targetCell.hasItem(item)).toBe(false);
     });
-    
+ 
+    test('takeAllItemsFromCell should get all item from a cell that has one or more items', () => {
+      const targetCell = gameState.world[0].grid[0][0];
+      const item = Item.makeItem("ROCK");
+      itemRepo.add(item);
+      targetCell.giveItem(item);
+      const item2 = Item.makeItem("ROCK");
+      itemRepo.add(item2);
+      targetCell.giveItem(item2);
+      expect(sourceEntity.hasItem(item)).toBe(false);
+      expect(targetCell.hasItem(item)).toBe(true);
+      expect(targetCell.hasItem(item2)).toBe(true);
+
+      sourceEntity.takeAllItemsFromCell(targetCell);
+
+      expect(sourceEntity.inventory).not.toBeNull();
+      expect(sourceEntity.hasItem(item)).toBe(true);
+      expect(sourceEntity.hasItem(item2)).toBe(true);
+      expect(targetCell.inventory).toBeNull();
+    });
 
   });
 

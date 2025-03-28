@@ -152,7 +152,23 @@ class GridCell {
         }
         const extractedItemId = this.inventory.extractFirst();
         const extractedItem = this.worldLevel.gameState.itemRepo.get(extractedItemId);
+
+        if (this.inventory.isEmpty()) {
+            this.inventory = null;
+        }
+
         return extractedItem;
+    }
+
+    extractAllItems() {
+        if (!this.inventory) {
+            console.log(`Cannot extract first item from empty or non-existent inventory of grid cell ${this.x} ${this.y} ${this.z}`);
+            return [];
+        }
+        const extractedItemIds = this.inventory.extractAll();
+        const extractedItems = extractedItemIds.map(itemId => { return this.worldLevel.gameState.itemRepo.get(itemId); });
+        this.inventory = null;
+        return extractedItems;
     }
 
     hasItem(itemObjectOrId) {

@@ -72,6 +72,17 @@ describe('ItemIdContainer', () => {
         expect(container.has(item3)).toBe(true);
     });
 
+    test('extracting all items removes them from the container and returns the ids for them',  () => {
+        container.add(item1);
+        container.add(item2);
+        container.add(item3);
+
+        const extractedItemIds = container.extractAll();
+
+        expect(extractedItemIds).toEqual(['item-1', 'item-2', 'item-3']);
+        expect(container.isEmpty()).toBe(true);
+    });
+
     test('gives item to another container', () => {
         const target = new ItemIdContainer();
         container.add(item1);
