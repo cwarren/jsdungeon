@@ -205,17 +205,37 @@ describe('GridCell', () => {
         test('should remove an item from the inventory', () => {
             const item = { id: 'item-1' };
             gridCell.giveItem(item);
+            const item2 = { id: 'item-2' };
+            gridCell.giveItem(item2);
             gridCell.takeItem(item);
 
             expect(gridCell.inventory.has(item)).toBe(false);
         });
 
+        test('should null out inventory when it is empty', () => {
+            const item = { id: 'item-1' };
+            gridCell.giveItem(item);
+            expect(gridCell.inventory.has(item)).toBe(true);
+
+            gridCell.takeItem(item);
+
+            expect(gridCell.inventory).toBeNull();
+        });
+
         test('should check if an item exists in the inventory', () => {
             const item = { id: 'item-1' };
             gridCell.giveItem(item);
+            const item2 = { id: 'item-2' };
+            gridCell.giveItem(item2);
 
             expect(gridCell.hasItem(item)).toBe(true);
             gridCell.takeItem(item);
+            expect(gridCell.hasItem(item)).toBe(false);
+        });
+
+        test('should report not having an item if inventory is null', () => {
+            const item = { id: 'item-1' };
+            expect(gridCell.inventory).toBeNull();
             expect(gridCell.hasItem(item)).toBe(false);
         });
 
@@ -234,11 +254,24 @@ describe('GridCell', () => {
             const item = { id: 'item-1' };
             const otherContainer = new ItemIdContainer();
             gridCell.giveItem(item);
+            const item2 = { id: 'item-2' };
+            gridCell.giveItem(item2);
 
             gridCell.giveItemTo(item, otherContainer);
 
             expect(gridCell.inventory.has(item)).toBe(false);
             expect(otherContainer.has(item)).toBe(true);
+        });
+
+        test('should null inventory if giving an item to another container empties it', () => {
+            const item = { id: 'item-1' };
+            const otherContainer = new ItemIdContainer();
+            gridCell.giveItem(item);
+
+            gridCell.giveItemTo(item, otherContainer);
+
+            expect(otherContainer.has(item)).toBe(true);
+            expect(gridCell.inventory).toBeNull();
         });
 
         test('should handle giving an item to a non-existent container', () => {

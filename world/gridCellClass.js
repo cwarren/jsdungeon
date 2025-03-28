@@ -140,6 +140,9 @@ class GridCell {
             return;
         }
         this.inventory.remove(itemObjectOrId);
+        if (this.inventory.isEmpty()) {
+            this.inventory = null;
+        }
     }
 
     hasItem(itemObjectOrId) {
@@ -172,6 +175,9 @@ class GridCell {
         }
 
         this.inventory.giveItemTo(itemObjectOrId, itemIdContainer);
+        if (this.inventory.isEmpty()) {
+            this.inventory = null;
+        }
     }
 
     // UTILITY
