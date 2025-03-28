@@ -183,32 +183,62 @@ describe('EntityMovement', () => {
 
   test('should confirm move to a new cell', () => {
     jest.spyOn(entity, 'determineVisibleCells');
+    jest.spyOn(entityMovement, 'messageAvatar');
     const newCell = { x: 6, y: 6, z: 0, entity: null, isTraversible: true };
     const oldCell = { x: 5, y: 5, z: 0, entity: entity };
     entityLocation.getCell = jest.fn(() => oldCell);
 
     const resultMovementCost = entityMovement.confirmMove(newCell);
+
     expect(resultMovementCost).toBe(TEST_MOVEMENT_SPEC.baseMovementTime);
     expect(oldCell.entity).toBeUndefined();
     expect(newCell.entity).toBe(entity);
     expect(entity.determineVisibleCells).toHaveBeenCalled();
+    expect(entityMovement.messageAvatar).not.toHaveBeenCalled();
+  });
+
+  test('should message avatar when moving into a cell with items in it', () => {
+    jest.spyOn(entityMovement, 'messageAvatar');
+    const newCell = { x: 6, y: 6, z: 0, entity: null, isTraversible: true, inventory: true };
+    const oldCell = { x: 5, y: 5, z: 0, entity: entity };
+    entityLocation.getCell = jest.fn(() => oldCell);
+
+    const resultMovementCost = entityMovement.confirmMove(newCell);
+
+    expect(entityMovement.messageAvatar).toHaveBeenCalled();
   });
 
   test('should confirm move to deltas', () => {
     jest.spyOn(entityLocation, 'placeAtCell');
     jest.spyOn(entity, 'determineVisibleCells');
+    jest.spyOn(entityMovement, 'messageAvatar');
     const oldCell = { x: 5, y: 5, z: 0, entity: entity };
     const newCell = { x: 6, y: 6, z: 0, entity: null, isTraversible: true };
     entityLocation.getCell = jest.fn(() => oldCell);
     entityLocation.getCellAtDelta = jest.fn((dx, dy) => newCell);
 
     const resultMovementCost = entityMovement.confirmMoveDeltas(1, 1);
+
     expect(resultMovementCost).toBe(DEFAULT_MOVEMENT_ACTION_COST);
     expect(oldCell.entity).toBeUndefined();
     expect(newCell.entity).toBe(entity);
     expect(entityLocation.placeAtCell).toHaveBeenCalledWith(newCell);
     expect(entity.determineVisibleCells).toHaveBeenCalled();
+    expect(entityMovement.messageAvatar).not.toHaveBeenCalled();
   });
+
+  test('should message avatar when moving by deltas into a cell with items in it', () => {
+    jest.spyOn(entityMovement, 'messageAvatar');
+    const newCell = { x: 6, y: 6, z: 0, entity: null, isTraversible: true, inventory: true };
+    const oldCell = { x: 5, y: 5, z: 0, entity: entity };
+    entityLocation.getCell = jest.fn(() => oldCell);
+    entityLocation.getCellAtDelta = jest.fn((dx, dy) => newCell);
+
+    const resultMovementCost = entityMovement.confirmMoveDeltas(1, 1);
+
+    expect(entityMovement.messageAvatar).toHaveBeenCalled();
+  });
+
 
   // SLEEPING (technically "movement" even if the entity isn't moving per se)
   describe('EntityMovement - Sleeping Methods', () => {
@@ -360,6 +390,19 @@ describe('EntityMovement', () => {
       worldLevel.addEntity(entityInTargetCell, traversibleCell);
 
       const result = entityMovement.canRunToDeltas(1, 1);
+      expect(result).toBe(false);
+    });
+
+    test('should check if can run to deltas and return false due to items in current cell', () => {
+      jest.spyOn(entityLocation, 'getCellAtDelta');
+      const traversibleCell = { x: 6, y: 6, z: 0, entity: null, isTraversible: true, getAdjacentCells: () => [] };
+      entityLocation.getCellAtDelta.mockReturnValue(traversibleCell);
+
+      const curCell = entityMovement.ofEntity.getCell();
+      curCell.giveItem('mock-item-id-123');
+
+      const result = entityMovement.canRunToDeltas(1, 1);
+
       expect(result).toBe(false);
     });
 

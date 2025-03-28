@@ -24,9 +24,8 @@ class UIPaneMainRendererGamePlay extends UIPaneMainRenderer {
     //=====================
 
     drawWorldLevel(worldLevel, centerCell = null) {
-        this.drawWorldLevelGrid(worldLevel, centerCell);
+        this.drawWorldLevelGrid(worldLevel, centerCell); // NOTE: this also ends up drawing the items
         this.drawWorldLevelStructures(worldLevel, centerCell);
-        this.drawWorldLevelItems(worldLevel, centerCell);
         this.drawWorldLevelEntities(worldLevel, centerCell);
     }
 
@@ -58,6 +57,11 @@ class UIPaneMainRendererGamePlay extends UIPaneMainRenderer {
                 const cell = worldLevel.grid[col][row];
                 if (this.ui.gameState.avatar.vision.visibleCells.has(cell)) {
                     this.drawGridCell(cell, offsetX, offsetY, cellSize, gridSpacing);
+                    if (cell.inventory) {
+                        cell.inventory.getItems(this.ui.gameState.itemRepo).forEach(itm => {
+                            this.drawItem(itm, cell, offsetX, offsetY, cellSize, gridSpacing);
+                        });
+                    }
                 } else if (this.ui.gameState.avatar.vision.seenCells.has(`${cell.x},${cell.y},${cell.z}`)) {
                     this.drawGridCellFaint(cell, offsetX, offsetY, cellSize, gridSpacing);
                 }
@@ -87,6 +91,18 @@ class UIPaneMainRendererGamePlay extends UIPaneMainRenderer {
         this.ctx.globalAlpha = 1;
     }
 
+    drawItem(item, cell, offsetX, offsetY, cellSize, gridSpacing) {
+        this.ctx.fillStyle = item.displayColor;
+        this.ctx.font = `${cellSize * 0.8}px Arial`;
+        this.ctx.textAlign = "center";
+        this.ctx.textBaseline = "middle";
+        this.ctx.fillText(
+            item.displaySymbol,
+            offsetX + cell.x * (cellSize + gridSpacing) + cellSize / 2,
+            offsetY + cell.y * (cellSize + gridSpacing) + cellSize / 2
+        );
+    }
+
     drawWorldLevelStructures(worldLevel, centerCell = null) {
         const { cellSize, gridSpacing, offsetX, offsetY } = this.getGridRenderSettings(worldLevel, centerCell);
         worldLevel.levelStructures.forEach(structure => {
@@ -108,10 +124,6 @@ class UIPaneMainRendererGamePlay extends UIPaneMainRenderer {
             offsetX + structure.x * (cellSize + gridSpacing) + cellSize / 2,
             offsetY + structure.y * (cellSize + gridSpacing) + cellSize / 2
         );
-    }
-
-    drawWorldLevelItems(worldLevel) {
-        // Placeholder for drawing items
     }
 
     drawWorldLevelEntities(worldLevel, centerCell = null) {

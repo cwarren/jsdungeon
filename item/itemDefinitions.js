@@ -4,6 +4,9 @@ const ITEM_DEFINITIONS = [
   {
     type: "ROCK", name: "Rock", displaySymbol: "*", displayColor: "#fff",
   },
+  {
+    type: "STICK", name: "Stick", displaySymbol: "-", displayColor: "#fff",
+  },
 ];
 
 function getItemDef(itemType) {

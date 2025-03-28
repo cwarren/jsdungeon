@@ -1,17 +1,6 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* give gridCells an optional inventory
-* * add a couple of test rocks on level gen (similar to entity population)
-* * draw gridCell inventory when gridCell is drawn
-
-* update entity movement to account for grid items
-* * interrupt running if entering a cell that has any items in it
-* * on entering a cell with items in it...
-* * * if single item, message to that effect
-* * * if multiple items, message that there are multiple and show the list in the list UI
-* * on exiting a cell with items in it, clear the list UI
-
 * implement a pick-up commands in game play (single, all)
 * * implement a pickUpSingleItem in Entity - takes a gridCell
 * * * if no items in the current space, message to that effect
@@ -40,6 +29,13 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * with an inventory
 * * implement structure interaction
 
+* update entity movement to show items in current cell
+* * on entering a cell with items in it...
+* * * if single item, message to that effect
+* * * if multiple items, message that there are multiple and show the list in the list UI
+* * on exiting a cell with items in it, clear the list UI (or maybe set the list UI to empty on entering an empty cell? will have to think a bit about efficiency and clarity there...)
+
+
 * implement automatic text-wrapping for text block - character screen help is a good in-game testing area for this
 * * NOTE: all that kind of stuff is already handed in HTML - should NOT have to re-create all that....
 
@@ -58,6 +54,11 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * how they work in general
 
 * consider removing the automatic repo registration from entity and structure instantiation... or maybe add a flag for it to the call.... or maybe keep it out but instead generally use some factory functions that handle that kind of thing
+
+* maybe add a 'known items' set to the avatar - this would have a location / cell and an item, and when drawing non-visible cells it would show a shaded/faint version of known items
+* * on avatar move (?)
+* * * add items in visible cells to known items set
+* * * remove from known items any known items from the visible cells that are no longer actually in those cells (e.g. someone else moved them, or they otherwise went away)
 
 * more mob stuff
 * * simple status sheets for mobs (for display in info block when attacking or otherwise interacting with that mob)
@@ -169,7 +170,6 @@ PS E:\code\jsdungeon> docker-compose up --build
       131 |             levelHeight: 10,
 
       at Object.<anonymous> (world/gridGeneration.test.js:128:9)
-* the worldLevelClass.integration.test.js occsionally hangs
 
 LONG TERM
 * split into FE & BE, so the game mechanics are handled server-side

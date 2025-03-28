@@ -66,13 +66,20 @@ class EntityMovement {
         const oldCell = this.location.getCell();
         oldCell.entity = undefined;
         this.location.placeAtCell(targetCell);
+        if (targetCell.inventory) {
+            this.messageAvatar("There are some items here.");
+        }
         return this.actionTime;
     }
     confirmMoveDeltas(dx, dy) {
         devTrace(6, `confirming move to deltas ${dx},${dy}`, this.ofEntity);
         const oldCell = this.location.getCell();
         oldCell.entity = undefined;
-        this.location.placeAtCell(this.location.getCellAtDelta(dx, dy));
+        const newCell = this.location.getCellAtDelta(dx, dy);
+        this.location.placeAtCell(newCell);
+        if (newCell.inventory) {
+            this.messageAvatar("There are some items here.");
+        }
         return this.actionTime;
     }
 
@@ -159,6 +166,10 @@ class EntityMovement {
         );
         if (hasAdjacentEntity) { 
             this.messageAvatar("You stop running because you're next to a creature of some sort.")
+            return false;
+        }
+        if (this.location.getCell().inventory) { 
+            this.messageAvatar("You stop running because there are some items here.")
             return false;
         }
 

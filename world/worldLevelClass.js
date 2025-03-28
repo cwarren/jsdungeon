@@ -208,11 +208,14 @@ class WorldLevel {
             this.placeEntityRandomly(ent);
         }
 
-        // TODO: real item population (just a couple of rocks for now)
+        // TODO: real item population (just a couple of rocks and sticks for now)
         for (let i = 0; i < 2; i++) {
             const item = Item.makeItem("ROCK");
             this.gameState.itemRepo.add(item);
             this.placeItemRandomly(item);
+            const item2 = Item.makeItem("STICK");
+            this.gameState.itemRepo.add(item2);
+            this.placeItemRandomly(item2);
         }
     }
 
@@ -234,7 +237,6 @@ class WorldLevel {
     }
 
     addItem(item, targetCell) {
-        // console.log("add item targetCell", targetCell);
         devTrace(3, `adding item ${item.type} to a world level at ${targetCell.x} ${targetCell.y} ${targetCell.z}`, this);
         targetCell.giveItem(item);
     }
