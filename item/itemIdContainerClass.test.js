@@ -59,6 +59,19 @@ describe('ItemIdContainer', () => {
         expect(container.itemIdList).toEqual(['item-1']);
     });
 
+    test('extracting the first item removes it from the container and returns the id for that item',  () => {
+        container.add(item1);
+        container.add(item2);
+        container.add(item3);
+
+        const extractedItemId = container.extractFirst();
+
+        expect(extractedItemId).toEqual('item-1');
+        expect(container.has(item1)).toBe(false);
+        expect(container.has(item2)).toBe(true);
+        expect(container.has(item3)).toBe(true);
+    });
+
     test('gives item to another container', () => {
         const target = new ItemIdContainer();
         container.add(item1);

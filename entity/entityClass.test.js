@@ -12,6 +12,7 @@ import { EffDamage } from '../effect/effDamageClass.js';
 import { Attack } from '../effect/attackClass.js';
 import { Repository } from '../repositoryClass.js';
 import { ItemIdContainer } from '../item/itemIdContainerClass.js';
+import { Item } from '../item/itemClass.js';
 
 // NOTE: many of these tests are more integration tests than unit tests
 
@@ -519,15 +520,15 @@ describe('Entity', () => {
       expect(() => entity.takeItem('item-1')).not.toThrow();
     });
 
-    test('should return true from isCarrying when item is in inventory', () => {
+    test('should return true from hasItem when item is in inventory', () => {
       entity.giveItem('item-1');
-      expect(entity.isCarrying('item-1')).toBe(true);
+      expect(entity.hasItem('item-1')).toBe(true);
     });
 
-    test('should return false from isCarrying when inventory is null or item missing', () => {
-      expect(entity.isCarrying('item-1')).toBe(false);
+    test('should return false from hasItem when inventory is null or item missing', () => {
+      expect(entity.hasItem('item-1')).toBe(false);
       entity.giveItem('item-2');
-      expect(entity.isCarrying('item-1')).toBe(false);
+      expect(entity.hasItem('item-1')).toBe(false);
     });
 
     test('takeItemFrom should transfer item from external container into entity inventory', () => {
@@ -572,6 +573,31 @@ describe('Entity', () => {
       sourceEntity.takeItemFrom('item-1', null);
       expect(sourceEntity.inventory).toBeNull();
     });
+
+    test('takeSingleItemFromCell should not do anything if cell has no inventory', () => {
+      const targetCell = gameState.world[0].grid[0][0];
+      expect(targetCell.inventory).toBeNull();
+
+      sourceEntity.takeSingleItemFromCell(targetCell);
+
+      expect(sourceEntity.inventory).toBeNull();
+      expect(targetCell.inventory).toBeNull();
+    });
+
+    test('takeSingleItemFromCell should get an item from a cell that has a single item', () => {
+      const targetCell = gameState.world[0].grid[0][0];
+      const item = Item.makeItem("ROCK");
+      targetCell.giveItem(item);
+      expect(sourceEntity.hasItem(item)).toBe(false);
+      expect(targetCell.hasItem(item)).toBe(true);
+
+      sourceEntity.takeSingleItemFromCell(targetCell);
+
+      expect(sourceEntity.inventory).not.toBeNull();
+      expect(sourceEntity.hasItem(item)).toBe(true);
+      expect(targetCell.hasItem(item)).toBe(false);
+    });
+    
 
   });
 

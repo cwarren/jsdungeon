@@ -135,6 +135,10 @@ class Avatar extends Entity {
     atk.sendMessageAboutAttackOutcome(messagePane);
   }
 
+  showMessage(msg) {
+    uiPaneMessages.addMessage(msg);
+  }
+
   // -----------
   /// overides for minichar updates
 

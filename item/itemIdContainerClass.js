@@ -46,6 +46,10 @@ class ItemIdContainer {
         }
     }
 
+    extractFirst() {
+        return this.itemIdList.shift();
+    }
+
     giveItemTo(itemObjectOrId, otherItemContainer) {
         if (this.has(itemObjectOrId)) {
             this.remove(itemObjectOrId);

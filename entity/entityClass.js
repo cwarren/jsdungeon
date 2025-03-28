@@ -766,6 +766,10 @@ class Entity {
     // atk.sendMessageAboutAttackOutcome(uiPaneMessages); // TODO NEXT: replace this with a showAttackMessages(atk, pane) call, which the avatar overrides (send message only if attacker or defender is visible)
   }
 
+  showMessage(msg) {
+    // empty for standard entities, overridden in Avatar
+  }
+
   //======================================================================
   // INVENTORY
 
@@ -784,7 +788,7 @@ class Entity {
     this.inventory.remove(itemObjectOrId);
   }
 
-  isCarrying(itemObjectOrId) {
+  hasItem(itemObjectOrId) {
     if (! this.inventory) {
       return false;
     }
@@ -814,6 +818,15 @@ class Entity {
     }
 
     this.inventory.giveItemTo(itemObjectOrId, itemIdContainer);
+  }
+
+  takeSingleItemFromCell(targetCell) {
+    if (! targetCell.inventory) {
+      return;
+    }
+    const extractedItem = targetCell.inventory.extractFirst();
+    this.giveItem(extractedItem);
+    this.showMessage(`You pick up the ${extractedItem.name}`);
   }
 
   //================================================

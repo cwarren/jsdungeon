@@ -2,9 +2,11 @@ import { GridCell } from './gridCellClass';
 import { devTrace } from '../util.js';
 import { Repository } from '../repositoryClass.js';
 import { ItemIdContainer } from '../item/itemIdContainerClass.js';
+import { Item } from '../item/itemClass.js';
 
 jest.mock('../util.js', () => ({
     devTrace: jest.fn(),
+    generateId: jest.requireActual('../util.js').generateId,
     idOf: jest.requireActual('../util.js').idOf,
 }));
 
@@ -13,12 +15,14 @@ describe('GridCell', () => {
     let worldLevel;
     let structureRepo;
     let entityRepo;
+    let itemRepo;
     let mockStructure;
     let mockEntity;
 
     beforeEach(() => {
         structureRepo = new Repository('stru');
         entityRepo = new Repository('enti');
+        itemRepo = new Repository('item');
 
         worldLevel = {
             levelNumber: 1,
@@ -26,7 +30,8 @@ describe('GridCell', () => {
             levelHeight: 10,
             gameState: {
                 structureRepo,
-                entityRepo
+                entityRepo,
+                itemRepo,
             },
         };
         worldLevel.grid = Array.from({ length: 10 }, (_, x) =>
@@ -195,7 +200,7 @@ describe('GridCell', () => {
 
     describe('GridCell - inventory', () => {
         test('should add an item to the inventory', () => {
-            const item = { id: 'item-1' };
+            const item =  Item.makeItem("ROCK");
             gridCell.giveItem(item);
 
             expect(gridCell.inventory).not.toBeNull();
@@ -203,9 +208,9 @@ describe('GridCell', () => {
         });
 
         test('should remove an item from the inventory', () => {
-            const item = { id: 'item-1' };
+            const item =  Item.makeItem("ROCK");
             gridCell.giveItem(item);
-            const item2 = { id: 'item-2' };
+            const item2 =  Item.makeItem("ROCK");
             gridCell.giveItem(item2);
             gridCell.takeItem(item);
 
@@ -213,7 +218,7 @@ describe('GridCell', () => {
         });
 
         test('should null out inventory when it is empty', () => {
-            const item = { id: 'item-1' };
+            const item =  Item.makeItem("ROCK");
             gridCell.giveItem(item);
             expect(gridCell.inventory.has(item)).toBe(true);
 
@@ -222,10 +227,27 @@ describe('GridCell', () => {
             expect(gridCell.inventory).toBeNull();
         });
 
-        test('should check if an item exists in the inventory', () => {
-            const item = { id: 'item-1' };
+        test('should return first item as item and remove it from own inventory',() => {
+            const item =  Item.makeItem("ROCK");
+            itemRepo.add(item);
             gridCell.giveItem(item);
-            const item2 = { id: 'item-2' };
+            const item2 =  Item.makeItem("ROCK");
+            itemRepo.add(item2);
+            gridCell.giveItem(item2);
+
+            const extractedItem = gridCell.extractFirstItem();
+
+            expect(gridCell.hasItem(item)).toBe(false);
+            expect(gridCell.hasItem(item2)).toBe(true);
+
+            expect(extractedItem).toBeInstanceOf(Item);
+            expect(extractedItem).toBe(item);
+        });
+
+        test('should check if an item exists in the inventory', () => {
+            const item =  Item.makeItem("ROCK");
+            gridCell.giveItem(item);
+            const item2 =  Item.makeItem("ROCK");
             gridCell.giveItem(item2);
 
             expect(gridCell.hasItem(item)).toBe(true);
@@ -234,13 +256,13 @@ describe('GridCell', () => {
         });
 
         test('should report not having an item if inventory is null', () => {
-            const item = { id: 'item-1' };
+            const item =  Item.makeItem("ROCK");
             expect(gridCell.inventory).toBeNull();
             expect(gridCell.hasItem(item)).toBe(false);
         });
 
         test('should take an item from another container', () => {
-            const item = { id: 'item-1' };
+            const item =  Item.makeItem("ROCK");
             const otherContainer = new ItemIdContainer();
             otherContainer.add(item);
 
@@ -251,10 +273,10 @@ describe('GridCell', () => {
         });
 
         test('should give an item to another container', () => {
-            const item = { id: 'item-1' };
+            const item =  Item.makeItem("ROCK");
             const otherContainer = new ItemIdContainer();
             gridCell.giveItem(item);
-            const item2 = { id: 'item-2' };
+            const item2 =  Item.makeItem("ROCK");
             gridCell.giveItem(item2);
 
             gridCell.giveItemTo(item, otherContainer);
@@ -264,7 +286,7 @@ describe('GridCell', () => {
         });
 
         test('should null inventory if giving an item to another container empties it', () => {
-            const item = { id: 'item-1' };
+            const item =  Item.makeItem("ROCK");
             const otherContainer = new ItemIdContainer();
             gridCell.giveItem(item);
 
@@ -275,7 +297,7 @@ describe('GridCell', () => {
         });
 
         test('should handle giving an item to a non-existent container', () => {
-            const item = { id: 'item-1' };
+            const item =  Item.makeItem("ROCK");
             gridCell.giveItem(item);
 
             expect(() => gridCell.giveItemTo(item, null)).not.toThrow();
@@ -283,14 +305,14 @@ describe('GridCell', () => {
         });
 
         test('should handle taking an item from a non-existent container', () => {
-            const item = { id: 'item-1' };
+            const item =  Item.makeItem("ROCK");
 
             expect(() => gridCell.takeItemFrom(item, null)).not.toThrow();
             expect(gridCell.inventory).toBeNull();
         });
 
         test('should handle giving an item from an empty inventory', () => {
-            const item = { id: 'item-1' };
+            const item =  Item.makeItem("ROCK");
             const otherContainer = new ItemIdContainer();
 
             expect(() => gridCell.giveItemTo(item, otherContainer)).not.toThrow();
@@ -298,7 +320,7 @@ describe('GridCell', () => {
         });
 
         test('should handle taking an item from an empty container', () => {
-            const item = { id: 'item-1' };
+            const item =  Item.makeItem("ROCK");
             const emptyContainer = new ItemIdContainer();
 
             expect(() => gridCell.takeItemFrom(item, emptyContainer)).not.toThrow();

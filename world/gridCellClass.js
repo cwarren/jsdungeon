@@ -145,6 +145,16 @@ class GridCell {
         }
     }
 
+    extractFirstItem() {
+        if (!this.inventory) {
+            console.log(`Cannot extract first item from empty or non-existent inventory of grid cell ${this.x} ${this.y} ${this.z}`);
+            return null;
+        }
+        const extractedItemId = this.inventory.extractFirst();
+        const extractedItem = this.worldLevel.gameState.itemRepo.get(extractedItemId);
+        return extractedItem;
+    }
+
     hasItem(itemObjectOrId) {
         if (!this.inventory) {
             return false;

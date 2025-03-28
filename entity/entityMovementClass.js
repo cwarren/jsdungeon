@@ -19,13 +19,6 @@ class EntityMovement {
         this.isSleeping = false;
     }
 
-    // UI METHODS
-    messageAvatar(msg) {
-        if (this.ofEntity.type == 'AVATAR') {
-            uiPaneMessages.addMessage(msg);
-        }
-    }
-
     // MOVEMENT METHODS
 
     tryMove(dx, dy) {
@@ -38,7 +31,7 @@ class EntityMovement {
         if (targetCell.entity) {
             return this.ofEntity.handleAttemptedMoveIntoOccupiedCell(targetCell);
         } else {
-            this.messageAvatar(`You cannot move there because it's not traversible`);
+            this.ofEntity.showMessage(`You cannot move there because it's not traversible`);
             console.log(`move prevented because target cell is not traversable: ${targetCell.terrain} at ${targetCell.x} ${targetCell.y} ${targetCell.z}`);
             return 0;
         }
@@ -67,7 +60,7 @@ class EntityMovement {
         oldCell.entity = undefined;
         this.location.placeAtCell(targetCell);
         if (targetCell.inventory) {
-            this.messageAvatar("There are some items here.");
+            this.ofEntity.showMessage("There are some items here.");
         }
         return this.actionTime;
     }
@@ -78,7 +71,7 @@ class EntityMovement {
         const newCell = this.location.getCellAtDelta(dx, dy);
         this.location.placeAtCell(newCell);
         if (newCell.inventory) {
-            this.messageAvatar("There are some items here.");
+            this.ofEntity.showMessage("There are some items here.");
         }
         return this.actionTime;
     }
@@ -91,7 +84,7 @@ class EntityMovement {
         // cannot sleep if already at max health
         if (this.ofEntity.health.curHealth >= this.ofEntity.health.maxHealth) {
             devTrace(6, `${this.ofEntity.type} is already at max health and does not need to sleep`, this.ofEntity);
-            this.messageAvatar(`You cannot sleep because you're already at full health`);
+            this.ofEntity.showMessage(`You cannot sleep because you're already at full health`);
             return false;
         }
 
@@ -102,7 +95,7 @@ class EntityMovement {
                 const relation = this.ofEntity.getRelationshipTo(cell.entity);
                 if (relation === "HOSTILE_TO" || relation === "VIOLENT_TO") {
                     devTrace(6, `${this.ofEntity.type} cannot sleep due to ${cell.entity.type} ${relation} it`, this.ofEntity, cell.entity);
-                    this.messageAvatar(`You cannot sleep because there's danger nearby`);
+                    this.ofEntity.showMessage(`You cannot sleep because there's danger nearby`);
                     return false;
                 }
             }
@@ -133,7 +126,7 @@ class EntityMovement {
 
     startSleeping() {
         devTrace(5, `${this.ofEntity.type} is starting to sleep`, this.ofEntity);
-        this.messageAvatar('You fall asleep.')
+        this.ofEntity.showMessage('You fall asleep.')
         this.isSleeping = true;
     }
 
@@ -158,18 +151,18 @@ class EntityMovement {
             !(cell.structure === undefined || cell.structure == null)  // stop if adjacent to a structure
         );
         if (hasAdjacentStructure) { 
-            this.messageAvatar("You stop running because you're next to a structure of some sort.")
+            this.ofEntity.showMessage("You stop running because you're next to a structure of some sort.")
             return false;
         }
         const hasAdjacentEntity = adjacentCells.some(cell =>
             !(cell.entity === undefined || cell.entity == null) // stop if adjacent to a mob
         );
         if (hasAdjacentEntity) { 
-            this.messageAvatar("You stop running because you're next to a creature of some sort.")
+            this.ofEntity.showMessage("You stop running because you're next to a creature of some sort.")
             return false;
         }
         if (this.location.getCell().inventory) { 
-            this.messageAvatar("You stop running because there are some items here.")
+            this.ofEntity.showMessage("You stop running because there are some items here.")
             return false;
         }
 

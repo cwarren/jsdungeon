@@ -90,19 +90,6 @@ describe('EntityMovement', () => {
     expect(entityMovement.actionTime).toBe(TEST_MOVEMENT_SPEC.baseMovementTime);
   });
 
-  test('message to avatar should be supressed if current entity is not avatar', () => {
-    entityMovement.messageAvatar('this should not be delivered because entity is a RAT_MALIGN');
-
-    expect(uiPaneMessages.addMessage).not.toHaveBeenCalled();
-  });
-  test('message to avatar should be delivered if current entity is avatar', () => {
-    entity.type = 'AVATAR';
-
-    entityMovement.messageAvatar('this should be delivered because entity is AVATAR');
-
-    expect(uiPaneMessages.addMessage).toHaveBeenCalled();
-  });
-
   test('should try to move to a cell and succeed', () => {
     jest.spyOn(entityLocation, 'getCellAtDelta');
     jest.spyOn(entity, 'determineVisibleCells');
@@ -124,11 +111,12 @@ describe('EntityMovement', () => {
 
   test('should try to move to a cell and fail due to non-traversible cell', () => {
     jest.spyOn(entityLocation, 'getCellAtDelta');
+    jest.spyOn(entityMovement.ofEntity, 'showMessage');
     entityLocation.getCellAtDelta = jest.fn((dx, dy) => ({ x: 5 + dx, y: 5 + dy, z: 0, entity: null, isTraversible: false }));
     const resultMovementCost = entityMovement.tryMove(1, 1);
     expect(resultMovementCost).toBe(0);
     expect(entityLocation.getCellAtDelta).toHaveBeenCalledWith(1, 1);
-    expect(uiPaneMessages.addMessage).toHaveBeenCalled();
+    expect(entityMovement.ofEntity.showMessage).toHaveBeenCalled();
   });
 
   test('should try to move to a cell and handle occupied cell', () => {
@@ -183,7 +171,7 @@ describe('EntityMovement', () => {
 
   test('should confirm move to a new cell', () => {
     jest.spyOn(entity, 'determineVisibleCells');
-    jest.spyOn(entityMovement, 'messageAvatar');
+    jest.spyOn(entityMovement.ofEntity, 'showMessage');
     const newCell = { x: 6, y: 6, z: 0, entity: null, isTraversible: true };
     const oldCell = { x: 5, y: 5, z: 0, entity: entity };
     entityLocation.getCell = jest.fn(() => oldCell);
@@ -194,24 +182,24 @@ describe('EntityMovement', () => {
     expect(oldCell.entity).toBeUndefined();
     expect(newCell.entity).toBe(entity);
     expect(entity.determineVisibleCells).toHaveBeenCalled();
-    expect(entityMovement.messageAvatar).not.toHaveBeenCalled();
+    expect(entityMovement.ofEntity.showMessage).not.toHaveBeenCalled();
   });
 
   test('should message avatar when moving into a cell with items in it', () => {
-    jest.spyOn(entityMovement, 'messageAvatar');
+    jest.spyOn(entityMovement.ofEntity, 'showMessage');
     const newCell = { x: 6, y: 6, z: 0, entity: null, isTraversible: true, inventory: true };
     const oldCell = { x: 5, y: 5, z: 0, entity: entity };
     entityLocation.getCell = jest.fn(() => oldCell);
 
     const resultMovementCost = entityMovement.confirmMove(newCell);
 
-    expect(entityMovement.messageAvatar).toHaveBeenCalled();
+    expect(entityMovement.ofEntity.showMessage).toHaveBeenCalled();
   });
 
   test('should confirm move to deltas', () => {
     jest.spyOn(entityLocation, 'placeAtCell');
     jest.spyOn(entity, 'determineVisibleCells');
-    jest.spyOn(entityMovement, 'messageAvatar');
+    jest.spyOn(entityMovement.ofEntity, 'showMessage');
     const oldCell = { x: 5, y: 5, z: 0, entity: entity };
     const newCell = { x: 6, y: 6, z: 0, entity: null, isTraversible: true };
     entityLocation.getCell = jest.fn(() => oldCell);
@@ -224,11 +212,11 @@ describe('EntityMovement', () => {
     expect(newCell.entity).toBe(entity);
     expect(entityLocation.placeAtCell).toHaveBeenCalledWith(newCell);
     expect(entity.determineVisibleCells).toHaveBeenCalled();
-    expect(entityMovement.messageAvatar).not.toHaveBeenCalled();
+    expect(entityMovement.ofEntity.showMessage).not.toHaveBeenCalled();
   });
 
   test('should message avatar when moving by deltas into a cell with items in it', () => {
-    jest.spyOn(entityMovement, 'messageAvatar');
+    jest.spyOn(entityMovement.ofEntity, 'showMessage');
     const newCell = { x: 6, y: 6, z: 0, entity: null, isTraversible: true, inventory: true };
     const oldCell = { x: 5, y: 5, z: 0, entity: entity };
     entityLocation.getCell = jest.fn(() => oldCell);
@@ -236,21 +224,21 @@ describe('EntityMovement', () => {
 
     const resultMovementCost = entityMovement.confirmMoveDeltas(1, 1);
 
-    expect(entityMovement.messageAvatar).toHaveBeenCalled();
+    expect(entityMovement.ofEntity.showMessage).toHaveBeenCalled();
   });
 
 
   // SLEEPING (technically "movement" even if the entity isn't moving per se)
   describe('EntityMovement - Sleeping Methods', () => {
     beforeEach(() => {
-      jest.spyOn(entityMovement, 'messageAvatar');
+      jest.spyOn(entityMovement.ofEntity, 'showMessage');
     });
 
     test('should start sleeping', () => {
       entityMovement.isSleeping = false;
       entityMovement.startSleeping();
       expect(entityMovement.isSleeping).toBe(true);
-      expect(entityMovement.messageAvatar).toHaveBeenCalled();
+      expect(entityMovement.ofEntity.showMessage).toHaveBeenCalled();
     });
 
     test('should stop sleeping', () => {
@@ -271,7 +259,7 @@ describe('EntityMovement', () => {
         entity.health.maxHealth = 100;
 
         expect(entityMovement.canSleep()).toBe(false);
-        expect(entityMovement.messageAvatar).toHaveBeenCalled();
+        expect(entityMovement.ofEntity.showMessage).toHaveBeenCalled();
       });
 
       test('should return true for canSleep when adjacent entity is not hostile or violent AND at less than max health', () => {
@@ -293,7 +281,7 @@ describe('EntityMovement', () => {
         worldLevel.addEntity(hostileEntity, occupiedCell);
 
         expect(entityMovement.canSleep()).toBe(false);
-        expect(entityMovement.messageAvatar).toHaveBeenCalled();
+        expect(entityMovement.ofEntity.showMessage).toHaveBeenCalled();
       });
 
       test('should return false for canSleep when a violent entity is adjacent', () => {
@@ -305,7 +293,7 @@ describe('EntityMovement', () => {
         jest.spyOn(entity, 'getRelationshipTo').mockReturnValue("VIOLENT_TO");
 
         expect(entityMovement.canSleep()).toBe(false);
-        expect(entityMovement.messageAvatar).toHaveBeenCalled();
+        expect(entityMovement.ofEntity.showMessage).toHaveBeenCalled();
       });
 
     });
@@ -347,7 +335,7 @@ describe('EntityMovement', () => {
   describe('EntityMovement - Running Methods', () => {
 
     beforeEach(() => {
-      jest.spyOn(entityMovement, 'messageAvatar');
+      jest.spyOn(entityMovement.ofEntity, 'showMessage');
     });
 
     test('should start running with given deltas', () => {
