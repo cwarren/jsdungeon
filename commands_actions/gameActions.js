@@ -158,7 +158,7 @@ function getAllItems(gameState, key, event) {
         uiPaneMessages.addMessage("Nothing to get here");
         return 0;
     }
-    if (targetCell.inventory.size() == 1) {
+    if (targetCell.inventory.count() == 1) {
         return getOneItem(gameState, key, event);
     }
     gameState.avatar.takeAllItemsFromCell(targetCell);

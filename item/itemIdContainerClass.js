@@ -30,7 +30,7 @@ class ItemIdContainer {
         return this.itemIdList.length == 0;
     }
 
-    size() {
+    count() {
         return this.itemIdList.length;
     }
 

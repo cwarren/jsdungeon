@@ -112,10 +112,10 @@ describe('gameActions tests', () => {
     describe('gameActions tests - inventory', () => {
         test('GET_SINGLE_ITEM does nothing and takes no time if no items to get', () => {
             avatar.getCell().inventory = null;
-            const initialInventorySize = avatar.inventory.size();
+            const initialInventorySize = avatar.inventory.count();
             const result = gameActionsMap.GET_SINGLE_ITEM.action(gameState);
             expect(result).toBe(0);
-            expect(avatar.inventory.size()).toEqual(initialInventorySize);
+            expect(avatar.inventory.count()).toEqual(initialInventorySize);
         });
 
         test('GET_SINGLE_ITEM takes the only item from the cell, using some time and clearing out that location', () => {
@@ -124,12 +124,12 @@ describe('gameActions tests', () => {
             const item = Item.makeItem("ROCK");
             gameState.itemRepo.add(item);
             avCell.giveItem(item);
-            expect(avatar.inventory.size()).toEqual(0);
-            expect(avCell.inventory.size()).toEqual(1);
+            expect(avatar.inventory.count()).toEqual(0);
+            expect(avCell.inventory.count()).toEqual(1);
 
             const result = gameActionsMap.GET_SINGLE_ITEM.action(gameState);
 
-            expect(avatar.inventory.size()).toEqual(1);
+            expect(avatar.inventory.count()).toEqual(1);
             expect(avCell.inventory).toBeNull();
             expect(result).toBe(avatar.baseActionTime);
         });
@@ -145,22 +145,22 @@ describe('gameActions tests', () => {
             gameState.itemRepo.add(item2);
             avCell.giveItem(item2);
             
-            expect(avatar.inventory.size()).toEqual(0);
-            expect(avCell.inventory.size()).toEqual(2);
+            expect(avatar.inventory.count()).toEqual(0);
+            expect(avCell.inventory.count()).toEqual(2);
 
             const result = gameActionsMap.GET_SINGLE_ITEM.action(gameState);
 
-            expect(avatar.inventory.size()).toEqual(1);
-            expect(avCell.inventory.size()).toEqual(1);
+            expect(avatar.inventory.count()).toEqual(1);
+            expect(avCell.inventory.count()).toEqual(1);
             expect(result).toBe(avatar.baseActionTime);
         });
 
         test('GET_ALL_ITEMS does nothing and takes no time if no items', () => {
             avatar.getCell().inventory = null;
-            const initialInventorySize = avatar.inventory.size();
+            const initialInventorySize = avatar.inventory.count();
             const result = gameActionsMap.GET_ALL_ITEMS.action(gameState);
             expect(result).toBe(0);
-            expect(avatar.inventory.size()).toEqual(initialInventorySize);
+            expect(avatar.inventory.count()).toEqual(initialInventorySize);
         });
 
         test('GET_ALL_ITEMS does the same as GET_SINGLE_ITEM if only one item is in the cell', () => {
@@ -169,12 +169,12 @@ describe('gameActions tests', () => {
             const item = Item.makeItem("ROCK");
             gameState.itemRepo.add(item);
             avCell.giveItem(item);
-            expect(avatar.inventory.size()).toEqual(0);
-            expect(avCell.inventory.size()).toEqual(1);
+            expect(avatar.inventory.count()).toEqual(0);
+            expect(avCell.inventory.count()).toEqual(1);
 
             const result = gameActionsMap.GET_ALL_ITEMS.action(gameState);
 
-            expect(avatar.inventory.size()).toEqual(1);
+            expect(avatar.inventory.count()).toEqual(1);
             expect(avCell.inventory).toBeNull();
             expect(result).toBe(avatar.baseActionTime);
         });
@@ -190,12 +190,12 @@ describe('gameActions tests', () => {
             gameState.itemRepo.add(item2);
             avCell.giveItem(item2);
             
-            expect(avatar.inventory.size()).toEqual(0);
-            expect(avCell.inventory.size()).toEqual(2);
+            expect(avatar.inventory.count()).toEqual(0);
+            expect(avCell.inventory.count()).toEqual(2);
 
             const result = gameActionsMap.GET_ALL_ITEMS.action(gameState);
 
-            expect(avatar.inventory.size()).toEqual(2);
+            expect(avatar.inventory.count()).toEqual(2);
             expect(avCell.inventory).toBeNull();
             expect(result).toBe(avatar.baseActionTime * 2);
         });
