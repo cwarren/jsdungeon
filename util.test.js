@@ -2,6 +2,7 @@ import {
     devTrace,
     formatNumberForMessage,
     formatNumberForShortDisplay,
+    prefixArticleTo,
     rollDice,
     rollDiceGroup,
     getRandomListItem,
@@ -94,6 +95,53 @@ describe('formatNumberForShortDisplay', () => {
         expect(formatNumberForShortDisplay(5.0005, 0)).toBe('5');
         expect(formatNumberForShortDisplay(-5.0005, 0)).toBe('-5');
 
+    });
+});
+
+describe('prefixArticleTo', () => {
+    test('prefixes "an" to nouns starting with a vowel', () => {
+        expect(prefixArticleTo('apple')).toBe('an apple');
+        expect(prefixArticleTo('eagle')).toBe('an eagle');
+        expect(prefixArticleTo('iguana')).toBe('an iguana');
+        expect(prefixArticleTo('octopus')).toBe('an octopus');
+        expect(prefixArticleTo('umbrella')).toBe('an umbrella');
+    });
+
+    test('prefixes "a" to nouns starting with a consonant', () => {
+        expect(prefixArticleTo('banana')).toBe('a banana');
+        expect(prefixArticleTo('car')).toBe('a car');
+        expect(prefixArticleTo('dog')).toBe('a dog');
+        expect(prefixArticleTo('house')).toBe('a house');
+        expect(prefixArticleTo('zebra')).toBe('a zebra');
+    });
+
+    test('handles irregular "an" cases correctly', () => {
+        expect(prefixArticleTo('hour')).toBe('an hour');
+        expect(prefixArticleTo('honest')).toBe('an honest');
+        expect(prefixArticleTo('honor')).toBe('an honor');
+        expect(prefixArticleTo('heir')).toBe('an heir');
+    });
+
+    test('handles irregular "a" cases correctly', () => {
+        expect(prefixArticleTo('unicorn')).toBe('a unicorn');
+        expect(prefixArticleTo('university')).toBe('a university');
+        expect(prefixArticleTo('european')).toBe('a european');
+        expect(prefixArticleTo('one')).toBe('a one');
+        expect(prefixArticleTo('use')).toBe('a use');
+    });
+
+    test('ignores case sensitivity', () => {
+        expect(prefixArticleTo('Apple')).toBe('an Apple');
+        expect(prefixArticleTo('Banana')).toBe('a Banana');
+        expect(prefixArticleTo('Unicorn')).toBe('a Unicorn');
+        expect(prefixArticleTo('Hour')).toBe('an Hour');
+    });
+
+    test('handles empty and non-string input gracefully', () => {
+        expect(prefixArticleTo('')).toBe('');
+        expect(prefixArticleTo(null)).toBe(null);
+        expect(prefixArticleTo(undefined)).toBe(undefined);
+        expect(prefixArticleTo(42)).toBe(42);
     });
 });
 

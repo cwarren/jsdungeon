@@ -124,6 +124,32 @@ function formatNumberForShortDisplay(num, places=0) {
     }
 }
 
+function prefixArticleTo(noun) {
+    if (typeof noun !== 'string' || noun.length === 0) {
+        return noun;
+    }
+
+    const lowerNoun = noun.trim().toLowerCase();
+    const vowels = ['a', 'e', 'i', 'o', 'u'];
+
+    // Handle special cases where the first letter doesn't match the first sound
+    const irregularAn = ['honest', 'hour', 'honor', 'heir'];
+    const irregularA = ['university', 'unicorn', 'european', 'one', 'use'];
+
+    if (irregularAn.includes(lowerNoun)) {
+        return `an ${noun}`;
+    }
+
+    if (irregularA.includes(lowerNoun)) {
+        return `a ${noun}`;
+    }
+
+    const firstChar = lowerNoun[0];
+    const article = vowels.includes(firstChar) ? 'an' : 'a';
+
+    return `${article} ${noun}`;
+}
+
 let idCounter = 0;
 function generateId(prefix = "id") {
     const timestamp = Date.now().toString(36); // Base-36 timestamp
@@ -150,6 +176,7 @@ export {
     devTrace,
     formatNumberForMessage,
     formatNumberForShortDisplay,
+    prefixArticleTo,
     generateId,
     idOf
 };
