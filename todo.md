@@ -1,8 +1,7 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* implement a pick-up commands in game play (single, all)
-* * create the gamePlay actions that cause the avatar to do those things
+* add something to world level spec (and the things that use it) to let standard population of the level be skipped (useful for testing)
 
 * inventory UI
 * * inventory screen

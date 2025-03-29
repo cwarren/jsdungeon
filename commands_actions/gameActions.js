@@ -1,4 +1,3 @@
-// import { DEFAULT_ACTION_COST } from "../entity/entityClass.js";
 import { uiPaneMain, uiPaneMessages } from "../ui/ui.js";
 import { devTrace } from "../util.js";
 
@@ -35,6 +34,9 @@ const gameActionsMap = {
     RUN_DR: { name: "Run DR", description: "Move repeatedly, starting in the given direction", action: runAvatar_DR },
 
     SLEEP: { name: "Sleep", description: "Stay in the same space doing nothing until something happens or enough time has passed", action: sleepAvatar },
+
+    GET_SINGLE_ITEM: { name: "Get an item", description: "Pick up a single item from the current location", action: getOneItem },
+    GET_ALL_ITEMS: { name: "Get all items", description: "Pick up as many items as you can from the current location", action: getAllItems },
 
     ZOOM_IN: { name: "Zoom In", description: "Zoom in", action: zoomIn },
     ZOOM_OUT: { name: "Zoom Out", description: "Zoom out", action: zoomOut },
@@ -91,6 +93,7 @@ function ascendStairs(gameState, key, event) {
         newCell.worldLevel.handleAvatarEnteringLevel(newCell);
     } else {
         uiPaneMessages.addMessage("Cannot ascend - no stairs up here");
+        return 0;
     }
     return gameState.avatar.baseActionTime;
 }
@@ -110,6 +113,7 @@ function descendStairs(gameState, key, event) {
         newCell.worldLevel.handleAvatarEnteringLevel(newCell);
     } else {
         uiPaneMessages.addMessage("Cannot descend - no stairs down here");
+        return 0;
     }
     return gameState.avatar.baseActionTime;
 }
@@ -137,6 +141,30 @@ function sleepAvatar(gameState, key, event) {
     gameState.avatar.startSleeping();
     return gameState.avatar.continueSleeping();
 }
+
+
+function getOneItem(gameState, key, event) {
+    const targetCell = gameState.avatar.getCell();
+    if (! targetCell.inventory) {
+        uiPaneMessages.addMessage("Nothing to get here");
+        return 0;
+    }
+    gameState.avatar.takeSingleItemFromCell(targetCell);
+    return gameState.avatar.baseActionTime;
+}
+function getAllItems(gameState, key, event) {
+    const targetCell = gameState.avatar.getCell();
+    if (! targetCell.inventory) {
+        uiPaneMessages.addMessage("Nothing to get here");
+        return 0;
+    }
+    if (targetCell.inventory.size() == 1) {
+        return getOneItem(gameState, key, event);
+    }
+    gameState.avatar.takeAllItemsFromCell(targetCell);
+    return gameState.avatar.baseActionTime * 2;
+}
+
 
 function zoomIn(gameState, key, event)  { uiPaneMain.zoomIn(); return 0; }
 function zoomOut(gameState, key, event)  { uiPaneMain.zoomOut(); return 0; }

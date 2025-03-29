@@ -30,6 +30,10 @@ class ItemIdContainer {
         return this.itemIdList.length == 0;
     }
 
+    size() {
+        return this.itemIdList.length;
+    }
+
     //================
 
     add(itemObjectOrId) {

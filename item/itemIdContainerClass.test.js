@@ -46,6 +46,20 @@ describe('ItemIdContainer', () => {
         expect(container.isEmpty()).toBe(true);
     });
 
+    test('says how many items contained', () => {
+        expect(container.isEmpty()).toBe(true);
+        expect(container.size()).toEqual(0);
+
+        container.add(item1);
+        expect(container.size()).toEqual(1);
+
+        container.add(item2);
+        expect(container.size()).toEqual(2);
+
+        container.remove(item1);
+        expect(container.size()).toEqual(1);
+    });
+
     test('removes items', () => {
         container.add(item1);
         container.add(item2);

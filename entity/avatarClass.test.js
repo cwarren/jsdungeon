@@ -54,6 +54,7 @@ describe('Avatar', () => {
     expect(avatar.type).toBe('AVATAR');
     expect(avatar.timeOnLevel).toBe(0);
     expect(avatar.meleeAttack).toBe(true);
+    expect(avatar.inventory).not.toBeNull();
   });
 
   test('should reset time on level', () => {

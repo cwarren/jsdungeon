@@ -10,12 +10,15 @@ import { EntityMovement } from "./entityMovementClass.js";
 import { EntityVision } from "./entityVisionClass.js";
 import { EntityAttributes } from "./entityAttributesClass.js";
 
+import { ItemIdContainer } from "../item/itemIdContainerClass.js";
+
 class Avatar extends Entity {
   constructor(gameState, id = null) {
     super(gameState, "AVATAR", id);
     this.timeOnLevel = 0;
     this.meleeAttack = true;
     this.paneMiniChar = null;
+    this.inventory = new ItemIdContainer(); // base entity has null inventory until used, but the avatar always has an inventory
   }
 
   forSerializing() {
