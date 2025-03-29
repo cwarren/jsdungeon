@@ -32,6 +32,9 @@ const keyBinding = {
         "<": "TAKE_STAIRS_UP",
         ">": "TAKE_STAIRS_DOWN",
 
+        "g": "GET_SINGLE_ITEM",
+        "G": "GET_ALL_ITEMS",
+
         "l": "DEV_LOSE_GAME",
         "w": "DEV_WIN_GAME",
         "%": "DEV_DUMP_GAME_STATE",
@@ -44,7 +47,6 @@ const keyBinding = {
         "I": "PUSH_INVENTORY_SCREEN",
         "E": "PUSH_EQUIPMENT_SCREEN",
         "M": "PUSH_MAP_SCREEN",
-        "G": "POP_UI_STATE", // GAME_META is the base game state, so from game play popping state gets you back to game meta
         "Escape": "POP_UI_STATE",
         "?": "PUSH_HELP",
     },

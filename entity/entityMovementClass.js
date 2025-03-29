@@ -1,4 +1,4 @@
-import { devTrace, getRandomListItem } from "../util.js";
+import { devTrace, getRandomListItem, prefixArticleTo } from "../util.js";
 import { GridCell } from "../world/gridCellClass.js";
 import { getRandomCellOfTerrainInGrid, determineCheapestMovementPathForEntity, computeBresenhamLine } from "../world/gridUtils.js";
 import { uiPaneMessages } from "../ui/ui.js";
@@ -59,9 +59,7 @@ class EntityMovement {
         const oldCell = this.location.getCell();
         oldCell.entity = undefined;
         this.location.placeAtCell(targetCell);
-        if (targetCell.inventory) {
-            this.ofEntity.showMessage("There are some items here.");
-        }
+        this.messageAboutCellContents(targetCell);
         return this.actionTime;
     }
     confirmMoveDeltas(dx, dy) {
@@ -70,10 +68,21 @@ class EntityMovement {
         oldCell.entity = undefined;
         const newCell = this.location.getCellAtDelta(dx, dy);
         this.location.placeAtCell(newCell);
-        if (newCell.inventory) {
-            this.ofEntity.showMessage("There are some items here.");
-        }
+        this.messageAboutCellContents(newCell);
         return this.actionTime;
+    }
+
+    // TODO: this function needs a better home....
+    messageAboutCellContents(targetCell) {
+        if (! targetCell.inventory) {
+            return;
+        }
+        if (targetCell.inventory.count() == 1) {
+            const item = targetCell.inventory.getFirstItem(this.ofEntity.gameState.itemRepo);
+            this.ofEntity.showMessage(`There's ${prefixArticleTo(item.name)} here.`);
+            return;
+        }
+        this.ofEntity.showMessage("There are some items here.");
     }
 
     // SLEEPING METHODS
@@ -162,7 +171,7 @@ class EntityMovement {
             return false;
         }
         if (this.location.getCell().inventory) { 
-            this.ofEntity.showMessage("You stop running because there are some items here.")
+            this.ofEntity.showMessage("You stop running because there's something here.")
             return false;
         }
 

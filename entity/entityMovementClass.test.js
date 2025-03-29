@@ -26,6 +26,7 @@ jest.mock('../util.js', () => ({
   rollDice: jest.requireActual('../util.js').rollDice,
   valueCalc: jest.requireActual('../util.js').valueCalc,
   getRandomListItem: jest.fn(),
+  prefixArticleTo: jest.requireActual('../util.js').prefixArticleTo,
   generateId: jest.requireActual('../util.js').generateId,
   idOf: jest.requireActual('../util.js').idOf,
 }));
@@ -44,8 +45,8 @@ jest.mock('../world/gridUtils.js', () => ({
 }));
 
 const WORLD_LEVEL_SPECS_FOR_TESTING = [
-  WorldLevelSpecification.generateWorldLevelSpec({ type: 'EMPTY', width: 10, height: 10, populationParams: {entityPopulation: 'NONE', itemPopulation: 'NONE'}, }),
-  WorldLevelSpecification.generateWorldLevelSpec({ type: 'EMPTY', width: 15, height: 15, populationParams: {entityPopulation: 'NONE', itemPopulation: 'NONE'}, }),
+  WorldLevelSpecification.generateWorldLevelSpec({ type: 'EMPTY', width: 10, height: 10, populationParams: { entityPopulation: 'NONE', itemPopulation: 'NONE' }, }),
+  WorldLevelSpecification.generateWorldLevelSpec({ type: 'EMPTY', width: 15, height: 15, populationParams: { entityPopulation: 'NONE', itemPopulation: 'NONE' }, }),
 ];
 
 
@@ -187,7 +188,12 @@ describe('EntityMovement', () => {
 
   test('should message avatar when moving into a cell with items in it', () => {
     jest.spyOn(entityMovement.ofEntity, 'showMessage');
-    const newCell = { x: 6, y: 6, z: 0, entity: null, isTraversible: true, inventory: true };
+    const newCell = {
+      x: 6, y: 6, z: 0, entity: null, isTraversible: true, inventory: {
+        count: jest.fn().mockReturnValue(1),
+        getFirstItem: jest.fn().mockReturnValue({ id: 'id-123', name: 'Item' })
+      }
+    };
     const oldCell = { x: 5, y: 5, z: 0, entity: entity };
     entityLocation.getCell = jest.fn(() => oldCell);
 
@@ -195,6 +201,8 @@ describe('EntityMovement', () => {
 
     expect(entityMovement.ofEntity.showMessage).toHaveBeenCalled();
   });
+
+  // messageAboutCellContents
 
   test('should confirm move to deltas', () => {
     jest.spyOn(entityLocation, 'placeAtCell');
@@ -217,7 +225,12 @@ describe('EntityMovement', () => {
 
   test('should message avatar when moving by deltas into a cell with items in it', () => {
     jest.spyOn(entityMovement.ofEntity, 'showMessage');
-    const newCell = { x: 6, y: 6, z: 0, entity: null, isTraversible: true, inventory: true };
+    const newCell = {
+      x: 6, y: 6, z: 0, entity: null, isTraversible: true, inventory: {
+        count: jest.fn().mockReturnValue(1),
+        getFirstItem: jest.fn().mockReturnValue({ id: 'id-123', name: 'Item' })
+      }
+    };
     const oldCell = { x: 5, y: 5, z: 0, entity: entity };
     entityLocation.getCell = jest.fn(() => oldCell);
     entityLocation.getCellAtDelta = jest.fn((dx, dy) => newCell);
@@ -226,7 +239,6 @@ describe('EntityMovement', () => {
 
     expect(entityMovement.ofEntity.showMessage).toHaveBeenCalled();
   });
-
 
   // SLEEPING (technically "movement" even if the entity isn't moving per se)
   describe('EntityMovement - Sleeping Methods', () => {
