@@ -83,6 +83,11 @@ class ItemIdContainer {
     getItems(itemRepository) {
         return this.itemIdList.map(itmId => itemRepository.get(itmId));
     }
+
+    getFirstItem(itemRepository) {
+        if (! this.itemIdList[0] ) { return null; }
+        return itemRepository.get(this.itemIdList[0]);
+    }
 }
 
 export { ItemIdContainer };

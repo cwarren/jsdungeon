@@ -158,6 +158,17 @@ describe('ItemIdContainer', () => {
                 null,
             ]);
         });
+
+        test('returns full item object for first item', () => {
+            container = new ItemIdContainer(['item-1']);
+
+            const results = container.getFirstItem(itemRepo);
+    
+            expect(results).toEqual(
+                { id: 'item-1', name: 'Sword' }
+            );
+        });
+
     });
 
     describe('ItemIdContainer - serializing', () => {
