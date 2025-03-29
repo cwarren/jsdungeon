@@ -123,6 +123,8 @@ describe('WorldLevel', () => {
       queue: expect.any(Array),
     }));
     expect(worldLevel.timeOfAvatarDeparture).toBe(0);
+    expect(worldLevel.gridTypeGenerationParams).toBeNull();
+    expect(worldLevel.populationParams).toBeNull();
   });
 
   test('should set gameState', () => {
@@ -146,6 +148,19 @@ describe('WorldLevel', () => {
     expect(levelFromSpec.levelHeight).toBe(12);
     expect(levelFromSpec.grid).toBeNull();
     expect(levelFromSpec.levelType).toBe('RANDOM');
+    expect(levelFromSpec.gridTypeGenerationParams).toBeNull();
+    expect(levelFromSpec.populationParams).toBeNull();
+  });
+
+  test('should get a world level from a WorldLevelSpecification with grid type params should pick those up', () => {
+    const levelFromSpec = WorldLevel.getFromSpecification(gameState, 5, WorldLevelSpecification.generateWorldLevelSpec({ 
+      width: 18, height: 12, type: "RANDOM",  
+      gridTypeGenerationParams: {foo: 'bar' },
+      populationParams: {alpha: 'beta' },
+    }));
+
+    expect(levelFromSpec.gridTypeGenerationParams).toEqual({foo: 'bar' });
+    expect(levelFromSpec.populationParams).toEqual({alpha: 'beta' });
   });
 
   test('should generate grid and set world level for grid cells', () => {

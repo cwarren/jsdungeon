@@ -45,7 +45,8 @@ class WorldLevel {
         this.stairsUp = null;
         this.turnQueue = new TurnQueue(this.gameState);
         this.timeOfAvatarDeparture = 0;
-        this.generationParams = null;
+        this.gridTypeGenerationParams = null;
+        this.populationParams = null;
     }
 
     setGameState(gameState) {
@@ -56,7 +57,7 @@ class WorldLevel {
     // ---------------------
 
     forSerializing() {
-        
+
         let serialGrid = [];
         if (this.grid && this.grid.length > 0) {
             for (let x = 0; x < this.levelWidth; x++) {
@@ -126,7 +127,8 @@ class WorldLevel {
 
     static getFromSpecification(gameState, levelNumber, worldLevelSpecification) {
         const wl = new WorldLevel(gameState, levelNumber, worldLevelSpecification.width, worldLevelSpecification.height, worldLevelSpecification.type);
-        wl.generationParams = worldLevelSpecification.typeGenerationParams ? worldLevelSpecification.typeGenerationParams : null;
+        wl.gridTypeGenerationParams = worldLevelSpecification.gridTypeGenerationParams ? worldLevelSpecification.gridTypeGenerationParams : null;
+        wl.populationParams = worldLevelSpecification.populationParams ? worldLevelSpecification.populationParams : null;
         return wl;
     }
 
@@ -193,7 +195,7 @@ class WorldLevel {
             devTrace(1, `!! no grid gen function found for ${this.levelType}, using DEFAULT one instead`);
             gridGenFunction = WorldLevel.levelTypeToGenFunction["DEFAULT"];
         }
-        this.grid = gridGenFunction(this.levelWidth, this.levelHeight, this.generationParams);
+        this.grid = gridGenFunction(this.levelWidth, this.levelHeight, this.gridTypeGenerationParams);
         setWorldLevelForGridCells(this, this.grid);
         determineCellViewability(this.grid);
     }
@@ -202,12 +204,24 @@ class WorldLevel {
     }
     populate() {
         devTrace(2, "populating level");
+        this.populateEntities();
+        this.populateItems();
+    }
+
+    populateEntities() {
+        if (this.populationParams?.entityPopulation == 'NONE') {
+            return;
+        }
         //TODO: console.log("world level population (TO BE IMPLEMENTED (1 insidious rat for now))");
         for (let i = 0; i < 1; i++) {
             const ent = new Entity(this.gameState, "RAT_INSIDIOUS");
             this.placeEntityRandomly(ent);
         }
-
+    }
+    populateItems() {
+        if (this.populationParams?.itemPopulation == 'NONE') {
+            return;
+        }
         // TODO: real item population (just a couple of rocks and sticks for now)
         for (let i = 0; i < 2; i++) {
             const item = Item.makeItem("ROCK");

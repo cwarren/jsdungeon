@@ -2,7 +2,7 @@ import { GameState } from './gameStateClass.js';
 import { WorldLevelSpecification } from './world/worldLevelSpecificationClass.js';
 
 const WORLD_LEVEL_SPECS_FOR_TESTING = [
-    WorldLevelSpecification.generateWorldLevelSpec({ type: 'EMPTY', width: 10, height: 10 }),
+    WorldLevelSpecification.generateWorldLevelSpec({ type: 'EMPTY', width: 10, height: 10, populationParams: {entityPopulation: 'NONE', itemPopulation: 'NONE'}, } ),
 ];
 
 jest.mock('../util.js', () => ({

@@ -1,8 +1,6 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* add something to world level spec (and the things that use it) to let standard population of the level be skipped (useful for testing)
-
 * inventory UI
 * * inventory screen
 * * * held by (avatar, structure, on floor, etc.)

@@ -14,7 +14,7 @@ describe('WorldLevelSpecification', () => {
     expect(spec.type).toBe('EMPTY');
     expect(spec.width).toBe(50);
     expect(spec.height).toBe(40);
-    expect(spec.typeGenerationParams).toBeNull();
+    expect(spec.gridTypeGenerationParams).toBeNull();
   });
 
   test('should default to EMPTY when an invalid type is provided', () => {
@@ -40,6 +40,21 @@ describe('WorldLevelSpecification', () => {
     expect(generatedSpec.width).toBe(60);
     expect(generatedSpec.height).toBe(50);
   });
+
+  test('should generate world level spec correctly with grid type generation params', () => {
+    const specGenerationParams = { type: 'TOWN', width: 60, height: 50, gridTypeGenerationParams: {foo: 'bar'} };
+    const generatedSpec = WorldLevelSpecification.generateWorldLevelSpec(specGenerationParams);
+
+    expect(generatedSpec.gridTypeGenerationParams).toEqual({foo: 'bar'});
+  });
+
+  test('should generate world level spec correctly with population params', () => {
+    const specGenerationParams = { type: 'TOWN', width: 60, height: 50, populationParams: {foo: 'bar'} };
+    const generatedSpec = WorldLevelSpecification.generateWorldLevelSpec(specGenerationParams);
+
+    expect(generatedSpec.populationParams).toEqual({foo: 'bar'});
+  });
+
 
   test('should select a type based on an attribute', () => {
     const specGenerationParams = { typeAttribute: 'NATURAL' };

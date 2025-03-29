@@ -18,7 +18,7 @@ class WorldLevelSpecification {
     }
     this.width = width;
     this.height = height;
-    this.typeGenerationParams = null;
+    this.gridTypeGenerationParams = null;
   }
 
   // -----------------------------------
@@ -28,8 +28,11 @@ class WorldLevelSpecification {
     let genWidth = WorldLevelSpecification.getGenWidthFromSpecGenParams(specGenerationParams);
     let genHeight = WorldLevelSpecification.getGenHeightFromSpecGenParams(specGenerationParams);
     const spec = new WorldLevelSpecification(genType, genWidth, genHeight);
-    if (specGenerationParams.typeGenerationParams) {
-      spec.typeGenerationParams = specGenerationParams.typeGenerationParams;
+    if (specGenerationParams.gridTypeGenerationParams) {
+      spec.gridTypeGenerationParams = specGenerationParams.gridTypeGenerationParams;
+    }
+    if (specGenerationParams.populationParams) {
+      spec.populationParams = specGenerationParams.populationParams;
     }
     return spec;
   }
