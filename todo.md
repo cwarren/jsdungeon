@@ -1,22 +1,54 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* implement a pick-up commands in game play (single, all)
-* * create the gamePlay actions that cause the avatar to do those things
+* general two-stage command
+* * initial is getMoreInput
+* * * takes a resolution function (resolveCommandFunction)
+* * * shifts UI mode
+* * * need one version to handle list interactions and one to handle other things (e.g. text, direction, etc.) - focus on the list one for now (initiateListBasedCommand)
+* * * * list UI includes scroll up and down via arrow keys
+* * * * escape to cancel
+* * * * letter to resolve with the given list items
+* * * * * on input recieved, pass to <resolveCommand>, along with gameState, key, event, etc.
+* * * * needs a help screen too
+* * NOTE: ideally able to chain these
+
+* drop command / action
+* * on 'd' switch input mode to list selection
+* * also, show inventory list in list screen
+* * * showItemListFromOffset (item list, offset)
+* * * arrow keys scroll the list up or down
+* * * * increment or decrement the offset
+* * * * update the list ui accordingly
+* * * list items shown are referenced by number
+* * * * list shows at most 9 items - 1-9, from the offset
+* * * * this number is an offset from the list top - referenced item is offset + selected number - 1
 
 * inventory UI
+* * on 'i' switch to inventory screen
 * * inventory screen
-* * * held by (avatar, structure, on floor, etc.)
+* * * held by (avatar, structure, on floor, in bag, etc.)
 * * * stub out commands
 * * * * drop command
 * * * * examine command
 * * * * wear / wield command (does nothing for now)
+* * * * put / place command (does nothing for now, eventually puts into another container)
 * * help screen for inventory
 * * pick up command to get an item in a grid cell
 * * when a grid cell has a single item, show that item
 * * when a grid cell has more than one item, render each on top of each other (don't really need special handling for an item pile... though might want a render limit if the list is huge)
 
+* implement capacity for item containers
+* * volume
+* * mass
+
 * ?? UI for general container-to-container transfer of items
+* * how to determine / select which containers?
+* * * current space
+* * * structure on current space, which has a container
+* * * main inventory
+* * * any containers in main inventory
+* need a container context - this is like managing any tree-like file storage structure
 
 * create a chest structure
 * * with an inventory
