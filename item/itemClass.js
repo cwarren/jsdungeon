@@ -6,6 +6,7 @@ class Item {
         this.id = id ? id : generateId();
         this.type = itemDef.type;
         this.name = itemDef.name;
+        this.description = itemDef.description;
         this.displaySymbol = itemDef.displaySymbol;
         this.displayColor = itemDef.displayColor;
     }
@@ -23,9 +24,6 @@ class Item {
         return {
             id: this.id,
             type: this.type,
-            name: this.name,
-            displaySymbol: this.displaySymbol,
-            displayColor: this.displayColor,
         };
     }
 
@@ -39,10 +37,6 @@ class Item {
             console.log('Could not deserialize item from data', data);
             return null;
         }
-
-        item.name=data.name;
-        item.displaySymbol=data.displaySymbol;
-        item.displayColor=data.displayColor;
 
         return item;
     }

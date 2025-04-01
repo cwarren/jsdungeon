@@ -1,4 +1,4 @@
-import { uiPaneMain, uiPaneMessages } from "../ui/ui.js";
+import { uiPaneMain, uiPaneMessages, uiPaneInfo } from "../ui/ui.js";
 import { devTrace } from "../util.js";
 
 
@@ -38,7 +38,7 @@ const gameActionsMap = {
     GET_SINGLE_ITEM: { name: "Get an item", description: "Pick up a single item from the current location", action: getOneItem },
     GET_ALL_ITEMS: { name: "Get all items", description: "Pick up as many items as you can from the current location", action: getAllItems },
 
-    INVENTORY_SHOW: { name: "Inventory", description: "See what's in your inventory", action: showInventoryInitiate, actionResolver: showInventoryResolve },
+    INVENTORY_SHOW: { name: "Inventory", description: "See what's in your inventory", action: showInventoryInitiate, actionResolver: showInventoryResolve, actionCancellation: showInventoryCancel },
     INVENTORY_DROP: { name: "Drop", description: "Drop something that's in your inventory", action: dropItemInitiate, actionResolver: dropItemResolve },
 
 
@@ -174,28 +174,36 @@ function showInventoryInitiate(gameState, key, event) {
     uiPaneMain.eventHandler.startListBasedInput("INVENTORY_SHOW",
         gameState.avatar.inventory.getItems(gameState.itemRepo),
         "Here's what you're carrying",
-        gameActionsMap.INVENTORY_SHOW.actionResolver);
+        gameActionsMap.INVENTORY_SHOW.actionResolver,
+        gameActionsMap.INVENTORY_SHOW.actionCancellation
+    );
     return 0;
 }
 function showInventoryResolve(gameState, listForInput, selectionIdx) {
     console.log("called showInventoryResolve");
     console.log(gameState, listForInput, selectionIdx);
-    // TODO: set info panel to item description
+    const selectedItem = listForInput[selectionIdx];
+    // NOTE: can't set uiPaneInfo directly because on resolution the info is reset to what it was before the inventory command, so instead need to update what it's restored from
+    uiPaneMain.eventHandler.priorInfo = `${selectedItem.name}<br/>${selectedItem.description}`;
 }
+function showInventoryCancel() {
+    uiPaneMain.eventHandler.priorInfo = '';
+}
+
 function dropItemInitiate(gameState, key, event) {
     console.log("called dropItemInitiate");
     uiPaneMain.eventHandler.startListBasedInput("INVENTORY_DROP",
         gameState.avatar.inventory.getItems(gameState.itemRepo),
         "Choose which item to drop",
-        gameActionsMap.INVENTORY_SHOW.actionResolver);
+        gameActionsMap.INVENTORY_DROP.actionResolver);
     return 0;
 }
 function dropItemResolve(gameState, listForInput, selectionIdx) {
     console.log("called dropItemResolve");
     console.log(gameState, listForInput, selectionIdx);
+    const selectedItem = listForInput[selectionIdx];
     // TODO: transfer selected item from avatar inventory to current cell
-    // TODO: message player about 'dropped foo'
-
+    uiPaneMessages.addMessage(`You drop the ${selectedItem.name}`);
 }
 
 function zoomIn(gameState, key, event) { uiPaneMain.zoomIn(); return 0; }

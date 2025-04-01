@@ -17,10 +17,11 @@ describe('Item', () => {
         const item = new Item(rockDef, 'custom-id-001');
 
         expect(item.id).toBe('custom-id-001');
-        expect(item.type).toBe('ROCK');
-        expect(item.name).toBe('Rock');
-        expect(item.displaySymbol).toBe('*');
-        expect(item.displayColor).toBe('#fff');
+        expect(item.type).toBe(rockDef.type);
+        expect(item.name).toBe(rockDef.name);
+        expect(item.description).toBe(rockDef.description);        
+        expect(item.displaySymbol).toBe(rockDef.displaySymbol);
+        expect(item.displayColor).toBe(rockDef.displayColor);
     });
 
     test('constructor assigns generated ID if none provided', () => {
@@ -34,8 +35,8 @@ describe('Item', () => {
         const item = Item.makeItem('ROCK');
 
         expect(item).toBeInstanceOf(Item);
-        expect(item.type).toBe('ROCK');
-        expect(item.name).toBe('Rock');
+        expect(item.type).toBe(rockDef.type);
+        expect(item.name).toBe(rockDef.name);
     });
 
     test('makeItem returns null and logs when type is unknown', () => {
@@ -57,9 +58,6 @@ describe('Item', () => {
             expect(serialized).toEqual({
                 id: item.id,
                 type: item.type,
-                name: item.name,
-                displaySymbol: item.displaySymbol,
-                displayColor: item.displayColor,
             });
         });
 
@@ -74,19 +72,17 @@ describe('Item', () => {
             const data = {
                 id: 'restored-1',
                 type: 'ROCK',
-                name: 'Restored Rock',
-                displaySymbol: ',',
-                displayColor: '#0f0',
             };
 
             const item = Item.deserialize(data);
 
             expect(item).toBeInstanceOf(Item);
             expect(item.id).toBe('restored-1');
-            expect(item.type).toBe('ROCK'); // taken from getItemDef
-            expect(item.name).toBe('Restored Rock'); // overridden
-            expect(item.displaySymbol).toBe(',');
-            expect(item.displayColor).toBe('#0f0');
+            expect(item.type).toBe(rockDef.type);
+            expect(item.name).toBe(rockDef.name);
+            expect(item.description).toBe(rockDef.description);
+            expect(item.displaySymbol).toBe(rockDef.displaySymbol);
+            expect(item.displayColor).toBe(rockDef.displayColor);
         });
 
         test('deserialize returns null and logs if item type is unknown', () => {
