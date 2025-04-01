@@ -1,27 +1,16 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* inventory and drop command / action
-* * also, show inventory list in list screen
-* * * showItemListFromOffset (item list, offset)
-* * * arrow keys scroll the list up or down
-* * * * increment or decrement the offset
-* * * * update the list ui accordingly
-
-
 * inventory UI
-* * on 'i' switch to inventory screen
-* * inventory screen
-* * * held by (avatar, structure, on floor, in bag, etc.)
-* * * stub out commands
-* * * * drop command
-* * * * examine command
-* * * * wear / wield command (does nothing for now)
-* * * * put / place command (does nothing for now, eventually puts into another container)
-* * help screen for inventory
-* * pick up command to get an item in a grid cell
-* * when a grid cell has a single item, show that item
-* * when a grid cell has more than one item, render each on top of each other (don't really need special handling for an item pile... though might want a render limit if the list is huge)
+* * use capital letters for these in-list commands
+* * figure out pseudo-screen swapping - shift from inventory mode to Drop mode
+* * stub out commands D, X, W, P
+* * * * drop command (D) (moves item from avatar to current cell)
+* * * * examine command (X) (shows item details in info panel)
+* * * * wear / wield command (does nothing for now) (W)
+* * * * put / place command (does nothing for now, eventually puts into another container) (P)
+
+* NOTE: all list actions take 0 time right now since they're call-back based for their resolution; figure out how to have diff resolutions take diff time (e.g. examine is 0 time, drop is 10%, wear / wield is 300%, etc.)
 
 * implement capacity for item containers
 * * volume

@@ -54,6 +54,11 @@ class Avatar extends Entity {
     avatar.currentAdvancementPoints = data.currentAdvancementPoints;
     avatar.actionStartingTime = data.actionStartingTime;
 
+    avatar.inventory = null;
+    if (data.inventory && data.inventory.length > 0) {
+      avatar.inventory = ItemIdContainer.deserialize(data.inventory);
+    }
+
     avatar.timeOnLevel = data.timeOnLevel;
     avatar.meleeAttack = data.meleeAttack;
 

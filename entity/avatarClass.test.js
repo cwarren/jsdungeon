@@ -8,6 +8,7 @@ import { uiPaneMain, uiPaneMessages } from "../ui/ui.js";
 import { UIPaneMiniChar, miniCharElement } from '../ui/uiPaneMiniCharClass.js';
 import { WorldLevelSpecification } from '../world/worldLevelSpecificationClass.js';
 import { getEntityDef } from "./entityDefinitions.js";
+import { Item } from '../item/itemClass.js';
 
 
 const WORLD_LEVEL_SPECS_FOR_TESTING = [
@@ -136,6 +137,8 @@ describe('Avatar', () => {
     test('should serialize to a plain object correctly', () => {
       avatar.timeOnLevel = 120;
       avatar.meleeAttack = false;
+      const item = Item.makeItem("ROCK");
+      avatar.giveItem(item);
 
       const serialized = avatar.forSerializing();
 
@@ -144,6 +147,7 @@ describe('Avatar', () => {
         timeOnLevel: 120,
         meleeAttack: false,
       });
+      expect(serialized.inventory.length).toEqual(1);
     });
 
     test('should serialize to JSON correctly', () => {
@@ -159,9 +163,14 @@ describe('Avatar', () => {
           meleeAttack: true,
         })
       );
+      expect(jsonString.indexOf('inventory')).toBeGreaterThan(-1);
+
     });
 
     test('should deserialize from a plain object correctly', () => {
+      const item = Item.makeItem("ROCK");
+      avatar.giveItem(item);
+
       const data = avatar.forSerializing();
 
       const deserializedAvatar = Avatar.deserialize(data, gameState);
@@ -171,6 +180,7 @@ describe('Avatar', () => {
       expect(deserializedAvatar.type).toBe('AVATAR');
       expect(deserializedAvatar.timeOnLevel).toBe(avatar.timeOnLevel);
       expect(deserializedAvatar.meleeAttack).toBe(true);
+      expect(deserializedAvatar.inventory.count()).toEqual(1);
     });
 
     test('should deserialize from JSON correctly', () => {

@@ -19,8 +19,8 @@ class ItemIdContainer {
         return JSON.stringify(this.forSerializing());
     }
 
-    static deserialize(data) {
-        return new ItemIdContainer(data);
+    static deserialize(listOfItemsOrIds) {
+        return new ItemIdContainer(listOfItemsOrIds);
     }
 
     //================
