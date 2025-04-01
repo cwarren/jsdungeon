@@ -1,20 +1,7 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* general two-stage command
-* * initial is getMoreInput
-* * * takes a resolution function (resolveCommandFunction)
-* * * shifts UI mode
-* * * need one version to handle list interactions and one to handle other things (e.g. text, direction, etc.) - focus on the list one for now (initiateListBasedCommand)
-* * * * list UI includes scroll up and down via arrow keys
-* * * * escape to cancel
-* * * * letter to resolve with the given list items
-* * * * * on input recieved, pass to <resolveCommand>, along with gameState, key, event, etc.
-* * * * needs a help screen too
-* * NOTE: ideally able to chain these
-
 * drop command / action
-* * on 'd' switch input mode to list selection
 * * also, show inventory list in list screen
 * * * showItemListFromOffset (item list, offset)
 * * * arrow keys scroll the list up or down
@@ -23,6 +10,7 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * * list items shown are referenced by number
 * * * * list shows at most 9 items - 1-9, from the offset
 * * * * this number is an offset from the list top - referenced item is offset + selected number - 1
+* * on drop resolution, determine the selected item, remove it from avatar, and put it in current cell
 
 * inventory UI
 * * on 'i' switch to inventory screen

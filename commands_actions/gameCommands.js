@@ -35,6 +35,9 @@ const keyBinding = {
         "g": "GET_SINGLE_ITEM",
         "G": "GET_ALL_ITEMS",
 
+        "i": "INVENTORY_SHOW",
+        "d": "INVENTORY_DROP",
+
         "l": "DEV_LOSE_GAME",
         "w": "DEV_WIN_GAME",
         "%": "DEV_DUMP_GAME_STATE",

@@ -1,5 +1,8 @@
 import { idOf } from "../util.js";
 
+// TODO: add a way to sort the container easily (maybe a flag on keeping it sorted or not?)
+// NOTE: consider adding a reference item repo on instantiation so it doesn't need to be passed in when needed
+
 class ItemIdContainer {
     constructor(itemList = []) {
         this.itemIdList = [];

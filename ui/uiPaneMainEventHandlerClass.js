@@ -1,6 +1,9 @@
 import { executeGameCommand } from "../commands_actions/gameCommands.js";
-import { devTrace } from "../util.js";
-import { uiPaneInfo } from "./ui.js";
+import { devTrace, constrainValue } from "../util.js";
+import { uiPaneInfo, uiPaneList } from "./ui.js";
+
+const LIST_SELECTION_KEYS = ['a','b','c','d','e','f','g','h','i','j','k'];
+const LIST_SHOW_COUNT = LIST_SELECTION_KEYS.length;
 
 class UIPaneMainEventHandler {
     constructor(ui, canvas) {
@@ -9,11 +12,17 @@ class UIPaneMainEventHandler {
 
         this.pressedKeys = new Set();
         this.inputMode = null;
-        this.textInputPrompt = null;
+        this.priorInfo = '';
+
         this.inputCallback = null;
         this.inputCancelledCallback = null;
+
+        this.textInputPrompt = null;
         this.currentInputText = "";
-        this.priorInfo = '';
+
+        this.listForInput = null;
+        this.listDisplayOffset = 0;
+
 
         this.initializeEventListeners();
     }
@@ -71,17 +80,21 @@ class UIPaneMainEventHandler {
             devTrace(3, "key event", event);
             this.pressedKeys.add(event.key);
 
-            if (this.inputMode) {
+            // TODO: this is a messy way to handle the modes - consolidate modes so we don't need a new mode for every command...
+            if (["AVATAR_NAME","GAME_TO_LOAD"].includes(this.inputMode)) {
                 this.handleTextInput(event);
                 return;
+            } else if (["INVENTORY_SHOW","INVENTORY_DROP"].includes(this.inputMode)) {
+                this.handleListBasedInput(event);
+                return;
             }
-
             executeGameCommand(this.ui.gameState, event.key, event);
             this.ui.resizeCanvas();
         }
     }
 
     /*** TEXT INPUT HANDLING ***/
+
     startTextInput(mode, prompt, callback, cancellationCallback = null) {
         devTrace(2, `Entering text input mode: ${mode}`);
         this.inputMode = mode;
@@ -130,6 +143,100 @@ class UIPaneMainEventHandler {
 
     updateTextInputDisplay() {
         uiPaneInfo.setInfo(`${this.textInputPrompt}: ${this.currentInputText}_`);
+    }
+
+    /*** LIST-BASED INPUT HANDLING ***/
+
+    startListBasedInput(mode, listForInput, prompt, callback, cancellationCallback = null) {
+        devTrace(2, `Entering list-based input mode: ${mode}`);
+        this.inputMode = mode;
+        this.listInputPrompt = prompt;
+        this.inputCallback = callback;
+        this.inputCancelledCallback = cancellationCallback;
+        this.listForInput = listForInput;
+        this.listDisplayOffset = 0;
+        this.priorInfo = uiPaneInfo.getInfo();
+        uiPaneInfo.setInfo(`${this.listInputPrompt}<br\><br\>ESC to cancel, arrows to scroll up or down, letter to select`);
+        this.updateListBasedInputDisplay();
+    }
+
+    stopListBasedInput() {
+        devTrace(2, "Exiting list-based input mode.");
+        this.inputMode = null;
+        this.listInputPrompt = null;
+        this.inputCallback = null;
+        this.inputCancelledCallback = null;
+        this.listForInput = null;
+        this.listDisplayOffset = 0;
+        uiPaneInfo.setInfo(this.priorInfo);
+        this.updateListBasedInputDisplay();
+        this.priorInfo = '';
+    }
+
+    handleListBasedInput(event) {
+        // exit list-input mode
+        if (event.key === "Escape") {
+            if (this.inputCancelledCallback) {
+                this.inputCancelledCallback();
+            }
+            this.stopListBasedInput();
+            return;
+        }
+
+        // select / activate a given list item
+        const validSelectionKeys = LIST_SELECTION_KEYS.slice(0, this.listForInput.length);
+        if (event.key.length === 1 && validSelectionKeys.includes(event.key)) {
+            if (this.inputCallback) {
+                const selectionIdx = this.listDisplayOffset + LIST_SELECTION_KEYS.indexOf(event.key);
+                this.inputCallback(this.ui.gameState, this.listForInput, selectionIdx);
+            }
+            this.stopListBasedInput();
+            return;
+        }
+
+        // simple list nav
+        if (event.key === "ArrowUp") {
+            this.listDisplayOffset = constrainValue(this.listDisplayOffset-1,0,this.listForInput.length-LIST_SELECTION_KEYS.length);
+        }
+        if (event.key === "ArrowDown") {
+            this.listDisplayOffset = constrainValue(this.listDisplayOffset+1,0,this.listForInput.length-LIST_SELECTION_KEYS.length);
+        }
+
+        this.updateListBasedInputDisplay();
+    }
+
+    
+    updateListBasedInputDisplay() {
+        console.log('updateListBasedInputDisplay');
+        if (this.listForInput == null) {
+            uiPaneList.clearList();
+            return;
+        }
+        
+        if (this.listForInput.length == 0) {
+            uiPaneList.setList('Empty',[]);
+            return;
+        }
+
+        // show list items from the current offset up to the selection keys supported
+        // TODO: could do this better using .slice and .map
+        let displayList = [];
+        for (let idx = 0; idx < LIST_SHOW_COUNT; idx++) {
+            const listIdx = idx + this.listDisplayOffset;
+            if (listIdx >= this.listForInput.length) { break; }
+            const listItemToShow = this.listForInput[listIdx];
+            let listItemText = '';
+            if (typeof listItemToShow == "string") {
+                listItemText = listItemToShow;
+            } else if (listItemToShow.name) {
+                listItemText = listItemToShow.name;
+            } else {
+                listItemText = 'UNKNOWN';
+            }
+            displayList.push({displayText: `${LIST_SELECTION_KEYS[idx]}: ${listItemText}`});
+        }
+        console.log('updateListBasedInputDisplay - displayList',displayList);
+        uiPaneList.setList('',displayList);
     }
 }
 

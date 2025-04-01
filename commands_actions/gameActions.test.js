@@ -24,6 +24,7 @@ jest.mock('../ui/ui.js', () => ({
         zoomIn: jest.fn(),
         zoomOut: jest.fn(),
         zoomReset: jest.fn(),
+        eventHandler: { startListBasedInput: jest.fn(), },
     },
 }));
 
@@ -109,7 +110,7 @@ describe('gameActions tests', () => {
         });
     });
 
-    describe('gameActions tests - inventory', () => {
+    describe('gameActions tests - inventory, get', () => {
         test('GET_SINGLE_ITEM does nothing and takes no time if no items to get', () => {
             avatar.getCell().inventory = null;
             const initialInventorySize = avatar.inventory.count();
@@ -199,6 +200,28 @@ describe('gameActions tests', () => {
             expect(avCell.inventory).toBeNull();
             expect(result).toBe(avatar.baseActionTime * 2);
         });
+    });
+
+    describe('gameActions tests - inventory, list and other', () => {
+        test('INVENTORY_SHOW shifts to list-based input', () => {
+            const result = gameActionsMap.INVENTORY_SHOW.action(gameState);
+            expect(result).toBe(0);
+            expect(uiPaneMain.eventHandler.startListBasedInput).toHaveBeenCalled();
+        });
+        test('INVENTORY_SHOW resolver updates the info panel', () => {
+            const result = gameActionsMap.INVENTORY_SHOW.actionResolver (gameState, [], 1);
+            expect(1).toBe(0);
+        }); 
+
+        test('INVENTORY_DROP shifts to list-based input', () => {
+            const result = gameActionsMap.INVENTORY_DROP.action(gameState);
+            expect(result).toBe(0);
+            expect(uiPaneMain.eventHandler.startListBasedInput).toHaveBeenCalled();
+        }); 
+        test('INVENTORY_DROP resolver moves item from avatar inventory to current cell', () => {
+            const result = gameActionsMap.INVENTORY_DROP.actionResolver (gameState, [], 1);
+            expect(1).toBe(0);
+        }); 
     });
 
     describe('gameActions tests - zoom', () => {
