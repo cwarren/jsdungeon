@@ -203,7 +203,7 @@ function dropItemResolve(gameState, listForInput, selectionIdx) {
     console.log(gameState, listForInput, selectionIdx);
     const selectedItem = listForInput[selectionIdx];
     // TODO: transfer selected item from avatar inventory to current cell
-    uiPaneMessages.addMessage(`You drop the ${selectedItem.name}`);
+    gameState.avatar.dropItem(selectedItem);
 }
 
 function zoomIn(gameState, key, event) { uiPaneMain.zoomIn(); return 0; }

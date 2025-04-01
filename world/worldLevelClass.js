@@ -223,7 +223,7 @@ class WorldLevel {
             return;
         }
         // TODO: real item population (just a couple of rocks and sticks for now)
-        for (let i = 0; i < 2; i++) {
+        for (let i = 0; i < 5; i++) {
             const item = Item.makeItem("ROCK");
             this.gameState.itemRepo.add(item);
             this.placeItemRandomly(item);

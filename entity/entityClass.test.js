@@ -621,6 +621,28 @@ describe('Entity', () => {
       expect(targetCell.inventory).toBeNull();
     });
 
+    test('dropItem should move item from inventory to current cell',() =>{
+      sourceEntity.placeAtCell(gameState.world[0].grid[5][5]);
+      const item = Item.makeItem("ROCK");
+      itemRepo.add(item);
+      const item2 = Item.makeItem("ROCK");
+      itemRepo.add(item2);
+      sourceEntity.giveItem(item);
+      sourceEntity.giveItem(item2);
+
+      expect(sourceEntity.inventory.count()).toEqual(2);
+      expect(sourceEntity.getCell().inventory).toBeNull();
+
+      sourceEntity.dropItem(item);
+
+      expect(sourceEntity.inventory.count()).toEqual(1);
+      expect(sourceEntity.inventory.has(item)).toBe(false);
+      expect(sourceEntity.inventory.has(item2)).toBe(true);
+
+      expect(sourceEntity.getCell().inventory.count()).toEqual(1);
+      expect(sourceEntity.getCell().inventory.has(item)).toBe(true);
+      expect(sourceEntity.getCell().inventory.has(item2)).toBe(false);
+    });
   });
 
 

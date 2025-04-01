@@ -838,6 +838,12 @@ class Entity {
     this.showMessage(`You pick up everything there`);
   }
 
+  dropItem(item) {
+    console.log(`entity ${this.name} dropping ${item.name}`);
+    this.getCell().takeItemFrom(item, this.inventory);
+    this.showMessage(`You drop the ${item.name}`);
+  }
+
   //================================================
   //================================================
   //================================================

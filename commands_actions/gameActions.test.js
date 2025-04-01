@@ -24,7 +24,7 @@ jest.mock('../ui/ui.js', () => ({
         zoomIn: jest.fn(),
         zoomOut: jest.fn(),
         zoomReset: jest.fn(),
-        eventHandler: { startListBasedInput: jest.fn(), },
+        eventHandler: { startListBasedInput: jest.fn(), priorInfo: 'priorInfo'},
     },
 }));
 
@@ -209,8 +209,9 @@ describe('gameActions tests', () => {
             expect(uiPaneMain.eventHandler.startListBasedInput).toHaveBeenCalled();
         });
         test('INVENTORY_SHOW resolver updates the info panel', () => {
-            const result = gameActionsMap.INVENTORY_SHOW.actionResolver (gameState, [], 1);
-            expect(1).toBe(0);
+            const result = gameActionsMap.INVENTORY_SHOW.actionResolver (gameState, [{},{name: 'item name', description: 'item descr'}], 1);
+            
+            expect(uiPaneMain.eventHandler.priorInfo).not.toEqual('priorInfo');
         }); 
 
         test('INVENTORY_DROP shifts to list-based input', () => {
@@ -219,8 +220,20 @@ describe('gameActions tests', () => {
             expect(uiPaneMain.eventHandler.startListBasedInput).toHaveBeenCalled();
         }); 
         test('INVENTORY_DROP resolver moves item from avatar inventory to current cell', () => {
-            const result = gameActionsMap.INVENTORY_DROP.actionResolver (gameState, [], 1);
-            expect(1).toBe(0);
+            const item1 = Item.makeItem('ROCK');
+            gameState.itemRepo.add(item1);
+            gameState.avatar.giveItem(item1);
+            const item2 = Item.makeItem('STICK');
+            gameState.itemRepo.add(item2);
+            gameState.avatar.giveItem(item2);
+
+            const result = gameActionsMap.INVENTORY_DROP.actionResolver (gameState, gameState.avatar.inventory.getItems(gameState.itemRepo), 0);
+
+            expect(gameState.avatar.hasItem(item1)).toBe(false);
+            expect(gameState.avatar.hasItem(item2)).toBe(true);
+
+            expect(gameState.avatar.getCell().hasItem(item1)).toBe(true);
+            expect(gameState.avatar.getCell().hasItem(item2)).toBe(false);
         }); 
     });
 

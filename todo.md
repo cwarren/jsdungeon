@@ -1,16 +1,13 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* drop command / action
+* inventory and drop command / action
 * * also, show inventory list in list screen
 * * * showItemListFromOffset (item list, offset)
 * * * arrow keys scroll the list up or down
 * * * * increment or decrement the offset
 * * * * update the list ui accordingly
-* * * list items shown are referenced by number
-* * * * list shows at most 9 items - 1-9, from the offset
-* * * * this number is an offset from the list top - referenced item is offset + selected number - 1
-* * on drop resolution, determine the selected item, remove it from avatar, and put it in current cell
+
 
 * inventory UI
 * * on 'i' switch to inventory screen
