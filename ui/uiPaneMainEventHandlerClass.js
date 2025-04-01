@@ -196,10 +196,10 @@ class UIPaneMainEventHandler {
 
         // simple list nav
         if (event.key === "ArrowUp") {
-            this.listDisplayOffset = constrainValue(this.listDisplayOffset-1,0,this.listForInput.length-LIST_SELECTION_KEYS.length);
+            this.listDisplayOffset = constrainValue(this.listDisplayOffset-1,0,this.listForInput.length-LIST_SELECTION_KEYS.length-1);
         }
         if (event.key === "ArrowDown") {
-            this.listDisplayOffset = constrainValue(this.listDisplayOffset+1,0,this.listForInput.length-LIST_SELECTION_KEYS.length);
+            this.listDisplayOffset = constrainValue(this.listDisplayOffset+1,0,this.listForInput.length-LIST_SELECTION_KEYS.length-1);
         }
 
         this.updateListBasedInputDisplay();
@@ -208,6 +208,7 @@ class UIPaneMainEventHandler {
     
     updateListBasedInputDisplay() {
         console.log('updateListBasedInputDisplay');
+        console.log(this);
         if (this.listForInput == null) {
             uiPaneList.clearList();
             return;

@@ -64,7 +64,7 @@ function getListIntersection(list1, list2) {
 }
 
 function constrainValue(valToConstrain,min,max) {
-    if (valToConstrain < min) { return min; }   
+    if (valToConstrain < min || max < min) { return min; }   
     if (valToConstrain > max) { return max; }
     return valToConstrain;  
 }

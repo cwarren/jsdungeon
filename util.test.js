@@ -221,6 +221,11 @@ describe('constrainValue', () => {
     test('should return the max value if the value is greater than the max', () => {
         expect(constrainValue(15, 1, 10)).toBe(10);
     });
+
+    test('should return the min value if the max is less then the min', () => {
+        expect(constrainValue(15, 1, -10)).toBe(1);
+    });
+
 });
 
 describe('createHelpText', () => {
