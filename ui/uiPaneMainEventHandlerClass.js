@@ -84,7 +84,7 @@ class UIPaneMainEventHandler {
             if (["AVATAR_NAME","GAME_TO_LOAD"].includes(this.inputMode)) {
                 this.handleTextInput(event);
                 return;
-            } else if (["INVENTORY_SHOW","INVENTORY_DROP"].includes(this.inputMode)) {
+            } else if (["INVENTORY_SHOW","INVENTORY_DROP"].includes(this.inputMode)) { 
                 this.handleListBasedInput(event);
                 return;
             }

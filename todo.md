@@ -2,15 +2,16 @@ to start server:
 PS E:\code\jsdungeon> docker-compose up --build
 
 * inventory UI
-* * use capital letters for these in-list commands
-* * figure out pseudo-screen swapping - shift from inventory mode to Drop mode
+* * implement the Inventory game mode - take over screen
+* * * NOTE: this replaces the simpler list-input mode used to show inventory (that mode is still useful and good for list-based commands (e.g. drop))
+* * * NOTE: use capital letters for these in-list commands
+* * implement inventoryActions
 * * stub out commands D, X, W, P
 * * * * drop command (D) (moves item from avatar to current cell)
 * * * * examine command (X) (shows item details in info panel)
 * * * * wear / wield command (does nothing for now) (W)
 * * * * put / place command (does nothing for now, eventually puts into another container) (P)
-
-* NOTE: all list actions take 0 time right now since they're call-back based for their resolution; figure out how to have diff resolutions take diff time (e.g. examine is 0 time, drop is 10%, wear / wield is 300%, etc.)
+* * remove unnecessary stuff from uiPaneMainEventHandler and gameActions
 
 * implement capacity for item containers
 * * volume
@@ -47,6 +48,8 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * equippables
 * * UI mode
 * * entity calcs use equipped things
+
+* NOTE: all list actions take 0 time right now since they're call-back based for their resolution; figure out how to have diff resolutions take diff time (e.g. examine is 0 time, drop is 10%, wear / wield is 300%, etc.)
 
 * skills for entities / skill system
 * * what they are

@@ -35,7 +35,7 @@ const keyBinding = {
         "g": "GET_SINGLE_ITEM",
         "G": "GET_ALL_ITEMS",
 
-        "i": "INVENTORY_SHOW",
+        // "i": "INVENTORY_SHOW",
         "d": "INVENTORY_DROP",
 
         "l": "DEV_LOSE_GAME",
@@ -48,6 +48,7 @@ const keyBinding = {
 
         "C": "PUSH_CHARACTER_SHEET",
         "I": "PUSH_INVENTORY_SCREEN",
+        "i": "PUSH_INVENTORY_SCREEN",
         "E": "PUSH_EQUIPMENT_SCREEN",
         "M": "PUSH_MAP_SCREEN",
         "Escape": "POP_UI_STATE",
@@ -60,6 +61,7 @@ const keyBinding = {
     },
     "INVENTORY": {
         "Escape": "POP_UI_STATE",
+        "D": "INVENTORY_DROP",
         "?": "PUSH_HELP",
     },
     "EQUIPMENT": {

@@ -38,8 +38,12 @@ const gameActionsMap = {
     GET_SINGLE_ITEM: { name: "Get an item", description: "Pick up a single item from the current location", action: getOneItem },
     GET_ALL_ITEMS: { name: "Get all items", description: "Pick up as many items as you can from the current location", action: getAllItems },
 
+    // TODO: remove this once the inventory screen is implemented
     INVENTORY_SHOW: { name: "Inventory", description: "See what's in your inventory", action: showInventoryInitiate, actionResolver: showInventoryResolve, actionCancellation: showInventoryCancel },
+
     INVENTORY_DROP: { name: "Drop", description: "Drop something that's in your inventory", action: dropItemInitiate, actionResolver: dropItemResolve },
+
+    // INVENTORY_MODE_SHIFT_DROP: { name: "Drop", description: "Drop from inventory", action: changeInventoryModeDrop },
 
 
     ZOOM_IN: { name: "Zoom In", description: "Zoom in", action: zoomIn },
@@ -169,6 +173,8 @@ function getAllItems(gameState, key, event) {
     return gameState.avatar.baseActionTime * 2;
 }
 
+
+// TODO: remove these once the inventory screen is implemented
 function showInventoryInitiate(gameState, key, event) {
     console.log("called showInventoryInitiate");
     uiPaneMain.eventHandler.startListBasedInput("INVENTORY_SHOW",
@@ -190,6 +196,7 @@ function showInventoryCancel() {
     uiPaneMain.eventHandler.priorInfo = '';
 }
 
+
 function dropItemInitiate(gameState, key, event) {
     console.log("called dropItemInitiate");
     uiPaneMain.eventHandler.startListBasedInput("INVENTORY_DROP",
@@ -205,6 +212,10 @@ function dropItemResolve(gameState, listForInput, selectionIdx) {
     // TODO: transfer selected item from avatar inventory to current cell
     gameState.avatar.dropItem(selectedItem);
 }
+
+// function changeInventoryModeDrop(gameState, key, event) {
+//    return dropItemInitiate(gameState, key, event);
+// }
 
 function zoomIn(gameState, key, event) { uiPaneMain.zoomIn(); return 0; }
 function zoomOut(gameState, key, event) { uiPaneMain.zoomOut(); return 0; }
