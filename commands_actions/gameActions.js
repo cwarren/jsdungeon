@@ -43,9 +43,6 @@ const gameActionsMap = {
 
     INVENTORY_DROP: { name: "Drop", description: "Drop something that's in your inventory", action: dropItemInitiate, actionResolver: dropItemResolve },
 
-    // INVENTORY_MODE_SHIFT_DROP: { name: "Drop", description: "Drop from inventory", action: changeInventoryModeDrop },
-
-
     ZOOM_IN: { name: "Zoom In", description: "Zoom in", action: zoomIn },
     ZOOM_OUT: { name: "Zoom Out", description: "Zoom out", action: zoomOut },
     ZOOM_RESET: { name: "Zoom Reset", description: "Reset the zoom level to the initial value", action: zoomReset },
@@ -145,7 +142,7 @@ function runAvatar_D(gameState, key, event) { return runAvatar(gameState, DIRECT
 function runAvatar_DR(gameState, key, event) { return runAvatar(gameState, DIRECTION_DELTAS["DR"]) }
 
 function sleepAvatar(gameState, key, event) {
-    // devTrace(3,`${key} - sleep avatar (not yet implemented)`, event);
+    devTrace(5,`${key} - sleep avatar`, event);
     gameState.avatar.startSleeping();
     return gameState.avatar.continueSleeping();
 }
@@ -177,7 +174,7 @@ function getAllItems(gameState, key, event) {
 // TODO: remove these once the inventory screen is implemented
 function showInventoryInitiate(gameState, key, event) {
     console.log("called showInventoryInitiate");
-    uiPaneMain.eventHandler.startListBasedInput("INVENTORY_SHOW",
+    uiPaneMain.eventHandler.startListBasedInput(
         gameState.avatar.inventory.getItems(gameState.itemRepo),
         "Here's what you're carrying",
         gameActionsMap.INVENTORY_SHOW.actionResolver,
@@ -199,7 +196,7 @@ function showInventoryCancel() {
 
 function dropItemInitiate(gameState, key, event) {
     console.log("called dropItemInitiate");
-    uiPaneMain.eventHandler.startListBasedInput("INVENTORY_DROP",
+    uiPaneMain.eventHandler.startListBasedInput(
         gameState.avatar.inventory.getItems(gameState.itemRepo),
         "Choose which item to drop",
         gameActionsMap.INVENTORY_DROP.actionResolver);
@@ -209,13 +206,9 @@ function dropItemResolve(gameState, listForInput, selectionIdx) {
     console.log("called dropItemResolve");
     console.log(gameState, listForInput, selectionIdx);
     const selectedItem = listForInput[selectionIdx];
-    // TODO: transfer selected item from avatar inventory to current cell
     gameState.avatar.dropItem(selectedItem);
 }
 
-// function changeInventoryModeDrop(gameState, key, event) {
-//    return dropItemInitiate(gameState, key, event);
-// }
 
 function zoomIn(gameState, key, event) { uiPaneMain.zoomIn(); return 0; }
 function zoomOut(gameState, key, event) { uiPaneMain.zoomOut(); return 0; }

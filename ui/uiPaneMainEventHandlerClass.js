@@ -2,7 +2,7 @@ import { executeGameCommand } from "../commands_actions/gameCommands.js";
 import { devTrace, constrainValue } from "../util.js";
 import { uiPaneInfo, uiPaneList } from "./ui.js";
 
-const LIST_SELECTION_KEYS = ['a','b','c','d','e','f','g','h','i','j','k'];
+const LIST_SELECTION_KEYS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k'];
 const LIST_SHOW_COUNT = LIST_SELECTION_KEYS.length;
 
 class UIPaneMainEventHandler {
@@ -23,6 +23,8 @@ class UIPaneMainEventHandler {
         this.listForInput = null;
         this.listDisplayOffset = 0;
 
+        this.secondaryInputPrompt = null;
+        this.secondaryInputValidator = null;
 
         this.initializeEventListeners();
     }
@@ -80,14 +82,17 @@ class UIPaneMainEventHandler {
             devTrace(3, "key event", event);
             this.pressedKeys.add(event.key);
 
-            // TODO: this is a messy way to handle the modes - consolidate modes so we don't need a new mode for every command...
-            if (["AVATAR_NAME","GAME_TO_LOAD"].includes(this.inputMode)) {
+            if (this.inputMode == "TEXT_INPUT") {
                 this.handleTextInput(event);
                 return;
-            } else if (["INVENTORY_SHOW","INVENTORY_DROP"].includes(this.inputMode)) { 
+            } else if (this.inputMode == "LIST_INPUT") {
                 this.handleListBasedInput(event);
                 return;
+            } else if (this.inputMode == "TWO_STAGE_INPUT") {
+                this.handleTwoStageInput(event);
+                return;
             }
+
             executeGameCommand(this.ui.gameState, event.key, event);
             this.ui.resizeCanvas();
         }
@@ -95,9 +100,9 @@ class UIPaneMainEventHandler {
 
     /*** TEXT INPUT HANDLING ***/
 
-    startTextInput(mode, prompt, callback, cancellationCallback = null) {
-        devTrace(2, `Entering text input mode: ${mode}`);
-        this.inputMode = mode;
+    startTextInput(prompt, callback, cancellationCallback = null) {
+        devTrace(2, `Entering text input mode`);
+        this.inputMode = "TEXT_INPUT";
         this.textInputPrompt = prompt;
         this.inputCallback = callback;
         this.inputCancelledCallback = cancellationCallback;
@@ -147,9 +152,9 @@ class UIPaneMainEventHandler {
 
     /*** LIST-BASED INPUT HANDLING ***/
 
-    startListBasedInput(mode, listForInput, prompt, callback, cancellationCallback = null) {
-        devTrace(2, `Entering list-based input mode: ${mode}`);
-        this.inputMode = mode;
+    startListBasedInput(listForInput, prompt, callback, cancellationCallback = null) {
+        devTrace(2, `Entering list-based input mode`);
+        this.inputMode = "LIST_INPUT";
         this.listInputPrompt = prompt;
         this.inputCallback = callback;
         this.inputCancelledCallback = cancellationCallback;
@@ -196,26 +201,24 @@ class UIPaneMainEventHandler {
 
         // simple list nav
         if (event.key === "ArrowUp") {
-            this.listDisplayOffset = constrainValue(this.listDisplayOffset-1,0,this.listForInput.length-LIST_SELECTION_KEYS.length-1);
+            this.listDisplayOffset = constrainValue(this.listDisplayOffset - 1, 0, this.listForInput.length - LIST_SELECTION_KEYS.length - 1);
         }
         if (event.key === "ArrowDown") {
-            this.listDisplayOffset = constrainValue(this.listDisplayOffset+1,0,this.listForInput.length-LIST_SELECTION_KEYS.length-1);
+            this.listDisplayOffset = constrainValue(this.listDisplayOffset + 1, 0, this.listForInput.length - LIST_SELECTION_KEYS.length - 1);
         }
 
         this.updateListBasedInputDisplay();
     }
 
-    
+
     updateListBasedInputDisplay() {
-        console.log('updateListBasedInputDisplay');
-        console.log(this);
         if (this.listForInput == null) {
             uiPaneList.clearList();
             return;
         }
-        
+
         if (this.listForInput.length == 0) {
-            uiPaneList.setList('Empty',[]);
+            uiPaneList.setList('Empty', []);
             return;
         }
 
@@ -234,11 +237,60 @@ class UIPaneMainEventHandler {
             } else {
                 listItemText = 'UNKNOWN';
             }
-            displayList.push({displayText: `${LIST_SELECTION_KEYS[idx]}: ${listItemText}`});
+            displayList.push({ displayText: `${LIST_SELECTION_KEYS[idx]}: ${listItemText}` });
         }
-        console.log('updateListBasedInputDisplay - displayList',displayList);
-        uiPaneList.setList('',displayList);
+        uiPaneList.setList('', displayList);
     }
+
+
+    //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+    /*** TWO-STAGE INPUT HANDLING ***/
+    // support for a primary command that requires a secondary input, e.g. dig -> which direction
+
+    startTwoStageInput(prompt, secondaryInputValidator, callback, cancellationCallback = null) {
+        devTrace(2, `Entering two-stage input mode`);
+        this.inputMode = "TWO_STAGE_INPUT";
+        this.secondaryInputPrompt = prompt;
+        this.secondaryInputValidator = secondaryInputValidator;
+        this.inputCallback = callback;
+        this.inputCancelledCallback = cancellationCallback;
+        this.priorInfo = uiPaneInfo.getInfo();
+        uiPaneInfo.setInfo(`${this.secondaryInputPrompt}<br\><br\>ESC to cancel`);
+    }
+
+    stopTwoStageInput() {
+        devTrace(2, "Exiting two-stage input mode.");
+        this.inputMode = null;
+        this.secondaryInputPrompt = null;
+        this.secondaryInputValidator = null;
+        this.inputCallback = null;
+        this.inputCancelledCallback = null;
+        uiPaneInfo.setInfo(this.priorInfo);
+        this.priorInfo = '';
+    }
+
+    handleTwoStageInput(event) {
+        // exit two-stage mode
+        if (event.key === "Escape") {
+            if (this.inputCancelledCallback) {
+                this.inputCancelledCallback();
+            }
+            this.stopTwoStageInput();
+            return;
+        }
+
+        if (!this.secondaryInputValidator(event.key)) {
+            devTrace(2, "Invalid secondary input");
+            // TODO: tell user
+            return;
+        }
+
+        this.inputCallback(this.ui.gameState, event.key);
+        this.stopTwoStageInput();
+        return;
+    }
+
 }
 
 export { UIPaneMainEventHandler };

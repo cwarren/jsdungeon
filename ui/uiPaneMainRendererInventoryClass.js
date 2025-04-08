@@ -13,7 +13,7 @@ class UIPaneMainRendererInventory extends UIPaneMainRenderer {
 
     draw() {
         super.draw();
-        // TODO: implement draw method for UIPaneMainRendererInventory
+      
         this.ctx.fillStyle = "white";
         this.ctx.font = "20px Arial";
 

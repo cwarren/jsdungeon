@@ -7,7 +7,7 @@ const characterSheetActionsMap = {
 };
 
 function setName(gameState, key, event) {
-    uiPaneMain.eventHandler.startTextInput("AVATAR_NAME", "New name", (newName) => {
+    uiPaneMain.eventHandler.startTextInput("New name", (newName) => {
         gameState.avatar.name = newName;
         gameState.avatar.updateMiniChar();
         uiPaneMain.drawUI();

@@ -82,7 +82,7 @@ function loadGame(gameState, key, event) {
 
     uiPaneList.setList('Saved Games', existingSaves.map(es => { return { displayText: es.name }; }));
     uiPaneMain.eventHandler.startTextInput(
-        "GAME_TO_LOAD", "Name of game to load",
+        "Name of game to load",
         (slotName) => {
             uiPaneList.clearList();
             const [saveSlot] = existingSaves.filter(slot => slot.name === slotName);
