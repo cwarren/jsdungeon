@@ -16,16 +16,36 @@ const inventoryActionsMap = {
     INVENTORY_EQUIP: { name: "Equip", description: "Wear/wield something that's in your inventory", action: equipItemInitiate, actionResolver: equipItemResolve },
 };
 
+function validatorForInventoryItemSelection(gameState, inputKey) {
+    console.log("STUBBED called validatorForInventoryItemSelection");
+    // needs avatar inventory
+    // needs listOffset in uiPaneMainRendererInventory
+    // needs itemRepo
+    // return true if inputKey is a valid item selection
+    // return false if inputKey is not a valid item selection
+    console.log(gameState, inputKey);
+    return true;
+}
+
+
 // IMPORTANT!!!!
 // action functions should return the time cost of the action!
 
 function lineUp(gameState, key, event) {
     console.log("STUBBED called inventory lineUp");
+    // needs avatar inventory
+    // needs listOffset in uiPaneMainRendererInventory
+    // needs MAX_ITEM_LIST_COUNT from uiPaneMainRendererInventory
+    // alters listOffset in uiPaneMainRendererInventory
     return 0;
 }
 
 function lineDown(gameState, key, event) {
     console.log("STUBBED called inventory lineDown");
+    // needs avatar inventory
+    // needs listOffset in uiPaneMainRendererInventory
+    // needs MAX_ITEM_LIST_COUNT from uiPaneMainRendererInventory
+    // alters listOffset in uiPaneMainRendererInventory
     return 0;
 }
 
@@ -40,6 +60,9 @@ function dropItemInitiate(gameState, key, event) {
 }
 function dropItemResolve(gameState, inputKey) {
     console.log("STUBBED called dropItemResolve");
+    // needs avatar inventory
+    // needs listOffset in uiPaneMainRendererInventory
+    // see dropItemResolve in gameActions.js
     console.log(gameState, inputKey);
 }
 
@@ -54,6 +77,9 @@ function examineItemInitiate(gameState, key, event) {
 }
 function examineItemResolve(gameState, inputKey) {
     console.log("STUBBED called examineItemResolve");
+    // needs avatar inventory
+    // needs listOffset in uiPaneMainRendererInventory
+    // see showInventoryResolve in gameActions.js
     console.log(gameState, inputKey);
 }
 
@@ -68,6 +94,10 @@ function putItemInitiate(gameState, key, event) {
 }
 function putItemResolve(gameState, inputKey) {
     console.log("STUBBED called putItemResolve");
+    // needs avatar inventory
+    // needs the structure in the avatar's current cell (avatar.getCell().structure)
+    // needs listOffset in uiPaneMainRendererInventory
+    // NOTE: this will remain stubbed until I tackle containers
     console.log(gameState, inputKey);
 }
 
@@ -82,8 +112,11 @@ function equipItemInitiate(gameState, key, event) {
 }
 function equipItemResolve(gameState, inputKey) {
     console.log("STUBBED called equipItemResolve");
+    // needs avatar inventory
+    // needs listOffset in uiPaneMainRendererInventory
+    // NOTE: this will remain stubbed until I tackle equipment
     console.log(gameState, inputKey);
 }
 
 
-export { inventoryActionsMap };
+export { inventoryActionsMap, validatorForInventoryItemSelection };

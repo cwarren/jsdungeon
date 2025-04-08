@@ -284,7 +284,7 @@ class UIPaneMainEventHandler {
             return;
         }
 
-        if (!this.secondaryInputValidator(event.key)) {
+        if (!this.secondaryInputValidator(this.ui.gameState, event.key)) {
             devTrace(2, "Invalid secondary input");
             // TODO: tell user
             return;

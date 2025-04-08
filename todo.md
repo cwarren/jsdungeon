@@ -2,15 +2,10 @@ to start server:
 PS E:\code\jsdungeon> docker-compose up --build
 
 * inventory UI
-* * implement the Inventory game mode - take over screen
-* * * NOTE: this replaces the simpler list-input mode used to show inventory (that mode is still useful and good for list-based commands (e.g. drop))
-* * * NOTE: use capital letters for these in-list commands
-* * implement inventoryActions
-* * stub out commands D, X, W, P
-* * * * drop command (D) (moves item from avatar to current cell)
-* * * * examine command (X) (shows item details in info panel)
-* * * * wear / wield command (does nothing for now) (W)
-* * * * put / place command (does nothing for now, eventually puts into another container) (P)
+* * remove the description from the primary display (there will be weight et al later in that space, and eXamine is for the details)
+* * implement validatorForInventoryItemSelection
+* * fully implement Drop item
+* * fully implement eXamine item
 * * remove unnecessary stuff from uiPaneMainEventHandler and gameActions
 
 * implement capacity for item containers

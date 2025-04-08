@@ -1,6 +1,6 @@
 import { GameState } from '../gameStateClass.js';
 import { WorldLevelSpecification } from '../world/worldLevelSpecificationClass.js';
-import { inventoryActionsMap } from './inventoryActions.js';
+import { inventoryActionsMap, validatorForInventoryItemSelection } from './inventoryActions.js';
 import { uiPaneMessages, uiPaneMain } from '../ui/ui.js';
 import { Item } from '../item/itemClass.js';
 import { ItemIdContainer } from '../item/itemIdContainerClass.js';
@@ -44,6 +44,7 @@ describe('inventoryActions tests', () => {
 
     test.todo('inventory secondary input validator');
     // test('inventory secondary input validator', () => {
+           // validatorForInventoryItemSelection
     //     expect(1).toEqual(0);
     // });
 

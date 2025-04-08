@@ -180,7 +180,7 @@ describe('UIPaneMainEventHandler', () => {
             eventHandler.handleTwoStageInput({ key: 'ArrowUp' });
 
             expect(callback).toHaveBeenCalledWith(uiMock.gameState, 'ArrowUp');
-            expect(validator).toHaveBeenCalledWith('ArrowUp');
+            expect(validator).toHaveBeenCalledWith(uiMock.gameState, 'ArrowUp');
             expect(uiPaneInfo.setInfo).toHaveBeenCalledWith('Previous Info');
             expect(eventHandler.inputMode).toBe(null);
         });
