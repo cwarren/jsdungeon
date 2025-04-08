@@ -1,6 +1,7 @@
 import { gameActionsMap } from "./gameActions.js";
 import { gameMetaActionsMap } from "./gameMetaActions.js";
 import { textActionsMap } from "./textActions.js";
+import { inventoryActionsMap } from "./inventoryActions.js";
 import { characterSheetActionsMap } from "./characterSheetActions.js";
 import { uiActionsMap } from "./uiActions.js";
 import { uiPaneMain } from "../ui/ui.js";
@@ -35,7 +36,6 @@ const keyBinding = {
         "g": "GET_SINGLE_ITEM",
         "G": "GET_ALL_ITEMS",
 
-        // "i": "INVENTORY_SHOW",
         "d": "INVENTORY_DROP",
 
         "l": "DEV_LOSE_GAME",
@@ -60,8 +60,15 @@ const keyBinding = {
         "?": "PUSH_HELP",
     },
     "INVENTORY": {
-        "Escape": "POP_UI_STATE",
+        "ArrowDown": "INVENTORY_LINE_DOWN",
+        "ArrowUp": "INVENTORY_LINE_UP",
+
         "D": "INVENTORY_DROP",
+        "X": "INVENTORY_EXAMINE",
+        "P": "INVENTORY_PUT",
+        "E": "INVENTORY_EQUIP",
+
+        "Escape": "POP_UI_STATE",
         "?": "PUSH_HELP",
     },
     "EQUIPMENT": {
@@ -97,6 +104,7 @@ const actionMaps = {
     "GAME_PLAY": gameActionsMap,
     "GAME_META": gameMetaActionsMap,
     "CHARACTER_SHEET": characterSheetActionsMap,
+    "INVENTORY": inventoryActionsMap,
     "HELP": textActionsMap,
 };
 

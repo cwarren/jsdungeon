@@ -37,8 +37,6 @@ describe('gameActions tests', () => {
         gameState.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
         avatar = gameState.avatar;
 
-        // TODO: clear out entities other than the avatar, and initial items - don't let the default level population interfere with testing (can cause intermittent failures)
-
         avatar.getCell().entity = null;
         avatar.placeAt(4, 4, 0);
         jest.clearAllMocks();
