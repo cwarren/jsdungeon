@@ -1,8 +1,6 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* streamline / consolidate input modes
-
 * inventory UI
 * * implement the Inventory game mode - take over screen
 * * * NOTE: this replaces the simpler list-input mode used to show inventory (that mode is still useful and good for list-based commands (e.g. drop))

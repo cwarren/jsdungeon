@@ -6,7 +6,7 @@ const LIST_SELECTION_KEYS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', '
 const LIST_SHOW_COUNT = LIST_SELECTION_KEYS.length;
 
 class UIPaneMainEventHandler {
-    constructor(ui, canvas) {
+    constructor(ui, canvas, setupListeners = true) {
         this.ui = ui;
         this.canvas = canvas;
 
@@ -26,7 +26,9 @@ class UIPaneMainEventHandler {
         this.secondaryInputPrompt = null;
         this.secondaryInputValidator = null;
 
-        this.initializeEventListeners();
+        if (setupListeners) {
+            this.initializeEventListeners();
+        }
     }
 
     initializeEventListeners() {
@@ -155,10 +157,10 @@ class UIPaneMainEventHandler {
     startListBasedInput(listForInput, prompt, callback, cancellationCallback = null) {
         devTrace(2, `Entering list-based input mode`);
         this.inputMode = "LIST_INPUT";
+        this.listForInput = listForInput;
         this.listInputPrompt = prompt;
         this.inputCallback = callback;
         this.inputCancelledCallback = cancellationCallback;
-        this.listForInput = listForInput;
         this.listDisplayOffset = 0;
         this.priorInfo = uiPaneInfo.getInfo();
         uiPaneInfo.setInfo(`${this.listInputPrompt}<br\><br\>ESC to cancel, arrows to scroll up or down, letter to select`);
@@ -178,6 +180,7 @@ class UIPaneMainEventHandler {
         this.priorInfo = '';
     }
 
+    // NOTE: a valid selection ends list-based input
     handleListBasedInput(event) {
         // exit list-input mode
         if (event.key === "Escape") {
@@ -270,6 +273,7 @@ class UIPaneMainEventHandler {
         this.priorInfo = '';
     }
 
+    // NOTE: a valid secondary command ends two-stage input
     handleTwoStageInput(event) {
         // exit two-stage mode
         if (event.key === "Escape") {
