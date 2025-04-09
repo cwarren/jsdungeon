@@ -1,34 +1,26 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* inventory UI
-* * remove the description from the primary display (there will be weight et al later in that space, and eXamine is for the details)
-* * implement validatorForInventoryItemSelection
-* * fully implement Drop item
-* * fully implement eXamine item
-* * remove unnecessary stuff from uiPaneMainEventHandler and gameActions
-
 * implement capacity for item containers
-* * volume
-* * mass
-
-* ?? UI for general container-to-container transfer of items
-* * how to determine / select which containers?
-* * * current space
-* * * structure on current space, which has a container
-* * * main inventory
-* * * any containers in main inventory
-* need a container context - this is like managing any tree-like file storage structure
+* * count ?
+* * volume ?
+* * mass ?
 
 * create a chest structure
 * * with an inventory
 * * implement structure interaction
+* * implement persistence
+
+* implement put command, which moves an item from avatar inventory to inventory of structure in current space
+* * short circuit if no valid (i.e. inventory-having) structure in the current space
+
+* take command
+* * inventory selection, but selecting from structure inventory in current space, and when valid selection move item from that into inventory
 
 * update entity movement to show items in current cell
 * * on entering a cell with items in it...
-* * * if single item, message to that effect
 * * * if multiple items, message that there are multiple and show the list in the list UI
-* * on exiting a cell with items in it, clear the list UI (or maybe set the list UI to empty on entering an empty cell? will have to think a bit about efficiency and clarity there...)
+* * * on exiting a cell with items in it, clear the list UI (or maybe set the list UI to empty on entering an empty cell? will have to think a bit about efficiency and clarity there...)
 
 
 * implement automatic text-wrapping for text block - character screen help is a good in-game testing area for this
@@ -76,6 +68,10 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * map view - very zoomed out, to fit screen; centered on level center, not avatar, structures and avatar drawn larger than cells; avatar highlighted
 * * * maybe base size and center on seen cells, not whole level (track up-est, down-est, left-est, and right-est seen cells to aid in these calcs)
 
+* add grid overlayTopOntoBottom and grid carveTopIntoBottom into grid utils
+* * chance for a level to have puddles (overlay)
+* * chance for a level to have a river through it (carve)
+
 * healing currently is checked when an entity takes it's turn, which could lead to some weird healing bursts for slow-acting entities. Consider moving it to a global check (anchored at world level, triggered by game time?)
 
 * more robust vision radius
@@ -98,13 +94,16 @@ PS E:\code\jsdungeon> docker-compose up --build
 
 * resolve duped info between direction deltas in gameActions and adjacency directions in GridCell
 
-* support for multi-input commands, e.g. first command is "dig" and second input is a direction, or first command is 'sleep' and second input is a duration
+* ?? UI for general container-to-container transfer of items
+* * how to determine / select which containers?
+* * * current space
+* * * structure on current space, which has a container
+* * * main inventory
+* * * any containers in main inventory
+* need a container context - this is like managing any tree-like file storage structure
+
 * support for command confirmations, e.g. 'Are you sure you want to attack the town sheriff? (y/n)'
 * support for targeted commands, first of which is look / examine
-
-* add grid overlayTopOntoBottom and grid carveTopIntoBottom into grid utils
-* * chance for a level to have puddles (overlay)
-* * chance for a level to have a river through it (carve)
 
 * add sleeping-related and running-related tests to gameTime.test.js
 

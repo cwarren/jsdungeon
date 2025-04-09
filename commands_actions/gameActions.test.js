@@ -200,18 +200,7 @@ describe('gameActions tests', () => {
         });
     });
 
-    describe('gameActions tests - inventory, list and other', () => {
-        test('INVENTORY_SHOW shifts to list-based input', () => {
-            const result = gameActionsMap.INVENTORY_SHOW.action(gameState);
-            expect(result).toBe(0);
-            expect(uiPaneMain.eventHandler.startListBasedInput).toHaveBeenCalled();
-        });
-        test('INVENTORY_SHOW resolver updates the info panel', () => {
-            const result = gameActionsMap.INVENTORY_SHOW.actionResolver (gameState, [{},{name: 'item name', description: 'item descr'}], 1);
-            
-            expect(uiPaneMain.eventHandler.priorInfo).not.toEqual('priorInfo');
-        }); 
-
+    describe('gameActions tests - inventory drop', () => {
         test('INVENTORY_DROP shifts to list-based input', () => {
             const result = gameActionsMap.INVENTORY_DROP.action(gameState);
             expect(result).toBe(0);

@@ -1,6 +1,6 @@
 import { GameState } from '../gameStateClass.js';
 import { WorldLevelSpecification } from '../world/worldLevelSpecificationClass.js';
-import { inventoryActionsMap, validatorForInventoryItemSelection } from './inventoryActions.js';
+import { inventoryActionsMap, validatorForInventoryItemSelection, getSelectedItem } from './inventoryActions.js';
 import { uiPaneMessages, uiPaneMain } from '../ui/ui.js';
 import { Item } from '../item/itemClass.js';
 import { ItemIdContainer } from '../item/itemIdContainerClass.js';
@@ -42,13 +42,54 @@ describe('inventoryActions tests', () => {
         avatar.getCell().entity = null;
         avatar.placeAt(4, 4, 0);
 
-        item1 = new Item('itemKey1', 'Item 1');
-        item2 = new Item('itemKey2', 'Item 2');
+        item1 = Item.makeItem("ROCK",'itemKey1');//  new Item('itemKey1', 'Item 1');
+        item2 = Item.makeItem("STICK",'itemKey2');//  new Item('itemKey2', 'Item 2');
 
         gameState.itemRepo.add(item1);
         gameState.itemRepo.add(item2);
 
         jest.clearAllMocks();
+    });
+
+    describe('inventoryActions tests - validatorForInventoryItemSelection', () => {
+        test('validatorForInventoryItemSelection calls isValidSelection in the inventory renderer', () => {
+            const mockIsValidSelection = jest.fn(() => true);
+            uiPaneMain.renderers = { INVENTORY: { isValidSelection: mockIsValidSelection } };
+
+            const result = validatorForInventoryItemSelection(gameState, 'testKey');
+
+            expect(mockIsValidSelection).toHaveBeenCalledTimes(1);
+            expect(mockIsValidSelection).toHaveBeenCalledWith('testKey');
+            expect(result).toBe(true);
+        });
+    });
+
+    describe('inventoryActions tests - getSelectedItem', () => {
+        test('getSelectedItem returns the appropriate item from the avatar inventory', () => {
+            const mockGetListOffset = jest.fn(() => 0);
+            const mockGetListItemLabels = jest.fn(() => ['a', 'b']);
+            uiPaneMain.renderers = { INVENTORY: { getListOffset: mockGetListOffset, getListItemLabels: mockGetListItemLabels, draw: jest.fn() } };
+
+            avatar.inventory.add(item1);
+            avatar.inventory.add(item2);
+
+            const selectedItem = getSelectedItem(gameState, 'b');
+
+            expect(selectedItem).toBe(item2);
+        });
+
+        test('getSelectedItem returns null if the item is not found', () => {
+            const mockGetListOffset = jest.fn(() => 0);
+            const mockGetListItemLabels = jest.fn(() => ['a', 'b']);
+            uiPaneMain.renderers = { INVENTORY: { getListOffset: mockGetListOffset, getListItemLabels: mockGetListItemLabels, draw: jest.fn() } };
+
+            avatar.inventory.add(item1);
+            avatar.inventory.add(item2);
+
+            const selectedItem = getSelectedItem(gameState, 'c');
+
+            expect(selectedItem).toBeNull();
+        });
     });
 
 
@@ -72,19 +113,6 @@ describe('inventoryActions tests', () => {
         });
     });
 
-    describe('inventoryActions tests - validatorForInventoryItemSelection', () => {
-        test('validatorForInventoryItemSelection calls isValidSelection in the inventory renderer', () => {
-            const mockIsValidSelection = jest.fn(() => true);
-            uiPaneMain.renderers = { INVENTORY: { isValidSelection: mockIsValidSelection } };
-
-            const result = validatorForInventoryItemSelection(gameState, 'testKey');
-
-            expect(mockIsValidSelection).toHaveBeenCalledTimes(1);
-            expect(mockIsValidSelection).toHaveBeenCalledWith('testKey');
-            expect(result).toBe(true);
-        });
-    });
-
 
     describe('inventoryActions tests - list drop', () => {
 
@@ -98,7 +126,6 @@ describe('inventoryActions tests', () => {
 
             avatar.inventory.add(item1);
             avatar.inventory.add(item2);
-
 
             inventoryActionsMap.INVENTORY_DROP.actionResolver(gameState, 'b');
 
@@ -136,10 +163,23 @@ describe('inventoryActions tests', () => {
     });
 
     describe('inventoryActions tests - examine', () => {
-        test.todo('Show details of selected item in info panel');
-        // test('Show details of selected item in info panel', () => {
-        //     expect(1).toEqual(0);
-        // });
+        test('Show details of selected item in info panel', () => {
+            const mockAddMessage = jest.fn();
+            uiPaneMessages.addMessage = mockAddMessage;
+
+            const mockGetListOffset = jest.fn(() => 0);
+            const mockGetListItemLabels = jest.fn(() => ['a', 'b']);
+            uiPaneMain.renderers = { INVENTORY: { getListOffset: mockGetListOffset, getListItemLabels: mockGetListItemLabels, draw: jest.fn() } };
+
+            avatar.inventory.add(item1);
+            avatar.inventory.add(item2);
+
+            expect(uiPaneMain.eventHandler.priorInfo.startsWith(item2.name)).toBe(false);
+
+            inventoryActionsMap.INVENTORY_EXAMINE.actionResolver(gameState, 'b');
+
+            expect(uiPaneMain.eventHandler.priorInfo.startsWith(item2.name)).toBe(true);
+        });
     });
 
     describe('inventoryActions tests - put', () => {

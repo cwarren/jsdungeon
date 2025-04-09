@@ -38,9 +38,6 @@ const gameActionsMap = {
     GET_SINGLE_ITEM: { name: "Get an item", description: "Pick up a single item from the current location", action: getOneItem },
     GET_ALL_ITEMS: { name: "Get all items", description: "Pick up as many items as you can from the current location", action: getAllItems },
 
-    // TODO: remove this once the inventory screen is implemented
-    INVENTORY_SHOW: { name: "Inventory", description: "See what's in your inventory", action: showInventoryInitiate, actionResolver: showInventoryResolve, actionCancellation: showInventoryCancel },
-
     INVENTORY_DROP: { name: "Drop", description: "Drop something that's in your inventory", action: dropItemInitiate, actionResolver: dropItemResolve },
 
     ZOOM_IN: { name: "Zoom In", description: "Zoom in", action: zoomIn },
@@ -170,30 +167,8 @@ function getAllItems(gameState, key, event) {
     return gameState.avatar.baseActionTime * 2;
 }
 
-
-// TODO: remove these once the inventory screen is implemented
-function showInventoryInitiate(gameState, key, event) {
-    console.log("called showInventoryInitiate");
-    uiPaneMain.eventHandler.startListBasedInput(
-        gameState.avatar.inventory.getItems(gameState.itemRepo),
-        "Here's what you're carrying",
-        gameActionsMap.INVENTORY_SHOW.actionResolver,
-        gameActionsMap.INVENTORY_SHOW.actionCancellation
-    );
-    return 0;
-}
-function showInventoryResolve(gameState, listForInput, selectionIdx) {
-    console.log("called showInventoryResolve");
-    console.log(gameState, listForInput, selectionIdx);
-    const selectedItem = listForInput[selectionIdx];
-    // NOTE: can't set uiPaneInfo directly because on resolution the info is reset to what it was before the inventory command, so instead need to update what it's restored from
-    uiPaneMain.eventHandler.priorInfo = `${selectedItem.name}<br/>${selectedItem.description}`;
-}
-function showInventoryCancel() {
-    uiPaneMain.eventHandler.priorInfo = '';
-}
-
-
+// NOTE: dropping items can also be done from the inventory screen, but this is a more streamlined user experience for when the player knows what they want to drop
+// and doesn't want to go through the inventory screen
 function dropItemInitiate(gameState, key, event) {
     console.log("called dropItemInitiate");
     uiPaneMain.eventHandler.startListBasedInput(

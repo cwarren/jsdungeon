@@ -20,6 +20,15 @@ function validatorForInventoryItemSelection(gameState, inputKey) {
     return uiPaneMain.renderers["INVENTORY"].isValidSelection(inputKey);
 }
 
+function getSelectedItem(gameState, inputKey) {
+    const inventory = gameState.avatar.inventory;
+    const selectionOffset = uiPaneMain.renderers["INVENTORY"].getListOffset();
+    const selectionIndex = uiPaneMain.renderers["INVENTORY"].getListItemLabels().indexOf(inputKey);
+    const itemIndex = selectionIndex + selectionOffset;
+    const selectedItem = inventory.getItems(gameState.itemRepo)[itemIndex];
+ 
+    return selectedItem ? selectedItem : null;
+}
 
 // IMPORTANT!!!!
 // action functions should return the time cost of the action!
@@ -35,6 +44,8 @@ function lineDown(gameState, key, event) {
 }
 
 
+// NOTE: dropping items can also be done as a list-based game action, but this lets
+// the user do it directly from the inventory screen, which streamlines the game play experience
 function dropItemInitiate(gameState, key, event) {
     uiPaneMain.eventHandler.startTwoStageInput(
         "Drop which item?",
@@ -43,12 +54,7 @@ function dropItemInitiate(gameState, key, event) {
     return 0;
 }
 function dropItemResolve(gameState, inputKey) {
-    console.log("called dropItemResolve");
-    const inventory = gameState.avatar.inventory;
-    const selectionOffset = uiPaneMain.renderers["INVENTORY"].getListOffset();
-    const selectionIndex = uiPaneMain.renderers["INVENTORY"].getListItemLabels().indexOf(inputKey);
-    const itemIndex = selectionIndex + selectionOffset;
-    const selectedItem = inventory.getItems(gameState.itemRepo)[itemIndex];
+    const selectedItem = getSelectedItem(gameState, inputKey)
     if (!selectedItem) {
         uiPaneMessages.addMessage("No such item in inventory");
         return 0;
@@ -59,19 +65,20 @@ function dropItemResolve(gameState, inputKey) {
 
 
 function examineItemInitiate(gameState, key, event) {
-    console.log("STUBBED called examineItemInitiate");
     uiPaneMain.eventHandler.startTwoStageInput(
         "Examine which item?",
-        () => { console.log("STUBBED called examineItem input validator"); return true; } ,
-        inventoryActionsMap.INVENTORY_DROP.actionResolver);
+        validatorForInventoryItemSelection,
+        inventoryActionsMap.INVENTORY_EXAMINE.actionResolver);
     return 0;
 }
 function examineItemResolve(gameState, inputKey) {
-    console.log("STUBBED called examineItemResolve");
-    // needs avatar inventory
-    // needs listOffset in uiPaneMainRendererInventory
-    // see showInventoryResolve in gameActions.js
-    console.log(gameState, inputKey);
+    const selectedItem = getSelectedItem(gameState, inputKey)
+    if (!selectedItem) {
+        uiPaneMessages.addMessage("No such item in inventory");
+        return 0;
+    }
+    // NOTE: can't set uiPaneInfo directly because on resolution the info is reset to what it was before the inventory command, so instead need to update what it's restored from
+    uiPaneMain.eventHandler.priorInfo = `${selectedItem.name}<br/>${selectedItem.description}`;
     // no draw call needed since this doesn't change the inventory
 }
 
@@ -81,7 +88,7 @@ function putItemInitiate(gameState, key, event) {
     uiPaneMain.eventHandler.startTwoStageInput(
         "Put which item into the container?",
         () => { console.log("STUBBED called putItem input validator"); return true; } ,
-        inventoryActionsMap.INVENTORY_DROP.actionResolver);
+        inventoryActionsMap.INVENTORY_PUT.actionResolver);
     return 0;
 }
 function putItemResolve(gameState, inputKey) {
@@ -100,7 +107,7 @@ function equipItemInitiate(gameState, key, event) {
     uiPaneMain.eventHandler.startTwoStageInput(
         "Wear/wield which item?",
         () => { console.log("STUBBED called equipItem input validator"); return true; } ,
-        inventoryActionsMap.INVENTORY_DROP.actionResolver);
+        inventoryActionsMap.INVENTORY_EQUIP.actionResolver);
     return 0;
 }
 function equipItemResolve(gameState, inputKey) {
@@ -113,4 +120,4 @@ function equipItemResolve(gameState, inputKey) {
 }
 
 
-export { inventoryActionsMap, validatorForInventoryItemSelection };
+export { inventoryActionsMap, validatorForInventoryItemSelection, getSelectedItem };
