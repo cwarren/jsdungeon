@@ -31,6 +31,8 @@ jest.mock('../ui/ui.js', () => ({
 describe('inventoryActions tests', () => {
     let avatar;
     let gameState;
+    let item1;
+    let item2;
 
     beforeEach(() => {
         gameState = new GameState();
@@ -39,25 +41,98 @@ describe('inventoryActions tests', () => {
 
         avatar.getCell().entity = null;
         avatar.placeAt(4, 4, 0);
+
+        item1 = new Item('itemKey1', 'Item 1');
+        item2 = new Item('itemKey2', 'Item 2');
+
+        gameState.itemRepo.add(item1);
+        gameState.itemRepo.add(item2);
+
         jest.clearAllMocks();
     });
 
-    // NOTE: lineUp and lineDown are not tested here as they just call a scroll method in UIPanelMainRendererInventoryClass - that class tests those
 
-    describe('inventoryActions tests - list drop', () => {
-        test.todo('inventory secondary input validator');
-        // test('inventory secondary input validator', () => {
-        // validatorForInventoryItemSelection
-        //     expect(1).toEqual(0);
-        // });
+    describe('inventoryActions tests - lineUp and lineDown', () => {
+        test('lineUp calls the scrollUp method in the inventory renderer', () => {
+            const mockScrollUp = jest.fn();
+            uiPaneMain.renderers = { INVENTORY: { scrollUp: mockScrollUp } };
+
+            inventoryActionsMap.INVENTORY_LINE_UP.action(gameState);
+
+            expect(mockScrollUp).toHaveBeenCalledTimes(1);
+        });
+
+        test('lineDown calls the scrollDown method in the inventory renderer', () => {
+            const mockScrollDown = jest.fn();
+            uiPaneMain.renderers = { INVENTORY: { scrollDown: mockScrollDown } };
+
+            inventoryActionsMap.INVENTORY_LINE_DOWN.action(gameState);
+
+            expect(mockScrollDown).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('inventoryActions tests - validatorForInventoryItemSelection', () => {
+        test('validatorForInventoryItemSelection calls isValidSelection in the inventory renderer', () => {
+            const mockIsValidSelection = jest.fn(() => true);
+            uiPaneMain.renderers = { INVENTORY: { isValidSelection: mockIsValidSelection } };
+
+            const result = validatorForInventoryItemSelection(gameState, 'testKey');
+
+            expect(mockIsValidSelection).toHaveBeenCalledTimes(1);
+            expect(mockIsValidSelection).toHaveBeenCalledWith('testKey');
+            expect(result).toBe(true);
+        });
     });
 
 
     describe('inventoryActions tests - list drop', () => {
-        test.todo('Drop selected item into current space');
-        // test('Drop selected item into current space', () => {
-        //     expect(1).toEqual(0);
-        // });
+
+        test('dropItemResolve calls dropItem on the avatar with the correct item', () => {
+            const mockGetListOffset = jest.fn(() => 0);
+            const mockGetListItemLabels = jest.fn(() => ['a', 'b']);
+            uiPaneMain.renderers = { INVENTORY: { getListOffset: mockGetListOffset, getListItemLabels: mockGetListItemLabels, draw: jest.fn() } };
+
+            const mockDropItem = jest.fn();
+            avatar.dropItem = mockDropItem;
+
+            avatar.inventory.add(item1);
+            avatar.inventory.add(item2);
+
+
+            inventoryActionsMap.INVENTORY_DROP.actionResolver(gameState, 'b');
+
+            expect(mockGetListOffset).toHaveBeenCalledTimes(1);
+            expect(mockGetListItemLabels).toHaveBeenCalledTimes(1);
+            expect(mockDropItem).toHaveBeenCalledTimes(1);
+            expect(mockDropItem).toHaveBeenCalledWith(item2);
+            expect(uiPaneMain.renderers.INVENTORY.draw).toHaveBeenCalledTimes(1);
+        });
+
+        test('dropItemResolve shows a message if no item is found', () => {
+            const mockGetListOffset = jest.fn(() => 0);
+            const mockGetListItemLabels = jest.fn(() => ['a', 'b']);
+            uiPaneMain.renderers = { INVENTORY: { getListOffset: mockGetListOffset, getListItemLabels: mockGetListItemLabels, draw: jest.fn()  } };
+
+            const mockDropItem = jest.fn();
+            avatar.dropItem = mockDropItem;
+
+            avatar.inventory.add(item1);
+
+            const mockAddMessage = jest.fn();
+            uiPaneMessages.addMessage = mockAddMessage;
+
+            inventoryActionsMap.INVENTORY_DROP.actionResolver(gameState, 'b');
+
+            expect(mockGetListOffset).toHaveBeenCalledTimes(1);
+            expect(mockGetListItemLabels).toHaveBeenCalledTimes(1);
+            expect(mockAddMessage).toHaveBeenCalledTimes(1);
+            expect(mockAddMessage).toHaveBeenCalledWith('No such item in inventory');
+            expect(uiPaneMain.renderers.INVENTORY.draw).not.toHaveBeenCalled();
+
+        });
+
+
     });
 
     describe('inventoryActions tests - examine', () => {

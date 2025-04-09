@@ -74,6 +74,11 @@ class UIPaneMainRendererInventory extends UIPaneMainRenderer {
     }
 
     //=====================
+
+    isValidSelection(selectionKey) {
+        const validlistItemLabels = this.getListItemLabels().slice(0, this.ui.gameState.avatar.inventory.count());
+        return validlistItemLabels.includes(selectionKey);
+    }
 }
 
 export { UIPaneMainRendererInventory };

@@ -72,4 +72,49 @@ describe('UIPaneMainRendererInventory', () => {
         inventoryRenderer.scrollUp();
         expect(inventoryRenderer.listOffset).toBe(0);
     });
+
+
+    test('isValidSelection should return true for valid selection keys', () => {
+        uiMock.gameState.avatar.inventory.count.mockReturnValue(10);
+
+        // small and fixed list of labels for testing
+        inventoryRenderer.getListItemLabels = () => { return ['a', 'b', 'c', 'd', 'e']; };
+
+        expect(inventoryRenderer.isValidSelection('a')).toBe(true);
+        expect(inventoryRenderer.isValidSelection('c')).toBe(true);
+        expect(inventoryRenderer.isValidSelection('e')).toBe(true);
+    });
+
+    test('isValidSelection should return false for selection key outside inventory count', () => {
+        uiMock.gameState.avatar.inventory.count.mockReturnValue(3);
+
+        // small and fixed list of labels for testing
+        inventoryRenderer.getListItemLabels = () => { return ['a', 'b', 'c', 'd', 'e']; };
+
+        expect(inventoryRenderer.isValidSelection('a')).toBe(true);
+        expect(inventoryRenderer.isValidSelection('c')).toBe(true);
+        expect(inventoryRenderer.isValidSelection('e')).toBe(false);
+    });
+
+    test('isValidSelection should return false for invalid selection keys', () => {
+        uiMock.gameState.avatar.inventory.count.mockReturnValue(5);
+
+        // small and fixed list of labels for testing
+        inventoryRenderer.getListItemLabels = () => { return ['a', 'b', 'c', 'd', 'e']; };
+
+        expect(inventoryRenderer.isValidSelection('f')).toBe(false);
+        expect(inventoryRenderer.isValidSelection('z')).toBe(false);
+        expect(inventoryRenderer.isValidSelection('1')).toBe(false);
+    });
+
+    test('isValidSelection should handle empty inventory', () => {
+        uiMock.gameState.avatar.inventory.count.mockReturnValue(0);
+
+        // small and fixed list of labels for testing
+        inventoryRenderer.getListItemLabels = () => { return ['a', 'b', 'c', 'd', 'e']; };
+
+        expect(inventoryRenderer.isValidSelection('a')).toBe(false);
+        expect(inventoryRenderer.isValidSelection('b')).toBe(false);
+    });
+
 });

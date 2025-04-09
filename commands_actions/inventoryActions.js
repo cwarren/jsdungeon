@@ -17,14 +17,7 @@ const inventoryActionsMap = {
 };
 
 function validatorForInventoryItemSelection(gameState, inputKey) {
-    console.log("STUBBED called validatorForInventoryItemSelection");
-    // needs avatar inventory
-    // needs listOffset in uiPaneMainRendererInventory
-    // needs itemRepo
-    // return true if inputKey is a valid item selection
-    // return false if inputKey is not a valid item selection
-    console.log(gameState, inputKey);
-    return true;
+    return uiPaneMain.renderers["INVENTORY"].isValidSelection(inputKey);
 }
 
 
@@ -43,19 +36,25 @@ function lineDown(gameState, key, event) {
 
 
 function dropItemInitiate(gameState, key, event) {
-    console.log("STUBBED called dropItemInitiate");
     uiPaneMain.eventHandler.startTwoStageInput(
         "Drop which item?",
-        () => { console.log("STUBBED called dropItem input validator"); return true; } ,
+        validatorForInventoryItemSelection,
         inventoryActionsMap.INVENTORY_DROP.actionResolver);
     return 0;
 }
 function dropItemResolve(gameState, inputKey) {
-    console.log("STUBBED called dropItemResolve");
-    // needs avatar inventory
-    // needs listOffset in uiPaneMainRendererInventory
-    // see dropItemResolve in gameActions.js
-    console.log(gameState, inputKey);
+    console.log("called dropItemResolve");
+    const inventory = gameState.avatar.inventory;
+    const selectionOffset = uiPaneMain.renderers["INVENTORY"].getListOffset();
+    const selectionIndex = uiPaneMain.renderers["INVENTORY"].getListItemLabels().indexOf(inputKey);
+    const itemIndex = selectionIndex + selectionOffset;
+    const selectedItem = inventory.getItems(gameState.itemRepo)[itemIndex];
+    if (!selectedItem) {
+        uiPaneMessages.addMessage("No such item in inventory");
+        return 0;
+    }
+    gameState.avatar.dropItem(selectedItem);
+    uiPaneMain.renderers["INVENTORY"].draw(); // draw needs to be called here since this is executed as a callback; the normal draw-after-action doesn't happen
 }
 
 
@@ -73,6 +72,7 @@ function examineItemResolve(gameState, inputKey) {
     // needs listOffset in uiPaneMainRendererInventory
     // see showInventoryResolve in gameActions.js
     console.log(gameState, inputKey);
+    // no draw call needed since this doesn't change the inventory
 }
 
 
@@ -91,6 +91,7 @@ function putItemResolve(gameState, inputKey) {
     // needs listOffset in uiPaneMainRendererInventory
     // NOTE: this will remain stubbed until I tackle containers
     console.log(gameState, inputKey);
+    uiPaneMain.renderers["INVENTORY"].draw(); // draw needs to be called here since this is executed as a callback; the normal draw-after-action doesn't happen
 }
 
 
@@ -108,6 +109,7 @@ function equipItemResolve(gameState, inputKey) {
     // needs listOffset in uiPaneMainRendererInventory
     // NOTE: this will remain stubbed until I tackle equipment
     console.log(gameState, inputKey);
+    uiPaneMain.renderers["INVENTORY"].draw(); // draw needs to be called here since this is executed as a callback; the normal draw-after-action doesn't happen
 }
 
 
