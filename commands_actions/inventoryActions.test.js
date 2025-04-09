@@ -6,7 +6,7 @@ import { Item } from '../item/itemClass.js';
 import { ItemIdContainer } from '../item/itemIdContainerClass.js';
 
 const WORLD_LEVEL_SPECS_FOR_TESTING = [
-    WorldLevelSpecification.generateWorldLevelSpec({ type: 'EMPTY', width: 10, height: 10, populationParams: {entityPopulation: 'NONE', itemPopulation: 'NONE'}, }),
+    WorldLevelSpecification.generateWorldLevelSpec({ type: 'EMPTY', width: 10, height: 10, populationParams: { entityPopulation: 'NONE', itemPopulation: 'NONE' }, }),
 ];
 
 jest.mock('../util.js', () => ({
@@ -24,7 +24,7 @@ jest.mock('../ui/ui.js', () => ({
         zoomIn: jest.fn(),
         zoomOut: jest.fn(),
         zoomReset: jest.fn(),
-        eventHandler: { startListBasedInput: jest.fn(), priorInfo: 'priorInfo'},
+        eventHandler: { startListBasedInput: jest.fn(), priorInfo: 'priorInfo' },
     },
 }));
 
@@ -42,45 +42,16 @@ describe('inventoryActions tests', () => {
         jest.clearAllMocks();
     });
 
-    test.todo('inventory secondary input validator');
-    // test('inventory secondary input validator', () => {
-           // validatorForInventoryItemSelection
-    //     expect(1).toEqual(0);
-    // });
+    // NOTE: lineUp and lineDown are not tested here as they just call a scroll method in UIPanelMainRendererInventoryClass - that class tests those
 
-    describe('inventoryActions tests - list nav', () => {
-
-        test.todo('Line down does nothing when inventory is empty or short');
-        // test('Line down does nothing when inventory is empty or short', () => {
+    describe('inventoryActions tests - list drop', () => {
+        test.todo('inventory secondary input validator');
+        // test('inventory secondary input validator', () => {
+        // validatorForInventoryItemSelection
         //     expect(1).toEqual(0);
         // });
-
-        test.todo('Line down moves down a line when inventory list is long');
-        // test('Line down moves down a line when inventory list is long', () => {
-        //     expect(1).toEqual(0);
-        // });
-
-        test.todo('Line down does nothing when already at the end of the inventory list');
-        // test('Line down does nothing when already at the end of the inventory list', () => {
-        //     expect(1).toEqual(0);
-        // });
-
-        test.todo('Line up does nothing when inventory is empty or short');
-        // test('Line up does nothing when inventory is empty or short', () => {
-        //     expect(1).toEqual(0);
-        // });
-
-        test.todo('Line up moves up a line when inventory list is long');
-        // test('Line up moves up a line when inventory list is long', () => {
-        //     expect(1).toEqual(0);
-        // });
-
-        test.todo('Line up does nothing when already at the beginning of the inventory list');
-        // test('Line up does nothing when already at the beginning of the inventory list', () => {
-        //     expect(1).toEqual(0);
-        // });
-
     });
+
 
     describe('inventoryActions tests - list drop', () => {
         test.todo('Drop selected item into current space');

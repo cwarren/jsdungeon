@@ -32,20 +32,12 @@ function validatorForInventoryItemSelection(gameState, inputKey) {
 // action functions should return the time cost of the action!
 
 function lineUp(gameState, key, event) {
-    console.log("STUBBED called inventory lineUp");
-    // needs avatar inventory
-    // needs listOffset in uiPaneMainRendererInventory
-    // needs MAX_ITEM_LIST_COUNT from uiPaneMainRendererInventory
-    // alters listOffset in uiPaneMainRendererInventory
+    uiPaneMain.renderers["INVENTORY"].scrollUp();
     return 0;
 }
 
 function lineDown(gameState, key, event) {
-    console.log("STUBBED called inventory lineDown");
-    // needs avatar inventory
-    // needs listOffset in uiPaneMainRendererInventory
-    // needs MAX_ITEM_LIST_COUNT from uiPaneMainRendererInventory
-    // alters listOffset in uiPaneMainRendererInventory
+    uiPaneMain.renderers["INVENTORY"].scrollDown();
     return 0;
 }
 

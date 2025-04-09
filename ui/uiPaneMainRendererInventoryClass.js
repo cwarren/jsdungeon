@@ -1,7 +1,6 @@
 import { UIPaneMainRenderer } from "./uiPaneMainRendererClass.js";
 
 const ITEM_LIST_LABELS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
-const MAX_ITEM_LIST_COUNT = ITEM_LIST_LABELS.length;
 
 class UIPaneMainRendererInventory extends UIPaneMainRenderer {
     constructor(ui, canvas) {
@@ -37,17 +36,41 @@ class UIPaneMainRendererInventory extends UIPaneMainRenderer {
 
         this.ctx.fillText(`You're carrying`, x, y);
 
-        const itemsToDisplay = itemsList.slice(this.listOffset, this.listOffset + MAX_ITEM_LIST_COUNT);
+        const listItemLabels = this.getListItemLabels();
+        const listItemLabelCount = listItemLabels.length;
+
+        const itemsToDisplay = itemsList.slice(this.listOffset, this.listOffset + listItemLabelCount);
         let displayCounter = 0;
         y = itemListStartY;
         itemsToDisplay.forEach(itm => {
-            this.ctx.fillText(`${ITEM_LIST_LABELS[displayCounter]})`, itemLabelX, y);
+            this.ctx.fillText(`${listItemLabels[displayCounter]})`, itemLabelX, y);
             this.ctx.fillText(`${itm.name}`, itemNameX, y);
             this.ctx.fillText(`${itm.description}`, itemDescriptionX, y);
             y += lineHeight;
             displayCounter++;
             
         });
+    }
+
+    //=====================
+
+    getListItemLabels() {
+        return ITEM_LIST_LABELS;
+    }
+
+    getListOffset() {
+        return this.listOffset;
+    }
+
+    //=====================
+
+    scrollDown() {
+        const inventoryCount = this.ui.gameState.avatar.inventory.count();
+        this.listOffset = Math.min(this.listOffset + 1, Math.max(0, inventoryCount - this.getListItemLabels().length));
+    }
+    scrollUp() {
+        const inventoryCount = this.ui.gameState.avatar.inventory.count();
+        this.listOffset = Math.max(this.listOffset - 1, 0);
     }
 
     //=====================
