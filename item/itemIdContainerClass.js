@@ -4,12 +4,25 @@ import { idOf } from "../util.js";
 // NOTE: consider adding a reference item repo on instantiation so it doesn't need to be passed in when needed
 
 class ItemIdContainer {
-    constructor(itemList = []) {
+    constructor(baseRespository, itemList = []) {
+        this.baseRespository = baseRespository;
+        if (!this.baseRespository) {
+            throw new Error("ItemIdContainer: baseRespository is not defined");
+        }
+
         this.itemIdList = [];
         if (itemList.length > 0) {
             this.itemIdList = itemList.map(itm => idOf(itm));
         }
     }
+
+    //================
+
+    setBaseRepository(baseRespository) {
+        this.baseRespository = baseRespository;
+    }
+
+    //================
 
     forSerializing() {
         return [...this.itemIdList];
@@ -19,8 +32,8 @@ class ItemIdContainer {
         return JSON.stringify(this.forSerializing());
     }
 
-    static deserialize(listOfItemsOrIds) {
-        return new ItemIdContainer(listOfItemsOrIds);
+    static deserialize(baseRespository, listOfItemsOrIds) {
+        return new ItemIdContainer(baseRespository, listOfItemsOrIds);
     }
 
     //================
@@ -83,13 +96,13 @@ class ItemIdContainer {
 
     //================
 
-    getItems(itemRepository) {
-        return this.itemIdList.map(itmId => itemRepository.get(itmId));
+    getItems() {
+        return this.itemIdList.map(itmId => this.baseRespository.get(itmId));
     }
 
-    getFirstItem(itemRepository) {
+    getFirstItem() {
         if (! this.itemIdList[0] ) { return null; }
-        return itemRepository.get(this.itemIdList[0]);
+        return this.baseRespository.get(this.itemIdList[0]);
     }
 }
 
