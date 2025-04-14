@@ -116,7 +116,7 @@ class Entity {
 
     entity.inventory = null;
     if (data.inventory && data.inventory.length > 0) {
-      entity.inventory = ItemIdContainer.deserialize(data.inventory);
+      entity.inventory = ItemIdContainer.deserialize(gameState.itemRepo, data.inventory);
     }
 
     return entity;
@@ -775,7 +775,7 @@ class Entity {
 
   giveItem(itemObjectOrId) {
     if (! this.inventory) {
-      this.inventory = new ItemIdContainer();
+      this.inventory = new ItemIdContainer(this.gameState.itemRepo);
     }
     this.inventory.add(itemObjectOrId);
   }
@@ -801,7 +801,7 @@ class Entity {
       return;
     }
     if (! this.inventory) {
-      this.inventory = new ItemIdContainer();
+      this.inventory = new ItemIdContainer(this.gameState.itemRepo);
     }
     
     this.inventory.takeItemFrom(itemObjectOrId, itemIdContainer);

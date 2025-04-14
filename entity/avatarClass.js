@@ -18,7 +18,7 @@ class Avatar extends Entity {
     this.timeOnLevel = 0;
     this.meleeAttack = true;
     this.paneMiniChar = null;
-    this.inventory = new ItemIdContainer(); // base entity has null inventory until used, but the avatar always has an inventory
+    this.inventory = new ItemIdContainer(gameState.itemRepo); // base entity has null inventory until used, but the avatar always has an inventory
   }
 
   forSerializing() {
@@ -54,10 +54,10 @@ class Avatar extends Entity {
     avatar.currentAdvancementPoints = data.currentAdvancementPoints;
     avatar.actionStartingTime = data.actionStartingTime;
 
-    avatar.inventory = null;
-    if (data.inventory && data.inventory.length > 0) {
-      avatar.inventory = ItemIdContainer.deserialize(data.inventory);
-    }
+    // avatar.inventory = null;
+    // if (data.inventory && data.inventory.length > 0) {
+      avatar.inventory = ItemIdContainer.deserialize(gameState.itemRepo, data.inventory);
+    // }
 
     avatar.timeOnLevel = data.timeOnLevel;
     avatar.meleeAttack = data.meleeAttack;

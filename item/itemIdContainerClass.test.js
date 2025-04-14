@@ -39,7 +39,7 @@ describe('ItemIdContainer', () => {
 
     test('initializes empty by default', () => {
         expect(container.itemIdList).toEqual([]);
-        expect(container.baseRespository).toBe(itemRepo);
+        expect(container.baseRepository).toBe(itemRepo);
     });
 
     test('throws error if no base repo provided on initialization', () => {

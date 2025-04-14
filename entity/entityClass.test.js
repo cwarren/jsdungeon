@@ -534,7 +534,7 @@ describe('Entity', () => {
     });
 
     test('takeItemFrom should transfer item from external container into entity inventory', () => {
-      const externalContainer = new ItemIdContainer(['item-1']);
+      const externalContainer = new ItemIdContainer(gameState.itemRepo,['item-1']);
       sourceEntity.takeItemFrom('item-1', externalContainer);
   
       expect(sourceEntity.inventory.has('item-1')).toBe(true);
@@ -542,7 +542,7 @@ describe('Entity', () => {
     });
   
     test('takeItemFrom should not add if source container is empty', () => {
-      const externalContainer = new ItemIdContainer();
+      const externalContainer = new ItemIdContainer(gameState.itemRepo,);
       const result = sourceEntity.takeItemFrom('item-1', externalContainer);
   
       expect(sourceEntity.inventory).toBeNull(); // Should not initialize if nothing added
@@ -550,7 +550,7 @@ describe('Entity', () => {
     });
   
     test('giveItemTo should transfer item to another container', () => {
-      const targetContainer = new ItemIdContainer();
+      const targetContainer = new ItemIdContainer(gameState.itemRepo,);
       sourceEntity.giveItem(item1);
       sourceEntity.giveItemTo(item1, targetContainer);
   
@@ -559,7 +559,7 @@ describe('Entity', () => {
     });
   
     test('giveItemTo should not transfer if entity inventory is empty', () => {
-      const targetContainer = new ItemIdContainer();
+      const targetContainer = new ItemIdContainer(gameState.itemRepo,);
       sourceEntity.giveItemTo(item1, targetContainer);
   
       expect(targetContainer.has(item1)).toBe(false);

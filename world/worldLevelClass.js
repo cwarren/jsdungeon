@@ -94,7 +94,7 @@ class WorldLevel {
 
         let hydratedEnties = data.levelEntities.map(entId => { return gameState.entityRepo.get(entId); });
 
-        let hydratedStructures = data.levelStructures.map(entId => { return gameState.structureRepo.get(entId); });
+        let hydratedStructures = data.levelStructures.map(structureId => { return gameState.structureRepo.get(structureId); });
         // make each structure attached to this new world level since basic structure deserializing leaves them detatched, and reconnect stairs
         hydratedStructures.forEach(structure => {
             structure.setWorldLevel(worldLevel);

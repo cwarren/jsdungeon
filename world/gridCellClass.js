@@ -81,7 +81,7 @@ class GridCell {
         const gridCell = GridCell.createAttached(data.x, data.y, worldLevel, data.terrain);
         if (data.structure) { gridCell.structure = worldLevel.gameState.structureRepo.get(data.structure); }
         if (data.entity) { gridCell.entity = worldLevel.gameState.entityRepo.get(data.entity); }
-        if (data.inventory) { gridCell.inventory = ItemIdContainer.deserialize(data.inventory); }
+        if (data.inventory) { gridCell.inventory = ItemIdContainer.deserialize(worldLevel.gameState.itemRepo, data.inventory); }
         return gridCell;
     }
 
@@ -129,7 +129,7 @@ class GridCell {
 
     giveItem(itemObjectOrId) {
         if (!this.inventory) {
-            this.inventory = new ItemIdContainer();
+            this.inventory = new ItemIdContainer(this.worldLevel.gameState.itemRepo);
         }
         this.inventory.add(itemObjectOrId);
     }
@@ -184,7 +184,7 @@ class GridCell {
             return;
         }
         if (!this.inventory) {
-            this.inventory = new ItemIdContainer();
+            this.inventory = new ItemIdContainer(this.worldLevel.gameState.itemRepo);
         }
 
         this.inventory.takeItemFrom(itemObjectOrId, itemIdContainer);

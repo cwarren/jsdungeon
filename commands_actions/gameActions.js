@@ -170,16 +170,15 @@ function getAllItems(gameState, key, event) {
 // NOTE: dropping items can also be done from the inventory screen, but this is a more streamlined user experience for when the player knows what they want to drop
 // and doesn't want to go through the inventory screen
 function dropItemInitiate(gameState, key, event) {
-    console.log("called dropItemInitiate");
+    devTrace(7, 'action - drop item initiate');
     uiPaneMain.eventHandler.startListBasedInput(
-        gameState.avatar.inventory.getItems(gameState.itemRepo),
+        gameState.avatar.inventory.getItems(),
         "Choose which item to drop",
         gameActionsMap.INVENTORY_DROP.actionResolver);
     return 0;
 }
 function dropItemResolve(gameState, listForInput, selectionIdx) {
-    console.log("called dropItemResolve");
-    console.log(gameState, listForInput, selectionIdx);
+    devTrace(7, 'action - drop item resolve', gameState, listForInput, selectionIdx);
     const selectedItem = listForInput[selectionIdx];
     gameState.avatar.dropItem(selectedItem);
 }

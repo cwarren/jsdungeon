@@ -25,7 +25,7 @@ function getSelectedItem(gameState, inputKey) {
     const selectionOffset = uiPaneMain.renderers["INVENTORY"].getListOffset();
     const selectionIndex = uiPaneMain.renderers["INVENTORY"].getListItemLabels().indexOf(inputKey);
     const itemIndex = selectionIndex + selectionOffset;
-    const selectedItem = inventory.getItems(gameState.itemRepo)[itemIndex];
+    const selectedItem = inventory.getItems()[itemIndex];
  
     return selectedItem ? selectedItem : null;
 }

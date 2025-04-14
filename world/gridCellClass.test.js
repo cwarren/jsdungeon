@@ -294,7 +294,7 @@ describe('GridCell', () => {
 
         test('should take an item from another container', () => {
             const item =  Item.makeItem("ROCK");
-            const otherContainer = new ItemIdContainer();
+            const otherContainer = new ItemIdContainer(itemRepo);
             otherContainer.add(item);
 
             gridCell.takeItemFrom(item, otherContainer);
@@ -305,7 +305,7 @@ describe('GridCell', () => {
 
         test('should give an item to another container', () => {
             const item =  Item.makeItem("ROCK");
-            const otherContainer = new ItemIdContainer();
+            const otherContainer = new ItemIdContainer(itemRepo);
             gridCell.giveItem(item);
             const item2 =  Item.makeItem("ROCK");
             gridCell.giveItem(item2);
@@ -318,7 +318,7 @@ describe('GridCell', () => {
 
         test('should null inventory if giving an item to another container empties it', () => {
             const item =  Item.makeItem("ROCK");
-            const otherContainer = new ItemIdContainer();
+            const otherContainer = new ItemIdContainer(itemRepo);
             gridCell.giveItem(item);
 
             gridCell.giveItemTo(item, otherContainer);
@@ -344,7 +344,7 @@ describe('GridCell', () => {
 
         test('should handle giving an item from an empty inventory', () => {
             const item =  Item.makeItem("ROCK");
-            const otherContainer = new ItemIdContainer();
+            const otherContainer = new ItemIdContainer(itemRepo);
 
             expect(() => gridCell.giveItemTo(item, otherContainer)).not.toThrow();
             expect(otherContainer.has(item)).toBe(false);
@@ -352,7 +352,7 @@ describe('GridCell', () => {
 
         test('should handle taking an item from an empty container', () => {
             const item =  Item.makeItem("ROCK");
-            const emptyContainer = new ItemIdContainer();
+            const emptyContainer = new ItemIdContainer(itemRepo);
 
             expect(() => gridCell.takeItemFrom(item, emptyContainer)).not.toThrow();
             expect(gridCell.inventory).toBeNull();

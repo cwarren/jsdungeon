@@ -119,7 +119,7 @@ describe('gameActions tests', () => {
 
         test('GET_SINGLE_ITEM takes the only item from the cell, using some time and clearing out that location', () => {
             const avCell = avatar.getCell();
-            avCell.inventory = new ItemIdContainer();
+            avCell.inventory = new ItemIdContainer(gameState.itemRepo);
             const item = Item.makeItem("ROCK");
             gameState.itemRepo.add(item);
             avCell.giveItem(item);
@@ -135,7 +135,7 @@ describe('gameActions tests', () => {
 
         test('GET_SINGLE_ITEM takes one of multiple item from the cell, using some time', () => {
             const avCell = avatar.getCell();
-            avCell.inventory = new ItemIdContainer();
+            avCell.inventory = new ItemIdContainer(gameState.itemRepo);
 
             const item = Item.makeItem("ROCK");
             gameState.itemRepo.add(item);
@@ -164,7 +164,7 @@ describe('gameActions tests', () => {
 
         test('GET_ALL_ITEMS does the same as GET_SINGLE_ITEM if only one item is in the cell', () => {
             const avCell = avatar.getCell();
-            avCell.inventory = new ItemIdContainer();
+            avCell.inventory = new ItemIdContainer(gameState.itemRepo);
             const item = Item.makeItem("ROCK");
             gameState.itemRepo.add(item);
             avCell.giveItem(item);
@@ -180,7 +180,7 @@ describe('gameActions tests', () => {
 
         test('GET_ALL_ITEMS gets all items and takes longer if more than one item is there', () => {
             const avCell = avatar.getCell();
-            avCell.inventory = new ItemIdContainer();
+            avCell.inventory = new ItemIdContainer(gameState.itemRepo);
 
             const item = Item.makeItem("ROCK");
             gameState.itemRepo.add(item);
@@ -214,7 +214,7 @@ describe('gameActions tests', () => {
             gameState.itemRepo.add(item2);
             gameState.avatar.giveItem(item2);
 
-            const result = gameActionsMap.INVENTORY_DROP.actionResolver (gameState, gameState.avatar.inventory.getItems(gameState.itemRepo), 0);
+            const result = gameActionsMap.INVENTORY_DROP.actionResolver (gameState, gameState.avatar.inventory.getItems(), 0);
 
             expect(gameState.avatar.hasItem(item1)).toBe(false);
             expect(gameState.avatar.hasItem(item2)).toBe(true);

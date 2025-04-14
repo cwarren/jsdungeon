@@ -58,7 +58,7 @@ class UIPaneMainRendererGamePlay extends UIPaneMainRenderer {
                 if (this.ui.gameState.avatar.vision.visibleCells.has(cell)) {
                     this.drawGridCell(cell, offsetX, offsetY, cellSize, gridSpacing);
                     if (cell.inventory) {
-                        cell.inventory.getItems(this.ui.gameState.itemRepo).forEach(itm => {
+                        cell.inventory.getItems().forEach(itm => {
                             this.drawItem(itm, cell, offsetX, offsetY, cellSize, gridSpacing);
                         });
                     }

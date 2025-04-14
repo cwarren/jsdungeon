@@ -21,7 +21,7 @@ class UIPaneMainRendererInventory extends UIPaneMainRenderer {
         const inventory = avatar.inventory;
         if (!inventory) return;
 
-        const itemsList = inventory.getItems(this.ui.gameState.itemRepo);
+        const itemsList = inventory.getItems();
         if (!itemsList || itemsList.length == 0) {
             this.ctx.fillText("Inventory is empty", 50, 50);
             return;
