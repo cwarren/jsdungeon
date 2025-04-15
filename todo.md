@@ -1,16 +1,6 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* item stacks
-* * item stacking handled in item container
-* * * it's clear at this point that the item container needs a refernce to the grounding repo - add that now and refactor existing code accordingly
-* * * * double check game state serialization / deserialization around this - possibility of dangling references that need to be resolved
-* * on item add, stack if possible (NOTE: this automatically covers stack combination, since adding an item to a stack is sugar for adding stacks)
-* * * handle item repo stuff to remove original item if it gets stacked
-* * on item remove
-* * * if stack, extract one item (and handle item repo stuff)
-* * * if not stack, handle per current
-
 * implement capacity for item containers
 * * add volume and mass to items / item definitions
 * * add capacity to containers

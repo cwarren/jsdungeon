@@ -489,12 +489,17 @@ describe('Entity', () => {
 
   describe('Entity - inventory', () => {
     let sourceEntity, targetEntity;
-    const item1 = { id: 'item-1' };
-    const item2 = { id: 'item-2' };
+    let item1, item2;
 
     beforeEach(() => {
       sourceEntity = new Entity(gameState, 'testEntity1');
       targetEntity = new Entity(gameState, 'testEntity1');
+
+      item1 = Item.makeItem("ROCK", "item-1");
+      gameState.itemRepo.add(item1);
+      item2 = Item.makeItem("STICK", "item-2");
+      gameState.itemRepo.add(item2);
+
     });
 
     test('should give item to entity and store it in inventory', () => {
@@ -535,6 +540,8 @@ describe('Entity', () => {
 
     test('takeItemFrom should transfer item from external container into entity inventory', () => {
       const externalContainer = new ItemIdContainer(gameState.itemRepo,['item-1']);
+      expect(externalContainer.has('item-1')).toBe(true);
+
       sourceEntity.takeItemFrom('item-1', externalContainer);
   
       expect(sourceEntity.inventory.has('item-1')).toBe(true);

@@ -32,7 +32,8 @@ class UIPaneMainRendererInventory extends UIPaneMainRenderer {
         const itemListStartY = 60;
         const itemLabelX = 30;
         const itemNameX = 60;
-        const itemDetailsX = 300;
+        const itemWeightX = 250;
+        const itemVolumeX = 350;
 
         this.ctx.fillText(`You're carrying`, x, y);
 
@@ -44,8 +45,14 @@ class UIPaneMainRendererInventory extends UIPaneMainRenderer {
         y = itemListStartY;
         itemsToDisplay.forEach(itm => {
             this.ctx.fillText(`${listItemLabels[displayCounter]})`, itemLabelX, y);
-            this.ctx.fillText(`${itm.name}`, itemNameX, y);
-            this.ctx.fillText(`???`, itemDetailsX, y); // TODO: add item details like weight et al
+            let nameInfo = itm.name;
+            if (itm.isStackable & itm.stackCount > 1) {
+                nameInfo += ` (# ${itm.stackCount})`;
+            }
+            this.ctx.fillText(`${nameInfo}`, itemNameX, y);
+            // let weightInfo = itm.weight ? `(${itm.weight})` : `???`;
+            // this.ctx.fillText(`???`, itemWeightX, y); // TODO: add item details like weight et al
+            // this.ctx.fillText(`???`, itemVolumeX, y); // TODO: add item details like weight et al
             y += lineHeight;
             displayCounter++;            
         });

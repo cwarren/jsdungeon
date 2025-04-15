@@ -294,6 +294,7 @@ describe('GridCell', () => {
 
         test('should take an item from another container', () => {
             const item =  Item.makeItem("ROCK");
+            worldLevel.gameState.itemRepo.add(item);
             const otherContainer = new ItemIdContainer(itemRepo);
             otherContainer.add(item);
 
@@ -305,6 +306,7 @@ describe('GridCell', () => {
 
         test('should give an item to another container', () => {
             const item =  Item.makeItem("ROCK");
+            worldLevel.gameState.itemRepo.add(item);
             const otherContainer = new ItemIdContainer(itemRepo);
             gridCell.giveItem(item);
             const item2 =  Item.makeItem("ROCK");
@@ -318,6 +320,7 @@ describe('GridCell', () => {
 
         test('should null inventory if giving an item to another container empties it', () => {
             const item =  Item.makeItem("ROCK");
+            worldLevel.gameState.itemRepo.add(item);
             const otherContainer = new ItemIdContainer(itemRepo);
             gridCell.giveItem(item);
 
