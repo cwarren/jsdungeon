@@ -79,7 +79,8 @@ class EntityMovement {
         }
         if (targetCell.inventory.count() == 1) {
             const item = targetCell.inventory.getFirstItem(this.ofEntity.gameState.itemRepo);
-            this.ofEntity.showMessage(`There's ${prefixArticleTo(item.name)} here.`);
+            const stackSuffix = item.stackCount > 1 ? " pile" : "";
+            this.ofEntity.showMessage(`There's ${prefixArticleTo(item.name)}${stackSuffix} here.`);
             return;
         }
         this.ofEntity.showMessage("There are some items here.");

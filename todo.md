@@ -2,11 +2,17 @@ to start server:
 PS E:\code\jsdungeon> docker-compose up --build
 
 * implement capacity for item containers
-* * add volume and mass to items / item definitions
+* * add volume and weight (just calling it weight, not mass - no need to get pedantic here...) to items / item definitions
 * * add capacity to containers
 * * * count ?
 * * * volume ?
 * * * mass ?
+
+* implement bulk pick up and drop, to take or give the whole stack, not just a single item from it
+* * add extractEntry to item container
+* * maybe a general rule that when specifying a list index, the capital letter means the whole entry?
+* * add / update game action
+* * add / update inventory action
 
 * create a chest structure
 * * with an inventory
