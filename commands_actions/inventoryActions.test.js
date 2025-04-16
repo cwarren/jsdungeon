@@ -178,7 +178,7 @@ describe('inventoryActions tests', () => {
 
             inventoryActionsMap.INVENTORY_EXAMINE.actionResolver(gameState, 'b');
 
-            expect(uiPaneMain.eventHandler.priorInfo.startsWith(item2.name)).toBe(true);
+            expect(uiPaneMain.eventHandler.priorInfo.includes(item2.name)).toBe(true);
         });
     });
 

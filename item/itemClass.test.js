@@ -19,39 +19,62 @@ describe('Item', () => {
         jest.clearAllMocks();
     });
 
-    test('constructor assigns fields correctly with explicit ID', () => {
-        const item = new Item(rockDef, 'custom-id-001');
+    describe('Item - creation', () => {
+        test('constructor assigns fields correctly with explicit ID', () => {
+            const item = new Item(rockDef, 'custom-id-001');
 
-        expect(item.id).toBe('custom-id-001');
-        expect(item.type).toBe(rockDef.type);
-        expect(item.name).toBe(rockDef.name);
-        expect(item.description).toBe(rockDef.description);        
-        expect(item.displaySymbol).toBe(rockDef.displaySymbol);
-        expect(item.displayColor).toBe(rockDef.displayColor);
+            expect(item.id).toBe('custom-id-001');
+            expect(item.type).toBe(rockDef.type);
+            expect(item.name).toBe(rockDef.name);
+            expect(item.description).toBe(rockDef.description);
+            expect(item.displaySymbol).toBe(rockDef.displaySymbol);
+            expect(item.displayColor).toBe(rockDef.displayColor);
+        });
+
+        test('constructor assigns generated ID if none provided', () => {
+            jest.spyOn(require('../util.js'), 'generateId');
+            const item = new Item(rockDef);
+
+            expect(generateId).toHaveBeenCalled();
+        });
+
+        test('makeItem returns a valid Item when type is known', () => {
+            const item = Item.makeItem('ROCK');
+
+            expect(item).toBeInstanceOf(Item);
+            expect(item.type).toBe(rockDef.type);
+            expect(item.name).toBe(rockDef.name);
+        });
+
+        test('makeItem returns null and logs when type is unknown', () => {
+            console.log = jest.fn();
+
+            const item = Item.makeItem('UNKNOWN_TYPE');
+
+            expect(item).toBeNull();
+            expect(console.log).toHaveBeenCalled();
+        });
     });
 
-    test('constructor assigns generated ID if none provided', () => {
-        jest.spyOn(require('../util.js'), 'generateId');
-        const item = new Item(rockDef);
+    describe('Item - getters and setters', () => {
+        test('getExtendedWeight returns correct extended weight', () => {
+            const item = new Item(rockDef);
+            item.stackCount = 3;
 
-        expect(generateId).toHaveBeenCalled();
-    });
+            expect(item.getExtendedWeight()).toBe(rockDef.weight * 3);
+        });
 
-    test('makeItem returns a valid Item when type is known', () => {
-        const item = Item.makeItem('ROCK');
+        test('getExtendedVolume returns correct extended volume', () => {
+            const item = new Item(stickDef);
+            item.stackCount = 2;
 
-        expect(item).toBeInstanceOf(Item);
-        expect(item.type).toBe(rockDef.type);
-        expect(item.name).toBe(rockDef.name);
-    });
+            expect(item.getExtendedVolume()).toBe(stickDef.volume * 2);
+        });
+        test('getExtendedWeight returns correct weight for single item', () => {
+            const item = new Item(rockDef);
 
-    test('makeItem returns null and logs when type is unknown', () => {
-        console.log = jest.fn();
-
-        const item = Item.makeItem('UNKNOWN_TYPE');
-
-        expect(item).toBeNull();
-        expect(console.log).toHaveBeenCalled();
+            expect(item.getExtendedWeight()).toBe(rockDef.weight);
+        });
     });
 
     describe('Item - stacking', () => {

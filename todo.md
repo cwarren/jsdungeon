@@ -2,11 +2,21 @@ to start server:
 PS E:\code\jsdungeon> docker-compose up --build
 
 * implement capacity for item containers
-* * add volume and weight (just calling it weight, not mass - no need to get pedantic here...) to items / item definitions
 * * add capacity to containers
 * * * count ?
 * * * volume ?
-* * * mass ?
+* * * NOT mass/weight - this limit would come from the entity or structure, not the container itself
+* * check capacity on add - if add would exceed capacity, prevent it
+* * add a hasRoomFor(objectOrId) method
+
+* implement carrying weight capacity for entities
+* * add fields for current and limit
+* * calculate limit from stats (and other things, but that's later)
+* * when exceeded, movement and action costs start going up
+* * show current and limit in mini-char and character screen
+
+* implement HTML display for help UI/screen
+* MAYBE use HTML for character screen
 
 * implement bulk pick up and drop, to take or give the whole stack, not just a single item from it
 * * add extractEntry to item container
@@ -14,22 +24,12 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * add / update game action
 * * add / update inventory action
 
-* create a chest structure
-* * with an inventory
-* * implement structure interaction
-* * implement persistence
-
-* implement put command, which moves an item from avatar inventory to inventory of structure in current space
-* * short circuit if no valid (i.e. inventory-having) structure in the current space
-
-* take command
-* * inventory selection, but selecting from structure inventory in current space, and when valid selection move item from that into inventory
+* support for command confirmations, e.g. 'Are you sure you want to attack the town sheriff? (y/n)'
 
 * update entity movement to show items in current cell
 * * on entering a cell with items in it...
 * * * if multiple items, message that there are multiple and show the list in the list UI
 * * * on exiting a cell with items in it, clear the list UI (or maybe set the list UI to empty on entering an empty cell? will have to think a bit about efficiency and clarity there...)
-
 
 * implement automatic text-wrapping for text block - character screen help is a good in-game testing area for this
 * * NOTE: all that kind of stuff is already handed in HTML - should NOT have to re-create all that....
@@ -56,6 +56,10 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * on avatar move (?)
 * * * add items in visible cells to known items set
 * * * remove from known items any known items from the visible cells that are no longer actually in those cells (e.g. someone else moved them, or they otherwise went away)
+
+* support for targeted commands
+* * first of which is look / examine
+* * second is fire/throw
 
 * more mob stuff
 * * simple status sheets for mobs (for display in info block when attacking or otherwise interacting with that mob)
@@ -102,6 +106,17 @@ PS E:\code\jsdungeon> docker-compose up --build
 
 * resolve duped info between direction deltas in gameActions and adjacency directions in GridCell
 
+* create a chest structure
+* * with an inventory
+* * implement structure interaction
+* * implement persistence
+
+* implement put command, which moves an item from avatar inventory to inventory of structure in current space
+* * short circuit if no valid (i.e. inventory-having) structure in the current space
+
+* take command
+* * inventory selection, but selecting from structure inventory in current space, and when valid selection move item from that into inventory
+
 * ?? UI for general container-to-container transfer of items
 * * how to determine / select which containers?
 * * * current space
@@ -109,9 +124,6 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * * main inventory
 * * * any containers in main inventory
 * need a container context - this is like managing any tree-like file storage structure
-
-* support for command confirmations, e.g. 'Are you sure you want to attack the town sheriff? (y/n)'
-* support for targeted commands, first of which is look / examine
 
 * add sleeping-related and running-related tests to gameTime.test.js
 
@@ -143,7 +155,7 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * though, it doesn't really break things... just means some mobs may fight if they're hostile to each other... which shouldn't be much of a problem outside development, since eventually most mobs will not be hostile to each other...
 
 
-* magic (probably use activate-able items under the hood...?)
+* magic! (probably use activate-able items under the hood...?)
 
 * special traits (e.g. extra mana channels, which lets an avatar equip more magic items than normal)
 

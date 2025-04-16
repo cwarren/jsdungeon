@@ -50,9 +50,8 @@ class UIPaneMainRendererInventory extends UIPaneMainRenderer {
                 nameInfo += ` (# ${itm.stackCount})`;
             }
             this.ctx.fillText(`${nameInfo}`, itemNameX, y);
-            // let weightInfo = itm.weight ? `(${itm.weight})` : `???`;
-            // this.ctx.fillText(`???`, itemWeightX, y); // TODO: add item details like weight et al
-            // this.ctx.fillText(`???`, itemVolumeX, y); // TODO: add item details like weight et al
+            this.ctx.fillText(`${itm.getExtendedWeight()} wt`, itemWeightX, y);
+            this.ctx.fillText(`${itm.getExtendedVolume()} vl`, itemVolumeX, y);
             y += lineHeight;
             displayCounter++;            
         });

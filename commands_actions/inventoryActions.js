@@ -78,7 +78,7 @@ function examineItemResolve(gameState, inputKey) {
         return 0;
     }
     // NOTE: can't set uiPaneInfo directly because on resolution the info is reset to what it was before the inventory command, so instead need to update what it's restored from
-    uiPaneMain.eventHandler.priorInfo = `${selectedItem.name}<br/>${selectedItem.description}`;
+    uiPaneMain.eventHandler.priorInfo = selectedItem.getRichInfo();
     // no draw call needed since this doesn't change the inventory
 }
 

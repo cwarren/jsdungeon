@@ -10,6 +10,9 @@ class Item {
         this.displaySymbol = itemDef.displaySymbol;
         this.displayColor = itemDef.displayColor;
 
+        this.weight = itemDef.weight || .1;
+        this.volume = itemDef.volume || .1;
+
         this.isStackable = itemDef.isStackable || false;
         this.stackCount = 1;
     }
@@ -21,6 +24,27 @@ class Item {
             return null;
         }
         return new Item(itemDef, id);
+    }
+
+    // GETTERS AND SETTERS
+
+    getExtendedWeight() {
+        return this.weight * this.stackCount;
+    }
+    getExtendedVolume() {
+        return this.volume * this.stackCount;
+    }
+
+    getRichInfo() {
+        const isStack = this.isStackable && this.stackCount > 1;
+        let richInfo = `<span style="color: ${this.displayColor}">${this.displaySymbol}</span>`;
+        richInfo += ` ${this.name}${isStack ? ` (stack of ${this.stackCount})` : ''}<br/>`;
+        richInfo += `Weight: ${this.weight} wt${isStack ? ' each' : ''} &nbsp; &nbsp; Volume: ${this.volume} vl${isStack ? ' each' : ''}<br/>`;
+        if (isStack) {
+            richInfo += `Stacked Weight: ${this.getExtendedWeight()} wt &nbsp; &nbsp; Stacked Volume: ${this.getExtendedVolume()} vl<br/>`;
+        }
+        richInfo += `<br/>Description: ${this.description}<br/>`
+        return richInfo;
     }
 
     // STACKING
