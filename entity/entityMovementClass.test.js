@@ -19,6 +19,7 @@ import {
   determineCheapestMovementPathForEntity
 } from '../world/gridUtils.js';
 import { GridCell } from '../world/gridCellClass.js';
+import { Item } from '../item/itemClass.js';
 
 jest.mock('../util.js', () => ({
   devTrace: jest.fn(),
@@ -399,7 +400,10 @@ describe('EntityMovement', () => {
       entityLocation.getCellAtDelta.mockReturnValue(traversibleCell);
 
       const curCell = entityMovement.ofEntity.getCell();
-      curCell.giveItem('mock-item-id-123');
+      const item = Item.makeItem("ROCK");
+      gameState.itemRepo.add(item);
+
+      curCell.giveItem(item);
 
       const result = entityMovement.canRunToDeltas(1, 1);
 

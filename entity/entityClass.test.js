@@ -750,7 +750,7 @@ describe('Entity', () => {
       ];
 
       const serializedData = entity.forSerializing();
-      serializedData.inventory = [];
+      serializedData.inventory = null;
 
       const deserializedEntity = Entity.deserialize(serializedData, gameState);
 
@@ -765,13 +765,21 @@ describe('Entity', () => {
         { damageSource: 'entity-2', damageSourceType: 'Entity', damage: new EffDamage(10) }
       ];
 
+      const item1 = Item.makeItem("ROCK", "item-1");
+      gameState.itemRepo.add(item1);
+      const item2 = Item.makeItem("STICK", "item-2");
+      gameState.itemRepo.add(item2);
+      entity.giveItem(item1);
+      entity.giveItem(item2);
+
       const serializedData = entity.forSerializing();
-      serializedData.inventory = ['item-id-123'];
+      console.log(serializedData);
 
       const deserializedEntity = Entity.deserialize(serializedData, gameState);
 
       expect(deserializedEntity.inventory).toBeInstanceOf(ItemIdContainer);
-      expect(deserializedEntity.inventory.has('item-id-123')).toEqual(true);
+      expect(deserializedEntity.inventory.has(item1)).toEqual(true);
+      expect(deserializedEntity.inventory.has(item2)).toEqual(true);
     });
 
     test('should correctly re-add the entity to the gameState repository on deserialization', () => {

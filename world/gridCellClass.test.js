@@ -209,9 +209,13 @@ describe('GridCell', () => {
 
         test('should remove an item from the inventory', () => {
             const item =  Item.makeItem("ROCK");
+            worldLevel.gameState.itemRepo.add(item);
             gridCell.giveItem(item);
+
             const item2 =  Item.makeItem("ROCK");
+            worldLevel.gameState.itemRepo.add(item2);
             gridCell.giveItem(item2);
+
             gridCell.takeItem(item);
 
             expect(gridCell.inventory.has(item)).toBe(false);
@@ -219,6 +223,7 @@ describe('GridCell', () => {
 
         test('should null out inventory when it is empty', () => {
             const item =  Item.makeItem("ROCK");
+            worldLevel.gameState.itemRepo.add(item);
             gridCell.giveItem(item);
             expect(gridCell.inventory.has(item)).toBe(true);
 
@@ -229,10 +234,10 @@ describe('GridCell', () => {
 
         test('should return first item as item and remove it from own inventory',() => {
             const item =  Item.makeItem("ROCK");
-            itemRepo.add(item);
+            worldLevel.gameState.itemRepo.add(item);
             gridCell.giveItem(item);
             const item2 =  Item.makeItem("ROCK");
-            itemRepo.add(item2);
+            worldLevel.gameState.itemRepo.add(item2);
             gridCell.giveItem(item2);
 
             const extractedItem = gridCell.extractFirstItem();
@@ -246,7 +251,7 @@ describe('GridCell', () => {
 
         test('should null inventory if extracting the last item',() => {
             const item =  Item.makeItem("ROCK");
-            itemRepo.add(item);
+            worldLevel.gameState.itemRepo.add(item);
             gridCell.giveItem(item);
 
             const extractedItem = gridCell.extractFirstItem();
@@ -260,10 +265,10 @@ describe('GridCell', () => {
 
         test('should null inventory and return all items if extracting all items',() => {
             const item =  Item.makeItem("ROCK");
-            itemRepo.add(item);
+            worldLevel.gameState.itemRepo.add(item);
             gridCell.giveItem(item);
             const item2 =  Item.makeItem("ROCK");
-            itemRepo.add(item2);
+            worldLevel.gameState.itemRepo.add(item2);
             gridCell.giveItem(item2);
 
             const extractedItems = gridCell.extractAllItems();
@@ -277,8 +282,10 @@ describe('GridCell', () => {
 
         test('should check if an item exists in the inventory', () => {
             const item =  Item.makeItem("ROCK");
+            worldLevel.gameState.itemRepo.add(item);
             gridCell.giveItem(item);
             const item2 =  Item.makeItem("ROCK");
+            worldLevel.gameState.itemRepo.add(item2);
             gridCell.giveItem(item2);
 
             expect(gridCell.hasItem(item)).toBe(true);
@@ -288,6 +295,7 @@ describe('GridCell', () => {
 
         test('should report not having an item if inventory is null', () => {
             const item =  Item.makeItem("ROCK");
+            worldLevel.gameState.itemRepo.add(item);
             expect(gridCell.inventory).toBeNull();
             expect(gridCell.hasItem(item)).toBe(false);
         });
@@ -310,6 +318,8 @@ describe('GridCell', () => {
             const otherContainer = new ItemIdContainer(itemRepo);
             gridCell.giveItem(item);
             const item2 =  Item.makeItem("ROCK");
+            worldLevel.gameState.itemRepo.add(item2);
+
             gridCell.giveItem(item2);
 
             gridCell.giveItemTo(item, otherContainer);
@@ -332,6 +342,7 @@ describe('GridCell', () => {
 
         test('should handle giving an item to a non-existent container', () => {
             const item =  Item.makeItem("ROCK");
+            worldLevel.gameState.itemRepo.add(item);
             gridCell.giveItem(item);
 
             expect(() => gridCell.giveItemTo(item, null)).not.toThrow();
@@ -340,6 +351,7 @@ describe('GridCell', () => {
 
         test('should handle taking an item from a non-existent container', () => {
             const item =  Item.makeItem("ROCK");
+            worldLevel.gameState.itemRepo.add(item);
 
             expect(() => gridCell.takeItemFrom(item, null)).not.toThrow();
             expect(gridCell.inventory).toBeNull();
@@ -347,6 +359,7 @@ describe('GridCell', () => {
 
         test('should handle giving an item from an empty inventory', () => {
             const item =  Item.makeItem("ROCK");
+            worldLevel.gameState.itemRepo.add(item);
             const otherContainer = new ItemIdContainer(itemRepo);
 
             expect(() => gridCell.giveItemTo(item, otherContainer)).not.toThrow();
@@ -355,6 +368,7 @@ describe('GridCell', () => {
 
         test('should handle taking an item from an empty container', () => {
             const item =  Item.makeItem("ROCK");
+            worldLevel.gameState.itemRepo.add(item);
             const emptyContainer = new ItemIdContainer(itemRepo);
 
             expect(() => gridCell.takeItemFrom(item, emptyContainer)).not.toThrow();

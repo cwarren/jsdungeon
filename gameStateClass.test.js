@@ -259,7 +259,14 @@ describe("GameState Tests", () => {
                             currentAdvancementPoints: 0,
                             actionStartingTime: 0,
                             timeOnLevel: 120,
-                            meleeAttack: true
+                            meleeAttack: true,
+                            inventory: {
+                                itemIds: ['simple-item-id-123'],
+                                limitless: false,
+                                capacityCount: 50,
+                                capacityVolume: 150,
+                                currentVolume: 1,
+                            }
                         }
                     ]
                 },

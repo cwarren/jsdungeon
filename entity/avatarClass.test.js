@@ -147,7 +147,7 @@ describe('Avatar', () => {
         timeOnLevel: 120,
         meleeAttack: false,
       });
-      expect(serialized.inventory.length).toEqual(1);
+      expect(serialized.inventory.itemIds.length).toEqual(1);
     });
 
     test('should serialize to JSON correctly', () => {

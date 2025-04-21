@@ -115,7 +115,7 @@ class Entity {
     entity.actionStartingTime = data.actionStartingTime;
 
     entity.inventory = null;
-    if (data.inventory && data.inventory.length > 0) {
+    if (data.inventory) {
       entity.inventory = ItemIdContainer.deserialize(gameState.itemRepo, data.inventory);
     }
 

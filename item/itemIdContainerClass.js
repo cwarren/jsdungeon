@@ -41,15 +41,26 @@ class ItemIdContainer {
     //================
 
     forSerializing() {
-        return [...this.itemIdList];
+        return {
+            itemIds: [...this.itemIdList],
+            limitless: this.limitless,
+            capacityCount: this.capacityCount,
+            capacityVolume: this.capacityVolume,
+            currentVolume: this.currentVolume,
+        };
     }
 
     serialize() {
         return JSON.stringify(this.forSerializing());
     }
 
-    static deserialize(baseRepository, listOfItemsOrIds) {
-        return new ItemIdContainer(baseRepository, listOfItemsOrIds);
+    static deserialize(baseRepository, data) {
+        const deserialized = new ItemIdContainer(baseRepository, data.itemIds);
+        deserialized.setLimitless(data.limitless);
+        deserialized.setCapacityCount(data.capacityCount);
+        deserialized.setCapacityVolume(data.capacityVolume);
+        deserialized.currentVolume = data.currentVolume;
+        return deserialized;
     }
 
     //================
@@ -115,6 +126,8 @@ class ItemIdContainer {
         const index = this.itemIdList.indexOf(itemId);
         if (index !== -1) {
             const item = this.baseRepository.get(itemId);
+
+            
             if (item && item.isStackable && item.stackCount > 1) {
                 item.stackCount -= 1;
             } else {

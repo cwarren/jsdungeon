@@ -552,13 +552,31 @@ describe('ItemIdContainer', () => {
         test('forSerializing returns array of item IDs', () => {
             container.add(testItem1);
             container.add(testItem2);
-            expect(container.forSerializing()).toEqual([testItem1.id, testItem2.id]);
+
+            const serializable = container.forSerializing();
+
+            expect(serializable.itemIds).toEqual([testItem1.id, testItem2.id]);
+            expect(serializable.limitless).toEqual(true);
+            expect(serializable.capacityCount).toEqual(0);
+            expect(serializable.capacityVolume).toEqual(0);
+            expect(serializable.currentVolume).toEqual(3);
         });
 
         test('deserializes from data', () => {
-            const data = [testItem1.id, testItem2.id];
+            const data = {
+                itemIds: [testItem1.id, testItem2.id],
+                limitless: false,
+                capacityCount: 5,
+                capacityVolume: 20,
+                currentVolume: 3,
+            };
             const restored = ItemIdContainer.deserialize(itemRepo, data);
-            expect(restored.itemIdList).toEqual([testItem1.id, testItem2.id]);
+            
+            expect(restored.itemIdList).toEqual(data.itemIds);
+            expect(restored.limitless).toEqual(data.limitless);
+            expect(restored.capacityCount).toEqual(data.capacityCount);
+            expect(restored.capacityVolume).toEqual(data.capacityVolume);
+            expect(restored.currentVolume).toEqual(data.currentVolume);
         });
     });
 });
