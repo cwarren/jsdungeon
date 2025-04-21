@@ -7,6 +7,8 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * * volume ?
 * * * NOT mass/weight - this limit would come from the entity or structure, not the container itself
 * * check capacity on add - if add would exceed capacity, prevent it
+* * manage current volume on add or remove or extract
+* * * TODO: add tests to validate this
 * * add a hasRoomFor(objectOrId) method
 
 * implement carrying weight capacity for entities

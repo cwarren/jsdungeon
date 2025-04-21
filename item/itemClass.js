@@ -55,15 +55,15 @@ class Item {
 
     canStackWith(otherItem) {
         if (!this.isStackable) {
-            console.log(`Item ${this.name} is not stackable`);
+            // console.log(`Item ${this.name} is not stackable`);
             return false;
         }
         if (!otherItem.isStackable) {
-            console.log(`Item ${otherItem.name} is not stackable`);
+            // console.log(`Item ${otherItem.name} is not stackable`);
             return false;
         }
         if (this.type !== otherItem.type) {
-            console.log(`Cannot stack ${this.name} with ${otherItem.name} - different types`);
+            // console.log(`Cannot stack ${this.name} with ${otherItem.name} - different types`);
             return false;
         }
         return true;
@@ -71,7 +71,7 @@ class Item {
    
     addStack(otherStack) {
         if (!this.canStackWith(otherStack)) {
-            console.log(`Cannot stack ${this.name} with ${otherStack.name}`);
+            // console.log(`Cannot stack ${this.name} with ${otherStack.name}`);
             return false;
         }
         this.stackCount += otherStack.stackCount;

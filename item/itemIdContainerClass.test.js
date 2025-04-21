@@ -374,6 +374,180 @@ describe('ItemIdContainer', () => {
 
     });
 
+    describe('ItemIdContainer - capacity', () => {
+        test('get and set capacities', () => {
+            container.setCapacityCount(5);
+            container.setCapacityVolume(100);
+            expect(container.capacityCount).toBe(5);
+            expect(container.capacityVolume).toBe(100);
+        });
+
+        test('setting non-zero capacity makes the container not limitless', () => {
+            container.setCapacityCount(5);
+            expect(container.limitless).toBe(false);
+
+            container.limitless = true; // reset to limitless
+            container.setCapacityVolume(100);
+            expect(container.limitless).toBe(false);
+        });
+
+        test('adding to existing stack increases volume but not count', () => {
+            const stackableItem = Item.makeItem("STICK");
+            itemRepo.add(stackableItem);
+
+            container.add(testItem2); // stackable
+            container.add(stackableItem); // should stack with testItem2
+
+            expect(container.count()).toBe(1);
+            expect(container.currentVolume).toBe(4);
+        });
+
+        test('hasRoomFor by count - item', () => {
+            container.setCapacityCount(2);
+            container.add(testItem1);
+            container.add(testItem2);
+            expect(container.hasRoomFor(testItem3)).toBe(false);
+        });
+
+        test('hasRoomFor by volume - item', () => {
+            container.setCapacityVolume(3);
+            container.add(testItem1);
+
+            expect(container.hasRoomFor(testItem2)).toBe(true);
+            container.add(testItem2);
+
+            expect(container.hasRoomFor(testItem3)).toBe(false);
+        });
+
+        test('hasRoomFor by count - stack addition does not affect count', () => {
+            const stackableItem = Item.makeItem("STICK");
+            itemRepo.add(stackableItem);
+
+            container.setCapacityCount(2);
+            container.add(testItem2); // stackable
+            container.add(stackableItem); // should stack with testItem2
+
+            expect(container.hasRoomFor(testItem1)).toBe(true);
+            container.add(testItem1); // not stackable
+
+            expect(container.hasRoomFor(testItem3)).toBe(false);  // not stackable
+        });
+
+
+        test('hasRoomFor by volume - stack addition can hit volume limits', () => {
+            const stackableItem = Item.makeItem("STICK"); // stick is vol 2
+            itemRepo.add(stackableItem);
+
+            container.setCapacityVolume(5);
+            container.add(testItem2); // stackable
+            container.add(stackableItem); // should stack with testItem2
+
+            const anotherStackableItem = Item.makeItem("STICK"); // stick is vol 2
+            itemRepo.add(anotherStackableItem);
+
+            expect(container.hasRoomFor(anotherStackableItem)).toBe(false);
+        });
+
+        test('adding item increases count and volume', () => {
+            container.add(testItem1);
+            expect(container.count()).toBe(1);
+            expect(container.currentVolume).toBe(1);
+        });
+
+
+
+        test('removing item decreases count and volume', () => {
+            container.add(testItem1);
+            expect(container.count()).toBe(1);
+            expect(container.currentVolume).toBe(1);
+
+            container.remove(testItem1);
+            expect(container.count()).toBe(0);
+            expect(container.currentVolume).toBe(0);
+        });
+
+        test('removing from stack decreases volume but not count', () => {
+            const stackableItem = Item.makeItem("STICK");
+            stackableItem.stackCount = 2;
+            itemRepo.add(stackableItem);
+
+            container.add(testItem2); // stackable
+            expect(container.count()).toBe(1);
+            expect(container.currentVolume).toBe(2);
+
+            container.add(stackableItem);
+            expect(container.count()).toBe(1);
+            expect(container.currentVolume).toBe(6);
+
+            container.remove(testItem2);
+            expect(container.count()).toBe(1);
+            expect(container.currentVolume).toBe(4);
+        });
+
+        test('removing last from stack decreases volume and count', () => {
+            const stackableItem = Item.makeItem("STICK");
+            stackableItem.stackCount = 2;
+            itemRepo.add(stackableItem);
+
+            container.add(stackableItem);
+            expect(container.count()).toBe(1);
+            expect(container.currentVolume).toBe(4);
+
+            container.remove(stackableItem);
+            expect(container.count()).toBe(1);
+            expect(container.currentVolume).toBe(2);
+
+            container.remove(stackableItem);
+            expect(container.count()).toBe(0);
+            expect(container.currentVolume).toBe(0);
+        });
+
+        test('extracting item decreases count and volume', () => {
+            container.add(testItem1);
+            expect(container.count()).toBe(1);
+            expect(container.currentVolume).toBe(1);
+ 
+            container.extractItem(testItem1);
+
+            expect(container.count()).toBe(0);
+            expect(container.currentVolume).toBe(0);
+        });
+
+        test('extracting from stack decreases volume but not count', () => {
+            const stackableItem = Item.makeItem("STICK");
+            stackableItem.stackCount = 2;
+            itemRepo.add(stackableItem);
+
+            container.add(stackableItem);
+            container.extractItem(stackableItem);
+            expect(container.count()).toBe(1);
+            expect(container.currentVolume).toBe(2);
+        });
+
+        test('extracting last from stack decreases volume and count', () => {
+            const stackableItem = Item.makeItem("STICK");
+            stackableItem.stackCount = 1;
+            itemRepo.add(stackableItem);
+
+            container.add(stackableItem);
+            container.extractItem(stackableItem);
+            expect(container.count()).toBe(0);
+            expect(container.currentVolume).toBe(0);
+        });
+
+        test('making a container limitless allows room for item for which there previously was not room', () => {
+
+            container.setCapacityVolume(3);
+            container.add(testItem1);
+            container.add(testItem2);
+            expect(container.hasRoomFor(testItem3)).toBe(false);
+
+            container.setLimitless(true);
+            expect(container.hasRoomFor(testItem3)).toBe(true);
+        });
+    });
+
+
     describe('ItemIdContainer - serializing', () => {
         test('forSerializing returns array of item IDs', () => {
             container.add(testItem1);

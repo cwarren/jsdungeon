@@ -13,12 +13,29 @@ class ItemIdContainer {
         if (itemList.length > 0) {
             this.itemIdList = itemList.map(itm => idOf(itm));
         }
+
+        this.limitless = true;
+        this.capacityCount = 0;
+        this.capacityVolume = 0;
+        this.currentVolume = 0;
     }
 
     //================
 
     setBaseRepository(baseRepository) {
         this.baseRepository = baseRepository;
+    }
+
+    setLimitless(limitless) {
+        this.limitless = limitless;
+    }
+    setCapacityCount(capacityCount) {
+        this.capacityCount = capacityCount;
+        this.limitless = false; // if we set a capacity count, we are no longer limitless
+    }
+    setCapacityVolume(capacityVolume) {
+        this.capacityVolume = capacityVolume;
+        this.limitless = false; // if we set a capacity volume, we are no longer limitless
     }
 
     //================
@@ -49,21 +66,47 @@ class ItemIdContainer {
         return this.itemIdList.length;
     }
 
+    hasRoomFor(itemObjectOrId) {
+        if (this.limitless) { return true; } // limitless containers can always take more items
+
+        if (this.capacityCount > 0 && this.itemIdList.length >= this.capacityCount) {
+            return false; // container is full by count
+        }
+
+        if (this.capacityVolume > 0) {
+            const item = typeof itemObjectOrId === "string"
+                ? this.baseRepository.get(itemObjectOrId)
+                : itemObjectOrId;
+            if (item) {
+                const itemVolume = item.getExtendedVolume() || 0;
+                if (this.currentVolume + itemVolume > this.capacityVolume) {
+                    return false; // container has no room by volume
+                }
+            }
+        }
+
+        return true;
+    }
     //================
 
     add(itemObjectOrId) {
         if (this.has(itemObjectOrId)) { return; } // no duplicates allowed
-        
+        const item = typeof itemObjectOrId === "string"
+            ? this.baseRepository.get(itemObjectOrId)
+            : itemObjectOrId;
+
         // stack it if possible...
         const stackableItem = this.getStackMatchingItem(itemObjectOrId);
         if (stackableItem) {
-            stackableItem.addItemToStack(itemObjectOrId);
-            this.baseRepository.remove(idOf(itemObjectOrId)); // remove the item from the repository, since it got combined with the stack
+            stackableItem.addItemToStack(item);
+            this.currentVolume += item.getExtendedVolume();
+            this.baseRepository.remove(idOf(item)); // remove the item from the repository, since it got combined with the stack
             return;
         }
-        
+
         // ...otherwise add it to the container
-        this.itemIdList.push(idOf(itemObjectOrId));
+        this.itemIdList.push(item.id);
+        this.currentVolume += item.getExtendedVolume();
     }
 
     // it the item is stacked, removes one from the stack, otherwise removes the item from the container
@@ -77,7 +120,9 @@ class ItemIdContainer {
             } else {
                 this.itemIdList.splice(index, 1);
             }
+            this.currentVolume -= item.volume;
         }
+
     }
 
     // this is similar to remove, but it returns the item object from the base repository instead of just removing it from the container
@@ -87,6 +132,7 @@ class ItemIdContainer {
         const index = this.itemIdList.indexOf(itemId);
         if (index !== -1) {
             const item = this.baseRepository.get(itemId);
+            this.currentVolume -= item.volume;
             if (item && item.isStackable && item.stackCount > 1) {
                 const extractedItem = item.extractOneFromStack();
                 this.baseRepository.add(extractedItem); // add the extracted item to the repository
@@ -101,16 +147,22 @@ class ItemIdContainer {
 
     extractFirst() {
         if (this.itemIdList.length == 0) { return null; }
+        const item = this.baseRepository.get(this.itemIdList[0]);
+        this.currentVolume -= item.volume;
         return this.extractItem(this.itemIdList[0]).id;
     }
 
     extractFirstEntry() {
+        const itemId = this.itemIdList[0];
+        const item = this.baseRepository.get(itemId);
+        this.currentVolume -= item.getExtendedVolume();
         return this.itemIdList.shift();
     }
 
     extractAll() {
         const extracted = this.itemIdList;
         this.itemIdList = [];
+        this.currentVolume = 0;
         return extracted;
     }
 
@@ -139,7 +191,7 @@ class ItemIdContainer {
     }
 
     getFirstItem() {
-        if (! this.itemIdList[0] ) { return null; }
+        if (!this.itemIdList[0]) { return null; }
         return this.baseRepository.get(this.itemIdList[0]);
     }
 
