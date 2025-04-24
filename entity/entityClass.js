@@ -89,6 +89,9 @@ class Entity {
       currentAdvancementPoints: this.currentAdvancementPoints,
       actionStartingTime: this.actionStartingTime,
       inventory: this.inventory ? this.inventory.forSerializing() : null,
+      carryWeightBase: this.carryWeightBase,
+      carryWeightCapacity: this.carryWeightCapacity,
+      carryWeighCurrent: this.carryWeighCurrent,
     };
   }
 
@@ -123,6 +126,11 @@ class Entity {
     if (data.inventory) {
       entity.inventory = ItemIdContainer.deserialize(gameState.itemRepo, data.inventory);
     }
+
+    // NOTE: could derive these instead handling them directly as a part of serialization, but simpler for now to just make them explicit
+    entity.carryWeightBase= data.carryWeightBase;
+    entity.carryWeightCapacity= data.carryWeightCapacity;
+    entity.carryWeighCurrent= data.carryWeighCurrent;
 
     return entity;
   }
@@ -847,7 +855,7 @@ class Entity {
   }
 
   dropItem(item) {
-    console.log(`entity ${this.name} dropping ${item.name}`);
+    // console.log(`entity ${this.name} dropping ${item.name}`);
     this.getCell().takeItemFrom(item, this.inventory);
     this.carryWeighCurrent = this.inventory.getTotalExtendedWeight();
     this.showMessage(`You drop the ${item.name}`);

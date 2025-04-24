@@ -543,45 +543,45 @@ describe('Entity', () => {
     });
 
     test('takeItemFrom should transfer item from external container into entity inventory', () => {
-      const externalContainer = new ItemIdContainer(gameState.itemRepo,['item-1']);
+      const externalContainer = new ItemIdContainer(gameState.itemRepo, ['item-1']);
       expect(externalContainer.has('item-1')).toBe(true);
 
       sourceEntity.takeItemFrom('item-1', externalContainer);
-  
+
       expect(sourceEntity.inventory.has('item-1')).toBe(true);
       expect(externalContainer.has('item-1')).toBe(false);
     });
-  
+
     test('takeItemFrom should not add if source container is empty', () => {
       const externalContainer = new ItemIdContainer(gameState.itemRepo,);
       const result = sourceEntity.takeItemFrom('item-1', externalContainer);
-  
+
       expect(sourceEntity.inventory).toBeNull(); // Should not initialize if nothing added
       expect(externalContainer.itemIdList).toEqual([]);
     });
-  
+
     test('giveItemTo should transfer item to another container', () => {
       const targetContainer = new ItemIdContainer(gameState.itemRepo,);
       sourceEntity.giveItem(item1);
       sourceEntity.giveItemTo(item1, targetContainer);
-  
+
       expect(sourceEntity.inventory.has(item1)).toBe(false);
       expect(targetContainer.has(item1)).toBe(true);
     });
-  
+
     test('giveItemTo should not transfer if entity inventory is empty', () => {
       const targetContainer = new ItemIdContainer(gameState.itemRepo,);
       sourceEntity.giveItemTo(item1, targetContainer);
-  
+
       expect(targetContainer.has(item1)).toBe(false);
     });
-  
+
     test('giveItemTo should not transfer if no container provided', () => {
       sourceEntity.giveItem(item1);
       sourceEntity.giveItemTo(item1, null);
       expect(sourceEntity.inventory.has(item1)).toBe(true);
     });
-  
+
     test('takeItemFrom should not do anything if no container provided', () => {
       sourceEntity.takeItemFrom('item-1', null);
       expect(sourceEntity.inventory).toBeNull();
@@ -611,7 +611,7 @@ describe('Entity', () => {
       expect(sourceEntity.hasItem(item)).toBe(true);
       expect(targetCell.hasItem(item)).toBe(false);
     });
- 
+
     test('takeAllItemsFromCell should get all item from a cell that has one or more items', () => {
       const targetCell = gameState.world[0].grid[0][0];
       const item = Item.makeItem("ROCK");
@@ -632,7 +632,7 @@ describe('Entity', () => {
       expect(targetCell.inventory).toBeNull();
     });
 
-    test('dropItem should move item from inventory to current cell',() =>{
+    test('dropItem should move item from inventory to current cell', () => {
       sourceEntity.placeAtCell(gameState.world[0].grid[5][5]);
       const item = Item.makeItem("ROCK");
       itemRepo.add(item);
@@ -686,9 +686,6 @@ describe('Entity', () => {
 
       // dropping an item reduces carry weight
       entity.dropItem(item1);
-      console.log(entity);
-      console.log(entity.inventory.getTotalExtendedWeight());
-      console.log(item2);
       expect(entity.carryWeighCurrent).toBe(item2.getExtendedWeight());
 
       // dropping part of a stack reduces carry weight
@@ -728,6 +725,9 @@ describe('Entity', () => {
           }
         ],
         baseKillPoints: entity.baseKillPoints,
+        carryWeighCurrent: 0,
+        carryWeightBase: 10,
+        carryWeightCapacity: 10,
         currentAdvancementPoints: 42,
         actionStartingTime: entity.actionStartingTime,
         inventory: null,
@@ -785,6 +785,9 @@ describe('Entity', () => {
       expect(deserializedEntity.currentAdvancementPoints).toBe(42);
       expect(deserializedEntity.actionStartingTime).toBe(entity.actionStartingTime);
       expect(deserializedEntity.inventory).toBeNull();
+      expect(deserializedEntity.carryWeightBase).toEqual(entity.carryWeightBase);
+      expect(deserializedEntity.carryWeightCapacity).toEqual(entity.carryWeightCapacity);
+      expect(deserializedEntity.carryWeighCurrent).toEqual(entity.carryWeighCurrent);
     });
 
     test('should deserialize with empty inventory correctly', () => {
@@ -801,6 +804,9 @@ describe('Entity', () => {
       const deserializedEntity = Entity.deserialize(serializedData, gameState);
 
       expect(deserializedEntity.inventory).toBeNull();
+      expect(deserializedEntity.carryWeightBase).toEqual(entity.carryWeightBase);
+      expect(deserializedEntity.carryWeightCapacity).toEqual(entity.carryWeightCapacity);
+      expect(deserializedEntity.carryWeighCurrent).toEqual(entity.carryWeighCurrent);
     });
 
     test('should deserialize with full inventory correctly', () => {
@@ -819,13 +825,16 @@ describe('Entity', () => {
       entity.giveItem(item2);
 
       const serializedData = entity.forSerializing();
-      console.log(serializedData);
 
       const deserializedEntity = Entity.deserialize(serializedData, gameState);
 
       expect(deserializedEntity.inventory).toBeInstanceOf(ItemIdContainer);
       expect(deserializedEntity.inventory.has(item1)).toEqual(true);
       expect(deserializedEntity.inventory.has(item2)).toEqual(true);
+
+      expect(deserializedEntity.carryWeightBase).toEqual(entity.carryWeightBase);
+      expect(deserializedEntity.carryWeightCapacity).toEqual(entity.carryWeightCapacity);
+      expect(deserializedEntity.carryWeighCurrent).toEqual(entity.carryWeighCurrent);
     });
 
     test('should correctly re-add the entity to the gameState repository on deserialization', () => {
