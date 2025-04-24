@@ -98,6 +98,17 @@ class ItemIdContainer {
 
         return true;
     }
+
+    getTotalExtendedWeight() {
+        return this.getItems().reduce((total, item) => {
+            if (item) {
+                return total + item.getExtendedWeight();
+            }
+            return total;
+        }
+        , 0);
+    }
+
     //================
 
     add(itemObjectOrId) {

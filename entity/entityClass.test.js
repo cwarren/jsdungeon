@@ -45,10 +45,11 @@ const TEST_ENTITIES_DEFINITIONS = [
       'aura': 100, 'refinement': 100, 'depth': 100, 'flow': 100,
     },
     baseViewRadius: 5, baseHealthRoll: '1d10', baseActionTime: 100, baseNaturalHealingAmount: 0.01,
+    baseCarryWeight: 10,
     naturalHealingTicks: 100,
     movementSpec: { movementType: 'WALK', baseMovementTime: 100 },
     meleeAttack: TEST_DAMAGE_SPEC,
-    relations: { iFeelAboutOthersP2: "HOSTILE_TO" },
+    relations: { iFeelAboutOthers: "HOSTILE_TO" },
   }
 ];
 
@@ -86,6 +87,9 @@ describe('Entity', () => {
     expect(entity.currentAdvancementPoints).toBe(0);
     expect(entity.actionStartingTime).toBe(0);
     expect(entity.inventory).toBeNull();
+    expect(entity.carryWeightBase).toBe(10);
+    expect(entity.carryWeightCapacity).toBe(10);
+    expect(entity.carryWeighCurrent).toBe(0);
 
     expect(gameState.entityRepo.get(entity.id)).toBe(entity);
   });
@@ -650,6 +654,48 @@ describe('Entity', () => {
       expect(sourceEntity.getCell().inventory.has(item)).toBe(true);
       expect(sourceEntity.getCell().inventory.has(item2)).toBe(false);
     });
+
+    test('should calculate carry weight capacity correctly', () => {
+      expect(entity.getCarryWeightCapacity()).toBe(entity.carryWeightBase);
+
+      entity.attributes.setAttributes({ strength: 120 });
+      expect(entity.getCarryWeightCapacity()).toBe(12);
+
+      entity.attributes.setAttributes({ fortitude: 120 });
+      expect(entity.getCarryWeightCapacity()).toBe(13);
+    });
+
+    test('should calculate carry weight correctly as items are picked up and dropped', () => {
+      const item1 = Item.makeItem("ROCK", "item-1");
+      gameState.itemRepo.add(item1);
+      const item2 = Item.makeItem("STICK", "item-2");
+      item2.stackCount = 2;
+      gameState.itemRepo.add(item2);
+
+      // entity has to be placed in a cell to have be able to drop items
+      const targetCell = gameState.world[0].grid[5][6];
+      entity.placeAtCell(targetCell);
+
+      expect(entity.carryWeighCurrent).toBe(0);
+
+      entity.giveItem(item1);
+      entity.giveItem(item2);
+
+      // carry weight reflects items in inventory
+      expect(entity.carryWeighCurrent).toBe(item1.getExtendedWeight() + item2.getExtendedWeight());
+
+      // dropping an item reduces carry weight
+      entity.dropItem(item1);
+      console.log(entity);
+      console.log(entity.inventory.getTotalExtendedWeight());
+      console.log(item2);
+      expect(entity.carryWeighCurrent).toBe(item2.getExtendedWeight());
+
+      // dropping part of a stack reduces carry weight
+      entity.dropItem(item2);
+      expect(entity.carryWeighCurrent).toBe(item2.getExtendedWeight());
+    });
+
   });
 
 

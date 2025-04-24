@@ -53,6 +53,11 @@ class Entity {
 
     this.inventory = null;
 
+    // NOTE: carry weight capacity is not a hard limit - once carry weight is over capacity, the entity will be slowed down
+    this.carryWeightBase = Entity.ENTITIES[type].baseCarryWeight || 0;
+    this.carryWeightCapacity = this.getCarryWeightCapacity();
+    this.carryWeighCurrent = 0;
+
     this.gameState.entityRepo.add(this);
   }
 
@@ -778,6 +783,7 @@ class Entity {
       this.inventory = new ItemIdContainer(this.gameState.itemRepo);
     }
     this.inventory.add(itemObjectOrId);
+    this.carryWeighCurrent = this.inventory.getTotalExtendedWeight();
   }
 
   takeItem(itemObjectOrId) {
@@ -786,6 +792,7 @@ class Entity {
       return;
     }
     this.inventory.remove(itemObjectOrId);
+    this.carryWeighCurrent = this.inventory.getTotalExtendedWeight();
   }
 
   hasItem(itemObjectOrId) {
@@ -805,6 +812,7 @@ class Entity {
     }
     
     this.inventory.takeItemFrom(itemObjectOrId, itemIdContainer);
+    this.carryWeighCurrent = this.inventory.getTotalExtendedWeight();
   }
 
   giveItemTo(itemObjectOrId, itemIdContainer) {
@@ -818,6 +826,7 @@ class Entity {
     }
 
     this.inventory.giveItemTo(itemObjectOrId, itemIdContainer);
+    this.carryWeighCurrent = this.inventory.getTotalExtendedWeight();
   }
 
   takeSingleItemFromCell(targetCell) {
@@ -833,7 +842,6 @@ class Entity {
     if (! targetCell.inventory) {
       return;
     }
-
     targetCell.extractAllItems().forEach(item => { this.giveItem(item)});
     this.showMessage(`You pick up everything there`);
   }
@@ -841,7 +849,33 @@ class Entity {
   dropItem(item) {
     console.log(`entity ${this.name} dropping ${item.name}`);
     this.getCell().takeItemFrom(item, this.inventory);
+    this.carryWeighCurrent = this.inventory.getTotalExtendedWeight();
     this.showMessage(`You drop the ${item.name}`);
+  }
+
+  getCarryWeightCapacity() {
+    // strength (major), fortitude (moderate), recovery (moderate), stability (minor), will (minor), aura (minor), depth (minor)
+    let carryWeightModifier = new ValueModifier([
+      new ModifierLayer(
+        [Math.sqrt(this.attributes.strength / EntityAttributes.BASE_VALUE),],
+        [(this.attributes.fortitude - EntityAttributes.BASE_VALUE) / 67,
+        (this.attributes.strength - EntityAttributes.BASE_VALUE) / 41,]
+      ),
+      new ModifierLayer(
+        [Math.sqrt(Math.sqrt(this.attributes.fortitude / EntityAttributes.BASE_VALUE)),],
+        [(this.attributes.recovery - EntityAttributes.BASE_VALUE) / 23,
+          (this.attributes.stability - EntityAttributes.BASE_VALUE) / 53,
+          (this.attributes.will - EntityAttributes.BASE_VALUE) / 47,
+          (this.attributes.aura - EntityAttributes.BASE_VALUE) / 51,
+          (this.attributes.depth - EntityAttributes.BASE_VALUE) / 61,]
+      ),
+      new ModifierLayer(
+        [Math.sqrt(this.attributes.strength / EntityAttributes.BASE_VALUE),],
+        []
+      ),
+    ]);
+
+    return Math.floor(carryWeightModifier.appliedTo(this.carryWeightBase));
   }
 
   //================================================

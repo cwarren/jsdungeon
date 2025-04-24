@@ -1,21 +1,13 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* implement capacity for item containers
-* * add capacity to containers
-* * * count ?
-* * * volume ?
-* * * NOT mass/weight - this limit would come from the entity or structure, not the container itself
-* * check capacity on add - if add would exceed capacity, prevent it
-* * manage current volume on add or remove or extract
-* * * TODO: add tests to validate this
-* * add a hasRoomFor(objectOrId) method
-
 * implement carrying weight capacity for entities
-* * add fields for current and limit
-* * calculate limit from stats (and other things, but that's later)
-* * when exceeded, movement and action costs start going up
-* * show current and limit in mini-char and character screen
+* * show current and capacity in mini-char
+* * * in yellow/orange/red when degrees of exceeded (0-10%,?10-25%,>25%)
+* * show current and capacity in mini-char and character screen
+* * * in yellow/orange/red when degrees of exceeded (0-10%,?10-25%,>25%)
+
+* when carry weight is above capacity, increase action cost
 
 * implement HTML display for help UI/screen
 * MAYBE use HTML for character screen

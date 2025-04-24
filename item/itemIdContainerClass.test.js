@@ -105,6 +105,35 @@ describe('ItemIdContainer', () => {
         expect(container.count()).toEqual(1);
     });
 
+    describe('ItemIdContainer - getTotalExtendedWeight', () => {
+        test('calculates total weight of all items in the container', () => {
+            container.add(testItem1);
+            container.add(testItem2);
+
+            const totalWeight = container.getTotalExtendedWeight();
+
+            expect(totalWeight).toBe(6); // 5 (rock) + 1 (stick)
+        });
+
+        test('handles empty container gracefully', () => {
+            const totalWeight = container.getTotalExtendedWeight();
+
+            expect(totalWeight).toBe(0);
+        });
+
+        test('includes weight of stacked items', () => {
+            const stackableItem = Item.makeItem("STICK");
+            stackableItem.stackCount = 3;
+            itemRepo.add(stackableItem);
+
+            container.add(stackableItem);
+
+            const totalWeight = container.getTotalExtendedWeight();
+
+            expect(totalWeight).toBe(3); // 1 weight * 3 stack count
+        });
+    });
+
     describe('ItemIdContainer - removing items', () => {
 
         test('removes items by id', () => {
