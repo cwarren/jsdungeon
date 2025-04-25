@@ -1,4 +1,5 @@
-import { formatNumberForMessage } from '../util.js';
+import { formatNumberForMessage } from "../util.js";
+import { getHealthTextColor, getCarryWeightTextColor } from './uiUtil.js';
 
 const miniCharElement = document.getElementById("minichar");
 
@@ -21,38 +22,19 @@ class UIPaneMiniChar {
     refreshMiniChar(charInfo) {
         this.clearMiniChar();
         this.getPageElement().innerHTML = this.getDisplayTextFromInfo(charInfo);
-    }
+    }      
 
     getHealthText(charInfo) {
-        let healthColor = "green";;
-        if (charInfo.curHealth < 0.15 * charInfo.maxHealth) {
-            healthColor = "red";
-        } else if (charInfo.curHealth < 0.35 * charInfo.maxHealth) {
-            healthColor = "orange";
-        } else if (charInfo.curHealth < 0.6 * charInfo.maxHealth) {
-            healthColor = "yellow";
-        } else if (charInfo.curHealth < 0.8 * charInfo.maxHealth) {
-            healthColor = "yellowgreen";
-        }
-        const healthStyle = `style='color:${healthColor};'`;
+        const healthStyle = `style='color:${getHealthTextColor(charInfo)};'`;
         const healthText = `<span ${healthStyle}>${Math.floor(charInfo.curHealth)} of ${charInfo.maxHealth}</span>`;
         return healthText;
     }
+    
     getCarryWeightText(charInfo) {
-        let carryWeightColor = "red";
-        if (charInfo.carryWeighCurrent < 0.9 * charInfo.carryWeightCapacity) {
-            carryWeightColor = "green";
-        } else if (charInfo.carryWeighCurrent < 1.0 * charInfo.carryWeightCapacity) {
-            carryWeightColor = "yellowgreen";
-        } else if (charInfo.carryWeighCurrent < 1.2 * charInfo.carryWeightCapacity) {
-            carryWeightColor = "yellow";
-        } else if (charInfo.carryWeighCurrent < 1.5 * charInfo.carryWeightCapacity) {
-            carryWeightColor = "orange";
-        }
-        const carryWeightStyle = `style='color:${carryWeightColor};'`;
+        const carryWeightStyle = `style='color:${getCarryWeightTextColor(charInfo)};'`;
         const carryWeightText = `<span ${carryWeightStyle}>${formatNumberForMessage(charInfo.carryWeighCurrent)} of ${formatNumberForMessage(charInfo.carryWeightCapacity)}</span>`;
         return carryWeightText;
-    }       
+    }
 
     getDisplayTextFromInfo(charInfo) {
 
