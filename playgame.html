@@ -46,6 +46,7 @@
             height: 100%;
             overflow: hidden;
             /* Prevents accidental scrolling */
+            position: relative; /* Ensure #main is the positioning context for #helpContainer */
         }
 
         #listdisplay {
@@ -95,6 +96,7 @@
             padding: 20px;
             font-family: Arial, sans-serif;
             font-size: 18px;
+            /* z-index: 10; */
         }
     </style>
 </head>
