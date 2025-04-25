@@ -2,10 +2,11 @@ to start server:
 PS E:\code\jsdungeon> docker-compose up --build
 
 * implement carrying weight capacity for entities
-* * show current and capacity in mini-char
+* * show current and capacity character screen
 * * * in yellow/orange/red when degrees of exceeded (0-10%,?10-25%,>25%)
-* * show current and capacity in mini-char and character screen
-* * * in yellow/orange/red when degrees of exceeded (0-10%,?10-25%,>25%)
+* * update/refresh minichar after inventory drop
+* * * list action
+* * * inventory screen action
 
 * when carry weight is above capacity, increase action cost
 
