@@ -152,6 +152,7 @@ function getOneItem(gameState, key, event) {
         return 0;
     }
     gameState.avatar.takeSingleItemFromCell(targetCell);
+    gameState.avatar.updateMiniChar();
     return gameState.avatar.baseActionTime;
 }
 function getAllItems(gameState, key, event) {
@@ -164,6 +165,7 @@ function getAllItems(gameState, key, event) {
         return getOneItem(gameState, key, event);
     }
     gameState.avatar.takeAllItemsFromCell(targetCell);
+    gameState.avatar.updateMiniChar();
     return gameState.avatar.baseActionTime * 2;
 }
 
@@ -181,6 +183,7 @@ function dropItemResolve(gameState, listForInput, selectionIdx) {
     devTrace(7, 'action - drop item resolve', gameState, listForInput, selectionIdx);
     const selectedItem = listForInput[selectionIdx];
     gameState.avatar.dropItem(selectedItem);
+    gameState.avatar.updateMiniChar();
 }
 
 

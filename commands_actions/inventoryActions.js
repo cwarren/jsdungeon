@@ -60,6 +60,7 @@ function dropItemResolve(gameState, inputKey) {
         return 0;
     }
     gameState.avatar.dropItem(selectedItem);
+    gameState.avatar.updateMiniChar();
     uiPaneMain.renderers["INVENTORY"].draw(); // draw needs to be called here since this is executed as a callback; the normal draw-after-action doesn't happen
 }
 
@@ -98,6 +99,7 @@ function putItemResolve(gameState, inputKey) {
     // needs listOffset in uiPaneMainRendererInventory
     // NOTE: this will remain stubbed until I tackle containers
     console.log(gameState, inputKey);
+    gameState.avatar.updateMiniChar();
     uiPaneMain.renderers["INVENTORY"].draw(); // draw needs to be called here since this is executed as a callback; the normal draw-after-action doesn't happen
 }
 
