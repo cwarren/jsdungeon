@@ -81,6 +81,21 @@
         #gameCanvas {
             display: block;
         }
+
+        #helpContainer {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: white;
+            overflow-y: auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+        }
     </style>
 </head>
 
@@ -88,6 +103,7 @@
     <div id="minichar"></div>
     <div id="main">
         <canvas id="gameCanvas"></canvas>
+        <div id="helpContainer"></div>
     </div>
     <div id="listdisplay"></div>
     <div id="messages"></div>

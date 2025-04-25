@@ -10,6 +10,7 @@ class UIPaneMainStateManager {
     "GAME_OVER",
     "PROSE_SECTION",
     "CUSTOM_GRAPHICS",
+    "HELP",
   ];
 
   constructor(ui) {
@@ -28,7 +29,7 @@ class UIPaneMainStateManager {
   popUIState() {
     if (this.uiStateStack.length > 1) {
       // Prevent popping the last state
-      this.uiStateStack.pop();
+      return this.uiStateStack.pop();
     }
   }
 

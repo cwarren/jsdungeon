@@ -42,17 +42,23 @@ class UIPaneMain {
     }
 
     pushUIState(newState) {
+        this.getCurrentRenderer().handleWasBuried();
         this.stateManager.pushUIState(newState);
+        this.getCurrentRenderer().handleWasSurfaced();
         this.resizeCanvas(); // Redraw to reflect new state
     }
 
     popUIState() {
+        this.getCurrentRenderer().handleWasBuried();
         this.stateManager.popUIState();
+        this.getCurrentRenderer().handleWasSurfaced();
         this.resizeCanvas(); // Redraw to reflect new state
     }
 
     resetUIState() {
+        this.getCurrentRenderer().handleWasBuried();
         this.stateManager.resetUIState();
+        this.getCurrentRenderer().handleWasSurfaced();
         this.resizeCanvas(); // Redraw to reflect new state
     }
 

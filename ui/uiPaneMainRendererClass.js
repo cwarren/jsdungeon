@@ -57,6 +57,17 @@ class UIPaneMainRenderer {
         // sub-class overrides
         return '';
     }
+
+    handleWasSurfaced() {
+        // sub-class overrides for any special handling when the screen is pushed onto the stack
+        // (e.g. help renderer changes makes canvas invisible and help text visible)
+        return false;
+    }
+    handleWasBuried() {
+        // sub-class overrides for any special handling when the screen is popped off the stack
+        // (e.g. help renderer changes makes canvas visible and help text invisible)
+        return false;
+    }
 }
 
 export { UIPaneMainRenderer };

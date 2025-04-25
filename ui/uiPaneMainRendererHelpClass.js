@@ -9,40 +9,44 @@ class UIPaneMainRendererHelp extends UIPaneMainRenderer {
         super(ui, canvas);
         this.helpTextBlocks = {};
         this.currentHelpTextBlock = null;
+        this.helpContainer = document.getElementById("helpContainer");
+    }
+
+    handleWasSurfaced() {
+        this.canvas.style.display = "none";
+        this.helpContainer.style.display = "block";
+    }
+    handleWasBuried() {
+        this.helpContainer.style.display = "none";
+        this.canvas.style.display = "block";
     }
 
     //=====================
 
     draw() {
-        super.draw();
-        this.ctx.fillStyle = "white";
-        this.ctx.font = "20px Arial";
-        const lineHeight = 24; // Space between lines
-        const startX = 50;
-        let startY = 50;
-
         const helpFor = this.ui.stateManager.uiStateStack[this.ui.stateManager.uiStateStack.length - 2]; // help is always in the context of the screen in which it was called
         const helpTextBlock = this.helpTextBlocks[helpFor];
         this.currentHelpTextBlock = helpTextBlock;
 
         if (!helpTextBlock) {
-            this.ctx.fillText("No help text available", startX, startY);
-            return;
-        }
-
-        const displayTextRows = helpTextBlock.getDisplayTextRows();
-
-        for (let i = 0; i < displayTextRows.length; i++) {
-            if (startY + lineHeight > this.canvas.height) break; // Stop drawing if the current line would go below the bottom of the canvas
-            this.ctx.fillText(displayTextRows[i], startX, startY);
-            startY += lineHeight;
+            this.helpContainer.innerHTML = "<p>No help text available</p>";
+        } else {
+            const displayTextRows = helpTextBlock.getDisplayTextRows();
+            this.helpContainer.innerHTML = displayTextRows.map(row => `<p>${row}</p>`).join("");
         }
     }
 
     //=====================
 
+    hideHelp() {
+        this.helpContainer.style.display = "none";
+        this.canvas.style.display = "block";
+    }
+
+    //=====================
+
     initializeHelpTextBlocks() {
-            for (const commandSetIdentifier in keyBinding) {
+        for (const commandSetIdentifier in keyBinding) {
             if (actionMaps[commandSetIdentifier]) {
                 const commandHelpText = createHelpText(keyBinding[commandSetIdentifier], actionMaps[commandSetIdentifier], uiActionsMap);
                 const additionHelpInfo = this.ui.renderers[commandSetIdentifier].getExplanationText();
