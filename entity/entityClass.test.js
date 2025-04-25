@@ -89,7 +89,7 @@ describe('Entity', () => {
     expect(entity.inventory).toBeNull();
     expect(entity.carryWeightBase).toBe(10);
     expect(entity.carryWeightCapacity).toBe(10);
-    expect(entity.carryWeighCurrent).toBe(0);
+    expect(entity.carryWeightCurrent).toBe(0);
 
     expect(gameState.entityRepo.get(entity.id)).toBe(entity);
   });
@@ -676,21 +676,21 @@ describe('Entity', () => {
       const targetCell = gameState.world[0].grid[5][6];
       entity.placeAtCell(targetCell);
 
-      expect(entity.carryWeighCurrent).toBe(0);
+      expect(entity.carryWeightCurrent).toBe(0);
 
       entity.giveItem(item1);
       entity.giveItem(item2);
 
       // carry weight reflects items in inventory
-      expect(entity.carryWeighCurrent).toBe(item1.getExtendedWeight() + item2.getExtendedWeight());
+      expect(entity.carryWeightCurrent).toBe(item1.getExtendedWeight() + item2.getExtendedWeight());
 
       // dropping an item reduces carry weight
       entity.dropItem(item1);
-      expect(entity.carryWeighCurrent).toBe(item2.getExtendedWeight());
+      expect(entity.carryWeightCurrent).toBe(item2.getExtendedWeight());
 
       // dropping part of a stack reduces carry weight
       entity.dropItem(item2);
-      expect(entity.carryWeighCurrent).toBe(item2.getExtendedWeight());
+      expect(entity.carryWeightCurrent).toBe(item2.getExtendedWeight());
     });
 
   });
@@ -725,7 +725,7 @@ describe('Entity', () => {
           }
         ],
         baseKillPoints: entity.baseKillPoints,
-        carryWeighCurrent: 0,
+        carryWeightCurrent: 0,
         carryWeightBase: 10,
         carryWeightCapacity: 10,
         currentAdvancementPoints: 42,
@@ -787,7 +787,7 @@ describe('Entity', () => {
       expect(deserializedEntity.inventory).toBeNull();
       expect(deserializedEntity.carryWeightBase).toEqual(entity.carryWeightBase);
       expect(deserializedEntity.carryWeightCapacity).toEqual(entity.carryWeightCapacity);
-      expect(deserializedEntity.carryWeighCurrent).toEqual(entity.carryWeighCurrent);
+      expect(deserializedEntity.carryWeightCurrent).toEqual(entity.carryWeightCurrent);
     });
 
     test('should deserialize with empty inventory correctly', () => {
@@ -806,7 +806,7 @@ describe('Entity', () => {
       expect(deserializedEntity.inventory).toBeNull();
       expect(deserializedEntity.carryWeightBase).toEqual(entity.carryWeightBase);
       expect(deserializedEntity.carryWeightCapacity).toEqual(entity.carryWeightCapacity);
-      expect(deserializedEntity.carryWeighCurrent).toEqual(entity.carryWeighCurrent);
+      expect(deserializedEntity.carryWeightCurrent).toEqual(entity.carryWeightCurrent);
     });
 
     test('should deserialize with full inventory correctly', () => {
@@ -834,7 +834,7 @@ describe('Entity', () => {
 
       expect(deserializedEntity.carryWeightBase).toEqual(entity.carryWeightBase);
       expect(deserializedEntity.carryWeightCapacity).toEqual(entity.carryWeightCapacity);
-      expect(deserializedEntity.carryWeighCurrent).toEqual(entity.carryWeighCurrent);
+      expect(deserializedEntity.carryWeightCurrent).toEqual(entity.carryWeightCurrent);
     });
 
     test('should correctly re-add the entity to the gameState repository on deserialization', () => {

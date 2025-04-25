@@ -20,13 +20,13 @@ function getHealthTextColor(charInfo) {
 
 function getCarryWeightTextColor(charInfo) {
   let carryWeightColor = "red";
-  if (charInfo.carryWeighCurrent < 0.9 * charInfo.carryWeightCapacity) {
+  if (charInfo.carryWeightCurrent < 0.9 * charInfo.carryWeightCapacity) {
       carryWeightColor = "green";
-  } else if (charInfo.carryWeighCurrent < 1.0 * charInfo.carryWeightCapacity) {
+  } else if (charInfo.carryWeightCurrent < 1.0 * charInfo.carryWeightCapacity) {
       carryWeightColor = "yellowgreen";
-  } else if (charInfo.carryWeighCurrent < 1.2 * charInfo.carryWeightCapacity) {
+  } else if (charInfo.carryWeightCurrent < 1.2 * charInfo.carryWeightCapacity) {
       carryWeightColor = "yellow";
-  } else if (charInfo.carryWeighCurrent < 1.5 * charInfo.carryWeightCapacity) {
+  } else if (charInfo.carryWeightCurrent < 1.5 * charInfo.carryWeightCapacity) {
       carryWeightColor = "orange";
   }
   return carryWeightColor;

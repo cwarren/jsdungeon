@@ -56,7 +56,7 @@ class Entity {
     // NOTE: carry weight capacity is not a hard limit - once carry weight is over capacity, the entity will be slowed down
     this.carryWeightBase = Entity.ENTITIES[type].baseCarryWeight || 0;
     this.carryWeightCapacity = this.getCarryWeightCapacity();
-    this.carryWeighCurrent = 0;
+    this.carryWeightCurrent = 0;
 
     this.gameState.entityRepo.add(this);
   }
@@ -91,7 +91,7 @@ class Entity {
       inventory: this.inventory ? this.inventory.forSerializing() : null,
       carryWeightBase: this.carryWeightBase,
       carryWeightCapacity: this.carryWeightCapacity,
-      carryWeighCurrent: this.carryWeighCurrent,
+      carryWeightCurrent: this.carryWeightCurrent,
     };
   }
 
@@ -130,7 +130,7 @@ class Entity {
     // NOTE: could derive these instead handling them directly as a part of serialization, but simpler for now to just make them explicit
     entity.carryWeightBase= data.carryWeightBase;
     entity.carryWeightCapacity= data.carryWeightCapacity;
-    entity.carryWeighCurrent= data.carryWeighCurrent;
+    entity.carryWeightCurrent= data.carryWeightCurrent;
 
     return entity;
   }
@@ -791,7 +791,7 @@ class Entity {
       this.inventory = new ItemIdContainer(this.gameState.itemRepo);
     }
     this.inventory.add(itemObjectOrId);
-    this.carryWeighCurrent = this.inventory.getTotalExtendedWeight();
+    this.carryWeightCurrent = this.inventory.getTotalExtendedWeight();
   }
 
   takeItem(itemObjectOrId) {
@@ -800,7 +800,7 @@ class Entity {
       return;
     }
     this.inventory.remove(itemObjectOrId);
-    this.carryWeighCurrent = this.inventory.getTotalExtendedWeight();
+    this.carryWeightCurrent = this.inventory.getTotalExtendedWeight();
   }
 
   hasItem(itemObjectOrId) {
@@ -820,7 +820,7 @@ class Entity {
     }
     
     this.inventory.takeItemFrom(itemObjectOrId, itemIdContainer);
-    this.carryWeighCurrent = this.inventory.getTotalExtendedWeight();
+    this.carryWeightCurrent = this.inventory.getTotalExtendedWeight();
   }
 
   giveItemTo(itemObjectOrId, itemIdContainer) {
@@ -834,7 +834,7 @@ class Entity {
     }
 
     this.inventory.giveItemTo(itemObjectOrId, itemIdContainer);
-    this.carryWeighCurrent = this.inventory.getTotalExtendedWeight();
+    this.carryWeightCurrent = this.inventory.getTotalExtendedWeight();
   }
 
   takeSingleItemFromCell(targetCell) {
@@ -857,7 +857,7 @@ class Entity {
   dropItem(item) {
     // console.log(`entity ${this.name} dropping ${item.name}`);
     this.getCell().takeItemFrom(item, this.inventory);
-    this.carryWeighCurrent = this.inventory.getTotalExtendedWeight();
+    this.carryWeightCurrent = this.inventory.getTotalExtendedWeight();
     this.showMessage(`You drop the ${item.name}`);
   }
 

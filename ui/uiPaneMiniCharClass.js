@@ -29,10 +29,10 @@ class UIPaneMiniChar {
         const healthText = `<span ${healthStyle}>${Math.floor(charInfo.curHealth)} of ${charInfo.maxHealth}</span>`;
         return healthText;
     }
-    
+
     getCarryWeightText(charInfo) {
         const carryWeightStyle = `style='color:${getCarryWeightTextColor(charInfo)};'`;
-        const carryWeightText = `<span ${carryWeightStyle}>${formatNumberForMessage(charInfo.carryWeighCurrent)} of ${formatNumberForMessage(charInfo.carryWeightCapacity)}</span>`;
+        const carryWeightText = `<span ${carryWeightStyle}>${formatNumberForMessage(charInfo.carryWeightCurrent)} of ${formatNumberForMessage(charInfo.carryWeightCapacity)}</span>`;
         return carryWeightText;
     }
 

@@ -1,6 +1,7 @@
 import { UIPaneMainRenderer } from "./uiPaneMainRendererClass.js";
 import { EntityAttributes } from "../entity/entityAttributesClass.js";
 import { formatNumberForShortDisplay } from "../util.js"; 
+import { getHealthTextColor, getCarryWeightTextColor } from './uiUtil.js';
 
 class UIPaneMainRendererCharacterSheet extends UIPaneMainRenderer {
     constructor(ui, canvas) {
@@ -58,7 +59,9 @@ class UIPaneMainRendererCharacterSheet extends UIPaneMainRenderer {
         y += lineHeight; // Space before resource pools
 
         // Resource Pools
+        ctx.fillStyle = getHealthTextColor(avatar.getCharSheetInfo());
         ctx.fillText(`HP: ${fnum(avatar.health.curHealth)} / ${fnum(avatar.health.maxHealth)}`, bodyX, y);
+        ctx.fillStyle = "white";
         ctx.fillText(`Foc: XX / XX`, mindX, y); // Placeholder until focus pool is implemented
         ctx.fillText(`MP: XX / XX`, spiritX, y); // Placeholder until mojo pool is implemented
 
@@ -71,8 +74,13 @@ class UIPaneMainRendererCharacterSheet extends UIPaneMainRenderer {
 
         y += lineHeight * 2;
 
+        // carry weight
+        ctx.fillStyle = getCarryWeightTextColor(avatar.getCharSheetInfo());
+        ctx.fillText(`Burden: ${fnum(avatar.carryWeightCurrent)} / ${fnum(avatar.carryWeightCapacity)}`, bodyX, y);
+        ctx.fillStyle = "white";
+
         // View Distance
-        ctx.fillText(`View Distance: ${fnum(avatar.vision.viewRadius, 1)}`, x, y);
+        ctx.fillText(`View Distance: ${fnum(avatar.vision.viewRadius, 1)}`, mindX, y);
     }
 
     //=====================

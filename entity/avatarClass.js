@@ -74,7 +74,7 @@ class Avatar extends Entity {
       naturalHealInterval: this.health.naturalHealingTicks,
       timeOnLevel: this.timeOnLevel,
       worldDepth: this.location.z,
-      carryWeighCurrent: this.carryWeighCurrent,
+      carryWeightCurrent: this.carryWeightCurrent,
       carryWeightCapacity: this.carryWeightCapacity,
     };
   }
