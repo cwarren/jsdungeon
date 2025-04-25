@@ -127,6 +127,22 @@ describe('Avatar', () => {
     expect(actionTime).toBe(DEFAULT_ACTION_COST);
   });
 
+  test('should get adjusted action time cost', () => {
+    avatar.carryWeightCurrent = 50;
+    avatar.carryWeightCapacity = 100;
+
+    // unburdened should be 1:1
+    const adjustedTime = avatar.getAdjustedActionTime(200);
+    expect(adjustedTime).toBe(200);
+    
+    // overburdened should be higher
+    // NOTE: should this check the specific algorithm (^4), or just that the value is higher? 
+    // Leaving as algo for now, but may change in the future to make this robust vs algo change
+    avatar.carryWeightCurrent = 150;
+    const adjustedTimeWithPenalty = avatar.getAdjustedActionTime(200);
+    expect(adjustedTimeWithPenalty).toBe(Math.floor(200 * Math.pow((150 / 100), 3)));
+  });
+
   test('should show natural healing message', () => {
     avatar.showNaturalHealingMessage('Healing message');
     // added .not for healing messages suppressed for now - later this will have a settings flag

@@ -240,8 +240,9 @@ class GameState {
         }
     }
 
-    handlePlayerActionTime(actionTime) {
-        devTrace(4, `handling player action time of ${actionTime} in game state`);
+    handlePlayerActionTime(initialActionTime) {
+        devTrace(4, `handling player action with initial action time of ${initialActionTime} in game state`);
+        const actionTime = this.avatar.getAdjustedActionTime(initialActionTime);
         if (actionTime <= 0) return;
         this.avatar.addTimeOnLevel(actionTime);
         uiPaneMessages.ageMessages();
@@ -249,7 +250,7 @@ class GameState {
         // If the avatar is running, immediately continue running
         if (this.avatar.movement.isRunning || this.avatar.isSleeping) {
             this.currentTurnQueue.addEntity(this.avatar, this.avatar.actionStartingTime + actionTime);
-            this.advanceGameTime();  // Keep the turns flowing for running
+            this.advanceGameTime();  // Keep the turns flowing for running and sleeping
             return;
         }
 

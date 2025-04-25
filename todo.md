@@ -1,8 +1,6 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* when carry weight is above capacity, increase action cost
-
 * implement HTML display for help UI/screen
 * MAYBE use HTML for character screen
 

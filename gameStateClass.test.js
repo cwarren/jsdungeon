@@ -7,7 +7,7 @@ import { Avatar } from "./entity/avatarClass.js";
 import { WorldLevelSpecification } from "./world/worldLevelSpecificationClass.js";
 import { devTrace } from "./util.js";
 import { TurnQueue } from "./gameTime.js";
-import { uiPaneMain } from "./ui/ui.js";
+import { uiPaneMain, uiPaneMessages } from "./ui/ui.js";
 import { Stairs } from "./structure/stairsClass.js";
 import { Item } from "./item/itemClass.js";
 
@@ -21,7 +21,7 @@ jest.mock('./util.js', () => ({
 }));
 
 jest.mock('./ui/ui.js', () => ({
-    uiPaneMessages: { addMessage: jest.fn(), },
+    uiPaneMessages: { addMessage: jest.fn(), ageMessages: jest.fn(), },
     uiPaneInfo: { setInfo: jest.fn() },
     uiPaneMain: { resetUIState: jest.fn(), pushUIState: jest.fn() },
 }));
@@ -89,6 +89,73 @@ describe("GameState Tests", () => {
         gameState.advanceGameTime();
 
         expect(gameState.currentTurnQueue).not.toBeNull();
+    });
+
+    test("handlePlayerActionTime processes player action time correctly", () => {
+        gameState.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
+
+        gameState.avatar.carryWeightCapacity = 10;
+        gameState.avatar.carryWeightCurrent = 12;
+
+        const initialActionTime = 100;
+        const adjustedActionTime = gameState.avatar.getAdjustedActionTime(initialActionTime);
+
+        jest.spyOn(gameState.avatar, 'getAdjustedActionTime');
+        jest.spyOn(gameState.avatar, 'addTimeOnLevel');
+
+        gameState.currentTurnQueue.addEntity = jest.fn();
+        gameState.currentTurnQueue.normalizeQueueTimes = jest.fn();
+        gameState.advanceGameTime = jest.fn();
+
+        gameState.handlePlayerActionTime(initialActionTime);
+
+        expect(gameState.avatar.getAdjustedActionTime).toHaveBeenCalledWith(initialActionTime);
+        expect(gameState.avatar.addTimeOnLevel).toHaveBeenCalledWith(adjustedActionTime);
+        expect(uiPaneMessages.ageMessages).toHaveBeenCalled();
+        expect(gameState.currentTurnQueue.addEntity).toHaveBeenCalled()
+        expect(gameState.currentTurnQueue.normalizeQueueTimes).toHaveBeenCalled();
+        expect(gameState.advanceGameTime).toHaveBeenCalled();
+    });
+
+    test("handlePlayerActionTime skips processing if action time is zero or less", () => {
+        gameState.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
+        const initialActionTime = 0;
+
+        jest.spyOn(gameState.avatar, 'getAdjustedActionTime');
+        jest.spyOn(gameState.avatar, 'addTimeOnLevel');
+
+        gameState.currentTurnQueue.addEntity = jest.fn();
+        gameState.advanceGameTime = jest.fn();
+
+        gameState.handlePlayerActionTime(initialActionTime);
+
+        expect(gameState.avatar.getAdjustedActionTime).toHaveBeenCalledWith(initialActionTime);
+        expect(gameState.avatar.addTimeOnLevel).not.toHaveBeenCalled();
+        expect(gameState.currentTurnQueue.addEntity).not.toHaveBeenCalled();
+        expect(gameState.advanceGameTime).not.toHaveBeenCalled();
+    });
+
+    test("handlePlayerActionTime continues running if avatar is running", () => {
+        gameState.initialize(WORLD_LEVEL_SPECS_FOR_TESTING);
+        const initialActionTime = 50;
+
+        jest.spyOn(gameState.avatar, 'getAdjustedActionTime');
+        jest.spyOn(gameState.avatar, 'addTimeOnLevel');
+
+        gameState.avatar.movement = { isRunning: true, isSleeping: false };
+        gameState.currentTurnQueue.addEntity = jest.fn();
+        gameState.currentTurnQueue.normalizeQueueTimes = jest.fn();
+        gameState.advanceGameTime = jest.fn();
+        uiPaneMessages.ageMessages = jest.fn();
+
+        gameState.handlePlayerActionTime(initialActionTime);
+
+        expect(gameState.avatar.getAdjustedActionTime).toHaveBeenCalledWith(initialActionTime);
+        expect(gameState.avatar.addTimeOnLevel).toHaveBeenCalledWith(initialActionTime);
+        expect(uiPaneMessages.ageMessages).toHaveBeenCalled();
+        expect(gameState.currentTurnQueue.addEntity).toHaveBeenCalled();
+        expect(gameState.currentTurnQueue.normalizeQueueTimes).not.toHaveBeenCalled();
+        expect(gameState.advanceGameTime).toHaveBeenCalled();
     });
 
     test("winGame updates status and ends the game", () => {

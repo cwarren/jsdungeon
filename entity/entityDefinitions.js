@@ -16,7 +16,7 @@ const ENTITIES_DEFINITIONS = [
       'aura': 100, 'refinement': 100, 'depth': 100, 'flow': 100,
     },
     baseViewRadius: 2.5, baseHealthRoll: "20", baseActionTime: 100, baseNaturalHealingAmount: .001,
-    baseCarryWeight: 100,
+    baseCarryWeight: 10, // NOTE: this is 10 for dev/testing purposes; the real value is 100
     basePrecision: 1, baseEvasion: 1,
     relations: { othersFeelAboutMe: "HOSTILE_TO", iFeelAboutOthers: "HOSTILE_TO" },
   },

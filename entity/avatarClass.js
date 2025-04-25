@@ -115,6 +115,18 @@ class Avatar extends Entity {
     return 0; // Player actions are handled through input, not automatic turns
   }
 
+  getAdjustedActionTime(initialActionTime) {
+    devTrace(6, "getting adjusted action time cost for avatar", this); 
+
+    if (this.carryWeightCurrent <= this.carryWeightCapacity) {
+      return initialActionTime;
+    }
+
+    const weightPenalty = Math.pow((this.carryWeightCurrent / this.carryWeightCapacity), 3);
+
+    return Math.floor(initialActionTime * weightPenalty);
+  }
+
   die() {
     devTrace(1, "Avatar has died.");
     this.gameState.loseGame();
