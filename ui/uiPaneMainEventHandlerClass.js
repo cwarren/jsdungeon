@@ -193,10 +193,12 @@ class UIPaneMainEventHandler {
 
         // select / activate a given list item
         const validSelectionKeys = LIST_SELECTION_KEYS.slice(0, this.listForInput.length);
-        if (event.key.length === 1 && validSelectionKeys.includes(event.key)) {
+        const actionKey = event.key.toLowerCase();
+        if (actionKey.length === 1 && validSelectionKeys.includes(actionKey)) {
             if (this.inputCallback) {
-                const selectionIdx = this.listDisplayOffset + LIST_SELECTION_KEYS.indexOf(event.key);
-                this.inputCallback(this.ui.gameState, this.listForInput, selectionIdx);
+                const isBulkAction = actionKey != event.key; // shift key pressed
+                const selectionIdx = this.listDisplayOffset + LIST_SELECTION_KEYS.indexOf(actionKey);
+                this.inputCallback(this.ui.gameState, this.listForInput, selectionIdx, isBulkAction);
             }
             this.stopListBasedInput();
             return;

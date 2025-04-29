@@ -854,11 +854,18 @@ class Entity {
     this.showMessage(`You pick up everything there`);
   }
 
-  dropItem(item) {
+  dropItem(item, isBulkDrop=false) {
     // console.log(`entity ${this.name} dropping ${item.name}`);
     this.getCell().takeItemFrom(item, this.inventory);
+    let pileSuffix = '';
+    if (isBulkDrop) {
+      pileSuffix = this.inventory.has(item) ? ' pile' : '';
+      while (this.inventory.has(item)) { // this loop-based approach is a bit of a hack, but it works well enough for now
+        this.getCell().takeItemFrom(item, this.inventory);
+      }
+    }
     this.carryWeightCurrent = this.inventory.getTotalExtendedWeight();
-    this.showMessage(`You drop the ${item.name}`);
+    this.showMessage(`You drop the ${item.name}${pileSuffix}`);
   }
 
   getCarryWeightCapacity() {

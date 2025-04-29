@@ -130,7 +130,17 @@ describe('UIPaneMainEventHandler', () => {
 
             eventHandler.handleListBasedInput({ key: 'a' });
             
-            expect(callback).toHaveBeenCalledWith(uiMock.gameState, list, 0);
+            expect(callback).toHaveBeenCalledWith(uiMock.gameState, list, 0, false);
+        });
+
+        test('should handle list-based bulk item selection', () => {
+            const callback = jest.fn();
+            const list = ['Option 1', 'Option 2', 'Option 3'];
+            eventHandler.startListBasedInput(list, 'Choose an option', callback);
+
+            eventHandler.handleListBasedInput({ key: 'A' }); // uppercase for bulk selection
+            
+            expect(callback).toHaveBeenCalledWith(uiMock.gameState, list, 0, true);
         });
 
         test('should handle list-based nav', () => {

@@ -179,10 +179,10 @@ function dropItemInitiate(gameState, key, event) {
         gameActionsMap.INVENTORY_DROP.actionResolver);
     return 0;
 }
-function dropItemResolve(gameState, listForInput, selectionIdx) {
-    devTrace(7, 'action - drop item resolve', gameState, listForInput, selectionIdx);
+function dropItemResolve(gameState, listForInput, selectionIdx, isBulkDrop=false) {
+    devTrace(4, 'action - drop item resolve', gameState, listForInput, selectionIdx, isBulkDrop);
     const selectedItem = listForInput[selectionIdx];
-    gameState.avatar.dropItem(selectedItem);
+    gameState.avatar.dropItem(selectedItem, isBulkDrop);
     gameState.avatar.updateMiniChar();
 }
 

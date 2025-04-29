@@ -222,6 +222,20 @@ describe('gameActions tests', () => {
             expect(gameState.avatar.getCell().hasItem(item1)).toBe(true);
             expect(gameState.avatar.getCell().hasItem(item2)).toBe(false);
         }); 
+
+        test('INVENTORY_DROP resolver handles bulk drop', () => {
+            const item2 = Item.makeItem('STICK');
+            item2.stackCount = 3;
+            gameState.itemRepo.add(item2);
+            gameState.avatar.giveItem(item2);
+
+            const result = gameActionsMap.INVENTORY_DROP.actionResolver (gameState, gameState.avatar.inventory.getItems(), 0, true);
+
+            expect(gameState.avatar.hasItem(item2)).toBe(false);
+
+            expect(gameState.avatar.getCell().inventory.getFirstItem().stackCount).toEqual(3);
+        }); 
+
     });
 
     describe('gameActions tests - zoom', () => {
