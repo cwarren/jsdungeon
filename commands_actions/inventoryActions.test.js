@@ -56,10 +56,10 @@ describe('inventoryActions tests', () => {
             const mockIsValidSelection = jest.fn(() => true);
             uiPaneMain.renderers = { INVENTORY: { isValidSelection: mockIsValidSelection } };
 
-            const result = validatorForInventoryItemSelection(gameState, 'testKey');
+            const result = validatorForInventoryItemSelection(gameState, 'k');
 
             expect(mockIsValidSelection).toHaveBeenCalledTimes(1);
-            expect(mockIsValidSelection).toHaveBeenCalledWith('testKey');
+            expect(mockIsValidSelection).toHaveBeenCalledWith('k');
             expect(result).toBe(true);
         });
     });
@@ -132,7 +132,29 @@ describe('inventoryActions tests', () => {
             expect(mockGetListOffset).toHaveBeenCalledTimes(1);
             expect(mockGetListItemLabels).toHaveBeenCalledTimes(1);
             expect(mockDropItem).toHaveBeenCalledTimes(1);
-            expect(mockDropItem).toHaveBeenCalledWith(item2);
+            expect(mockDropItem).toHaveBeenCalledWith(item2, false);
+            expect(uiPaneMain.renderers.INVENTORY.draw).toHaveBeenCalledTimes(1);
+        });
+
+        test('dropItemResolve calls dropItem on the avatar with flag for bulk drop', () => {
+            const mockGetListOffset = jest.fn(() => 0);
+            const mockGetListItemLabels = jest.fn(() => ['a', 'b']);
+            uiPaneMain.renderers = { INVENTORY: { getListOffset: mockGetListOffset, getListItemLabels: mockGetListItemLabels, draw: jest.fn() } };
+
+            const mockDropItem = jest.fn();
+            avatar.dropItem = mockDropItem;
+
+            avatar.inventory.add(item1);
+            item2.stackCount = 2; // Simulate a stackable item
+            avatar.inventory.add(item2);
+
+            // upper case selection for bulk drop
+            inventoryActionsMap.INVENTORY_DROP.actionResolver(gameState, 'B');
+
+            expect(mockGetListOffset).toHaveBeenCalledTimes(1);
+            expect(mockGetListItemLabels).toHaveBeenCalledTimes(1);
+            expect(mockDropItem).toHaveBeenCalledTimes(1);
+            expect(mockDropItem).toHaveBeenCalledWith(item2, true);
             expect(uiPaneMain.renderers.INVENTORY.draw).toHaveBeenCalledTimes(1);
         });
 

@@ -1,17 +1,14 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* implement bulk pick up and drop, to take or give the whole stack, not just a single item from it
-* * add extractEntry to item container
-* * maybe a general rule that when specifying a list index, the capital letter means the whole entry?
-* * add / update game action
-* * add / update inventory action
-
-* support for command confirmations, e.g. 'Are you sure you want to attack the town sheriff? (y/n)'
-
 * extended messages
 * * keep a longer message buffer; small number of most recent are shown in message pane, but much larger set is saved and can be separately viewed
+* * * not unlimited history
+* * * track when there are older messages
+* * * track summary info about older messages (just count, for now)
+* * persist this
 * * add a UI mode to see longer messages
+* * * html display, as a list (similar to help screen handling)
 
 * equipment
 * * slots
@@ -25,16 +22,19 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * what they are
 * * how they work in general
 
-* consider removing the automatic repo registration from entity and structure instantiation... or maybe add a flag for it to the call.... or maybe keep it out but instead generally use some factory functions that handle that kind of thing
-
 * maybe add a 'known items' set to the avatar - this would have a location / cell and an item, and when drawing non-visible cells it would show a shaded/faint version of known items
 * * on avatar move (?)
 * * * add items in visible cells to known items set
 * * * remove from known items any known items from the visible cells that are no longer actually in those cells (e.g. someone else moved them, or they otherwise went away)
 
+* support for directional commands
+* * first is fire/throw
+
 * support for targeted commands
 * * first of which is look / examine
-* * second is fire/throw
+* * second is fire/throw to a target rather than a direction
+
+* support for command confirmations, e.g. 'Are you sure you want to throw that item? (y/n)'
 
 * more mob stuff
 * * simple status sheets for mobs (for display in info block when attacking or otherwise interacting with that mob)

@@ -161,12 +161,13 @@ function getAllItems(gameState, key, event) {
         uiPaneMessages.addMessage("Nothing to get here");
         return 0;
     }
-    if (targetCell.inventory.count() == 1) {
-        return getOneItem(gameState, key, event);
-    }
+    let actionTime = gameState.avatar.baseActionTime;
+    if (targetCell.inventory.count() > 1) {
+        actionTime = gameState.avatar.baseActionTime * 2;
+    } 
     gameState.avatar.takeAllItemsFromCell(targetCell);
     gameState.avatar.updateMiniChar();
-    return gameState.avatar.baseActionTime * 2;
+    return actionTime;
 }
 
 // NOTE: dropping items can also be done from the inventory screen, but this is a more streamlined user experience for when the player knows what they want to drop

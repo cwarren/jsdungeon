@@ -17,7 +17,8 @@ const inventoryActionsMap = {
 };
 
 function validatorForInventoryItemSelection(gameState, inputKey) {
-    return uiPaneMain.renderers["INVENTORY"].isValidSelection(inputKey);
+    const selectionKey = inputKey.toLowerCase();
+    return uiPaneMain.renderers["INVENTORY"].isValidSelection(selectionKey);
 }
 
 function getSelectedItem(gameState, inputKey) {
@@ -54,12 +55,14 @@ function dropItemInitiate(gameState, key, event) {
     return 0;
 }
 function dropItemResolve(gameState, inputKey) {
-    const selectedItem = getSelectedItem(gameState, inputKey)
+    const selectionKey = inputKey.toLowerCase();
+    const selectedItem = getSelectedItem(gameState, selectionKey)
     if (!selectedItem) {
         uiPaneMessages.addMessage("No such item in inventory");
         return 0;
     }
-    gameState.avatar.dropItem(selectedItem);
+    const isBulkDrop = selectionKey != inputKey; // uppercase input means bulk drop
+    gameState.avatar.dropItem(selectedItem, isBulkDrop);
     gameState.avatar.updateMiniChar();
     uiPaneMain.renderers["INVENTORY"].draw(); // draw needs to be called here since this is executed as a callback; the normal draw-after-action doesn't happen
 }
