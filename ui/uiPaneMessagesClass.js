@@ -17,8 +17,17 @@ class UIPaneMessages {
         const messages = this.messageArchive.getRecentMessages(numToDisplay);
         messages.forEach(message => {
             const newMessage = document.createElement("div");
-            newMessage.textContent = message;
-            newMessage.classList.add("message-entry", "message-new");
+            newMessage.textContent = message.text;
+            newMessage.classList.add("message-entry");
+            if (message.status === 'newest') {
+                newMessage.classList.add("message-newest");
+            }
+            if (message.status === 'current') {
+                newMessage.classList.add("message-current");
+            }
+            if (message.status === 'aged') {
+                newMessage.classList.add("message-aged");
+            }
             messagesElement.appendChild(newMessage);
         });
         messagesElement.scrollTop = messagesElement.scrollHeight;
