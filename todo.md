@@ -10,6 +10,11 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * add a UI mode to see longer messages
 * * * html display, as a list (similar to help screen handling)
 
+* persist UI setting
+* * add a section for this to the persistence data
+* * persist zoom factor
+* * restore zoom factor and make sure game play is drawn at approp zoom
+
 * equipment
 * * slots
 * * equippables

@@ -7,6 +7,7 @@ const uiActionsMap = {
     "PUSH_INVENTORY_SCREEN": { name: "Inventory", description: "Items that you're carrying", action: uiInventory } ,
     "PUSH_EQUIPMENT_SCREEN": { name: "Equipment", description: "Items that you're using", action: uiEquipment } ,
     "PUSH_MAP_SCREEN": { name: "Map", description: "A zoomed out map", action: uiMap } ,
+    "PUSH_MESSAGE_HISTORY_SCREEN": { name: "Message History", description: "Look at all recent messages", action: uiMessageHistory } ,
     "PUSH_GAME_META": { name: "Game menu", description: "The main game menu", action: uiGameMeta } ,
     "PUSH_HELP": { name: "Help", description: "Details about the commands available", action: uiHelp } ,
     "POP_UI_STATE": { name: "Exit", description: "Close this screen", action: uiPopState } 
@@ -23,6 +24,7 @@ function uiGamePlay(gameState, key, event) {
 }
 function uiCharacterSheet(gameState, key, event) { uiPaneMain.pushUIState("CHARACTER_SHEET"); }
 function uiInventory(gameState, key, event) { uiPaneMain.pushUIState("INVENTORY"); }
+function uiMessageHistory(gameState, key, event) { uiPaneMain.pushUIState("MESSAGE_HISTORY"); }
 function uiEquipment(gameState, key, event) { uiPaneMain.pushUIState("EQUIPMENT"); }
 function uiMap(gameState, key, event) { uiPaneMain.pushUIState("MAP_SCREEN"); }
 function uiGameMeta(gameState, key, event) { uiPaneMain.pushUIState("GAME_META"); }

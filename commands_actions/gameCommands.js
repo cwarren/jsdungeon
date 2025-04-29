@@ -1,6 +1,7 @@
 import { gameActionsMap } from "./gameActions.js";
 import { gameMetaActionsMap } from "./gameMetaActions.js";
 import { textActionsMap } from "./textActions.js";
+import { messageHistoryActionsMap } from "./messageHistoryActions.js";
 import { inventoryActionsMap } from "./inventoryActions.js";
 import { characterSheetActionsMap } from "./characterSheetActions.js";
 import { uiActionsMap } from "./uiActions.js";
@@ -47,6 +48,7 @@ const keyBinding = {
         "=": "ZOOM_RESET",
 
         "C": "PUSH_CHARACTER_SHEET",
+        "H": "PUSH_MESSAGE_HISTORY_SCREEN",
         "I": "PUSH_INVENTORY_SCREEN",
         "i": "PUSH_INVENTORY_SCREEN",
         "E": "PUSH_EQUIPMENT_SCREEN",
@@ -90,6 +92,14 @@ const keyBinding = {
     "GAME_OVER": {
         "Escape": "POP_UI_STATE",
     },
+    "MESSAGE_HISTORY": {
+        "ArrowUp": "LINE_UP",
+        "ArrowDown": "LINE_DOWN",
+        "PageUp": "SCROLL_UP",
+        "PageDown": "SCROLL_DOWN",
+        "Escape": "POP_UI_STATE",
+        "?": "PUSH_HELP",
+    },
     "HELP": {
         "ArrowUp": "LINE_UP",
         "ArrowDown": "LINE_DOWN",
@@ -105,6 +115,7 @@ const actionMaps = {
     "GAME_META": gameMetaActionsMap,
     "CHARACTER_SHEET": characterSheetActionsMap,
     "INVENTORY": inventoryActionsMap,
+    "MESSAGE_HISTORY": messageHistoryActionsMap,
     "HELP": textActionsMap,
 };
 

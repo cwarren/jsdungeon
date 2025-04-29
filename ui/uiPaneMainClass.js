@@ -7,6 +7,7 @@ import { UIPaneMainRendererGameOver } from './uiPaneMainRendererGameOverClass.js
 import { UIPaneMainRendererGamePlay } from './uiPaneMainRendererGamePlayClass.js';
 import { UIPaneMainRendererHelp } from './uiPaneMainRendererHelpClass.js';
 import { UIPaneMainRendererInventory } from './uiPaneMainRendererInventoryClass.js';
+import { UIPaneMainRendererMessageHistory } from './uiPaneMainRendererMessageHistoryClass.js';
 import { UIPaneMainRendererMapScreen } from './uiPaneMainRendererMapScreenClass.js';
 import { UIPaneMainRendererProseSection } from './uiPaneMainRendererProseSectionClass.js';
 import { UIPaneMainStateManager } from './uiPaneMainStateManagerClass.js';
@@ -28,6 +29,7 @@ class UIPaneMain {
             "HELP": new UIPaneMainRendererHelp(this, this.canvas),
             "INVENTORY": new UIPaneMainRendererInventory(this, this.canvas),
             "MAP_SCREEN": new UIPaneMainRendererMapScreen(this, this.canvas),
+            "MESSAGE_HISTORY": new UIPaneMainRendererMessageHistory(this, this.canvas),
             "PROSE_SECTION": new UIPaneMainRendererProseSection(this, this.canvas),
         };
         this.renderers['HELP'].initializeHelpTextBlocks();
