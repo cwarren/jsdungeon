@@ -226,25 +226,30 @@ class UIPaneMainEventHandler {
         }
 
         // show list items from the current offset up to the selection keys supported
-        // TODO: could do this better using .slice and .map
-        let displayList = [];
-        for (let idx = 0; idx < LIST_SHOW_COUNT; idx++) {
-            const listIdx = idx + this.listDisplayOffset;
-            if (listIdx >= this.listForInput.length) { break; }
-            const listItemToShow = this.listForInput[listIdx];
-            let listItemText = '';
-            if (typeof listItemToShow == "string") {
-                listItemText = listItemToShow;
-            } else if (listItemToShow.name) {
-                listItemText = listItemToShow.name;
-            } else {
-                listItemText = 'UNKNOWN';
-            }
-            displayList.push({ displayText: `${LIST_SELECTION_KEYS[idx]}: ${listItemText}` });
-        }
+        const displayList = this.listForInput
+            .slice(this.listDisplayOffset, this.listDisplayOffset + LIST_SHOW_COUNT)
+            .map((listItemToShow, idx) => {
+                const listItemText = this.getDisplayTextForListItem(listItemToShow);
+                return { displayText: `${LIST_SELECTION_KEYS[idx]}: ${listItemText}` };
+            });
+
         uiPaneList.setList('', displayList);
     }
 
+    getDisplayTextForListItem(item) {
+        let listItemText = 'UNKNOWN';
+
+        if (typeof item == "string") {
+            listItemText = item;
+        } else if (item.name) {
+            listItemText = item.name;
+            if (item.stackCount && item.stackCount > 1) {
+                listItemText += ` (# ${item.stackCount})`;
+            }
+        }
+
+        return listItemText
+    }
 
     //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 

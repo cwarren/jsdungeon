@@ -1,9 +1,6 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* implement HTML display for help UI/screen
-* MAYBE use HTML for character screen
-
 * implement bulk pick up and drop, to take or give the whole stack, not just a single item from it
 * * add extractEntry to item container
 * * maybe a general rule that when specifying a list index, the capital letter means the whole entry?
@@ -11,14 +8,6 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * add / update inventory action
 
 * support for command confirmations, e.g. 'Are you sure you want to attack the town sheriff? (y/n)'
-
-* update entity movement to show items in current cell
-* * on entering a cell with items in it...
-* * * if multiple items, message that there are multiple and show the list in the list UI
-* * * on exiting a cell with items in it, clear the list UI (or maybe set the list UI to empty on entering an empty cell? will have to think a bit about efficiency and clarity there...)
-
-* implement automatic text-wrapping for text block - character screen help is a good in-game testing area for this
-* * NOTE: all that kind of stuff is already handed in HTML - should NOT have to re-create all that....
 
 * extended messages
 * * keep a longer message buffer; small number of most recent are shown in message pane, but much larger set is saved and can be separately viewed
