@@ -1,10 +1,13 @@
 import { MessageArchive } from "./messageArchiveClass.js";
+import { constrainValue } from "../util.js";
 const messagesElement = document.getElementById("messages");
 const MAX_MESSAGES_TO_SHOW = 5;
 
 class UIPaneMessages {
     constructor() {
         this.messageArchive = new MessageArchive();
+        this.displayCount = 0;
+        this.reduceDisplayCount = false;
     }
 
     static createMessageHtml(message) {
@@ -25,14 +28,13 @@ class UIPaneMessages {
 
     addMessage(message) {
         this.messageArchive.addMessage(message);
+        this.displayCount = constrainValue(this.displayCount + 1, 0, MAX_MESSAGES_TO_SHOW);
         this.displayMessages();
-        console.log("XXXXX Added message:", message);
-        console.log("XXXXX Message archive:", this.messageArchive.messages);
     }
 
     displayMessages(numToDisplay = MAX_MESSAGES_TO_SHOW) {
         this.clearMessageDisplay();
-        const messages = this.messageArchive.getRecentMessages(numToDisplay);
+        const messages = this.messageArchive.getRecentMessages(Math.min(this.displayCount, numToDisplay));
         messages.forEach(message => {
             messagesElement.appendChild(UIPaneMessages.createMessageHtml(message));
         });
@@ -51,9 +53,14 @@ class UIPaneMessages {
     }
 
     ageMessages() {
-        console.log("XXXXX Aging messages...");
         this.messageArchive.ageMessages();
         this.displayMessages();
+        if (this.messageArchive.getRecentMessages()[0].ageStatus === 'aged') {
+            if (this.reduceDisplayCount) {
+                this.displayCount = constrainValue(this.displayCount - 1, 0, MAX_MESSAGES_TO_SHOW);
+            }
+            this.reduceDisplayCount = !this.reduceDisplayCount;
+        }
     }
 }
 
