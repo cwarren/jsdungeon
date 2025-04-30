@@ -50,6 +50,16 @@ class MessageArchive {
         return true; // successfully aged the message
     }
 
+    getCssClassForAgeStatus(ageStatus) {
+        const ageStatusClasses = {
+            'newest': 'message-new',
+            'new': 'message-new',
+            'current': 'message-current',
+            'aged': 'message-aged',
+        };
+        return ageStatusClasses[ageStatus] || ''; // default to empty string for unknown status
+    }
+
     ageMessages() {
         for (let i = this.messages.length - 1; i >= 0; i--) {
             if (!this.ageMessage(this.messages[i])) {
@@ -66,7 +76,7 @@ class MessageArchive {
         if (count <= 0) {
             return []; // no messages to return
         }
-        
+
         return this.messages.slice(-count);
     }
 }

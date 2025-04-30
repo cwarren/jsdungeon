@@ -3,12 +3,24 @@ PS E:\code\jsdungeon> docker-compose up --build
 
 * extended messages
 * * add a UI mode to see longer messages
-* * * html display, as a list (similar to help screen handling)
+* * implement nav actions and commands (line and scroll up and down)
+
+* on item pick up, add message if overburdened
 
 * persist UI setting
 * * add a section for this to the persistence data
 * * persist zoom factor
 * * restore zoom factor and make sure game play is drawn at approp zoom
+
+* MAYBE add a messageCategory field to message objects
+* * categories
+* * * player-active - due to player action (e.g. entering a space with something in it)
+* * * envi-passive - due to actions of other entities / structures / envi
+* * * combat - combat messages, and damage messages in general (e.g. from a trap)
+* * * player-action - messages about player actions (picked up, dropped, ascended stairs, etc.)
+* * * misc
+* * update places messages are set to give the messages an appropriate category
+* * update message display to account for the message category
 
 * equipment
 * * slots
@@ -60,6 +72,9 @@ PS E:\code\jsdungeon> docker-compose up --build
 * * chance for a level to have a river through it (carve)
 
 * healing currently is checked when an entity takes it's turn, which could lead to some weird healing bursts for slow-acting entities. Consider moving it to a global check (anchored at world level, triggered by game time?)
+
+* MAYBE add timing info about when messages are created
+* * update message history display to include that timing info for each message
 
 * more robust vision radius
 * * add a getLightRadius to entities

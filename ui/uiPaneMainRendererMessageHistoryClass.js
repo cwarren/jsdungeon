@@ -1,11 +1,15 @@
 import { UIPaneMainRenderer } from "./uiPaneMainRendererClass.js";
 import { keyBinding, actionMaps } from "../commands_actions/gameCommands.js";
 import { uiActionsMap } from "../commands_actions/uiActions.js";
+import { uiPaneMessages } from "./ui.js";
+
+const MAX_MESSAGES_TO_SHOW = 25;
 
 class UIPaneMainRendererMessageHistory extends UIPaneMainRenderer {
     constructor(ui, canvas) {
         super(ui, canvas);
         this.messageHistoryContainer = document.getElementById("messageHistoryContainer");
+        this.listOffset = 0;
     }
 
     handleWasSurfaced() {
@@ -20,11 +24,15 @@ class UIPaneMainRendererMessageHistory extends UIPaneMainRenderer {
     //=====================
 
     draw() {
-        // this.currentHelpTextBlock = helpTextBlock;
+        this.messageHistoryContainer.innerHTML = '';
+        
+        const messageList = document.createElement("ul");
+        let messagesToShow = uiPaneMessages.messageArchive.getRecentMessages(MAX_MESSAGES_TO_SHOW + this.listOffset).slice(this.listOffset, this.listOffset + MAX_MESSAGES_TO_SHOW);
+        messagesToShow.forEach(msg => {
+            messageList.appendChild(uiPaneMessages.createMessageHtml(msg));
+        });
 
-        this.messageHistoryContainer.innerHTML = "<p>No messge history available</p>";
-
-        // this.messageHistoryContainer.innerHTML = displayTextRows.map(row => `<p>${row}</p>`).join("");
+        this.messageHistoryContainer.appendChild(messageList);
     }
 
     //=====================
@@ -35,6 +43,16 @@ class UIPaneMainRendererMessageHistory extends UIPaneMainRenderer {
     }
 
     //=====================
+
+    getListOffset() {
+        return this.listOffset;
+    }
+    scrollDown() {
+        this.listOffset = Math.min(this.listOffset + 1, MAX_MESSAGES_TO_SHOW);
+    }
+    scrollUp() {
+        this.listOffset = Math.max(this.listOffset - 1, 0);
+    }
 }
 
 export { UIPaneMainRendererMessageHistory };

@@ -10,19 +10,11 @@ class UIPaneMessages {
         this.reduceDisplayCount = false;
     }
 
-    static createMessageHtml(message) {
+    createMessageHtml(message) {
         const messageHtml = document.createElement("div");
         messageHtml.textContent = message.text;
         messageHtml.classList.add("message-entry");
-        if (message.ageStatus === 'new' || message.ageStatus === 'newest') {
-            messageHtml.classList.add("message-new");
-        }
-        if (message.ageStatus === 'current') {
-            messageHtml.classList.add("message-current");
-        }
-        if (message.ageStatus === 'aged') {
-            messageHtml.classList.add("message-aged");
-        }
+        messageHtml.classList.add(this.messageArchive.getCssClassForAgeStatus(message.ageStatus));
         return messageHtml;
     }
 
@@ -36,7 +28,7 @@ class UIPaneMessages {
         this.clearMessageDisplay();
         const messages = this.messageArchive.getRecentMessages(Math.min(this.displayCount, numToDisplay));
         messages.forEach(message => {
-            messagesElement.appendChild(UIPaneMessages.createMessageHtml(message));
+            messagesElement.appendChild(this.createMessageHtml(message));
         });
         messagesElement.scrollTop = messagesElement.scrollHeight;
     }
@@ -45,21 +37,23 @@ class UIPaneMessages {
         messagesElement.innerHTML = "";
     }
 
-    // TODO: figure out handling for setMessage
     setMessage(message) {
         this.addMessage(message);
         this.clearMessageDisplay();
-        this.displayMessages(1);
+        this.displayCount = 1;
+        this.displayMessages();
     }
 
     ageMessages() {
         this.messageArchive.ageMessages();
         this.displayMessages();
-        if (this.messageArchive.getRecentMessages()[0].ageStatus === 'aged') {
-            if (this.reduceDisplayCount) {
-                this.displayCount = constrainValue(this.displayCount - 1, 0, MAX_MESSAGES_TO_SHOW);
+        if (this.messageArchive.messages.length > 0) {
+            if (this.messageArchive.getRecentMessages()[0].ageStatus === 'aged') {
+                if (this.reduceDisplayCount) {
+                    this.displayCount = constrainValue(this.displayCount - 1, 0, MAX_MESSAGES_TO_SHOW);
+                }
+                this.reduceDisplayCount = !this.reduceDisplayCount;
             }
-            this.reduceDisplayCount = !this.reduceDisplayCount;
         }
     }
 }
