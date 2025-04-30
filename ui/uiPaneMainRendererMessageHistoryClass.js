@@ -1,15 +1,14 @@
 import { UIPaneMainRenderer } from "./uiPaneMainRendererClass.js";
-import { keyBinding, actionMaps } from "../commands_actions/gameCommands.js";
-import { uiActionsMap } from "../commands_actions/uiActions.js";
 import { uiPaneMessages } from "./ui.js";
+import { constrainValue } from "../util.js";
 
-const MAX_MESSAGES_TO_SHOW = 25;
+const MAX_MESSAGES_TO_SHOW = 24;
 
 class UIPaneMainRendererMessageHistory extends UIPaneMainRenderer {
     constructor(ui, canvas) {
         super(ui, canvas);
         this.messageHistoryContainer = document.getElementById("messageHistoryContainer");
-        this.listOffset = 0;
+        this.listOffsetFromEnd = MAX_MESSAGES_TO_SHOW;
     }
 
     handleWasSurfaced() {
@@ -25,9 +24,15 @@ class UIPaneMainRendererMessageHistory extends UIPaneMainRenderer {
 
     draw() {
         this.messageHistoryContainer.innerHTML = '';
-        
+
         const messageList = document.createElement("ul");
-        let messagesToShow = uiPaneMessages.messageArchive.getRecentMessages(MAX_MESSAGES_TO_SHOW + this.listOffset).slice(this.listOffset, this.listOffset + MAX_MESSAGES_TO_SHOW);
+        let messagesToShow = uiPaneMessages.messageArchive.getRecentMessages(this.listOffsetFromEnd)
+            .slice(0, MAX_MESSAGES_TO_SHOW);
+
+        if (messagesToShow.length === 0) {
+            this.messageHistoryContainer.innerHTML = '<p class="no-messages-note">No messages to show</p>';
+        }
+
         messagesToShow.forEach(msg => {
             messageList.appendChild(uiPaneMessages.createMessageHtml(msg));
         });
@@ -44,15 +49,28 @@ class UIPaneMainRendererMessageHistory extends UIPaneMainRenderer {
 
     //=====================
 
-    getListOffset() {
-        return this.listOffset;
+    getListOffsetFromEnd() {
+        return this.listOffsetFromEnd;
     }
-    scrollDown() {
-        this.listOffset = Math.min(this.listOffset + 1, MAX_MESSAGES_TO_SHOW);
+    getMaxOffsetFromEnd() {
+        return Math.min(uiPaneMessages.messageArchive.maxMessages, uiPaneMessages.messageArchive.messages.length);
     }
     scrollUp() {
-        this.listOffset = Math.max(this.listOffset - 1, 0);
+        this.listOffsetFromEnd = constrainValue(
+            this.listOffsetFromEnd + 1,
+            MAX_MESSAGES_TO_SHOW,
+            this.getMaxOffsetFromEnd()
+        );
     }
+
+    scrollDown() {
+        this.listOffsetFromEnd = constrainValue(
+            this.listOffsetFromEnd - 1,
+            MAX_MESSAGES_TO_SHOW,
+            this.getMaxOffsetFromEnd()
+        );
+    }
+
 }
 
 export { UIPaneMainRendererMessageHistory };
