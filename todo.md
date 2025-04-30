@@ -1,6 +1,8 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
+timing issue w/ messages - added, then aged, then display updated
+
 * extended messages
 * * keep a longer message buffer; small number of most recent are shown in message pane, but much larger set is saved and can be separately viewed
 * * * not unlimited history

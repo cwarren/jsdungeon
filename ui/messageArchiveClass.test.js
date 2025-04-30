@@ -38,6 +38,10 @@ describe('MessageArchive', () => {
         const message = { text: 'Test message', ageStatus: 'newest' };
         const archive = new MessageArchive();
 
+        const result0 = archive.ageMessage(message);
+        expect(result0).toBe(true);
+        expect(message.ageStatus).toBe('new');
+
         const result1 = archive.ageMessage(message);
         expect(result1).toBe(true);
         expect(message.ageStatus).toBe('current');
@@ -103,6 +107,17 @@ describe('MessageArchive', () => {
         test('should return an empty array if no messages are present', () => {
             const archive = new MessageArchive(5);
             expect(archive.getRecentMessages(3)).toEqual([]);
+        });
+
+        test('should return an empty array if count given is <= 0', () => {
+            const archive = new MessageArchive(5);
+            archive.addMessage(msg1.text);
+            archive.addMessage(msg2.text);
+            archive.addMessage(msg3.text);
+
+            expect(archive.getRecentMessages(0)).toEqual([]);
+
+            expect(archive.getRecentMessages(-1)).toEqual([]);
         });
 
         test('should return the most recent message by default when no count is provided', () => {

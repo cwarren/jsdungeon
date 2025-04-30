@@ -11,7 +11,7 @@ class MessageArchive {
     static makeMessageObject(messageText) {
         return {
             text: messageText,
-            ageStatus: 'newest'
+            ageStatus: 'newest',
         };
     }
 
@@ -36,22 +36,24 @@ class MessageArchive {
     }
 
     ageMessage(message) {
+        if (message.ageStatus === 'aged') {
+            return false; // already aged, so no change made
+        }
+
         if (message.ageStatus === 'newest') {
+            message.ageStatus = 'new';
+        } else if (message.ageStatus === 'new') {
             message.ageStatus = 'current';
         } else if (message.ageStatus === 'current') {
             message.ageStatus = 'aged';
-        } else if (message.ageStatus === 'aged') {
-            return false; // already aged, so no change made
         }
         return true; // successfully aged the message
     }
 
     ageMessages() {
-        for (let i = 0; i < this.messages.length; i++) {
+        for (let i = this.messages.length - 1; i >= 0; i--) {
             if (!this.ageMessage(this.messages[i])) {
-                break; // short circuit if a message is already 'aged'; 
-                // since this is a queue, we can stop aging once we hit the first one that
-                // is already 'aged'
+                break; 
             }
         }
     }
@@ -61,6 +63,10 @@ class MessageArchive {
     }
 
     getRecentMessages(count = 1) {
+        if (count <= 0) {
+            return []; // no messages to return
+        }
+        
         return this.messages.slice(-count);
     }
 }

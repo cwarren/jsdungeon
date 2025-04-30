@@ -7,28 +7,34 @@ class UIPaneMessages {
         this.messageArchive = new MessageArchive();
     }
 
+    static createMessageHtml(message) {
+        const messageHtml = document.createElement("div");
+        messageHtml.textContent = message.text;
+        messageHtml.classList.add("message-entry");
+        if (message.ageStatus === 'new' || message.ageStatus === 'newest') {
+            messageHtml.classList.add("message-new");
+        }
+        if (message.ageStatus === 'current') {
+            messageHtml.classList.add("message-current");
+        }
+        if (message.ageStatus === 'aged') {
+            messageHtml.classList.add("message-aged");
+        }
+        return messageHtml;
+    }
+
     addMessage(message) {
         this.messageArchive.addMessage(message);
         this.displayMessages();
+        console.log("XXXXX Added message:", message);
+        console.log("XXXXX Message archive:", this.messageArchive.messages);
     }
 
     displayMessages(numToDisplay = MAX_MESSAGES_TO_SHOW) {
         this.clearMessageDisplay();
         const messages = this.messageArchive.getRecentMessages(numToDisplay);
         messages.forEach(message => {
-            const newMessage = document.createElement("div");
-            newMessage.textContent = message.text;
-            newMessage.classList.add("message-entry");
-            if (message.status === 'newest') {
-                newMessage.classList.add("message-newest");
-            }
-            if (message.status === 'current') {
-                newMessage.classList.add("message-current");
-            }
-            if (message.status === 'aged') {
-                newMessage.classList.add("message-aged");
-            }
-            messagesElement.appendChild(newMessage);
+            messagesElement.appendChild(UIPaneMessages.createMessageHtml(message));
         });
         messagesElement.scrollTop = messagesElement.scrollHeight;
     }
@@ -37,6 +43,7 @@ class UIPaneMessages {
         messagesElement.innerHTML = "";
     }
 
+    // TODO: figure out handling for setMessage
     setMessage(message) {
         this.addMessage(message);
         this.clearMessageDisplay();
@@ -44,14 +51,9 @@ class UIPaneMessages {
     }
 
     ageMessages() {
-        if (messagesElement.firstChild) {
-            if (messagesElement.firstChild.classList.contains('message-aged')) {
-                messagesElement.removeChild(messagesElement.firstChild);
-                Array.from(messagesElement.children).forEach(msg => msg.classList.remove("message-new"));
-            } else {
-                Array.from(messagesElement.children).forEach(msg => msg.classList.add("message-aged"));
-            }
-        }
+        console.log("XXXXX Aging messages...");
+        this.messageArchive.ageMessages();
+        this.displayMessages();
     }
 }
 
