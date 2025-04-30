@@ -1,13 +1,7 @@
 to start server: 
 PS E:\code\jsdungeon> docker-compose up --build
 
-* extended messages
-* * add a UI mode to see longer messages
-* * implement nav actions and commands (line and scroll up and down)
-
-* on item pick up, add message if overburdened
-
-* persist UI setting
+* persist UI settings
 * * add a section for this to the persistence data
 * * persist zoom factor
 * * restore zoom factor and make sure game play is drawn at approp zoom

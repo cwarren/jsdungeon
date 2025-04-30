@@ -786,21 +786,35 @@ class Entity {
   //======================================================================
   // INVENTORY
 
+  isOverburdened() {
+    return this.carryWeightCurrent > this.carryWeightCapacity;
+  }
+
+  // this is named from the perspective of someone interacting with the entity - giveItem adds the item to this entity's inventory
   giveItem(itemObjectOrId) {
     if (! this.inventory) {
       this.inventory = new ItemIdContainer(this.gameState.itemRepo);
     }
+    const wasOverburdened = this.isOverburdened();
     this.inventory.add(itemObjectOrId);
     this.carryWeightCurrent = this.inventory.getTotalExtendedWeight();
+    if (this.isOverburdened() && !wasOverburdened) {
+      this.showMessage(`You are now overburdened!`);
+    }
   }
 
-  takeItem(itemObjectOrId) {
+  // this is named from the perspective of someone interacting with the entity - takeItem removed the item from this entity's inventory
+  takeItem(itemObjectOrId) { // may be better named takeAwayItem
     if (! this.inventory) {
       console.log(`Cannot remove item ${idOf(itemObjectOrId)} from empty or non-existent inventory of entity ${this.name}`);
       return;
     }
+    const wasOverburdened = this.isOverburdened();
     this.inventory.remove(itemObjectOrId);
     this.carryWeightCurrent = this.inventory.getTotalExtendedWeight();
+    if (wasOverburdened && !this.isOverburdened()) {
+      this.showMessage(`You are no longer overburdened!`);
+    }
   }
 
   hasItem(itemObjectOrId) {
@@ -818,9 +832,12 @@ class Entity {
     if (! this.inventory) {
       this.inventory = new ItemIdContainer(this.gameState.itemRepo);
     }
-    
+    const wasOverburdened = this.isOverburdened();
     this.inventory.takeItemFrom(itemObjectOrId, itemIdContainer);
     this.carryWeightCurrent = this.inventory.getTotalExtendedWeight();
+    if (this.isOverburdened() && !wasOverburdened) {
+      this.showMessage(`You are now overburdened!`);
+    }
   }
 
   giveItemTo(itemObjectOrId, itemIdContainer) {
@@ -832,9 +849,12 @@ class Entity {
       console.log(`Cannot give item ${idOf(itemObjectOrId)} from empty or non-existent inventory of entity ${this.name}`);
       return;
     }
-
+    const wasOverburdened = this.isOverburdened();
     this.inventory.giveItemTo(itemObjectOrId, itemIdContainer);
     this.carryWeightCurrent = this.inventory.getTotalExtendedWeight();
+    if (wasOverburdened && !this.isOverburdened()) {
+      this.showMessage(`You are no longer overburdened!`);
+    }
   }
 
   takeSingleItemFromCell(targetCell) {
@@ -842,21 +862,23 @@ class Entity {
       return;
     }
     const extractedItem = targetCell.extractFirstItem();
-    this.giveItem(extractedItem);
     this.showMessage(`You pick up the ${extractedItem.name}`);
+    this.giveItem(extractedItem);
   }
 
   takeAllItemsFromCell(targetCell) {
     if (! targetCell.inventory) {
       return;
     }
-    targetCell.extractAllItems().forEach(item => { this.giveItem(item)});
     this.showMessage(`You pick up everything there`);
+    targetCell.extractAllItems().forEach(item => { this.giveItem(item)});
+
   }
 
   dropItem(item, isBulkDrop=false) {
     // console.log(`entity ${this.name} dropping ${item.name}`);
     this.getCell().takeItemFrom(item, this.inventory);
+    const wasOverburdened = this.isOverburdened();
     let pileSuffix = '';
     if (isBulkDrop) {
       pileSuffix = this.inventory.has(item) ? ' pile' : '';
@@ -866,6 +888,9 @@ class Entity {
     }
     this.carryWeightCurrent = this.inventory.getTotalExtendedWeight();
     this.showMessage(`You drop the ${item.name}${pileSuffix}`);
+    if (wasOverburdened && !this.isOverburdened()) {
+      this.showMessage(`You are no longer overburdened!`);
+    }
   }
 
   getCarryWeightCapacity() {
